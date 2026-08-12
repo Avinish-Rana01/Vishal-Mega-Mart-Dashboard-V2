@@ -1,0 +1,204 @@
+/* LiveStockDataTable.css - Strictly matches the provided flat reference image */
+
+.ls-table-wrapper {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #374151;
+  width: 100%;
+  box-sizing: border-box;
+  /* margin: 10PX; */
+}
+
+/* Top Toolbar */
+.ls-toolbar-top {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.ls-export-btn {
+  background: linear-gradient(to right, #1F4E79, #2F6DA3, #3C7DB8);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-bottom: 12px;
+}
+
+.ls-export-btn:hover {
+  background: linear-gradient(to right, #4285c5, #2F6DA3, #224c72);
+}
+
+.ls-toolbar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.ls-entries-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 6px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  min-width: 60px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-select-trigger:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.custom-select-trigger.open {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.custom-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  overflow: hidden;
+  animation: dropdownSlideIn 0.15s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-select-option {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.custom-select-option:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.custom-select-option.selected {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.ls-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ls-search-box input {
+  padding: 6px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  width: 220px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ls-search-box input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ls-search-box input:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.ls-search-box input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Bottom Toolbar (Pagination) */
+.ls-toolbar-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.ls-pagination-info {
+  color: #374151;
+}
+
+.ls-pagination-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.ls-page-btn {
+  background: #e5e7eb;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: #374151;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.ls-page-btn:hover:not(:disabled) {
+  background: #d1d5db;
+}
+
+.ls-page-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.ls-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ls-page-ellipsis {
+  padding: 6px 4px;
+  color: #6b7280;
+}

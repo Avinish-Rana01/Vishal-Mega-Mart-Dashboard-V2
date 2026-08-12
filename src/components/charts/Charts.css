@@ -1,0 +1,156 @@
+.vmm-chart-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  height: 100%;
+  display: flex;
+}
+
+.vmm-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.vmm-chart-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.vmm-chart-graphic {
+  flex: 0 0 45%;
+  min-width: 200px;
+}
+
+.vmm-chart-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.vmm-chart-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.vmm-chart-header p {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 12px 0;
+}
+
+.vmm-mb-large {
+  margin-bottom: 16px !important;
+}
+
+.vmm-chart-legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vmm-compact-items {
+  gap: 8px;
+}
+
+.vmm-legend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.vmm-legend-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.vmm-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.vmm-legend-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vmm-legend-value {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.vmm-legend-percent {
+  color: #94a3b8;
+  font-size: 13px;
+  min-width: 45px;
+  text-align: right;
+}
+
+/* Semi Circle specific styles */
+.vmm-semi-circle-wrapper {
+  position: relative;
+}
+
+.vmm-semi-circle-center-text {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vmm-recycle-icon {
+  margin-bottom: 4px;
+}
+
+.vmm-semi-circle-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.vmm-semi-circle-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.vmm-chart-badge-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vmm-chart-badge-corner strong {
+  color: #0d9488;
+  font-size: 14px;
+}
+
+.vmm-trend-icon {
+  font-size: 16px;
+}

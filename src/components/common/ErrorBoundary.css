@@ -1,0 +1,59 @@
+.vmm-error-boundary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  padding: 20px;
+}
+
+.vmm-error-boundary-content {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.vmm-error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.vmm-error-boundary-content h2 {
+  color: #0f172a;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 24px;
+}
+
+.vmm-error-boundary-content p {
+  color: #475569;
+  margin-bottom: 24px;
+}
+
+.vmm-error-details {
+  margin-top: 32px;
+  text-align: left;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.vmm-error-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.vmm-error-details pre {
+  font-size: 12px;
+  color: #dc2626;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 12px;
+}
