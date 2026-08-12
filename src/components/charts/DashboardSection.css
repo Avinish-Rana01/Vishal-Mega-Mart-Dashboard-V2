@@ -1,0 +1,225 @@
+/* ==============================================
+   DashboardSection.css
+   Shared layout primitives for ALL visual sections
+   in the V2 Dashboard. Do NOT add section-specific
+   styles here. Keep this as design tokens only.
+   ============================================== */
+
+/* ---- Section Container ---- */
+.ds-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ---- Section Header ---- */
+.ds-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ds-header-text h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.ds-header-text p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ds-header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---- Buttons ---- */
+.ds-btn {
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ds-btn-primary {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+}
+
+.ds-btn-primary:hover {
+  background-color: #1e3a8a;
+}
+
+.ds-btn-secondary {
+  background-color: white;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.ds-btn-secondary:hover {
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+/* ---- KPI Row ---- */
+.ds-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* ---- Charts Row ---- */
+.ds-charts-row {
+  display: grid;
+  gap: 16px;
+}
+
+/* Common chart layout variants */
+.ds-charts-row--2col {
+  grid-template-columns: 2fr 1fr;
+}
+
+.ds-charts-row--3col {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.ds-charts-row--equal {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ds-charts-row--single {
+  grid-template-columns: 1fr;
+}
+
+/* ---- Card (White Box) ---- */
+.ds-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+}
+
+.ds-card-title--flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ds-card-title--flex h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* ---- Skeleton Loading ---- */
+.ds-skeleton-row {
+  display: grid;
+  gap: 16px;
+}
+
+.ds-skeleton-box {
+  border-radius: 20px;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.ds-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
+  background-size: 200% 100%;
+  animation: ds-shimmer-anim 1.5s infinite;
+}
+
+@keyframes ds-shimmer-anim {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Error State ---- */
+.ds-error {
+  padding: 20px;
+  background: #fee2e2;
+  border-radius: 12px;
+  color: #b91c1c;
+  font-size: 14px;
+  border: 1px solid #fca5a5;
+}
+
+/* ---- Empty State ---- */
+.ds-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: #94a3b8;
+  text-align: center;
+  gap: 8px;
+}
+
+.ds-empty svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.4;
+}
+
+.ds-empty p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ---- Responsive Breakpoints ---- */
+@media (max-width: 1200px) {
+  .ds-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ds-charts-row--3col {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ds-charts-row--2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .ds-kpi-row {
+    grid-template-columns: 1fr;
+  }
+  .ds-charts-row--equal,
+  .ds-charts-row--2col,
+  .ds-charts-row--3col {
+    grid-template-columns: 1fr;
+  }
+  .ds-header-text h1 {
+    font-size: 22px;
+  }
+}

@@ -48,7 +48,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper) => {
           setTotals(totalsMapper(response.summary));
         }
       } catch (err) {
-        if (err.name === 'AbortError') return;
+        if (err.name === 'AbortError' || err.name === 'CanceledError') return;
         console.error("Error fetching data:", err);
         setError("Unable to load data. Please check your connection.");
       } finally {
@@ -101,7 +101,8 @@ const cycleCountFilter = (row, term) =>
 
 const cycleCountTotals = (summary) => ({
   STORE_CODE: 'TOTAL',
-  REF_NO: summary.refNo,
+  REF_NO: summary.refNo || 0,
+  recordCount: summary.recordCount || 0
 });
 
 export const useCycleCount = () => useDashboardFetch(getCycleCount, cycleCountFilter, cycleCountTotals);
@@ -344,9 +345,9 @@ export const useWarehouseEncoding = () => {
         }
 
       } catch (err) {
-        if (err.name === 'AbortError') return;
+        if (err.name === 'AbortError' || err.name === 'CanceledError') return;
         console.error("Error fetching warehouse encoding data:", err);
-        setError("Unable to load warehouse encoding data.");
+        setError(`Unable to load warehouse encoding data: ${err.message}`);
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);

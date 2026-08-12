@@ -1,0 +1,271 @@
+/* LiveStockSection.css - Blue Theme Masonry Layout */
+
+.ls-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* background-color: #f8fafc; */
+  padding: 24px;
+  border-radius: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.ls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ls-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.ls-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ls-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.ls-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.ls-btn-primary {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+}
+
+.ls-btn-primary:hover {
+  background-color: #1e3a8a;
+}
+
+.ls-btn-secondary {
+  background-color: white;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.ls-btn-secondary:hover {
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+/* Grid Layout */
+.ls-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* Cards */
+.ls-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.ls-card-active {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.ls-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #475569;
+  margin: 0 0 12px 0;
+}
+
+.ls-card-active .ls-card-title {
+  color: #eff6ff;
+}
+
+.ls-card-value {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.ls-card-active .ls-card-value {
+  color: white;
+}
+
+.ls-card-icon {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.ls-card-active .ls-card-icon {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+}
+
+/* Subtext with badge */
+.ls-card-subtext {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.ls-card-active .ls-card-subtext {
+  color: #bfdbfe;
+}
+
+.ls-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #dcfce7;
+  color: #166534;
+  white-space: nowrap; /* Fix wrapping */
+}
+
+.ls-card-active .ls-badge {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* Section specific styling */
+.ls-span-2 {
+  grid-column: span 2;
+}
+
+.ls-span-1 {
+  grid-column: span 1;
+}
+
+.ls-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 20px 0;
+}
+
+/* List Items */
+.ls-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ls-list-item:last-child {
+  border-bottom: none;
+}
+
+.ls-item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ls-item-content {
+  flex: 1;
+  min-width: 0; /* Fix flexbox truncation */
+}
+
+.ls-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ls-item-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ls-item-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Recharts Customization */
+.recharts-bar-rectangle {
+  rx: 20; /* Fully rounded caps */
+  ry: 20;
+}
+
+@media (max-width: 1200px) {
+  .ls-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ls-grid {
+    grid-template-columns: 1fr;
+  }
+  .ls-span-2 {
+    grid-column: span 1;
+  }
+}

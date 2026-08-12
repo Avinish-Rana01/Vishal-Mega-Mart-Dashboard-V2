@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2777'], icon }) {
+export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2777'], icon, progress, progressText }) {
   // Ensure we have an array for gradient, fallback to same color if string passed
   const colors = Array.isArray(waveColor) ? waveColor : [waveColor, waveColor];
   // We need a unique ID for the SVG gradient so they don't clash on the page
@@ -49,9 +49,34 @@ export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2
   return (
     <div className="curve-card" style={{ backgroundColor: '#ffffff', borderTop: 'none' }}>
       <div className="card-top">
-        <div className="card-content">
+        <div className="card-content" style={{ flex: 1, marginRight: '16px' }}>
           <p>{title}</p>
-          <h3>{value}</h3>
+          <h3 style={{ marginBottom: progress !== undefined ? '8px' : '0' }}>{value}</h3>
+          
+          {progress !== undefined && (
+            <div style={{ width: '100%', maxWidth: '200px' }}>
+              <div style={{ 
+                height: '8px', 
+                background: '#e2e8f0', 
+                borderRadius: '4px', 
+                overflow: 'hidden',
+                marginBottom: '4px'
+              }}>
+                <div style={{ 
+                  height: '100%', 
+                  width: `${Math.min(100, Math.max(0, progress))}%`, 
+                  background: `linear-gradient(90deg, ${colors[0]}, ${colors[1]})`,
+                  borderRadius: '4px',
+                  transition: 'width 0.5s ease-out'
+                }} />
+              </div>
+              {progressText && (
+                <div style={{ fontSize: '11px', color: '#64748b', fontWeight: '500' }}>
+                  {progressText}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
         {/* Dynamic Circular Icon */}
