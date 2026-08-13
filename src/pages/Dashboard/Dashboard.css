@@ -263,7 +263,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #eceef0;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
 }
@@ -279,13 +279,22 @@
 }
 
 .vmm-tab-nav {
-  display: flex;
-  gap: 6px;
-  padding: 16px 0 0;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  flex: 1;
+  display: none;
+}
+
+/* Tab scroll buttons */
+.vmm-tab-scroll-btn {
+  display: none;
+}
+
+.vmm-grid-cell {
+  background: #eceef0;
+  border-radius: 16px;
+  /* border: 1px solid #cbd5e1; */
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  padding: 24px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .vmm-tab-nav::-webkit-scrollbar {

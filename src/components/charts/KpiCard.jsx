@@ -23,29 +23,29 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
   return (
     <div style={{
       background: 'white',
-      borderRadius: '20px',
-      padding: '24px',
-      boxShadow: '0 4px 20px -2px rgba(0,0,0,0.03)',
+      borderRadius: '10px',
+      padding: '12px',
+      boxShadow: '0 2px 8px -2px rgba(0,0,0,0.03)',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
       border: '1px solid #f1f5f9',
     }}>
-      <h3 style={{ fontSize: '14px', fontWeight: '500', color: '#475569', margin: '0 0 12px 0', paddingRight: '40px' }}>
+      <h3 style={{ fontSize: '11px', fontWeight: '600', color: '#475569', margin: '0 0 6px 0', paddingRight: '28px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
         {title}
       </h3>
 
-      <div style={{ fontSize: '36px', fontWeight: '700', color: '#0f172a', margin: '0 0 16px 0', lineHeight: 1 }}>
+      <div style={{ fontSize: '22px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1 }}>
         {value}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#64748b', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#64748b', flexWrap: 'wrap' }}>
         {badge && (
           <span style={{
             ...badgeStyles[badgeVariant],
-            padding: '2px 8px',
+            padding: '2px 4px',
             borderRadius: '4px',
-            fontSize: '11px',
+            fontSize: '10px',
             fontWeight: '600',
             whiteSpace: 'nowrap',
           }}>
@@ -58,10 +58,10 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
       {icon && (
         <div style={{
           position: 'absolute',
-          top: '20px',
-          right: '20px',
-          width: '32px',
-          height: '32px',
+          top: '12px',
+          right: '12px',
+          width: '24px',
+          height: '24px',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
@@ -69,7 +69,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
           border: '1px solid #e2e8f0',
           color: '#64748b',
         }}>
-          {icon}
+          {React.cloneElement(icon, { size: 14 })}
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { RefreshCw } from 'lucide-react';
 import './LiveStockSection.css'; // The new CSS
 
 // Minimalist Icons
@@ -8,20 +9,6 @@ const ArrowUpRight = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="7" y1="17" x2="17" y2="7"></line>
     <polyline points="7 7 17 7 17 17"></polyline>
-  </svg>
-);
-
-const PlusIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="5" x2="12" y2="19"></line>
-    <line x1="5" y1="12" x2="19" y2="12"></line>
-  </svg>
-);
-
-const RefreshIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 4 23 10 17 10"></polyline>
-    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
   </svg>
 );
 
@@ -74,17 +61,14 @@ export default function LiveStockSection() {
     <div className="ls-dashboard-container">
       
       {/* Header */}
-      <div className="ls-header">
-        <div>
+      <div className="ds-header">
+        <div className="ds-header-text">
           <h1>Live Stock</h1>
           <p>Monitor SAP vs RFID inventory differences across all stores.</p>
         </div>
-        <div className="ls-header-actions">
-          <button className="ls-btn ls-btn-primary" onClick={refresh}>
-            <RefreshIcon /> Refresh Data
-          </button>
-          <button className="ls-btn ls-btn-secondary">
-            Import Data
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#475569' }}>
+            <RefreshCw size={14} /> Refresh Data
           </button>
         </div>
       </div>
@@ -123,20 +107,8 @@ export default function LiveStockSection() {
           <div className="ls-card-icon"><ArrowUpRight /></div>
         </div>
 
-        <div className="ls-card">
-          <h3 className="ls-card-title">Overall Accuracy</h3>
-          <div className="ls-card-value">{accuracyPercent}%</div>
-          <div className="ls-card-subtext">
-            <span className="ls-badge" style={{ background: '#eff6ff', color: '#1d4ed8' }}>Live</span>
-            Current global accuracy
-          </div>
-          <div className="ls-card-icon"><ArrowUpRight /></div>
-        </div>
-
-        {/* ROW 2 */}
-        
-        {/* 1. Store Performance Bar Chart (Span 2) */}
-        <div className="ls-card ls-span-2">
+        {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
+        <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
           <h3 className="ls-section-title">Store Performance</h3>
           <div style={{ height: '240px', marginTop: '10px' }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -159,51 +131,19 @@ export default function LiveStockSection() {
           </div>
         </div>
 
-        {/* 2. Global Accuracy Semi-Circle (Span 1) */}
-        <div className="ls-card ls-span-1">
-          <h3 className="ls-section-title">Stock Progress</h3>
-          <div style={{ position: 'relative', height: '200px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <defs>
-                  <pattern id="striped-donut" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-                    <rect width="8" height="8" fill="#f8fafc" />
-                    <line x1="0" y="0" x2="0" y2="8" stroke="#e2e8f0" strokeWidth="3" />
-                  </pattern>
-                </defs>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="75%"
-                  startAngle={180}
-                  endAngle={0}
-                  innerRadius="65%"
-                  outerRadius="100%"
-                  paddingAngle={0}
-                  dataKey="value"
-                  stroke="none"
-                  cornerRadius={10} /* Rounded edges for the slices */
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <RechartsTooltip formatter={(value) => value.toLocaleString('en-IN')} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
-              </PieChart>
-            </ResponsiveContainer>
-            
-            {/* Center Text inside Donut */}
-            <div style={{ position: 'absolute', bottom: '15px', textAlign: 'center', width: '100%' }}>
-              <div style={{ fontSize: '36px', fontWeight: '800', color: '#0f172a', lineHeight: '1' }}>{accuracyPercent}%</div>
-              <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>Accuracy Rate</div>
-            </div>
+        {/* ROW 3: Accuracy KPI, Stock Progress Donut, Store Accuracy Ranking */}
+        <div className="ls-card">
+          <h3 className="ls-card-title">Overall Accuracy</h3>
+          <div className="ls-card-value">{accuracyPercent}%</div>
+          <div className="ls-card-subtext">
+            <span className="ls-badge" style={{ background: '#eff6ff', color: '#1d4ed8' }}>Live</span>
+            Current global accuracy
           </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '24px', fontSize: '12px', color: '#64748b' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: 10, height: 10, borderRadius: '50%', background: '#1d4ed8' }}></div> Scanned</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: 10, height: 10, borderRadius: '50%', background: 'url(#striped-donut)' }}></div> Missing</span>
-          </div>
+          <div className="ls-card-icon"><ArrowUpRight /></div>
         </div>
+
+        {/* 2. Global Accuracy Semi-Circle (Span 1) */}
+
 
         {/* 3. Store Accuracy Breakdown List (Span 1) */}
         <div className="ls-card ls-span-1">

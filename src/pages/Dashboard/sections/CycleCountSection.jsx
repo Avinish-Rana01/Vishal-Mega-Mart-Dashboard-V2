@@ -1,7 +1,7 @@
+// Force HMR reload
 import React, { useState, useMemo } from 'react';
-import { ClipboardList, Clock, AlertTriangle, Zap, Hourglass, Filter, Search, RefreshCw } from 'lucide-react';
+import { ClipboardList, Clock, AlertTriangle, Zap, Hourglass, Filter, RefreshCw, Search } from 'lucide-react';
 import KpiCard from '../../../components/charts/KpiCard';
-import DataTableCard from '../../../components/common/DataTableCard';
 import CycleCountModal from '../../../components/modals/CycleCountModal';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
@@ -87,7 +87,7 @@ export default function CycleCountSection() {
       </div>
 
       {/* SECTION 1 - KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '20px' }}>
         <KpiCard title="TOTAL AUDITS" value={metrics.totalAudits} subtext="Audit records" icon={<ClipboardList size={24} color="#64748b" />} />
         <KpiCard title="AVG DURATION" value={metrics.avgDurationFormatted} subtext="Across all audits" icon={<Clock size={24} color="#64748b" />} />
         <KpiCard 
@@ -105,22 +105,22 @@ export default function CycleCountSection() {
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
         
         {/* MAIN VISUALIZATION: BAR CHART */}
-        <div className="ds-card" style={{ flex: '2 1 500px', padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+        <div className="ds-card" style={{ flex: '2 1 400px', padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
           <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#0f172a' }}>Audit Duration by Store</h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#64748b' }}>Sorted by duration (minutes)</p>
-          <div style={{ width: '100%', height: 350 }}>
+          <div style={{ width: '100%', height: 220 }}>
             <ResponsiveContainer>
               <BarChart data={metrics.storeDurations} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} stroke="#f1f5f9" />
-                <XAxis type="number" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: '#475569', fontWeight: 500 }} axisLine={false} tickLine={false} width={60} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 11, fill: '#475569', fontWeight: 500 }} axisLine={false} tickLine={false} width={50} />
                 <Tooltip 
                   cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   formatter={(val, name, props) => [`${props.payload.formattedDuration} (${val}m)`, 'Duration']}
                 />
-                <ReferenceLine x={metrics.OVERTIME_THRESHOLD_MINS} stroke="#dc2626" strokeDasharray="3 3" label={{ position: 'top', value: '4h Threshold', fill: '#dc2626', fontSize: 12 }} />
-                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} barSize={24}>
+                <ReferenceLine x={metrics.OVERTIME_THRESHOLD_MINS} stroke="#dc2626" strokeDasharray="3 3" label={{ position: 'top', value: '4h Threshold', fill: '#dc2626', fontSize: 11 }} />
+                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} barSize={12}>
                   {metrics.storeDurations.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.isOvertime ? '#f59e0b' : '#3b82f6'} />
                   ))}
@@ -158,7 +158,7 @@ export default function CycleCountSection() {
           </div>
 
           {/* Exceptions Panel */}
-          <div className="ds-card" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', flex: 1 }}>
+          {/* <div className="ds-card" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', flex: 1 }}>
             <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <AlertTriangle size={18} color="#dc2626" /> Requires Attention
             </h3>
@@ -184,7 +184,7 @@ export default function CycleCountSection() {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
 
         </div>
       </div>
