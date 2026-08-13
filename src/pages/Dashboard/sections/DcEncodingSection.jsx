@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -14,7 +15,7 @@ const Icons = {
 };
 
 export default function DcEncodingSection() {
-  const { chartData, isLoading, error, fromDate, setFromDate, toDate, setToDate } = useWarehouseEncoding();
+  const { chartData, isLoading, error, fromDate, setFromDate, toDate, setToDate, refresh } = useWarehouseEncoding();
 
   // Derived Metrics
   const { totalEncoded, peakHour, avgPerHour, topHours } = useMemo(() => {
@@ -65,29 +66,24 @@ export default function DcEncodingSection() {
     <section className="ds-section">
       
       {/* Interactive Header with Date Pickers */}
-      <div className="ds-header">
-        <div className="ds-header-text">
-          <h1>Warehouse Encoding</h1>
-          <p>Hourly encoding activity at the distribution center.</p>
-        </div>
-        <div className="ds-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'white', padding: '8px 12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>From:</span>
-            <input 
-              type="date" 
-              value={fromDate} 
-              onChange={(e) => setFromDate(e.target.value)}
-              style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '4px 8px', fontSize: '13px', color: '#0f172a', outline: 'none' }}
-            />
+      <div className="ds-header" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', background: '#fff', borderRadius: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+          <div className="ds-header-text">
+            <h1 style={{ whiteSpace: 'nowrap' }}>DC Encoding Performance</h1>
+            <p>Track warehouse encoding throughput and hourly trends.</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500', whiteSpace: 'nowrap' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
+        </div>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>From:</span>
+            <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>To:</span>
-            <input 
-              type="date" 
-              value={toDate} 
-              onChange={(e) => setToDate(e.target.value)}
-              style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '4px 8px', fontSize: '13px', color: '#0f172a', outline: 'none' }}
-            />
+            <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
           </div>
         </div>
       </div>

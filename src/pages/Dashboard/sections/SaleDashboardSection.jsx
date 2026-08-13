@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RefreshCw } from 'lucide-react';
 import { useSaleDashboard } from '../../../hooks/useDashboardData';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -17,7 +18,7 @@ const Icons = {
 };
 
 export default function SaleDashboardSection() {
-  const { data, totals, isLoading, error } = useSaleDashboard();
+  const { data, totals, isLoading, error, refresh } = useSaleDashboard();
   const navigate = useNavigate();
 
   // Derived Metrics for Charts & Lists
@@ -94,10 +95,15 @@ export default function SaleDashboardSection() {
 
   return (
     <section className="ds-section">
-      <div className="ds-header">
+      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1>Sales Dashboard</h1>
-          <p>Real-time DPOS vs RFID checkout performance and mismatch tracking.</p>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Sale Operations</h1>
+          <p>Monitor RFID vs. POS sales, discrepancies, and manual overrides.</p>
+        </div>
+        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
         </div>
       </div>
 

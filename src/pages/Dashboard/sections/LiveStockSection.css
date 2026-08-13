@@ -202,6 +202,11 @@
   padding: 12px 0;
   border-bottom: 1px solid #c9c9c9;
 }
+.ls-list-item:hover {
+background-color: #eceeff;
+border-radius: 9px;
+
+}
 
 .ls-list-item:last-child {
   border-bottom: none;
@@ -269,13 +274,13 @@
   ry: 20;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .ls-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .ls-grid {
     grid-template-columns: 1fr;
   }

@@ -44,7 +44,20 @@ export default function CycleCountSection() {
   ];
 
   if (isLoading) {
-    return <div className="ds-section"><div className="ds-shimmer" style={{ height: '400px' }}></div></div>;
+    return (
+      <div className="ds-section" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr', marginBottom: '0' }}>
+          <div className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
+        </div>
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)', gap: '3px', marginBottom: '0' }}>
+          {[1,2,3,4,5].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '110px' }}><div className="ds-shimmer" /></div>)}
+        </div>
+        <div className="ds-skeleton-row" style={{ display: 'flex', gap: '4px', marginBottom: '0' }}>
+          <div className="ds-skeleton-box" style={{ flex: '2 1 400px', height: '350px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
+          <div className="ds-skeleton-box" style={{ flex: '1 1 300px', height: '350px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
+        </div>
+      </div>
+    );
   }
   if (error) {
     return <div className="ds-empty-state">Error loading cycle count data: {error}</div>;
@@ -64,7 +77,7 @@ export default function CycleCountSection() {
     <div className="ds-section" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
       
       {/* HEADER & FILTERS */}
-      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
+      <div className="ds-header" style={{ alignItems: 'center', padding: '3px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
           <h1 style={{ whiteSpace: 'nowrap' }}>Cycle Count Operations</h1>
           <p>Monitor store audit activity, duration and operational exceptions.</p>

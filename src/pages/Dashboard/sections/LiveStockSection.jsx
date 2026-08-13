@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
-import './LiveStockSection.css'; // The new CSS
+import './LiveStockSection.css';
 
 // Minimalist Icons
 const ArrowUpRight = () => (
@@ -15,6 +16,18 @@ const ArrowUpRight = () => (
 
 export default function LiveStockSection() {
   const { data, totals, isLoading, error, refresh, pageIndex, totalPages, setPageIndex } = useLiveStock();
+  const navigate = useNavigate();
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  const handleBarClick = (dataProps) => {
+    console.log("Bar clicked! Props:", dataProps);
+    // When clicking a <Bar>, Recharts passes the data payload directly or nested.
+    // E.g., dataProps might be { name: 'HD44', SAP: 1234, payload: { ... } }
+    const storeCode = dataProps?.name || dataProps?.payload?.name;
+    if (storeCode) {
+      navigate('/reports/live-stock', { state: { store: storeCode, date: todayStr } });
+    }
+  };
 
   // Extract total numbers
   const rawSap = parseInt(totals?.SAP_STOCK?.toString().replace(/,/g, '') || 0, 10);
@@ -48,8 +61,17 @@ export default function LiveStockSection() {
 
   if (isLoading) {
     return (
-      <div className="ls-dashboard-container" style={{ minHeight: '600px' }}>
-        <div className="vmm-shimmer" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
+      <div className="ls-dashboard-container" style={{ gap: '4px' }}>
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '0' }}>
+          {[1,2,3,4].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>)}
+        </div>
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr', marginBottom: '0' }}>
+          <div className="ds-skeleton-box" style={{ height: '280px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
+        </div>
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr 1fr', gap: '4px', marginBottom: '0' }}>
+          <div className="ds-skeleton-box" style={{ height: '350px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
+          <div className="ds-skeleton-box" style={{ height: '350px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
+        </div>
       </div>
     );
   }
@@ -74,7 +96,6 @@ export default function LiveStockSection() {
         </div>
       </div>
 
-      {/* Grid */}
       <div className="ls-grid">
         
         {/* ROW 1: 4 KPI Cards */}
@@ -113,7 +134,11 @@ export default function LiveStockSection() {
           <h3 className="ls-section-title">Store Performance</h3>
           <div style={{ height: '240px', marginTop: '10px' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barChartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }} barGap={2}>
+              <BarChart 
+                data={barChartData} 
+                margin={{ top: 10, right: 20, left: -10, bottom: 0 }} 
+                barGap={2}
+              >
                 <defs>
                   <pattern id="striped-bar" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                     <rect width="10" height="10" fill="#f8fafc" />
@@ -125,8 +150,8 @@ export default function LiveStockSection() {
                 <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
                 {/* SAP is striped, RFID is solid blue with full rounded caps */}
-                <Bar dataKey="SAP" fill="url(#striped-bar)" radius={15} maxBarSize={30} />
-                <Bar dataKey="RFID" fill="#1d4ed8" radius={15} maxBarSize={30} />
+                <Bar dataKey="SAP" fill="url(#striped-bar)" radius={15} maxBarSize={30} cursor="pointer" onClick={handleBarClick} />
+                <Bar dataKey="RFID" fill="#1d4ed8" radius={15} maxBarSize={30} cursor="pointer" onClick={handleBarClick} />
               </BarChart>
             </ResponsiveContainer>
           </div>

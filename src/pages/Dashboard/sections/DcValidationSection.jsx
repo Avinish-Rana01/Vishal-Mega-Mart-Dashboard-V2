@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useDcValidation } from '../../../hooks/useDashboardData';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -15,7 +16,7 @@ const Icons = {
 };
 
 export default function DcValidationSection() {
-  const { data, totals, isLoading, error } = useDcValidation();
+  const { data, totals, isLoading, error, refresh } = useDcValidation();
 
   // Derived Metrics for Charts & Lists
   const { barData, donutData, rankList } = useMemo(() => {
@@ -72,10 +73,15 @@ export default function DcValidationSection() {
 
   return (
     <section className="ds-section">
-      <div className="ds-header">
+      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1>DC Validation</h1>
-          <p>Handling Units (HU) processed and validated at the Distribution Center.</p>
+          <h1 style={{ whiteSpace: 'nowrap' }}>DC Validation</h1>
+          <p>Track store-bound handling unit validation and processing volume.</p>
+        </div>
+        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
         </div>
       </div>
 

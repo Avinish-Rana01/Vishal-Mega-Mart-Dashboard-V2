@@ -1,4 +1,5 @@
 import React from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useTagCharts } from '../../../hooks/useDashboardData';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -21,7 +22,8 @@ export default function TagManagementSection() {
     cycleData,
     cycleTotal,
     avgRecycle,
-    isLoading
+    isLoading,
+    refresh
   } = useTagCharts();
 
   if (isLoading) {
@@ -49,10 +51,15 @@ export default function TagManagementSection() {
 
   return (
     <section className="ds-section">
-      <div className="ds-header">
+      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1>Tag Management</h1>
-          <p>Monitor physical RFID tag distribution and recycling rates.</p>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Tag Management</h1>
+          <p>Monitor RFID tag locations, lifecycle, and recycling metrics.</p>
+        </div>
+        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
         </div>
       </div>
 

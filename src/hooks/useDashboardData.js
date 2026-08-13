@@ -187,9 +187,9 @@ const voidDashboardFilter = (row, term) =>
 
 const voidDashboardTotals = (summary) => ({
   STORE: 'TOTAL',
-  VOID_QTY: summary.returnQty?.toLocaleString('en-IN') || 0,
-  ENCODE_QTY: summary.returnEncodedQty?.toLocaleString('en-IN') || 0,
-  DIFFERENCE_QTY: summary.pendingQty?.toLocaleString('en-IN') || 0
+  VOID_QTY: (summary.returnQty ?? summary.VOID_QTY ?? 0).toLocaleString('en-IN'),
+  ENCODE_QTY: (summary.returnEncodedQty ?? summary.ENCODE_QTY ?? 0).toLocaleString('en-IN'),
+  DIFFERENCE_QTY: (summary.pendingQty ?? summary.DIFFERENCE_QTY ?? 0).toLocaleString('en-IN')
 });
 
 export const useVoidDashboard = () => useDashboardFetch(getVoidDashboard, voidDashboardFilter, voidDashboardTotals);
@@ -204,9 +204,9 @@ const returnDashboardFilter = (row, term) =>
 
 const returnDashboardTotals = (summary) => ({
   Store_Code: 'TOTAL',
-  RETURN_QTY: summary.returnQty?.toLocaleString('en-IN') || 0,
-  ENCODE_QTY: summary.returnEncodedQty?.toLocaleString('en-IN') || 0,
-  DIFFERENCE_QTY: summary.pendingQty?.toLocaleString('en-IN') || 0
+  RETURN_QTY: (summary.returnQty ?? summary.RETURN_QTY ?? 0).toLocaleString('en-IN'),
+  ENCODE_QTY: (summary.returnEncodedQty ?? summary.ENCODE_QTY ?? 0).toLocaleString('en-IN'),
+  DIFFERENCE_QTY: (summary.pendingQty ?? summary.DIFFERENCE_QTY ?? 0).toLocaleString('en-IN')
 });
 
 export const useReturnDashboard = () => useDashboardFetch(getReturnDashboard, returnDashboardFilter, returnDashboardTotals);
@@ -237,6 +237,7 @@ export const useTagCharts = () => {
   const [cycleTotal, setCycleTotal] = useState(0);
   const [avgRecycle, setAvgRecycle] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [trigger, setTrigger] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -286,9 +287,19 @@ export const useTagCharts = () => {
 
     fetchTagCharts();
     return () => controller.abort();
-  }, []);
+  }, [trigger]);
 
-  return { locationData, locationTotal, cycleData, cycleTotal, avgRecycle, isLoading };
+  const refresh = () => setTrigger(t => t + 1);
+
+  return {
+    locationData,
+    locationTotal,
+    cycleData,
+    cycleTotal,
+    avgRecycle,
+    isLoading,
+    refresh
+  };
 };
 
 // ==========================================
@@ -304,6 +315,7 @@ export const useWarehouseEncoding = () => {
   const today = new Date().toISOString().split('T')[0];
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
+  const [trigger, setTrigger] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -368,7 +380,9 @@ export const useWarehouseEncoding = () => {
 
     fetchData();
     return () => controller.abort();
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, trigger]);
 
-  return { data, chartData, isLoading, error, fromDate, setFromDate, toDate, setToDate };
+  const refresh = () => setTrigger(t => t + 1);
+
+  return { data, chartData, isLoading, error, fromDate, setFromDate, toDate, setToDate, refresh };
 };

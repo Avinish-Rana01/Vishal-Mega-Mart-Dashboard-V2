@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useReturnDashboard } from '../../../hooks/useDashboardData';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -15,7 +16,7 @@ const Icons = {
 };
 
 export default function ReturnDashboardSection() {
-  const { data, totals, isLoading, error } = useReturnDashboard();
+  const { data, totals, isLoading, error, refresh } = useReturnDashboard();
 
   // Derived Metrics for Charts & Lists
   const { barData, rankList, encodePercent, totalReturnRaw, encodeRaw } = useMemo(() => {
@@ -68,10 +69,15 @@ export default function ReturnDashboardSection() {
 
   return (
     <section className="ds-section">
-      <div className="ds-header">
+      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1>Return Dashboard</h1>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Return Operations</h1>
           <p>Track customer returns vs successfully encoded items.</p>
+        </div>
+        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
         </div>
       </div>
 

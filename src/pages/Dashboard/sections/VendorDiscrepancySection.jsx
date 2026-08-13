@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useVendorDiscrepancy } from '../../../hooks/useDashboardData';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -16,7 +17,7 @@ const Icons = {
 };
 
 export default function VendorDiscrepancySection() {
-  const { data, totals, isLoading, error } = useVendorDiscrepancy();
+  const { data, totals, isLoading, error, refresh } = useVendorDiscrepancy();
 
   // Derived Metrics for Charts & Lists
   const { barData, rankList, totalExpectedRaw, totalScannedRaw } = useMemo(() => {
@@ -68,10 +69,15 @@ export default function VendorDiscrepancySection() {
 
   return (
     <section className="ds-section">
-      <div className="ds-header">
+      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1>Vendor Discrepancy</h1>
-          <p>Track what vendors shipped vs what the DC actually received.</p>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Vendor Discrepancy</h1>
+          <p>Track ASNs with missing or surplus goods at receiving.</p>
+        </div>
+        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
         </div>
       </div>
 
