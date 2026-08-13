@@ -95,9 +95,9 @@ export default function DcEncodingSection() {
       {/* 1. KPI Row (3 cols) */}
       <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
         <CurvedCard
-          title="Total Tags Encoded"
+          title="Tags Encoded"
           value={totalEncoded.toLocaleString('en-IN')}
-          waveColor={['#c2410c', '#ea580c']} // Orange gradient
+          waveColor={['#3b82f6', '#ffffffff']} // Orange gradient
           icon={<Icons.Barcode />}
         />
         <KpiCard
@@ -135,22 +135,7 @@ export default function DcEncodingSection() {
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Top 5 Busiest Hours</h3>
-          </div>
-          <StoreRankList
-            items={topHours}
-            labelKey="timeBlock"
-            valueKey="count"
-            diffKey=""
-            formatValue={(val) => `${Number(val).toLocaleString('en-IN')} Tags`}
-            statusFn={(val, row, i) => i === 0 ? 'warning' : 'default'} // Highlight #1 hour
-            emptyText="No encoding activity recorded for this period."
-          />
-        </div>
-      </div>
+
 
     </section>
   );

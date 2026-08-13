@@ -4,6 +4,7 @@ import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
+import StoreRankList from '../../../components/charts/StoreRankList';
 import '../../../components/charts/DashboardSection.css';
 
 // SVG Icons
@@ -60,7 +61,7 @@ export default function TagManagementSection() {
         <CurvedCard
           title="Total Tags"
           value={locationTotal.toLocaleString('en-IN')}
-          waveColor={['#7e22ce', '#6b21a8']} // Purple gradient
+          waveColor={['#8b5cf6', '#e9cfffff']} // Purple gradient
           icon={<Icons.Tag />}
         />
         <KpiCard
@@ -108,6 +109,9 @@ export default function TagManagementSection() {
           />
         </div>
       </div>
+
+      {/* 3. Quick-List Row */}
+
 
     </section>
   );

@@ -108,7 +108,7 @@
 /* Top Header Bar */
 .vmm-top-header {
   height: 60px;
-  background: #ffffff;
+  background: #eceef0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -263,7 +263,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #ffffff;
+  background-color: #eceef0;
   display: flex;
   flex-direction: column;
 }
@@ -288,11 +288,11 @@
 }
 
 .vmm-grid-cell {
-  background: #eceef0;
+  background: white;
   border-radius: 16px;
   /* border: 1px solid #cbd5e1; */
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-  padding: 24px;
+  padding: 8px;
   min-width: 0;
   overflow: hidden;
 }
@@ -914,27 +914,59 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 
 /* Footer Line */
 .vmm-footer {
-  height: 36px;
-  background-color: #c5c5c5;
-  border-top: 1px solid #cbd5e1;
+  height: 52px;
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  font-size: 11px;
-  color: #334155;
+  padding: 0 32px;
+  font-size: 13px;
+  color: #64748b;
   font-weight: 500;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.vmm-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vmm-footer-left .copyright {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.vmm-footer-left .dot {
+  color: #cbd5e1;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.vmm-footer-left .version {
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
 }
 
 .vmm-footer-right {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 12px;
 }
 
 .vmm-vyapti-tag {
-  color: #0284c7;
-  font-weight: 700;
+  color: transparent;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 /* Modal Styling */

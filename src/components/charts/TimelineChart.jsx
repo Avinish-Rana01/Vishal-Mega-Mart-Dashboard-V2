@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useIsInViewport } from '../../hooks/useIsInViewport';
 
 /**
  * TimelineChart - A single-series bar chart for time-block / hourly data.
@@ -47,35 +48,41 @@ export default function TimelineChart({
     [dataKey]: Number(d[dataKey]) || 0,
   }));
 
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
+
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-        <XAxis
-          dataKey="name"
-          tick={{ fontSize: 10, fill: '#94a3b8' }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fontSize: 11, fill: '#94a3b8' }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <Tooltip
-          cursor={{ fill: 'rgba(241,245,249,0.7)' }}
-          contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
-          formatter={(value) => [value.toLocaleString('en-IN'), tooltipLabel]}
-        />
-        <Bar dataKey={dataKey} radius={[8, 8, 0, 0]} maxBarSize={40}>
-          {chartData.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={entry[dataKey] === maxValue && maxValue > 0 ? highlightColor : color}
+    <div ref={containerRef} style={{ width: '100%', height: height }}>
+      {hasBeenVisible && (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 10, fill: '#94a3b8' }}
+              axisLine={false}
+              tickLine={false}
             />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+            <YAxis
+              tick={{ fontSize: 11, fill: '#94a3b8' }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              cursor={{ fill: 'rgba(241,245,249,0.7)' }}
+              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+              formatter={(value) => [value.toLocaleString('en-IN'), tooltipLabel]}
+            />
+            <Bar dataKey={dataKey} radius={[8, 8, 0, 0]} maxBarSize={40}>
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry[dataKey] === maxValue && maxValue > 0 ? highlightColor : color}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
   );
 }

@@ -80,7 +80,7 @@ export default function VoidDashboardSection() {
         <CurvedCard
           title="Total Void Qty"
           value={totals?.VOID_QTY || '0'}
-          waveColor={['#475569', '#0f172a']}
+          waveColor={['#b45309', '#ffd8abff']} // Amber gradient
           icon={<Icons.Trash />}
         />
         <KpiCard
@@ -109,8 +109,8 @@ export default function VoidDashboardSection() {
           <GroupedBarChart
             data={barData}
             bars={[
-              { dataKey: 'Void', color: '#64748b', label: 'Void Qty' },
-              { dataKey: 'Encoded', color: '#8b5cf6', label: 'Encoded Qty' }
+              { dataKey: 'Void', color: '#d97706', label: 'Void Qty' },
+              { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
             ]}
             height={280}
             onBarClick={handleStoreClick}
@@ -132,26 +132,7 @@ export default function VoidDashboardSection() {
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Highest Pending Voids</h3>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Click a store for detailed report</span>
-          </div>
-          <StoreRankList
-            items={rankList}
-            labelKey="STORE_NAME"
-            sublabelKey="STORE"
-            valueKey="DIFFERENCE_QTY"
-            diffKey="VOID_QTY"
-            diffLabel="Total Voids:"
-            formatValue={(val) => `${Number(val).toLocaleString('en-IN')} Pending`}
-            statusFn={() => 'danger'}
-            emptyText="All voids have been successfully encoded."
-            onItemClick={handleStoreClick}
-          />
-        </div>
-      </div>
+
 
     </section>
   );

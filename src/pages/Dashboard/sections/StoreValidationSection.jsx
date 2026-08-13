@@ -88,7 +88,7 @@ export default function StoreValidationSection() {
         <CurvedCard
           title="Total HU Received"
           value={totals?.HU_RECEIVED_QTY || '0'}
-          waveColor={['#0369a1', '#0284c7']} // Blue gradient
+          waveColor={['#ff0000ff', '#ffaeaeff']} // Crimson gradient
           icon={<Icons.Truck />}
         />
         <KpiCard
@@ -124,8 +124,8 @@ export default function StoreValidationSection() {
           <GroupedBarChart
             data={barData}
             bars={[
-              { dataKey: 'Received', color: '#0284c7', label: 'Received HU' },
-              { dataKey: 'Validated', color: '#10b981', label: 'Validated HU' }
+              { dataKey: 'Received', color: '#e11d48', label: 'Received HU' },
+              { dataKey: 'Validated', color: '#fda4af', label: 'Validated HU' }
             ]}
             height={280}
             onBarClick={handleStoreClick}
@@ -145,7 +145,7 @@ export default function StoreValidationSection() {
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
+      <div className="ds-charts-row ds-charts-row--single ds-grow">
         <div className="ds-card">
           <div className="ds-card-title--flex">
             <h3>Highest Pending Backlogs</h3>

@@ -35,8 +35,8 @@ export default function DcValidationSection() {
     const unprocessedRaw = Number(totals.UNPROCESSED_HU || 0);
     
     const donutData = [
-      { name: 'Processed HU', value: processedRaw, color: '#10b981' },
-      { name: 'Unprocessed HU', value: unprocessedRaw, color: '#f97316' },
+      { name: 'Processed HU', value: processedRaw, color: '#06b6d4' },
+      { name: 'Unprocessed HU', value: unprocessedRaw, color: '#64748b' },
     ].filter(d => d.value > 0);
 
     // 3. Rank List (Stores with Highest Unprocessed HU)
@@ -84,7 +84,7 @@ export default function DcValidationSection() {
         <CurvedCard
           title="Processed HUs"
           value={Number(totals?.PROCESSED_HU || 0).toLocaleString('en-IN')}
-          waveColor={['#065f46', '#059669']} // Green gradient
+          waveColor={['#0891b2', '#9fe5f8ff']} // Cyan gradient
           icon={<Icons.CheckSquare />}
         />
         <KpiCard
@@ -114,8 +114,8 @@ export default function DcValidationSection() {
           <GroupedBarChart
             data={barData}
             bars={[
-              { dataKey: 'Processed', color: '#10b981', label: 'Processed HU' },
-              { dataKey: 'Unprocessed', color: '#f97316', label: 'Unprocessed HU' }
+              { dataKey: 'Processed', color: '#06b6d4', label: 'Processed HU' },
+              { dataKey: 'Unprocessed', color: '#64748b', label: 'Unprocessed HU' }
             ]}
             height={280}
             onBarClick={handleStoreClick}
@@ -135,25 +135,7 @@ export default function DcValidationSection() {
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Highest Unprocessed Backlogs</h3>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Click a store for detailed report</span>
-          </div>
-          <StoreRankList
-            items={rankList}
-            labelKey="Reciving_Plant"
-            valueKey="UNPROCESSED_HU"
-            diffKey="PROCESSED_ARTICLE_QTY"
-            diffLabel="Validated Articles:"
-            formatValue={(val) => `${Number(val).toLocaleString('en-IN')} Unprocessed HUs`}
-            statusFn={() => 'warning'}
-            emptyText="All Handling Units have been processed."
-            onItemClick={handleStoreClick}
-          />
-        </div>
-      </div>
+
 
     </section>
   );

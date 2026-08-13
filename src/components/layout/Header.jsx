@@ -35,7 +35,7 @@ export default function Header({
 
       <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div className="vmm-search-box" style={{
-          display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '6px 12px', width: '250px'
+          display: 'flex', alignItems: 'center', background: '#ffffffff', borderRadius: '20px', padding: '6px 12px', width: '250px'
         }}>
           <Search size={16} color="#94a3b8" />
           <input type="text" placeholder="Search..." style={{

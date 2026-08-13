@@ -31,3 +31,13 @@ html, body, #root {
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Hide scrollbar globally but allow scrolling */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

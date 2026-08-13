@@ -1,5 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { useIsInViewport } from '../../hooks/useIsInViewport';
 
 /**
  * SemiDonutChart - A semi-circle (180°) progress gauge chart.
@@ -27,49 +28,55 @@ export default function SemiDonutChart({
     { name: 'Remaining', value: remaining },
   ];
 
-  return (
-    <div style={{ position: 'relative', height: '190px' }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={pieData}
-            cx="50%"
-            cy="75%"
-            startAngle={180}
-            endAngle={0}
-            innerRadius="65%"
-            outerRadius="100%"
-            paddingAngle={0}
-            dataKey="value"
-            stroke="none"
-            cornerRadius={8}
-          >
-            <Cell fill={primaryColor} />
-            <Cell fill={emptyColor} />
-          </Pie>
-          <Tooltip
-            formatter={(val, name) => [`${Number(val).toFixed(1)}%`, name]}
-            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
-      {/* Center text overlay */}
-      <div style={{
-        position: 'absolute',
-        bottom: '8px',
-        left: 0,
-        right: 0,
-        textAlign: 'center',
-        pointerEvents: 'none',
-      }}>
-        <div style={{ fontSize: '30px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
-          {percent.toFixed(0)}%
-        </div>
-        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-          {centerLabel}
-        </div>
-      </div>
+  return (
+    <div ref={containerRef} style={{ position: 'relative', height: '190px', width: '100%' }}>
+      {hasBeenVisible && (
+        <>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="75%"
+                startAngle={180}
+                endAngle={0}
+                innerRadius="65%"
+                outerRadius="100%"
+                paddingAngle={0}
+                dataKey="value"
+                stroke="none"
+                cornerRadius={8}
+              >
+                <Cell fill={primaryColor} />
+                <Cell fill={emptyColor} />
+              </Pie>
+              <Tooltip
+                formatter={(val, name) => [`${Number(val).toFixed(1)}%`, name]}
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+
+          {/* Center text overlay */}
+          <div style={{
+            position: 'absolute',
+            bottom: '8px',
+            left: 0,
+            right: 0,
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}>
+            <div style={{ fontSize: '30px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
+              {percent.toFixed(0)}%
+            </div>
+            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+              {centerLabel}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -106,7 +106,7 @@ export default function SaleDashboardSection() {
         <CurvedCard
           title="Total DPOS Sale"
           value={totals?.TOTAL_DPOS_SALE || '0'}
-          waveColor={['#1e3a8a', '#1d4ed8']}
+          waveColor={['#047857', '#b2ffe7ff']} // Emerald gradient
           icon={<Icons.Cart />}
         />
         <KpiCard
@@ -143,8 +143,8 @@ export default function SaleDashboardSection() {
           <GroupedBarChart
             data={barData}
             bars={[
-              { dataKey: 'DPOS', color: '#1d4ed8', label: 'DPOS Sale' },
-              { dataKey: 'RFID', color: '#10b981', label: 'RFID Checkout' }
+              { dataKey: 'DPOS', color: '#059669', label: 'DPOS Sale' },
+              { dataKey: 'RFID', color: '#34d399', label: 'RFID Checkout' }
             ]}
             height={280}
             onBarClick={handleStoreClick}
@@ -164,7 +164,7 @@ export default function SaleDashboardSection() {
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
+      <div className="ds-charts-row ds-charts-row--single ds-grow">
         <div className="ds-card">
           <div className="ds-card-title--flex">
             <h3>Highest Mismatch Rates</h3>

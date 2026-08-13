@@ -12,27 +12,27 @@ const getHeaders = () => ({
 // Dashboard APIs
 // ==============================================================
 
-export const getLiveStock = async (searchQuery = '', signal) => {
+export const getLiveStock = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/live-details?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/live-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
   return response.data;
 };
 
-export const getCycleCount = async (searchQuery = '', signal) => {
+export const getCycleCount = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-dashboard?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&sortColumn=STORE%20CODE&sortDirection=ASC&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=STORE%20CODE&sortDirection=ASC&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
   return response.data;
 };
 
-export const getVendorDiscrepancy = async (searchQuery = '', signal) => {
+export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&sortColumn=DIFF_TILL_DATE&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=DIFF_TILL_DATE&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
@@ -55,41 +55,73 @@ export const getTagCycleCount = async (signal) => {
   return response.data;
 };
 
-export const getStoreDashboard = async (searchQuery = '', signal) => {
+export const getStoreDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/store-dashboard?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/store-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
   return response.data;
 };
 
-export const getSaleDashboard = async (searchQuery = '', signal) => {
+export const getSaleDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/sale-dashboard?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/sale-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
+  // Mock Data for Demo
+  if (response.data) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    response.data.summary = { 
+      TOTAL_DPOS_SALE: "154200", TOTAL_RFID_CHECKOUT: "151000", RFID_CHECKOUT_MATCHING_WITH_DPOS_SALE: "150000", RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE: "1000", TOTAL_MANUAL_SALE: "3200", TOTAL_VOID: "450"
+    };
+    response.data.items = [
+      { STORE: 'S101', STORE_NAME: 'VMM Delhi', DATE: todayStr, TOTAL_DPOS_SALE: "45000", TOTAL_RFID_CHECKOUT: "44000", RFID_CHECKOUT_MATCHING_WITH_DPOS_SALE: "43500", RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE: "500", TOTAL_MANUAL_SALE: "1000", TOTAL_VOID: "120" },
+      { STORE: 'S102', STORE_NAME: 'VMM Mumbai', DATE: todayStr, TOTAL_DPOS_SALE: "65000", TOTAL_RFID_CHECKOUT: "64000", RFID_CHECKOUT_MATCHING_WITH_DPOS_SALE: "63800", RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE: "200", TOTAL_MANUAL_SALE: "1000", TOTAL_VOID: "200" },
+      { STORE: 'S103', STORE_NAME: 'VMM Bangalore', DATE: todayStr, TOTAL_DPOS_SALE: "44200", TOTAL_RFID_CHECKOUT: "43000", RFID_CHECKOUT_MATCHING_WITH_DPOS_SALE: "42700", RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE: "300", TOTAL_MANUAL_SALE: "1200", TOTAL_VOID: "130" }
+    ];
+  }
 
   return response.data;
 };
 
-export const getVoidDashboard = async (searchQuery = '', signal) => {
+export const getVoidDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/void-dashboard?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/void-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
+  // Mock Data for Demo
+  if (response.data) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    response.data.summary = { VOID_QTY: "12450", ENCODE_QTY: "12100", DIFFERENCE_QTY: "350" };
+    response.data.items = [
+      { STORE: 'S101', STORE_NAME: 'VMM Delhi', DATE: todayStr, VOID_QTY: "4000", ENCODE_QTY: "3900", DIFFERENCE_QTY: "100" },
+      { STORE: 'S102', STORE_NAME: 'VMM Mumbai', DATE: todayStr, VOID_QTY: "5000", ENCODE_QTY: "4900", DIFFERENCE_QTY: "100" },
+      { STORE: 'S103', STORE_NAME: 'VMM Bangalore', DATE: todayStr, VOID_QTY: "3450", ENCODE_QTY: "3300", DIFFERENCE_QTY: "150" }
+    ];
+  }
 
   return response.data;
 };
 
-export const getReturnDashboard = async (searchQuery = '', signal) => {
+export const getReturnDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${API_DEFAULTS.PAGE_INDEX}&pageSize=${API_DEFAULTS.PAGE_SIZE}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
+  // Mock Data for Demo
+  if (response.data) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    response.data.summary = { RETURN_QTY: "8400", ENCODE_QTY: "8200", DIFFERENCE_QTY: "200" };
+    response.data.items = [
+      { Store_Code: 'S101', STORE_NAME: 'VMM Delhi', DATE: todayStr, RETURN_QTY: "3000", ENCODE_QTY: "2950", DIFFERENCE_QTY: "50" },
+      { Store_Code: 'S102', STORE_NAME: 'VMM Mumbai', DATE: todayStr, RETURN_QTY: "4000", ENCODE_QTY: "3900", DIFFERENCE_QTY: "100" },
+      { Store_Code: 'S103', STORE_NAME: 'VMM Bangalore', DATE: todayStr, RETURN_QTY: "1400", ENCODE_QTY: "1350", DIFFERENCE_QTY: "50" }
+    ];
+  }
 
   return response.data;
 };
@@ -102,15 +134,33 @@ export const getWarehouseEncoding = async (fromDate, toDate, signal) => {
     headers: getHeaders(),
     signal
   });
+  // Mock Data for Demo
+  if (response.data) {
+    response.data.summary = { 
+      hour8To9: 1200, hour9To10: 2500, hour10To11: 4100, hour11To12: 5800, 
+      hour12To13: 4900, hour13To14: 3200, hour14To15: 3800, hour15To16: 6200, 
+      hour16To17: 5500, hour17To18: 3100, hour18To19: 1500, hour19To20: 800 
+    };
+  }
 
   return response.data;
 };
 
-export const getDcValidation = async (pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, userId = API_DEFAULTS.USER_ID, signal) => {
-  const response = await axios.get(`${API_BASE}/api/stock/dc-validate-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&userId=${userId}`, {
+export const getDcValidation = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+  const term = encodeURIComponent(searchQuery || '');
+  const response = await axios.get(`${API_BASE}/api/stock/dc-validate-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${API_DEFAULTS.USER_ID}`, {
     headers: getHeaders(),
     signal
   });
+  // Mock Data for Demo
+  if (response.data) {
+    response.data.summary = { recordCount: 150, PROCESSED_HU: "142", UNPROCESSED_HU: "8", PROCESSED_ARTICLE_QTY: "24500" };
+    response.data.items = [
+      { STORE_NAME: 'VMM Delhi', Reciving_Plant: 'DC North', PROCESSED_HU: "45", UNPROCESSED_HU: "2", PROCESSED_ARTICLE_QTY: "8000" },
+      { STORE_NAME: 'VMM Mumbai', Reciving_Plant: 'DC West', PROCESSED_HU: "60", UNPROCESSED_HU: "3", PROCESSED_ARTICLE_QTY: "10000" },
+      { STORE_NAME: 'VMM Bangalore', Reciving_Plant: 'DC South', PROCESSED_HU: "37", UNPROCESSED_HU: "3", PROCESSED_ARTICLE_QTY: "6500" }
+    ];
+  }
 
   return response.data;
 };

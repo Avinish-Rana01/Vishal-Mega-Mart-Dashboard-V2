@@ -61,15 +61,15 @@ export default function CycleCountSection() {
   });
 
   return (
-    <div className="ds-section" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="ds-section" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
       
       {/* HEADER & FILTERS */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-        <div>
-          <h2 style={{ margin: '0 0 4px 0', fontSize: '20px', color: '#0f172a' }}>Cycle Count Operations</h2>
-          <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>Monitor store audit activity, duration and operational exceptions.</p>
+      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
+        <div className="ds-header-text">
+          <h1 style={{ whiteSpace: 'nowrap' }}>Cycle Count Operations</h1>
+          <p>Monitor store audit activity, duration and operational exceptions.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
           <div style={{ position: 'relative' }}>
             <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '10px' }} />
             <input 
@@ -77,17 +77,17 @@ export default function CycleCountSection() {
               placeholder="Filter by Store..." 
               value={storeFilter}
               onChange={e => setStoreFilter(e.target.value)}
-              style={{ padding: '8px 12px 8px 32px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }}
+              style={{ padding: '8px 12px 8px 32px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none', minWidth: '200px' }}
             />
           </div>
-          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#475569' }}>
+          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
             <RefreshCw size={14} /> Refresh
           </button>
         </div>
       </div>
 
       {/* SECTION 1 - KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '3px' }}>
         <KpiCard title="TOTAL AUDITS" value={metrics.totalAudits} subtext="Audit records" icon={<ClipboardList size={24} color="#64748b" />} />
         <KpiCard title="AVG DURATION" value={metrics.avgDurationFormatted} subtext="Across all audits" icon={<Clock size={24} color="#64748b" />} />
         <KpiCard 
@@ -102,13 +102,13 @@ export default function CycleCountSection() {
       </div>
 
       {/* SECTION 2 & 3 - CHARTS & EXCEPTIONS */}
-      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, minHeight: 0 }}>
         
         {/* MAIN VISUALIZATION: BAR CHART */}
-        <div className="ds-card" style={{ flex: '2 1 400px', padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+        <div className="ds-card" style={{ flex: '2 1 400px', padding: '24px', background: '#eceef0', borderRadius: '12px', border: '1px solid #e2e8f0', minHeight: 0 }}>
           <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#0f172a' }}>Audit Duration by Store</h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#64748b' }}>Sorted by duration (minutes)</p>
-          <div style={{ width: '100%', height: 220 }}>
+          <div style={{ width: '100%', flex: 1, minHeight: 220 }}>
             <ResponsiveContainer>
               <BarChart data={metrics.storeDurations} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} stroke="#f1f5f9" />
@@ -120,9 +120,9 @@ export default function CycleCountSection() {
                   formatter={(val, name, props) => [`${props.payload.formattedDuration} (${val}m)`, 'Duration']}
                 />
                 <ReferenceLine x={metrics.OVERTIME_THRESHOLD_MINS} stroke="#dc2626" strokeDasharray="3 3" label={{ position: 'top', value: '4h Threshold', fill: '#dc2626', fontSize: 11 }} />
-                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} barSize={12}>
+                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={32}>
                   {metrics.storeDurations.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.isOvertime ? '#f59e0b' : '#3b82f6'} />
+                    <Cell key={`cell-${index}`} fill={entry.isOvertime ? '#ec4899' : '#4f46e5'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -134,7 +134,7 @@ export default function CycleCountSection() {
         <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Operational Health */}
-          <div className="ds-card" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <div className="ds-card" style={{ padding: '24px', background: '#eceef0', borderRadius: '12px', border: '1px solid #e2e8f0', flex: 1 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#0f172a' }}>Operational Health</h3>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>

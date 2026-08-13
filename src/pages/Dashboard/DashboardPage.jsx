@@ -28,7 +28,7 @@ export default function DashboardPage() {
           <div className="vmm-dashboard-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(600px, 1fr))',
-            gap: '32px',
+            gap: '10px',
             alignItems: 'stretch'
           }}>
             <div className="vmm-grid-cell">
@@ -55,10 +55,10 @@ export default function DashboardPage() {
             <div className="vmm-grid-cell">
               <DcEncodingSection />
             </div>
-            <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
               <TagManagementSection />
             </div>
-            <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
               <VendorDiscrepancySection />
             </div>
           </div>

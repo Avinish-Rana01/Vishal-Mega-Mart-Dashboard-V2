@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RefreshCw } from 'lucide-react';
+import ChartPaginator from '../../../components/common/ChartPaginator';
 import './LiveStockSection.css'; // The new CSS
 
 // Minimalist Icons
@@ -13,7 +14,7 @@ const ArrowUpRight = () => (
 );
 
 export default function LiveStockSection() {
-  const { data, totals, isLoading, error, refresh } = useLiveStock();
+  const { data, totals, isLoading, error, refresh, pageIndex, totalPages, setPageIndex } = useLiveStock();
 
   // Extract total numbers
   const rawSap = parseInt(totals?.SAP_STOCK?.toString().replace(/,/g, '') || 0, 10);
@@ -24,7 +25,7 @@ export default function LiveStockSection() {
   // Process data for the Bar Chart
   const barChartData = useMemo(() => {
     if (!data || data.length === 0) return [];
-    return data.slice(0, 7).map(row => ({
+    return data.map(row => ({
       name: row.STORE_CODE,
       SAP: Number(row.SAP_STOCK) || 0,
       RFID: Number(row.RFID_STOCK) || 0,
@@ -112,7 +113,7 @@ export default function LiveStockSection() {
           <h3 className="ls-section-title">Store Performance</h3>
           <div style={{ height: '240px', marginTop: '10px' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barChartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
+              <BarChart data={barChartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }} barGap={2}>
                 <defs>
                   <pattern id="striped-bar" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                     <rect width="10" height="10" fill="#f8fafc" />
@@ -129,24 +130,26 @@ export default function LiveStockSection() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+          <ChartPaginator 
+            currentPage={pageIndex} 
+            totalPages={totalPages} 
+            onPageChange={setPageIndex} 
+          />
         </div>
 
-        {/* ROW 3: Accuracy KPI, Stock Progress Donut, Store Accuracy Ranking */}
-        <div className="ls-card">
-          <h3 className="ls-card-title">Overall Accuracy</h3>
-          <div className="ls-card-value">{accuracyPercent}%</div>
-          <div className="ls-card-subtext">
-            <span className="ls-badge" style={{ background: '#eff6ff', color: '#1d4ed8' }}>Live</span>
-            Current global accuracy
+        {/* ROW 3: Accuracy KPI + Store Accuracy Ranking (full width) */}
+        <div className="ls-row-bottom">
+          <div className="ls-card">
+            <h3 className="ls-card-title">Overall Accuracy</h3>
+            <div className="ls-card-value">{accuracyPercent}%</div>
+            <div className="ls-card-subtext">
+              <span className="ls-badge" style={{ background: '#eff6ff', color: '#1d4ed8' }}>Live</span>
+              Current global accuracy
+            </div>
+            <div className="ls-card-icon"><ArrowUpRight /></div>
           </div>
-          <div className="ls-card-icon"><ArrowUpRight /></div>
-        </div>
 
-        {/* 2. Global Accuracy Semi-Circle (Span 1) */}
-
-
-        {/* 3. Store Accuracy Breakdown List (Span 1) */}
-        <div className="ls-card ls-span-1">
+          <div className="ls-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 className="ls-section-title" style={{ margin: 0 }}>Store Accuracy Ranking</h3>
           </div>
@@ -179,6 +182,7 @@ export default function LiveStockSection() {
                 No store data available.
               </div>
             )}
+          </div>
           </div>
         </div>
 

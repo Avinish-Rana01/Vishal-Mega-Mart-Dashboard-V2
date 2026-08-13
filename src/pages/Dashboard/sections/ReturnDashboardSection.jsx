@@ -80,7 +80,7 @@ export default function ReturnDashboardSection() {
         <CurvedCard
           title="Total Return Qty"
           value={totals?.RETURN_QTY || '0'}
-          waveColor={['#0ea5e9', '#0369a1']} // Different color for Returns
+          waveColor={['#a21caf', '#f6afffff']} // Fuchsia gradient
           icon={<Icons.CornerUpLeft />}
         />
         <KpiCard
@@ -109,8 +109,8 @@ export default function ReturnDashboardSection() {
           <GroupedBarChart
             data={barData}
             bars={[
-              { dataKey: 'Return', color: '#0ea5e9', label: 'Return Qty' },
-              { dataKey: 'Encoded', color: '#8b5cf6', label: 'Encoded Qty' }
+              { dataKey: 'Return', color: '#c026d3', label: 'Return Qty' },
+              { dataKey: 'Encoded', color: '#f0abfc', label: 'Encoded Qty' }
             ]}
             height={280}
             onBarClick={handleStoreClick}
@@ -125,33 +125,14 @@ export default function ReturnDashboardSection() {
               value={encodeRaw}
               maxValue={totalReturnRaw}
               centerLabel="Encoded"
-              primaryColor="#0ea5e9"
+              primaryColor="#c026d3"
             />
           </div>
         </div>
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Highest Pending Returns</h3>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Click a store for detailed report</span>
-          </div>
-          <StoreRankList
-            items={rankList}
-            labelKey="STORE_NAME"
-            sublabelKey="Store_Code"
-            valueKey="DIFFERENCE_QTY"
-            diffKey="RETURN_QTY"
-            diffLabel="Total Returns:"
-            formatValue={(val) => `${Number(val).toLocaleString('en-IN')} Pending`}
-            statusFn={() => 'danger'}
-            emptyText="All returns have been successfully encoded."
-            onItemClick={handleStoreClick}
-          />
-        </div>
-      </div>
+
 
     </section>
   );

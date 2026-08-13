@@ -18,13 +18,18 @@ import { API_DEFAULTS } from '../config/constants';
  * Generic hook for dashboard table endpoints.
  * Handles state management, debouncing, and API fetching with AbortController.
  */
-const useDashboardFetch = (apiFn, filterFn, totalsMapper) => {
+const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_DEFAULTS.PAGE_SIZE) => {
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  // Pagination State
+  const [pageIndex, setPageIndex] = useState(1);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -33,7 +38,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper) => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await apiFn(searchQuery, controller.signal);
+        const response = await apiFn(searchQuery, pageIndex, pageSize, controller.signal);
         
         if (controller.signal.aborted) return;
 
@@ -44,8 +49,13 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper) => {
         }
         setData(items);
 
-        if (response.summary && totalsMapper) {
-          setTotals(totalsMapper(response.summary));
+        if (response.summary) {
+          if (totalsMapper) {
+            setTotals(totalsMapper(response.summary));
+          }
+          if (response.summary.totalRecords !== undefined) {
+            setTotalPages(Math.max(1, Math.ceil(response.summary.totalRecords / pageSize)));
+          }
         }
       } catch (err) {
         if (err.name === 'AbortError' || err.name === 'CanceledError') return;
@@ -66,11 +76,15 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper) => {
       clearTimeout(delayDebounceFn);
       controller.abort();
     };
-  }, [searchQuery, refreshTrigger, apiFn, filterFn, totalsMapper]);
+  }, [searchQuery, pageIndex, pageSize, refreshTrigger, apiFn, filterFn, totalsMapper]);
 
   const refresh = useCallback(() => setRefreshTrigger(prev => prev + 1), []);
 
-  return { data, totals, isLoading, error, searchQuery, setSearchQuery, refresh };
+  return { 
+    data, totals, isLoading, error, 
+    searchQuery, setSearchQuery, refresh,
+    pageIndex, setPageIndex, pageSize, setPageSize, totalPages 
+  };
 };
 
 // ==========================================
@@ -88,7 +102,7 @@ const liveStockTotals = (summary) => ({
   DIFFERENCE: summary.diffQty?.toLocaleString('en-IN') || 0
 });
 
-export const useLiveStock = () => useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals);
+export const useLiveStock = () => useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals, 5);
 
 // ==========================================
 // 2. Cycle Count
@@ -211,10 +225,7 @@ const dcValidationTotals = (summary) => ({
   PROCESSED_ARTICLE_QTY: summary.articleQty || 0
 });
 
-export const useDcValidation = () => {
-  const apiCall = useCallback((_sq, signal) => getDcValidation(API_DEFAULTS.PAGE_INDEX, API_DEFAULTS.PAGE_SIZE, API_DEFAULTS.USER_ID, signal), []);
-  return useDashboardFetch(apiCall, dcValidationFilter, dcValidationTotals);
-};
+export const useDcValidation = () => useDashboardFetch(getDcValidation, dcValidationFilter, dcValidationTotals);
 
 // ==========================================
 // 9. Tag Management Charts (NOT REFACTORED)

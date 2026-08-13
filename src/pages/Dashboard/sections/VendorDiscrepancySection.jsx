@@ -78,9 +78,9 @@ export default function VendorDiscrepancySection() {
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
         <CurvedCard
-          title="Total Expected Qty"
+          title="Total Qty"
           value={totals?.ACTUAL_QTY || '0'}
-          waveColor={['#0f766e', '#0d9488']} // Teal gradient
+          waveColor={['#0f766e', '#77d2cbff']} // Teal gradient
           icon={<Icons.Truck />}
         />
         <KpiCard
@@ -139,26 +139,7 @@ export default function VendorDiscrepancySection() {
       </div>
 
       {/* 3. Quick-List Row */}
-      <div className="ds-charts-row ds-charts-row--single">
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Highest Vendor Discrepancies</h3>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Click a vendor for detailed report</span>
-          </div>
-          <StoreRankList
-            items={rankList}
-            labelKey="VENDOR_NAME"
-            sublabelKey="VENDOR_CODE"
-            valueKey="DIFF_QTY"
-            diffKey="DIFF_TILL_DATE"
-            diffLabel="Historical Discrepancy:"
-            formatValue={(val) => `${Number(val).toLocaleString('en-IN')} Missing`}
-            statusFn={() => 'danger'}
-            emptyText="All vendor shipments perfectly match expected quantities."
-            onItemClick={handleVendorClick}
-          />
-        </div>
-      </div>
+
 
     </section>
   );

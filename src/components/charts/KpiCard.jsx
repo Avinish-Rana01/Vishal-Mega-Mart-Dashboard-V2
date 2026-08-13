@@ -22,7 +22,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
 
   return (
     <div style={{
-      background: 'white',
+      background: '#eceef0',
       borderRadius: '10px',
       padding: '12px',
       boxShadow: '0 2px 8px -2px rgba(0,0,0,0.03)',

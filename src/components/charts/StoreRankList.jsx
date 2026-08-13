@@ -46,7 +46,7 @@ export default function StoreRankList({
   }
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       {displayItems.map((row, i) => {
         const label = row[labelKey] || '—';
         const sublabel = sublabelKey ? row[sublabelKey] : null;
@@ -64,6 +64,7 @@ export default function StoreRankList({
               alignItems: 'center',
               gap: '12px',
               padding: '12px 10px',
+              flex: 1,
               borderBottom: i < displayItems.length - 1 ? '1px solid #f1f5f9' : 'none',
               cursor: onItemClick ? 'pointer' : 'default',
               borderRadius: '8px',
