@@ -28,14 +28,14 @@ export const storeRenderer = (val, row) => {
 
 // Columns for the Live Stock Table Headers based on API response
 export const liveStockColumns = [
-  { key: 'STORE_CODE', label: 'STORE', render: storeRenderer },
-  { key: 'SAP_STOCK', label: 'SAP STOCK QTY', render: numRenderer },
-  { key: 'RFID_STOCK', label: 'RFID STOCK QTY', render: numRenderer },
-  { key: 'DIFFERENCE', label: 'DIFFERENCE QTY', render: numRenderer },
-  { key: 'DATE', label: 'SYNC DATE', render: dateRenderer },
+  { key: 'STORE_CODE', label: 'Store', render: storeRenderer },
+  { key: 'SAP_STOCK', label: 'SAP Stock Qty', render: numRenderer },
+  { key: 'RFID_STOCK', label: 'RFID Stock Qty', render: numRenderer },
+  { key: 'DIFFERENCE', label: 'Difference Qty', render: numRenderer },
+  { key: 'DATE', label: 'Sync Date', render: dateRenderer },
   {
     key: 'PERCENTAGE',
-    label: 'COVERAGE(%)',
+    label: 'Coverage(%)',
     render: (val) => {
       const percent = parseFloat(val) || 0;
       const opacity = Math.max(0.15, percent / 100);
@@ -84,9 +84,9 @@ export const cycleCountStoreRenderer = (val, row) => {
 };
 
 export const getCycleCountColumns = (onRefClick) => [
-  { key: 'STORE_CODE', label: 'STORE', render: cycleCountStoreRenderer },
-  { key: 'CYCLE_COUNT_TYPE', label: 'TYPE' },
-  { key: 'REF_NO', label: 'REF NO', render: (val, row) => (
+  { key: 'STORE_CODE', label: 'Store', render: cycleCountStoreRenderer },
+  { key: 'CYCLE_COUNT_TYPE', label: 'Cycle Count Type' },
+  { key: 'REF_NO', label: 'Reference No', render: (val, row) => (
       <span 
         className="vmm-link-num text-blue" 
         style={{ cursor: 'pointer', textDecoration: 'underline' }} 
@@ -99,10 +99,10 @@ export const getCycleCountColumns = (onRefClick) => [
       </span>
     ) 
   },
-  { key: 'DATE', label: 'DATE', render: dateRenderer },
-  { key: 'Start_DateTime', label: 'START TIME', render: dateRenderer },
-  { key: 'END_DateTime', label: 'END TIME', render: dateRenderer },
-  { key: 'Time_Taken', label: 'TIME TAKEN' }
+  { key: 'DATE', label: 'Date', render: dateRenderer },
+  { key: 'Start_DateTime', label: 'Started On', render: dateRenderer },
+  { key: 'END_DateTime', label: 'Ended On', render: dateRenderer },
+  { key: 'Time_Taken', label: 'Time Taken' }
 ];
 
 // Columns for Vendor Discrepancy
@@ -112,57 +112,57 @@ export const vendorDiscrepancyColumns = [
   { key: 'ACTUAL_QTY', label: 'Expected Qty', render: numRenderer },
   { key: 'SCANNED_QTY', label: 'Actual Qty', render: numRenderer },
   { key: 'DIFF_QTY', label: 'Diff Qty', render: numRenderer },
-  { key: 'DIFF_TILL_DATE', label: 'Diff Qty (From 27-06-2026)', render: numRenderer }
+  { key: 'DIFF_TILL_DATE', label: 'Diff Qty (From 27-06-2026)', render: numRenderer },
+  { key: 'TOTAL_QTY', label: 'Total Qty (From 27-06-2026)', render: numRenderer },
+  { key: 'DISCREPANCY', label: 'Discrepancy(%)', render: numRenderer }
 ];
 
 // Columns for Store Validation Dashboard
 export const storeDashboardColumns = [
-  { key: 'STORE', label: 'STORE', render: storeRenderer },
-  { key: 'DATE', label: 'DATE', render: dateRenderer },
-  { key: 'HU_RECEIVED_QTY', label: 'HU RECEIVED', render: numRenderer },
-  { key: 'HU_VALIDATED_QTY', label: 'HU VALIDATED', render: numRenderer },
-  { key: 'HHT_VALIDATE_QTY', label: 'HHT VALIDATE', render: numRenderer },
-  { key: 'STORE_PENDING_QTY', label: 'PENDING', render: numRenderer },
-  { key: 'HU_WRONG_QTY', label: 'WRONG QTY', render: numRenderer }
+  { key: 'STORE', label: 'Store', render: storeRenderer },
+  { key: 'DATE', label: 'Last GRC Date', render: dateRenderer },
+  { key: 'HU_RECEIVED_QTY', label: 'HU Received Qty', render: numRenderer },
+  { key: 'HU_VALIDATED_QTY', label: 'WH Validated Qty', render: numRenderer },
+  { key: 'HHT_VALIDATE_QTY', label: 'Store Validated Qty', render: numRenderer },
+  { key: 'STORE_PENDING_QTY', label: 'Store Pending for Validation (Qty)', render: numRenderer },
+  { key: 'HU_WRONG_QTY', label: 'Wrong HU Qty', render: numRenderer }
 ];
 
 // Columns for Sale Dashboard
 export const saleDashboardColumns = [
-  { key: 'STORE', label: 'STORE', render: storeRenderer },
-  { key: 'DATE', label: 'DATE', render: dateRenderer },
-  { key: 'TOTAL_DPOS_SALE', label: 'DPOS SALE', render: numRenderer },
-  { key: 'TOTAL_RFID_CHECKOUT', label: 'RFID CHECKOUT', render: numRenderer },
-  { key: 'RFID_CHECKOUT_MATCHING_WITH_DPOS_SALE', label: 'MATCHING', render: numRendererGreen },
-  { key: 'RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE', label: 'NOT MATCHING', render: numRendererRed },
-  { key: 'TOTAL_MANUAL_SALE', label: 'MANUAL SALE', render: numRenderer },
-  { key: 'TOTAL_VOID', label: 'VOID', render: numRenderer }
+  { key: 'STORE', label: 'Store', render: storeRenderer },
+  { key: 'DATE', label: 'Date', render: dateRenderer },
+  { key: 'TOTAL_DPOS_SALE', label: 'Total Sale Qty', render: numRenderer },
+  { key: 'TOTAL_RFID_CHECKOUT', label: 'Total RFID Checkout Qty', render: numRenderer },
+  { key: 'RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE', label: 'Total Taffeta Sale Qty', render: numRendererRed },
+  { key: 'TOTAL_MANUAL_SALE', label: 'Total Manual Sale Qty', render: numRenderer }
 ];
 
 // Columns for Void Dashboard
 export const voidDashboardColumns = [
-  { key: 'STORE', label: 'STORE', render: storeRenderer },
-  { key: 'VOID_QTY', label: 'VOID QTY', render: numRenderer },
-  { key: 'ENCODE_QTY', label: 'ENCODE QTY', render: numRenderer },
-  { key: 'DIFFERENCE_QTY', label: 'DIFFERENCE', render: numRendererRed }
+  { key: 'STORE', label: 'Store', render: storeRenderer },
+  { key: 'VOID_QTY', label: 'Void Qty', render: numRenderer },
+  { key: 'ENCODE_QTY', label: 'Encoded VS Void (Qty)', render: numRenderer },
+  { key: 'DIFFERENCE_QTY', label: 'Pending Qty', render: numRendererRed }
 ];
 
 // Columns for Return Dashboard
 export const returnDashboardColumns = [
-  { key: 'Store_Code', label: 'STORE', render: storeRenderer },
-  { key: 'RETURN_QTY', label: 'RETURN QTY', render: numRenderer },
-  { key: 'ENCODE_QTY', label: 'ENCODE QTY', render: numRenderer },
-  { key: 'DIFFERENCE_QTY', label: 'DIFFERENCE', render: numRendererRed }
+  { key: 'Store_Code', label: 'Store', render: storeRenderer },
+  { key: 'RETURN_QTY', label: 'Return Qty', render: numRenderer },
+  { key: 'ENCODE_QTY', label: 'Encoded VS Return (Qty)', render: numRenderer },
+  { key: 'DIFFERENCE_QTY', label: 'Pending Qty', render: numRendererRed }
 ];
 
 // Columns for Warehouse Encoding Dashboard
 export const warehouseEncodingColumns = [
-  { key: 'timeBlock', label: 'TIME' },
-  { key: 'count', label: 'ENCODING COUNT', render: numRenderer }
+  { key: 'timeBlock', label: 'Time' },
+  { key: 'count', label: 'Encoding Count', render: numRenderer }
 ];
 
 export const dcValidationColumns = [
-  { key: 'Reciving_Plant', label: 'STORE', minWidth: '150px' },
-  { key: 'PROCESSED_HU', label: 'PROCESSED HU QTY', type: 'number', render: numRenderer },
-  { key: 'UNPROCESSED_HU', label: 'UNPROCESSED HU QTY', type: 'number', render: numRenderer },
-  { key: 'PROCESSED_ARTICLE_QTY', label: 'VALIDATED HU ARTICLE QTY', type: 'number', render: numRenderer }
+  { key: 'Reciving_Plant', label: 'Store', minWidth: '150px' },
+  { key: 'PROCESSED_HU', label: 'Processed HU Qty', type: 'number', render: numRenderer },
+  { key: 'UNPROCESSED_HU', label: 'Unprocessed HU Qty', type: 'number', render: numRenderer },
+  { key: 'PROCESSED_ARTICLE_QTY', label: 'Validated HU Article Qty', type: 'number', render: numRenderer }
 ];

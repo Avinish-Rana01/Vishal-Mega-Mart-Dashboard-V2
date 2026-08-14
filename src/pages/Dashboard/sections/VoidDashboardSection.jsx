@@ -71,7 +71,7 @@ export default function VoidDashboardSection() {
     <section className="ds-section">
       <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1 style={{ whiteSpace: 'nowrap' }}>Void Operations</h1>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Void</h1>
           <p>Track voided transactions vs successfully encoded items.</p>
         </div>
         <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>

@@ -79,8 +79,8 @@ export default function StoreValidationSection() {
     <section className="ds-section">
       <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1 style={{ whiteSpace: 'nowrap' }}>Store Operations Validation</h1>
-          <p>Track store-level physical receiving and Handling Unit (HU) validation.</p>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Store Validation</h1>
+          <p>Monitor HU validation pipeline, store GRC processing, and pending discrepancies.</p>
         </div>
         <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
           <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>

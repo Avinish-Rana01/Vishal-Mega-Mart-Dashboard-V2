@@ -69,7 +69,7 @@ export default function DcEncodingSection() {
       <div className="ds-header" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', background: '#fff', borderRadius: '12px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
           <div className="ds-header-text">
-            <h1 style={{ whiteSpace: 'nowrap' }}>DC Encoding Performance</h1>
+            <h1 style={{ whiteSpace: 'nowrap' }}>DC Encoding</h1>
             <p>Track warehouse encoding throughput and hourly trends.</p>
           </div>
           <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500', whiteSpace: 'nowrap' }}>

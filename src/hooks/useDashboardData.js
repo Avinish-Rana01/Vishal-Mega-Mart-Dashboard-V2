@@ -285,8 +285,14 @@ export const useTagCharts = () => {
       }
     };
 
-    fetchTagCharts();
-    return () => controller.abort();
+    const delayDebounceFn = setTimeout(() => {
+      fetchTagCharts();
+    }, 300);
+
+    return () => {
+      clearTimeout(delayDebounceFn);
+      controller.abort();
+    };
   }, [trigger]);
 
   const refresh = () => setTrigger(t => t + 1);
@@ -378,8 +384,14 @@ export const useWarehouseEncoding = () => {
       }
     };
 
-    fetchData();
-    return () => controller.abort();
+    const delayDebounceFn = setTimeout(() => {
+      fetchData();
+    }, 300);
+
+    return () => {
+      clearTimeout(delayDebounceFn);
+      controller.abort();
+    };
   }, [fromDate, toDate, trigger]);
 
   const refresh = () => setTrigger(t => t + 1);

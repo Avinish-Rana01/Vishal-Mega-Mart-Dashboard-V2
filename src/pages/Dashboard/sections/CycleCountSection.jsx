@@ -79,7 +79,7 @@ export default function CycleCountSection() {
       {/* HEADER & FILTERS */}
       <div className="ds-header" style={{ alignItems: 'center', padding: '3px', background: '#fff', flexWrap: 'nowrap' }}>
         <div className="ds-header-text">
-          <h1 style={{ whiteSpace: 'nowrap' }}>Cycle Count Operations</h1>
+          <h1 style={{ whiteSpace: 'nowrap' }}>Cycle Count</h1>
           <p>Monitor store audit activity, duration and operational exceptions.</p>
         </div>
         <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
