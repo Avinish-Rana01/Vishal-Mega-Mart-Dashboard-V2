@@ -5,6 +5,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
 import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
 import KpiCard from '../../../components/charts/KpiCard';
+import { generateMockData } from '../../../utils/mockLiveStock';
+import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
 import './LiveStockSection.css';
 
 // Minimalist Icons
@@ -15,119 +17,35 @@ const ArrowUpRight = () => (
   </svg>
 );
 
-// --- MOCK DATA GENERATOR ---
-const generateMockData = () => {
-  const stores = [];
-  let totalSap = 0;
-  let totalRfid = 0;
-
-  for (let i = 1; i <= 125; i++) {
-    const storeCode = `ST${i.toString().padStart(3, '0')}`;
-    const sapStock = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
-    
-    // Distribute accuracy: 46% >=95, 26% 90-95, 17% 80-90, 11% <80
-    const rand = Math.random();
-    let accuracy;
-    if (rand < 0.46) accuracy = 0.95 + Math.random() * 0.05; // 95-100%
-    else if (rand < 0.72) accuracy = 0.90 + Math.random() * 0.05; // 90-95%
-    else if (rand < 0.89) accuracy = 0.80 + Math.random() * 0.10; // 80-90%
-    else accuracy = 0.60 + Math.random() * 0.20; // 60-80%
-
-    const rfidStock = Math.floor(sapStock * accuracy);
-    const diff = sapStock - rfidStock;
-    const percentage = ((rfidStock / sapStock) * 100).toFixed(2);
-
-    totalSap += sapStock;
-    totalRfid += rfidStock;
-
-    stores.push({
-      STORE_CODE: storeCode,
-      STORE_NAME: `${storeCode} - Mock Store ${i}`,
-      SAP_STOCK: sapStock,
-      RFID_STOCK: rfidStock,
-      DIFFERENCE: diff,
-      PERCENTAGE: percentage
-    });
-  }
-
-  const mockTotals = {
-    SAP_STOCK: totalSap.toLocaleString('en-IN'),
-    RFID_STOCK: totalRfid.toLocaleString('en-IN'),
-    DIFFERENCE: (totalSap - totalRfid).toLocaleString('en-IN')
-  };
-
-  return { mockStores: stores, mockTotals };
-};
-
 const { mockStores, mockTotals } = generateMockData();
 // ---------------------------
 
-// Custom tooltip for the aggregate pie chart (Moved outside render to prevent recreation)
-const AccuracyTooltip = React.memo(({ active, payload }) => {
-  if (!active || !payload || !payload.length) return null;
-  const item = payload[0];
-  const name = item.name || item.payload?.name;
-  const value = item.value;
-  const fill = item.payload?.fill || item.fill || '#0f172a';
-
-  return (
-    <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 8px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', minWidth: '140px' }}>
-      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '6px' }}>{name}</div>
-      <div style={{ fontSize: '13px', color: '#475569' }}>
-        Stores: <span style={{ fontWeight: 700, color: fill, marginLeft: '6px' }}>{value}</span>
-      </div>
-    </div>
-  );
-});
-
-// Custom tooltip for the store performance bar chart
-const StoreBarTooltip = React.memo(({ active, payload, label }) => {
-  if (!active || !payload || !payload.length) return null;
-  const data = payload[0].payload;
-  return (
-    <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', minWidth: '180px' }}>
-      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-        {data.fullName || label}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-          <span style={{ color: '#64748b' }}>Accuracy:</span>
-          <span style={{ fontWeight: 700, color: data.PERCENTAGE >= 95 ? '#16a34a' : data.PERCENTAGE >= 80 ? '#d97706' : '#dc2626' }}>
-            {Number(data.PERCENTAGE).toFixed(2)}%
-          </span>
-        </div>
-        {payload.map((entry, index) => (
-          <div key={index} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-            <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: entry.fill === 'url(#striped-bar)' ? '#ff5c5c' : '#406bde' }}></div>
-              {entry.name}:
-            </span>
-            <span style={{ fontWeight: 600, color: '#0f172a' }}>{entry.value.toLocaleString()}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-});
-
 export default function LiveStockSection() {
+  // === STATE MANAGEMENT ===
+  // Global Data & Context
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
-  
-  // USE MOCK DATA OVERRIDE
-  const data = mockStores;
+  const data = mockStores; // USE MOCK DATA OVERRIDE
   const totals = mockTotals;
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // Filters State
-  const [searchStore, setSearchStore] = React.useState('');
-  const [filterField, setFilterField] = React.useState('ALL');
-  const [filterOp, setFilterOp] = React.useState('<');
-  const [filterVal, setFilterVal] = React.useState('');
-  const [appliedFilter, setAppliedFilter] = React.useState({ field: 'ALL', op: '<', val: '' });
-  const [filterError, setFilterError] = React.useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  // Filtering & Search State
+  const [searchStore, setSearchStore] = React.useState(''); // Text input for searching by store code/name
+  const [filterField, setFilterField] = React.useState('ALL'); // Which metric to filter by
+  const [filterOp, setFilterOp] = React.useState('<'); // Mathematical operator for filtering (<, >, =)
+  const [filterVal, setFilterVal] = React.useState(''); // The numerical threshold for the filter
+  const [appliedFilter, setAppliedFilter] = React.useState({ field: 'ALL', op: '<', val: '' }); // The active filter currently applied to the dataset
+  const [filterError, setFilterError] = React.useState(''); // Validation error messages for filter input
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false); // Controls the filter operator dropdown visibility
 
+  // Sorting State
+  const [sortBy, setSortBy] = React.useState('CODE_ASC'); // Active sorting metric (e.g., Variance, Accuracy)
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = React.useState(false); // Controls the sort dropdown visibility
+
+  /**
+   * Validates and applies the user's custom filter criteria.
+   * Ensures the input is a valid number and within the 0-100 range for accuracy.
+   */
   const handleApplyFilter = React.useCallback(() => {
     const value = String(filterVal).trim();
     if (value === '') {
@@ -147,10 +65,18 @@ export default function LiveStockSection() {
     setAppliedFilter({ field: 'Accuracy', op: filterOp, val: numValue });
   }, [filterVal, filterOp]);
 
+  /**
+   * Computes the final dataset to be displayed in the charts.
+   * This is a multi-step data pipeline:
+   * 1. Search: Filters out stores that don't match the search text.
+   * 2. Filter: Applies the mathematical comparison (e.g., Accuracy < 80).
+   * 3. Sort: Orders the remaining data based on the selected metric.
+   */
   const filteredData = React.useMemo(() => {
     if (!data) return [];
     let result = data;
 
+    // Step 1: Text Search
     if (searchStore.trim()) {
       const term = searchStore.toLowerCase();
       result = result.filter(row => 
@@ -181,9 +107,25 @@ export default function LiveStockSection() {
       });
     }
 
-    return result;
-  }, [data, searchStore, appliedFilter]);
+    // Step 3: Apply Sorting
+    if (sortBy === 'DIFF_DESC') {
+      result = [...result].sort((a, b) => Number(b.DIFFERENCE) - Number(a.DIFFERENCE));
+    } else if (sortBy === 'ACC_ASC') {
+      result = [...result].sort((a, b) => Number(a.PERCENTAGE) - Number(b.PERCENTAGE));
+    } else if (sortBy === 'SAP_DESC') {
+      result = [...result].sort((a, b) => Number(b.SAP_STOCK) - Number(a.SAP_STOCK));
+    } else {
+      // Default: Alphabetical by Store Code
+      result = [...result].sort((a, b) => a.STORE_CODE.localeCompare(b.STORE_CODE));
+    }
 
+    return result;
+  }, [data, searchStore, appliedFilter, sortBy]);
+
+  /**
+   * Transforms the filtered data into the exact schema required by the Recharts BarChart.
+   * Calculates the exact Difference integer for the stacked bar visual.
+   */
   const barChartData = React.useMemo(() => {
     return filteredData.map(row => {
       const percentage = Number(row.PERCENTAGE) || 0;
@@ -201,7 +143,10 @@ export default function LiveStockSection() {
     });
   }, [filteredData]);
 
-  // Global Store Coverage Distribution Pie Chart Data
+  /**
+   * Aggregates store performance into 4 distinct health buckets for the Coverage Distribution Donut Chart.
+   * Calculates the total count of stores falling into: Excellent (>=95%), Good (90-95%), Average (80-90%), Poor (<80%).
+   */
   const accuracyPieData = useMemo(() => {
     if (!data || data.length === 0) return [];
     
@@ -229,6 +174,10 @@ export default function LiveStockSection() {
 
   const totalPieStores = accuracyPieData.reduce((sum, item) => sum + item.value, 0);
 
+  /**
+   * Navigates the user to a detailed report view for a specific store
+   * when a bar in the chart is clicked.
+   */
   const handleBarClick = React.useCallback((dataProps) => {
     const storeCode = dataProps?.name || dataProps?.payload?.name;
     if (storeCode) {
@@ -236,7 +185,10 @@ export default function LiveStockSection() {
     }
   }, [navigate, todayStr]);
 
-  // Extract total numbers
+  /**
+   * Parses the raw string totals (which contain commas) into pure integers
+   * so they can be accurately displayed and calculated in the top KPI cards.
+   */
   const { rawSap, rawRfid, rawDiff, accuracyPercent } = React.useMemo(() => {
     const sap = parseInt(totals?.SAP_STOCK?.toString().replace(/,/g, '') || 0, 10);
     const rfid = parseInt(totals?.RFID_STOCK?.toString().replace(/,/g, '') || 0, 10);
@@ -287,10 +239,11 @@ export default function LiveStockSection() {
           <h1>Live Stock</h1>
           <p>Monitor SAP vs RFID inventory differences across all stores.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#475569' }}>
-            <RefreshCw size={14} /> Refresh Data
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: '#f8fafc', color: '#475569', padding: '8px 16px', borderRadius: '20px', border: '1px solid #e2e8f0', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            {new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+          </div>
         </div>
       </div>
 
@@ -336,10 +289,10 @@ export default function LiveStockSection() {
 
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
-          <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
+          <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', gap: '3px' }}>
             <h3 className="ls-section-title" style={{ margin: 0 }}>Store Performance</h3>
             
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '3px', alignItems: 'center', flexWrap: 'wrap' }}>
               {/* Dynamic Filter Controls */}
               <div className="ls-filter-container">
                 <div className="ls-filter-label">
@@ -414,7 +367,7 @@ export default function LiveStockSection() {
               </div>
 
               {/* Search */}
-              <div className="ls-search-container">
+              <div className="ls-search-container" style={{ position: 'relative' }}>
                 <span className="ls-search-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8"/>
@@ -426,7 +379,16 @@ export default function LiveStockSection() {
                   placeholder="Search Store..."
                   value={searchStore}
                   onChange={e => setSearchStore(e.target.value)}
+                  style={{ paddingRight: searchStore ? '32px' : '16px' }}
                 />
+                {searchStore && (
+                  <button 
+                    onClick={() => setSearchStore('')}
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -440,24 +402,67 @@ export default function LiveStockSection() {
           )}
 
           {/* Sticky Legend & Active Filter Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', paddingBottom: '12px' }}>
-            {/* Active Filter Chip */}
-            <div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
-              {appliedFilter.field !== 'ALL' && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0e7ff', color: '#4338ca', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
-                  Accuracy {appliedFilter.op} {appliedFilter.val}%
-                  <button 
-                    onClick={() => {
-                      setFilterVal('');
-                      setAppliedFilter({ field: 'ALL', op: '<', val: '' });
-                      setFilterError('');
-                    }} 
-                    style={{ background: 'transparent', border: 'none', color: '#4338ca', cursor: 'pointer', padding: '0 2px', fontSize: '16px', lineHeight: 1 }}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px',  position: 'relative', zIndex: 9 }}>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {/* Sort By Controls */}
+              <div 
+                style={{ position: 'relative' }}
+                tabIndex={0}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setIsSortDropdownOpen(false);
+                  }
+                }}
+              >
+                <button 
+                  className="ls-filter-select"
+                  style={{ minWidth: '160px', paddingRight: '24px', justifyContent: 'space-between' }}
+                  onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                >
+                  <span style={{ color: '#94a3b8', marginRight: '6px' }}>Sort:</span> 
+                  {sortBy === 'CODE_ASC' ? 'Store Code (A-Z)' : 
+                   sortBy === 'DIFF_DESC' ? 'Highest Variance' : 
+                   sortBy === 'ACC_ASC' ? 'Lowest Accuracy' : 
+                   'Highest Volume'}
+                </button>
+
+                {isSortDropdownOpen && (
+                  <div className="ls-dropdown-menu" style={{ left: 0, right: 'auto', minWidth: '180px' }}>
+                    <div className={`ls-dropdown-item ${sortBy === 'CODE_ASC' ? 'active' : ''}`} onClick={() => { setSortBy('CODE_ASC'); setIsSortDropdownOpen(false); }}>
+                      Store Code (A-Z)
+                    </div>
+                    <div className={`ls-dropdown-item ${sortBy === 'DIFF_DESC' ? 'active' : ''}`} onClick={() => { setSortBy('DIFF_DESC'); setIsSortDropdownOpen(false); }}>
+                      Highest Variance
+                    </div>
+                    <div className={`ls-dropdown-item ${sortBy === 'ACC_ASC' ? 'active' : ''}`} onClick={() => { setSortBy('ACC_ASC'); setIsSortDropdownOpen(false); }}>
+                      Lowest Accuracy
+                    </div>
+                    <div className={`ls-dropdown-item ${sortBy === 'SAP_DESC' ? 'active' : ''}`} onClick={() => { setSortBy('SAP_DESC'); setIsSortDropdownOpen(false); }}>
+                      Highest Volume
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Active Filter Chip */}
+              <div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
+                {appliedFilter.field !== 'ALL' && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0e7ff', color: '#4338ca', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
+                    Accuracy {appliedFilter.op} {appliedFilter.val}%
+                    <button 
+                      onClick={() => {
+                        setFilterVal('');
+                        setAppliedFilter({ field: 'ALL', op: '<', val: '' });
+                        setFilterError('');
+                      }} 
+                      style={{ background: 'transparent', border: 'none', color: '#4338ca', cursor: 'pointer', padding: '0 2px', fontSize: '16px', lineHeight: 1 }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Custom Chart Legend */}
@@ -475,34 +480,51 @@ export default function LiveStockSection() {
             </div>
           </div>
 
-          <div style={{ height: '350px', overflowY: 'auto', paddingRight: '10px' }}>
-            <div style={{ height: `${Math.max(barChartData.length * 28, 240)}px` }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  layout="vertical"
-                  data={barChartData} 
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
+          <div style={{ height: '350px' }}>
+            {barChartData.length === 0 ? (
+              <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
+                  <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                No stores match your search or filter criteria.
+                <button 
+                  onClick={() => { setSearchStore(''); setAppliedFilter({ field: 'ALL', op: '<', val: '' }); }}
+                  style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                  <YAxis 
-                    type="category" 
-                    dataKey="name" 
-                    width={60} 
-                    tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
-                    axisLine={false} 
-                    tickLine={false} 
-                  />
-                  <RechartsTooltip 
-                    cursor={{ fill: '#f1f5f9' }} 
-                    content={<StoreBarTooltip />}
-                  />
-                  
-                  {/* Stacked bars: RFID on left, Difference on right */}
-                  <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={handleBarClick} />
-                  <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={handleBarClick} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
+                <div style={{ height: `${Math.max(barChartData.length * 28, 240)}px` }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart 
+                      layout="vertical"
+                      data={barChartData} 
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
+                    >
+                      <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                      <YAxis 
+                        type="category" 
+                        dataKey="name" 
+                        width={60} 
+                        tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
+                        axisLine={false} 
+                        tickLine={false} 
+                      />
+                      <RechartsTooltip 
+                        cursor={{ fill: '#f1f5f9' }} 
+                        content={<StoreBarTooltip />}
+                      />
+                      
+                      {/* Stacked bars: RFID on left, Difference on right */}
+                      <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={handleBarClick} />
+                      <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={handleBarClick} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -555,14 +577,14 @@ export default function LiveStockSection() {
                   const percentage = ((entry.value / totalPieStores) * 100).toFixed(2);
                   return (
                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569' }}>
                           <div style={{ width: '10px', height: '10px', backgroundColor: entry.fill, borderRadius: '50%' }} />
                           <span>{entry.name}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <span style={{ fontWeight: '700', color: '#0f172a' }}>{entry.value}</span>
-                          <span style={{ color: '#94a3b8', fontSize: '13px', minWidth: '45px', textAlign: 'right' }}>{percentage}%</span>
+                          <span style={{ color: '#94a3b8', fontSize: '14px', minWidth: '45px', textAlign: 'right' }}>{percentage}%</span>
                         </div>
                       </div>
                       

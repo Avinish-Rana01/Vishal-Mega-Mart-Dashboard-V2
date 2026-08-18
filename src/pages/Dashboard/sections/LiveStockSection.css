@@ -336,7 +336,7 @@
 }
 
 .ls-search-input {
-  width: 180px;
+  width: 150px;
   padding: 8px 16px 8px 36px;
   background: transparent;
   border: none;
@@ -435,7 +435,7 @@
 }
 
 .ls-filter-input:focus {
-  width: 90px;
+  /* width: 90px; */
   background: #fff;
   border-color: rgba(59, 130, 246, 0.4);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);

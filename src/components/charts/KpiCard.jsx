@@ -19,8 +19,8 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
     default: { background: '#dcfce7', color: '#166534' },
     success: { background: '#dcfce7', color: '#15803d' },
     warning: { background: '#fef3c7', color: '#b45309' },
-    danger:  { background: '#fee2e2', color: '#b91c1c' },
-    info:    { background: '#eff6ff', color: '#1d4ed8' },
+    danger: { background: '#fee2e2', color: '#b91c1c' },
+    info: { background: '#eff6ff', color: '#1d4ed8' },
   };
 
   const [randomBg] = React.useState(() => randomColor());
@@ -29,18 +29,18 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
     <div style={{
       background: randomBg,
       borderRadius: '10px',
-      padding: '12px',
+      padding: '10px',
       boxShadow: '0 2px 8px -2px rgba(0,0,0,0.03)',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
       border: '1px solid #f1f5f9',
     }}>
-      <h3 style={{ fontSize: '11px', fontWeight: '600', color: '#475569', margin: '0 0 6px 0', paddingRight: '28px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+      <h3 style={{ fontSize: '11px', fontWeight: '600', color: '#475569', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
         {title}
       </h3>
 
-      <div style={{ fontSize: '22px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1 }}>
+      <div style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1 }}>
         {value}
       </div>
 
@@ -59,7 +59,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
         )}
         {subtext && <span>{subtext}</span>}
       </div> */}
-
+      {/* 
       {icon && (
         <div style={{
           position: 'absolute',
@@ -76,7 +76,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
         }}>
           {React.cloneElement(icon, { size: 14 })}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
