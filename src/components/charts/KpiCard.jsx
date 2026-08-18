@@ -11,6 +11,9 @@ import React from 'react';
  * @param {'default'|'success'|'warning'|'danger'|'info'} badgeVariant - Controls badge color
  * @param {React.ReactNode} icon - Optional icon in the top-right corner
  */
+// Generate a very light pastel color using HSL (Hue, Saturation, Lightness)
+const randomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 85%, 92%)`;
+
 export default function KpiCard({ title, value, subtext, badge, badgeVariant = 'default', icon }) {
   const badgeStyles = {
     default: { background: '#dcfce7', color: '#166534' },
@@ -20,9 +23,11 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
     info:    { background: '#eff6ff', color: '#1d4ed8' },
   };
 
+  const [randomBg] = React.useState(() => randomColor());
+
   return (
     <div style={{
-      background: '#eceef0',
+      background: randomBg,
       borderRadius: '10px',
       padding: '12px',
       boxShadow: '0 2px 8px -2px rgba(0,0,0,0.03)',
@@ -39,7 +44,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
         {value}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#64748b', flexWrap: 'wrap' }}>
+      {/* <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#64748b', flexWrap: 'wrap' }}>
         {badge && (
           <span style={{
             ...badgeStyles[badgeVariant],
@@ -53,7 +58,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
           </span>
         )}
         {subtext && <span>{subtext}</span>}
-      </div>
+      </div> */}
 
       {icon && (
         <div style={{

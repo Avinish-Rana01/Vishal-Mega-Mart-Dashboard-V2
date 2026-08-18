@@ -4,6 +4,7 @@ import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,LabelList } from 'recharts';
 import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
+import KpiCard from '../../../components/charts/KpiCard';
 import './LiveStockSection.css';
 
 // Minimalist Icons
@@ -61,6 +62,54 @@ const generateMockData = () => {
 const { mockStores, mockTotals } = generateMockData();
 // ---------------------------
 
+// Custom tooltip for the aggregate pie chart (Moved outside render to prevent recreation)
+const AccuracyTooltip = React.memo(({ active, payload }) => {
+  if (!active || !payload || !payload.length) return null;
+  const item = payload[0];
+  const name = item.name || item.payload?.name;
+  const value = item.value;
+  const fill = item.payload?.fill || item.fill || '#0f172a';
+
+  return (
+    <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 8px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', minWidth: '140px' }}>
+      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '6px' }}>{name}</div>
+      <div style={{ fontSize: '13px', color: '#475569' }}>
+        Stores: <span style={{ fontWeight: 700, color: fill, marginLeft: '6px' }}>{value}</span>
+      </div>
+    </div>
+  );
+});
+
+// Custom tooltip for the store performance bar chart
+const StoreBarTooltip = React.memo(({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+  const data = payload[0].payload;
+  return (
+    <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', minWidth: '180px' }}>
+      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+        {data.fullName || label}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+          <span style={{ color: '#64748b' }}>Accuracy:</span>
+          <span style={{ fontWeight: 700, color: data.PERCENTAGE >= 95 ? '#16a34a' : data.PERCENTAGE >= 80 ? '#d97706' : '#dc2626' }}>
+            {Number(data.PERCENTAGE).toFixed(2)}%
+          </span>
+        </div>
+        {payload.map((entry, index) => (
+          <div key={index} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: entry.fill === 'url(#striped-bar)' ? '#ff5c5c' : '#406bde' }}></div>
+              {entry.name}:
+            </span>
+            <span style={{ fontWeight: 600, color: '#0f172a' }}>{entry.value.toLocaleString()}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
 export default function LiveStockSection() {
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
   
@@ -71,8 +120,32 @@ export default function LiveStockSection() {
   const todayStr = new Date().toISOString().split('T')[0];
 
   // Filters State
-  const [filterAcc, setFilterAcc] = React.useState('ALL');
   const [searchStore, setSearchStore] = React.useState('');
+  const [filterField, setFilterField] = React.useState('ALL');
+  const [filterOp, setFilterOp] = React.useState('<');
+  const [filterVal, setFilterVal] = React.useState('');
+  const [appliedFilter, setAppliedFilter] = React.useState({ field: 'ALL', op: '<', val: '' });
+  const [filterError, setFilterError] = React.useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+
+  const handleApplyFilter = React.useCallback(() => {
+    const value = String(filterVal).trim();
+    if (value === '') {
+      setFilterError('Please enter a value');
+      return;
+    }
+    const numValue = Number(value);
+    if (!Number.isFinite(numValue)) {
+      setFilterError('Please enter a valid number');
+      return;
+    }
+    if (numValue < 0 || numValue > 100) {
+      setFilterError('Accuracy must be between 0 and 100');
+      return;
+    }
+    setFilterError('');
+    setAppliedFilter({ field: 'Accuracy', op: filterOp, val: numValue });
+  }, [filterVal, filterOp]);
 
   const filteredData = React.useMemo(() => {
     if (!data) return [];
@@ -86,19 +159,30 @@ export default function LiveStockSection() {
       );
     }
 
-    if (filterAcc !== 'ALL') {
+    if (appliedFilter.field !== 'ALL') {
       result = result.filter(row => {
-        const acc = Number(row.PERCENTAGE) || 0;
-        if (filterAcc === '<80') return acc < 80;
-        if (filterAcc === '80-90') return acc >= 80 && acc < 90;
-        if (filterAcc === '90-95') return acc >= 90 && acc < 95;
-        if (filterAcc === '>=95') return acc >= 95;
+        let fieldVal = 0;
+        if (appliedFilter.field === 'Accuracy') {
+          fieldVal = Number(row.PERCENTAGE) || 0;
+        } else if (appliedFilter.field === 'SAP Stock') {
+          fieldVal = Number(row.SAP_STOCK) || 0;
+        } else if (appliedFilter.field === 'RFID Stock') {
+          fieldVal = Number(row.RFID_STOCK) || 0;
+        } else if (appliedFilter.field === 'Difference') {
+          const sap = Number(row.SAP_STOCK) || 0;
+          const rfid = Number(row.RFID_STOCK) || 0;
+          fieldVal = sap > rfid ? sap - rfid : 0;
+        }
+        
+        if (appliedFilter.op === '<') return fieldVal < appliedFilter.val;
+        if (appliedFilter.op === '>') return fieldVal > appliedFilter.val;
+        if (appliedFilter.op === '=') return fieldVal === appliedFilter.val;
         return true;
       });
     }
 
     return result;
-  }, [data, searchStore, filterAcc]);
+  }, [data, searchStore, appliedFilter]);
 
   const barChartData = React.useMemo(() => {
     return filteredData.map(row => {
@@ -109,6 +193,7 @@ export default function LiveStockSection() {
       
       return {
         name: row.STORE_CODE,
+        fullName: row.STORE_NAME || row.STORE_CODE,
         PERCENTAGE: percentage,
         RFID: rfid,
         Difference: difference
@@ -144,32 +229,21 @@ export default function LiveStockSection() {
 
   const totalPieStores = accuracyPieData.reduce((sum, item) => sum + item.value, 0);
 
-  // Custom tooltip for the aggregate pie chart
-  const AccuracyTooltip = ({ active, payload }) => {
-    if (!active || !payload || !payload[0]) return null;
-    const d = payload[0].payload;
-    return (
-      <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: 'none', minWidth: '160px' }}>
-        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '6px' }}>{d.name}</div>
-        <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.8' }}>
-          Stores: <span style={{ fontWeight: 600, color: d.fill }}>{d.value}</span>
-        </div>
-      </div>
-    );
-  };
-
-  const handleBarClick = (dataProps) => {
+  const handleBarClick = React.useCallback((dataProps) => {
     const storeCode = dataProps?.name || dataProps?.payload?.name;
     if (storeCode) {
       navigate('/reports/live-stock', { state: { store: storeCode, date: todayStr } });
     }
-  };
+  }, [navigate, todayStr]);
 
   // Extract total numbers
-  const rawSap = parseInt(totals?.SAP_STOCK?.toString().replace(/,/g, '') || 0, 10);
-  const rawRfid = parseInt(totals?.RFID_STOCK?.toString().replace(/,/g, '') || 0, 10);
-  const rawDiff = parseInt(totals?.DIFFERENCE?.toString().replace(/,/g, '') || 0, 10);
-  const accuracyPercent = rawSap > 0 ? ((rawRfid / rawSap) * 100).toFixed(0) : 0;
+  const { rawSap, rawRfid, rawDiff, accuracyPercent } = React.useMemo(() => {
+    const sap = parseInt(totals?.SAP_STOCK?.toString().replace(/,/g, '') || 0, 10);
+    const rfid = parseInt(totals?.RFID_STOCK?.toString().replace(/,/g, '') || 0, 10);
+    const diff = parseInt(totals?.DIFFERENCE?.toString().replace(/,/g, '') || 0, 10);
+    const percent = sap > 0 ? ((rfid / sap) * 100).toFixed(0) : 0;
+    return { rawSap: sap, rawRfid: rfid, rawDiff: diff, accuracyPercent: percent };
+  }, [totals]);
 
   if (isLoading) {
     return (
@@ -196,25 +270,13 @@ export default function LiveStockSection() {
       {/* Global SVG Defs for Gradients and Patterns */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
-          <pattern id="striped-bar" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-            <rect width="8" height="8" fill="#f8fafc" />
-            <line x1="0" y="0" x2="0" y2="8" stroke="#cbd5e1" strokeWidth="2" />
+          <pattern id="striped-bar" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="#fcf8f8ff" />
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#ff5c5cff" strokeWidth="4" />
           </pattern>
           <linearGradient id="blue-gradient" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#406bdeff" />
             <stop offset="100%" stopColor="#4370ecff" />
-          </linearGradient>
-          <linearGradient id="teal-gradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#0f766e" />
-            <stop offset="100%" stopColor="#14b8a6" />
-          </linearGradient>
-          <linearGradient id="orange-gradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#b45309" />
-            <stop offset="100%" stopColor="#f59e0b" />
-          </linearGradient>
-          <linearGradient id="red-gradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#b91c1c" />
-            <stop offset="100%" stopColor="#ef4444" />
           </linearGradient>
         </defs>
       </svg>
@@ -235,100 +297,186 @@ export default function LiveStockSection() {
       <div className="ls-grid">
         
         {/* ROW 1: 4 KPI Cards */}
-        <div className="ls-card ls-card-active">
-          <h3 className="ls-card-title">Total SAP Stock</h3>
-          <div className="ls-card-value">{totals?.SAP_STOCK || '0'}</div>
-          <div className="ls-card-subtext">
-            <span className="ls-badge">System Data</span>
-            <span>Total expected volume</span>
-          </div>
-          <div className="ls-card-icon"><ArrowUpRight /></div>
-        </div>
+        <KpiCard
+          title="Total SAP Stock"
+          value={totals?.SAP_STOCK || '0'}
+          subtext="Total expected volume"
+          badge="System Data"
+          badgeVariant="default"
+          icon={<ArrowUpRight />}
+        />
 
-        <div className="ls-card">
-          <h3 className="ls-card-title">Total RFID Scanned</h3>
-          <div className="ls-card-value">{totals?.RFID_STOCK || '0'}</div>
-          <div className="ls-card-subtext">
-            <span className="ls-badge">Physical</span>
-            <span>Actual scanned items</span>
-          </div>
-          <div className="ls-card-icon"><ArrowUpRight /></div>
-        </div>
+        <KpiCard
+          title="Total RFID Scanned"
+          value={totals?.RFID_STOCK || '0'}
+          subtext="Actual scanned items"
+          badge="Physical"
+          badgeVariant="default"
+          icon={<ArrowUpRight />}
+        />
 
-        <div className="ls-card">
-          <h3 className="ls-card-title">Global Variance</h3>
-          <div className="ls-card-value">{totals?.DIFFERENCE || '0'}</div>
-          <div className="ls-card-subtext">
-            <span className="ls-badge" style={{ background: '#fef3c7', color: '#b45309' }}>Gap</span>
-            <span>Items missing</span>
-          </div>
-          <div className="ls-card-icon"><ArrowUpRight /></div>
-        </div>
+        <KpiCard
+          title="Global Variance"
+          value={totals?.DIFFERENCE || '0'}
+          subtext="Items missing"
+          badge="Gap"
+          badgeVariant="warning"
+          icon={<ArrowUpRight />}
+        />
 
-        {/* Overall Accuracy — moved up to top row */}
-        <div className="ls-card">
-          <h3 className="ls-card-title">Overall Accuracy</h3>
-          <div className="ls-card-value">{accuracyPercent}%</div>
-          <div className="ls-card-subtext">
-            <span className="ls-badge" style={{ background: '#eff6ff', color: '#1d4ed8' }}>Live</span>
-            <span>Current global accuracy</span>
-          </div>
-          <div className="ls-card-icon"><ArrowUpRight /></div>
-        </div>
+        {/* Overall Accuracy */}
+        <KpiCard
+          title="Overall Accuracy"
+          value={`${accuracyPercent}%`}
+          subtext="Current global accuracy"
+          badge="Live"
+          badgeVariant="info"
+          icon={<ArrowUpRight />}
+        />
 
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
+          <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
             <h3 className="ls-section-title" style={{ margin: 0 }}>Store Performance</h3>
             
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-              {/* Filter Buttons */}
-              <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                {['ALL', '<80', '80-90', '90-95', '>=95'].map(f => (
+              {/* Dynamic Filter Controls */}
+              <div className="ls-filter-container">
+                <div className="ls-filter-label">
+                  All Stores
+                </div>
+
+                <div 
+                  style={{ position: 'relative' }}
+                  tabIndex={0}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                      setIsDropdownOpen(false);
+                    }
+                  }}
+                >
                   <button 
-                    key={f}
-                    onClick={() => setFilterAcc(f)}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      border: 'none',
-                      cursor: 'pointer',
-                      background: filterAcc === f ? '#ffffff' : 'transparent',
-                      color: filterAcc === f ? '#0f172a' : '#64748b',
-                      boxShadow: filterAcc === f ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                      transition: 'all 0.2s'
-                    }}
+                    className="ls-filter-select"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    style={{ paddingRight: '24px' }}
                   >
-                    {f === 'ALL' ? 'All Stores' : f === '<80' ? '<80%' : f === '80-90' ? '80–90%' : f === '90-95' ? '90-95%' : '≥95%'}
+                    {filterOp === '<' ? 'Less (<)' : filterOp === '>' ? 'Greater (>)' : 'Equal (=)'}
                   </button>
-                ))}
+
+                  {isDropdownOpen && (
+                    <div className="ls-dropdown-menu">
+                      <div 
+                        className={`ls-dropdown-item ${filterOp === '<' ? 'active' : ''}`} 
+                        onClick={() => { setFilterOp('<'); setIsDropdownOpen(false); }}
+                      >
+                        Less (&lt;)
+                      </div>
+                      <div 
+                        className={`ls-dropdown-item ${filterOp === '>' ? 'active' : ''}`} 
+                        onClick={() => { setFilterOp('>'); setIsDropdownOpen(false); }}
+                      >
+                        Greater (&gt;)
+                      </div>
+                      <div 
+                        className={`ls-dropdown-item ${filterOp === '=' ? 'active' : ''}`} 
+                        onClick={() => { setFilterOp('='); setIsDropdownOpen(false); }}
+                      >
+                        Equal (=)
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="ls-filter-input-wrapper">
+                  <input 
+                    type="number" 
+                    className="ls-filter-input"
+                    value={filterVal} 
+                    onChange={(e) => {
+                      setFilterVal(e.target.value);
+                      setFilterError('');
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleApplyFilter();
+                    }}
+                    placeholder="Value"
+                  />
+                  <span className="ls-filter-percent">%</span>
+                </div>
+
+                <button 
+                  className="ls-filter-btn"
+                  onClick={handleApplyFilter}
+                  disabled={!String(filterVal).trim()}
+                >
+                  OK
+                </button>
               </div>
 
               {/* Search */}
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '12px' }}>🔍</span>
+              <div className="ls-search-container">
+                <span className="ls-search-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8"/>
+                  </svg>
+                </span>
                 <input 
                   type="text" 
+                  className="ls-search-input"
                   placeholder="Search Store..."
                   value={searchStore}
                   onChange={e => setSearchStore(e.target.value)}
-                  style={{
-                    padding: '8px 12px 8px 30px',
-                    borderRadius: '8px',
-                    border: '1px solid #e2e8f0',
-                    fontSize: '13px',
-                    width: '180px',
-                    outline: 'none',
-                    background: '#f8fafc'
-                  }}
                 />
               </div>
             </div>
           </div>
-                   <div style={{ height: '350px', marginTop: '10px', overflowY: 'auto', paddingRight: '10px' }}>
-            <div style={{ height: `${Math.max(barChartData.length * 60, 240)}px` }}>
+
+          {filterError && (
+            <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '8px', marginTop: '-8px' }}>
+              <span style={{ color: '#dc2626', fontSize: '12px', fontWeight: '500' }}>
+                {filterError}
+              </span>
+            </div>
+          )}
+
+          {/* Sticky Legend & Active Filter Bar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', paddingBottom: '12px' }}>
+            {/* Active Filter Chip */}
+            <div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
+              {appliedFilter.field !== 'ALL' && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0e7ff', color: '#4338ca', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
+                  Accuracy {appliedFilter.op} {appliedFilter.val}%
+                  <button 
+                    onClick={() => {
+                      setFilterVal('');
+                      setAppliedFilter({ field: 'ALL', op: '<', val: '' });
+                      setFilterError('');
+                    }} 
+                    style={{ background: 'transparent', border: 'none', color: '#4338ca', cursor: 'pointer', padding: '0 2px', fontSize: '16px', lineHeight: 1 }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Custom Chart Legend */}
+            <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#475569', fontWeight: '500' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14">
+                  <circle cx="7" cy="7" r="6.5" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth="1" />
+                </svg>
+                Difference
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '12px', height: '12px', background: '#406bdeff', borderRadius: '50%' }}></div>
+                RFID
+              </div>
+            </div>
+          </div>
+
+          <div style={{ height: '350px', overflowY: 'auto', paddingRight: '10px' }}>
+            <div style={{ height: `${Math.max(barChartData.length * 28, 240)}px` }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   layout="vertical"
@@ -336,16 +484,22 @@ export default function LiveStockSection() {
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
                 >
                   <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} axisLine={false} tickLine={false} />
+                  <YAxis 
+                    type="category" 
+                    dataKey="name" 
+                    width={60} 
+                    tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
+                    axisLine={false} 
+                    tickLine={false} 
+                  />
                   <RechartsTooltip 
                     cursor={{ fill: '#f1f5f9' }} 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} 
+                    content={<StoreBarTooltip />}
                   />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
                   
                   {/* Stacked bars: RFID on left, Difference on right */}
-                  <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={40} radius={[15, 0, 0, 15]} cursor="pointer" onClick={handleBarClick} />
-                  <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={40} radius={[0, 15, 15, 0]} cursor="pointer" onClick={handleBarClick} />
+                  <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={handleBarClick} />
+                  <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={handleBarClick} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -384,7 +538,7 @@ export default function LiveStockSection() {
                         <Cell key={idx} fill={entry.fill} />
                       ))}
                     </Pie>
-                    <RechartsTooltip content={<AccuracyTooltip />} />
+                    <RechartsTooltip content={<AccuracyTooltip />} wrapperStyle={{ zIndex: 1000, outline: 'none' }} />
                   </PieChart>
                 </ResponsiveContainer>
                 
@@ -413,8 +567,8 @@ export default function LiveStockSection() {
                       </div>
                       
                       {/* Horizontal Progress Bar */}
-                      <div style={{ width: '100%', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                        <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '3px' }} />
+                      <div style={{ width: '100%', height: '12px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
+                        <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '6px' }} />
                       </div>
                     </div>
                   );
