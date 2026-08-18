@@ -33,18 +33,18 @@ export default function Header({
         <div className="vmm-breadcrumbs">{breadcrumb}</div>
       </div>
 
-      <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
         <div className="vmm-search-box" style={{
-          display: 'flex', alignItems: 'center', background: '#ffffffff', borderRadius: '20px', padding: '6px 12px', width: '250px'
+          display: 'flex', alignItems: 'center', background: '#ffffffff', borderRadius: '20px', padding: '6px 12px', flex: '1 1 auto', minWidth: '120px', maxWidth: '250px'
         }}>
-          <Search size={16} color="#94a3b8" />
+          <Search size={16} color="#94a3b8" style={{ flexShrink: 0 }} />
           <input type="text" placeholder="Search..." style={{
             background: 'transparent', border: 'none', outline: 'none', marginLeft: '8px', fontSize: '13px', color: '#334155', width: '100%'
           }} />
         </div>
 
         <button className="vmm-icon-btn" style={{
-          background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', position: 'relative'
+          background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', position: 'relative', flexShrink: 0
         }}>
           <Bell size={20} />
           <span style={{

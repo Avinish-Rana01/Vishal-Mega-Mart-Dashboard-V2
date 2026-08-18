@@ -95,6 +95,49 @@
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
+/* Responsive Sidebar / Bottom Nav */
+@media (max-width: 767px) {
+  .vmm-sidebar {
+    width: 100%;
+    height: 64px;
+    flex-direction: row;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 0;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .vmm-sidebar-logo {
+    display: none; /* Hide logo on mobile bottom bar */
+  }
+
+  .vmm-sidebar-nav {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    gap: 0;
+  }
+
+  .vmm-nav-item {
+    width: auto;
+    flex: 1;
+    height: 100%;
+    border-radius: 0;
+    border-top: 3px solid transparent;
+  }
+
+  .vmm-nav-item.active {
+    background: transparent;
+    border-top-color: #3b82f6;
+    color: #3b82f6;
+    box-shadow: none;
+    background-image: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+  }
+}
+
 /* Main Area Right */
 .vmm-main-wrapper {
   flex: 1;
@@ -103,6 +146,7 @@
   height: 100vh;
   overflow: hidden;
   position: relative;
+  min-width: 0; /* Important to prevent flex children from blowing out width */
 }
 
 /* Top Header Bar */
@@ -125,7 +169,7 @@
 }
 
 .vmm-brand-title {
-  font-size: 20px;
+  font-size: clamp(16px, 4vw, 20px);
   font-weight: 700;
   color: #0f172a;
   letter-spacing: 0.5px;
@@ -137,6 +181,18 @@
   font-weight: 500;
   color: #64748b;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 767px) {
+  .vmm-breadcrumbs {
+    display: none; /* Hide on mobile to save space */
+  }
+  .vmm-top-header {
+    padding: 0 16px;
+  }
 }
 
 .text-green {
@@ -266,6 +322,31 @@
   background-color: #eceef0;
   display: flex;
   flex-direction: column;
+  padding: 24px;
+}
+
+/* Dashboard Grid Component */
+.vmm-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (max-width: 1199px) {
+  .vmm-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .vmm-dashboard-body {
+    padding: 16px 12px 80px 12px; /* Extra bottom padding for mobile tab bar */
+  }
+  .vmm-dashboard-grid {
+    gap: 12px;
+  }
 }
 
 /* ---- Tab Navigation ---- */

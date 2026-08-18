@@ -40,7 +40,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
         {title}
       </h3>
 
-      <div style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1 }}>
+      <div style={{ fontSize: 'clamp(18px, 4vw, 22px)', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
         {value}
       </div>
 

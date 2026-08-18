@@ -199,6 +199,21 @@
   margin: 0 0 20px 0;
 }
 
+/* Donut Chart Layout */
+.ls-donut-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 60px;
+  align-items: center;
+}
+
+.ls-donut-wrapper {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
 /* List Items */
 .ls-list-item {
   display: flex;
@@ -295,6 +310,90 @@
 
   .ls-span-2 {
     grid-column: span 1;
+  }
+}
+
+/* Responsive Toolbar Layout */
+.ls-toolbar-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.ls-toolbar-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ls-toolbar-secondary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 9;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ls-toolbar-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .ls-toolbar-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .ls-toolbar-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ls-toolbar-secondary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ls-toolbar-controls-left {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .ls-filter-container {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .ls-search-container {
+    width: 100%;
+  }
+  
+  .ls-search-input {
+    width: 100%;
+  }
+
+  /* Donut Responsive */
+  .ls-donut-container {
+    flex-direction: column;
+    gap: 30px !important;
+  }
+  
+  .ls-donut-wrapper {
+    margin: 0 auto;
   }
 }
 

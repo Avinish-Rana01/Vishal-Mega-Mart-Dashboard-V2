@@ -289,10 +289,10 @@ export default function LiveStockSection() {
 
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
-          <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', gap: '3px' }}>
+          <div className="ls-toolbar-header">
             <h3 className="ls-section-title" style={{ margin: 0 }}>Store Performance</h3>
             
-            <div style={{ display: 'flex', gap: '3px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="ls-toolbar-controls">
               {/* Dynamic Filter Controls */}
               <div className="ls-filter-container">
                 <div className="ls-filter-label">
@@ -402,9 +402,9 @@ export default function LiveStockSection() {
           )}
 
           {/* Sticky Legend & Active Filter Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px',  position: 'relative', zIndex: 9 }}>
+          <div className="ls-toolbar-secondary">
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="ls-toolbar-controls-left">
               {/* Sort By Controls */}
               <div 
                 style={{ position: 'relative' }}
@@ -530,17 +530,17 @@ export default function LiveStockSection() {
 
         {/* ROW 3: Coverage Distribution Donut Chart */}
         <div className="ls-card" style={{ gridColumn: '1 / -1', background: '#eceef0', padding: '24px 32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div className="ls-toolbar-header">
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', margin: 0 }}>
               COVERAGE DISTRIBUTION
             </h3>
           </div>
 
           {accuracyPieData.length > 0 && totalPieStores > 0 ? (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '60px', alignItems: 'center' }}>
+            <div className="ls-donut-container">
               
               {/* Left Side: Pie Chart */}
-              <div style={{ position: 'relative', width: '220px', height: '220px' }}>
+              <div className="ls-donut-wrapper">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -563,8 +563,6 @@ export default function LiveStockSection() {
                     <RechartsTooltip content={<AccuracyTooltip />} wrapperStyle={{ zIndex: 1000, outline: 'none' }} />
                   </PieChart>
                 </ResponsiveContainer>
-                
-                {/* Center Label */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                   <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', lineHeight: 1 }}>{totalPieStores}</div>
                   <div style={{ fontSize: '12px', fontWeight: '500', color: '#64748b', marginTop: '6px' }}>Total Stores</div>

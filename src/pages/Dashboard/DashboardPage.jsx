@@ -23,14 +23,8 @@ export default function DashboardPage() {
       <Sidebar />
       <div className="vmm-main-wrapper">
         <Header />
-        <main className="vmm-dashboard-body" style={{ maxWidth: 'none', padding: '24px' }}>
-          
-          <div className="vmm-dashboard-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(600px, 1fr))',
-            gap: '10px',
-            alignItems: 'stretch'
-          }}>
+        <main className="vmm-dashboard-body">
+          <div className="vmm-dashboard-grid">
             <div className="vmm-grid-cell">
               <LiveStockSection />
             </div>
