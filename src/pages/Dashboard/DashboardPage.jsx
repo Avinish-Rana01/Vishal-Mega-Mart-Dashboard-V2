@@ -37,7 +37,7 @@ export default function DashboardPage() {
             <div className="vmm-grid-cell">
               <CycleCountSection />
             </div>
-            <div className="vmm-grid-cell">
+            {/* <div className="vmm-grid-cell">
               <StoreValidationSection />
             </div>
             <div className="vmm-grid-cell">
@@ -60,7 +60,7 @@ export default function DashboardPage() {
             </div>
             <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
               <VendorDiscrepancySection />
-            </div>
+            </div> */}
           </div>
 
         </main>

@@ -70,7 +70,7 @@
 /* Grid Layout */
 .ls-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 5px;
   min-width: 0;
 }
@@ -80,7 +80,7 @@
   /* background: white; */
   background: #eceef0;
   border-radius: 20px;
-  padding: 24px;
+  padding: 10px 10px 8px 10px;
   box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);
   position: relative;
   display: flex;
@@ -90,7 +90,7 @@
 }
 
 .ls-card-active {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+  background: rgb(79, 79, 255);
   color: white;
 }
 
@@ -106,7 +106,7 @@
 }
 
 .ls-card-value {
-  font-size: clamp(18px, 2.6vw, 28px);
+  font-size: clamp(14px, 1.8vw, 28px);
   font-weight: 700;
   margin: 0 0 16px 0;
   color: #0f172a;
@@ -122,8 +122,8 @@
 
 .ls-card-icon {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 7px;
+  right: 7px;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -145,8 +145,16 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 12px;
   color: #64748b;
+  margin-top: auto;
+}
+
+.ls-card-subtext > span:last-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .ls-card-active .ls-card-subtext {
@@ -156,13 +164,15 @@
 .ls-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 6px;
-  border-radius: 4px;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 6px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   background: #dcfce7;
   color: #166534;
-  white-space: nowrap; /* Fix wrapping */
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ls-card-active .ls-badge {

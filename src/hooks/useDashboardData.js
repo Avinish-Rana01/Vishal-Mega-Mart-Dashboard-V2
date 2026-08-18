@@ -53,8 +53,9 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_
           if (totalsMapper) {
             setTotals(totalsMapper(response.summary));
           }
-          if (response.summary.totalRecords !== undefined) {
-            setTotalPages(Math.max(1, Math.ceil(response.summary.totalRecords / pageSize)));
+          const total = response.summary.totalRecords ?? response.summary.totalCount ?? response.summary.recordCount;
+          if (total !== undefined && total > 0) {
+            setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
           }
         }
       } catch (err) {
@@ -102,7 +103,7 @@ const liveStockTotals = (summary) => ({
   DIFFERENCE: summary.diffQty?.toLocaleString('en-IN') || 0
 });
 
-export const useLiveStock = () => useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals, 5);
+export const useLiveStock = () => useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals);
 
 // ==========================================
 // 2. Cycle Count
