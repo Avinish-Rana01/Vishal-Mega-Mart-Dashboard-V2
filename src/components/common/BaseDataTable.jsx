@@ -22,13 +22,14 @@ export default function BaseDataTable({
   searching = false,
   lengthChange = false,
   containerClassName = "vmm-table-container",
-  tableClassName = "vmm-table"
+  tableClassName = "vmm-table",
+  ordering = true
 }) {
   const tableRef = useRef(null);
   const dataTableInstance = useRef(null);
 
   // 1. Force a complete React remount of the table when data changes.
-  const tableKey = useMemo(() => Math.random().toString(36), [data, isLoading, enablePagination, pageSize, domConfig, searching, lengthChange]);
+  const tableKey = useMemo(() => Math.random().toString(36), [data, isLoading, enablePagination, pageSize, domConfig, searching, lengthChange, ordering]);
 
   // 2. Safe jQuery DataTables Initialization
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function BaseDataTable({
         paging: enablePagination,
         pageLength: pageSize,
         searching: searching,
-        ordering: true,
+        ordering: ordering,
         info: enablePagination,
         lengthChange: lengthChange,
         destroy: true,
@@ -108,7 +109,7 @@ export default function BaseDataTable({
     <div className={containerClassName}>
       {isLoading ? (
         <div className="dt-container">
-          <table className={`${tableClassName} dataTable vmm-skeleton-table ${striped ? 'vmm-table-striped' : ''}`} style={{ width: '100%', borderCollapse: 'collapse', margin: 0 }}>
+          <table className={`${tableClassName} dataTable vmm-skeleton-table ${striped ? 'vmm-table-striped' : ''}`}>
             <thead>
               <tr>
                 {columns.map((col) => (
@@ -146,7 +147,7 @@ export default function BaseDataTable({
         </div>
       ) : (
         <div key={tableKey}>
-          <table ref={tableRef} className={`${tableClassName} ${striped ? 'vmm-table-striped' : ''}`} style={{ width: '100%', borderCollapse: 'collapse', margin: 0 }}>
+          <table ref={tableRef} className={`${tableClassName} ${striped ? 'vmm-table-striped' : ''}`}>
             <thead>
               <tr>
                 {columns.map((col) => (

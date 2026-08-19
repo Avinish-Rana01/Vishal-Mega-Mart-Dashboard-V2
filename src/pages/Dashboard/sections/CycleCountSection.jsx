@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass } from 'lucide-react';
+import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import CycleCountModal from '../../../components/modals/CycleCountModal';
 import BaseDataTable from '../../../components/common/BaseDataTable';
+import CustomDropdown from '../../../components/common/CustomDropdown';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
+import './common.css';
 import './CycleCountSection.css';
 
 // Generate mock data once (same pattern as LiveStock)
@@ -40,6 +42,13 @@ export default function CycleCountSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
+  const [sortBy, setSortBy] = useState('DURATION_DESC');
+
+  const sortOptions = useMemo(() => [
+    { value: 'DURATION_DESC', label: 'Duration (Longest first)' },
+    { value: 'DURATION_ASC', label: 'Duration (Shortest first)' },
+    { value: 'STORE_ASC', label: 'Store Code (A-Z)' }
+  ], []);
 
   // Single source of filtered data for both chart and table
   const filteredData = useMemo(() => {
@@ -53,12 +62,20 @@ export default function CycleCountSection() {
     );
   }, [metrics.parsedData, searchFilter]);
 
-  // Chart data: filter valid durations, sort longest→shortest
+  // Chart data: filter valid durations, apply sorting
   const chartData = useMemo(() => {
-    return [...filteredData]
-      .filter(r => r.durationMins !== null)
-      .sort((a, b) => b.durationMins - a.durationMins);
-  }, [filteredData]);
+    let result = [...filteredData].filter(r => r.durationMins !== null);
+    
+    if (sortBy === 'DURATION_DESC') {
+      result.sort((a, b) => b.durationMins - a.durationMins);
+    } else if (sortBy === 'DURATION_ASC') {
+      result.sort((a, b) => a.durationMins - b.durationMins);
+    } else if (sortBy === 'STORE_ASC') {
+      result.sort((a, b) => (a.STORE_CODE || '').localeCompare(b.STORE_CODE || ''));
+    }
+    
+    return result;
+  }, [filteredData, sortBy]);
 
   // Table data: top 5 latest counts globally (ignores search filter)
   const top5LatestData = useMemo(() => {
@@ -75,14 +92,20 @@ export default function CycleCountSection() {
   const chartHeight = Math.max(250, chartData.length * 32);
 
   const tableColumns = useMemo(() => [
-    { key: 'STORE_CODE', label: 'Store', render: (val) => <span className="cc-col-store">{val || '—'}</span> },
+    { key: 'STORE_CODE', label: 'Store Code' },
     { key: 'STORE_NAME', label: 'Store Name', render: (val) => val || '—' },
+    { key: 'CYCLE_COUNT_TYPE', label: 'Cycle Count Type', render: (val) => val || '—' },
+    { key: 'REF_NO', label: 'Reference No', render: (val) => <span className="cc-ref-link">{val || '—'}</span> },
     { key: 'formattedDate', label: 'Date' },
-    { key: 'CYCLE_COUNT_TYPE', label: 'Type', render: (val) => val || '—' },
-    { key: 'REF_NO', label: 'Reference No.', render: (val) => <span className="cc-col-ref">{val || '—'}</span> },
     { key: 'Start_DateTime', label: 'Start Time', render: (val) => val || '—' },
     { key: 'END_DateTime', label: 'End Time', render: (val) => val || '—' },
-    { key: 'rawDuration', label: 'Time Taken', render: (val) => <span className="cc-col-duration">{val || '—'}</span> }
+    { key: 'rawDuration', label: 'Duration' },
+    { key: 'exceedsThreshold', label: 'Status', render: (val) => (
+        <span className={`cc-status-pill ${val ? 'cc-status-high' : 'cc-status-normal'}`}>
+          {val ? 'Very High' : 'Normal'}
+        </span>
+      )
+    }
   ], []);
 
   const handleRowClick = (row) => {
@@ -176,37 +199,59 @@ export default function CycleCountSection() {
       <div className="cc-card">
 
         {/* Toolbar */}
-        <div className="cc-toolbar">
-          <h3 className="cc-toolbar-title">Audit Duration by Store</h3>
+        <div className="vmm-toolbar-header">
+          <h3 className="vmm-toolbar-title">Audit Duration by Store</h3>
 
-          <div className="cc-search-container">
-            <span className="cc-search-icon">
-              <Search size={14} />
-            </span>
-            <input
-              type="text"
-              className="cc-search-input"
-              placeholder="Search store..."
-              value={searchFilter}
-              onChange={e => setSearchFilter(e.target.value)}
+          <div className="vmm-toolbar-controls">
+            <CustomDropdown 
+              options={sortOptions}
+              value={sortBy}
+              onChange={(val) => setSortBy(val)}
+              prefix="Sort:"
+              buttonStyle={{ minWidth: '200px', justifyContent: 'space-between' }}
+              menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
             />
-            {searchFilter && (
-              <button
-                className="cc-search-clear"
-                onClick={() => setSearchFilter('')}
-              >
-                ×
-              </button>
-            )}
+
+            <div className="vmm-search-container">
+              <span className="vmm-search-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8"/>
+                </svg>
+              </span>
+              <input
+                type="text"
+                className="vmm-search-input"
+                placeholder="Search store..."
+                value={searchFilter}
+                onChange={e => setSearchFilter(e.target.value)}
+                style={{ paddingRight: searchFilter ? '32px' : '16px' }}
+              />
+              {searchFilter && (
+                <button
+                  className="vmm-search-clear"
+                  onClick={() => setSearchFilter('')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Chart */}
         <div className="cc-chart-scroll">
           {chartData.length === 0 ? (
-            <div className="cc-empty">
-              <Search size={32} />
-              <p>No matching cycle count records found.</p>
+            <div style={{ height: '100%', minHeight: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              No matching cycle count records found.
+              <button 
+                onClick={() => setSearchFilter('')}
+                style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Clear Search
+              </button>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={chartHeight}>
@@ -245,16 +290,25 @@ export default function CycleCountSection() {
       </div>
 
       {/* DATA GRID */}
-      <div className="cc-card" style={{ padding: 10}}>
-        <div className="cc-grid-header">
-          <h3 className="cc-grid-title">Latest 5 Audits</h3>
-          <span className="cc-grid-count">{top5LatestData.length} Records</span>
+      <div className="cc-card" style={{ padding: 0, background: '#eceef0', border: '1px solid #e2e8f0', borderRadius: '20px', boxShadow: 'none', flex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 16px', borderBottom: '1px solid #e2e8f0' }}>
+          <h3 class="vmm-toolbar-title">
+            LATEST CYCLE COUNT BY STORE
+          </h3>
+          {/* <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="cc-action-btn"><Search size={16} /></button>
+            <button className="cc-action-btn"><Filter size={16} /></button>
+            <button className="cc-action-btn cc-export-btn"><Download size={16} /> Export</button>
+          </div> */}
         </div>
         <BaseDataTable
           columns={tableColumns}
           data={top5LatestData}
           onRowClick={handleRowClick}
-          enablePagination={false} // Only 5 records, no need for pagination
+          enablePagination={false}
+          ordering={false}
+          containerClassName="cc-table-scroll"
+          tableClassName="cc-table-custom"
         />
       </div>
 

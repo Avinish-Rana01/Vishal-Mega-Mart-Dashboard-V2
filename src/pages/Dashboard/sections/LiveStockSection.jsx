@@ -9,6 +9,8 @@ import SectionHeader, { DateBadge } from '../../../components/common/SectionHead
 import { generateMockData } from '../../../utils/mockLiveStock';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
 import CustomDropdown from '../../../components/common/CustomDropdown';
+import '../../../components/charts/DashboardSection.css';
+import './common.css';
 import './LiveStockSection.css';
 
 // Minimalist Icons
@@ -294,12 +296,12 @@ export default function LiveStockSection() {
 
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="ls-toolbar-header">
-            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', margin: 0 }}>
+          <div className="vmm-toolbar-header">
+            <h3 className="vmm-toolbar-title">
               STORE PERFORMANCE
             </h3>
             
-            <div className="ls-toolbar-controls">
+            <div className="vmm-toolbar-controls">
               {/* Dynamic Filter Controls */}
               <div className="ls-filter-container">
                 <div className="ls-filter-label">
@@ -324,7 +326,7 @@ export default function LiveStockSection() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleApplyFilter();
                     }}
-                    placeholder="Value"
+                    placeholder="90"
                   />
                   <span className="ls-filter-percent">%</span>
                 </div>
@@ -339,15 +341,15 @@ export default function LiveStockSection() {
               </div>
 
               {/* Search */}
-              <div className="ls-search-container" style={{ position: 'relative' }}>
-                <span className="ls-search-icon">
+              <div className="vmm-search-container">
+                <span className="vmm-search-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8"/>
                   </svg>
                 </span>
                 <input 
                   type="text" 
-                  className="ls-search-input"
+                  className="vmm-search-input"
                   placeholder="Search Store..."
                   value={searchStore}
                   onChange={e => setSearchStore(e.target.value)}
@@ -355,8 +357,8 @@ export default function LiveStockSection() {
                 />
                 {searchStore && (
                   <button 
+                    className="vmm-search-clear"
                     onClick={() => setSearchStore('')}
-                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
                   >
                     ×
                   </button>
@@ -438,8 +440,7 @@ export default function LiveStockSection() {
               </div>
             ) : (
               <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
-                <div style={{ height: `${Math.max(barChartData.length * 28, 240)}px` }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height={Math.max(barChartData.length * 28, 240)}>
                     <BarChart 
                       layout="vertical"
                       data={barChartData} 
@@ -464,7 +465,6 @@ export default function LiveStockSection() {
                       <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={handleBarClick} />
                     </BarChart>
                   </ResponsiveContainer>
-                </div>
               </div>
             )}
           </div>
@@ -512,17 +512,17 @@ export default function LiveStockSection() {
               </div>
 
               {/* Right Side: Custom Legend with Progress Bars */}
-              <div style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ flex: 1, minWidth: '200px', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {accuracyPieData.map((entry, idx) => {
                   const percentage = ((entry.value / totalPieStores) * 100).toFixed(2);
                   return (
                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569' }}>
-                          <div style={{ width: '10px', height: '10px', backgroundColor: entry.fill, borderRadius: '50%' }} />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', fontSize: '16px', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>
+                          <div style={{ width: '10px', height: '10px', backgroundColor: entry.fill, borderRadius: '50%', flexShrink: 0 }} />
                           <span>{entry.name}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                           <span style={{ fontWeight: '700', color: '#0f172a' }}>{entry.value}</span>
                           <span style={{ color: '#94a3b8', fontSize: '14px', minWidth: '45px', textAlign: 'right' }}>{percentage}%</span>
                         </div>

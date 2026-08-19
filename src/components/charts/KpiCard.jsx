@@ -23,11 +23,9 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
     info: { background: '#eff6ff', color: '#1d4ed8' },
   };
 
-  const [randomBg] = React.useState(() => randomColor());
-
   return (
     <div style={{
-      background: randomBg,
+      background: '#eceef0',
       borderRadius: '10px',
       padding: '10px',
       boxShadow: '0 2px 8px -2px rgba(0,0,0,0.03)',
