@@ -91,22 +91,24 @@ export default function CycleCountSection() {
 
   const chartHeight = Math.max(250, chartData.length * 32);
 
-  const tableColumns = useMemo(() => [
-    { key: 'STORE_CODE', label: 'Store Code' },
-    { key: 'STORE_NAME', label: 'Store Name', render: (val) => val || '—' },
-    { key: 'CYCLE_COUNT_TYPE', label: 'Cycle Count Type', render: (val) => val || '—' },
-    { key: 'REF_NO', label: 'Reference No', render: (val) => <span className="cc-ref-link">{val || '—'}</span> },
-    { key: 'formattedDate', label: 'Date' },
-    { key: 'Start_DateTime', label: 'Start Time', render: (val) => val || '—' },
-    { key: 'END_DateTime', label: 'End Time', render: (val) => val || '—' },
-    { key: 'rawDuration', label: 'Duration' },
-    { key: 'exceedsThreshold', label: 'Status', render: (val) => (
-        <span className={`cc-status-pill ${val ? 'cc-status-high' : 'cc-status-normal'}`}>
-          {val ? 'Very High' : 'Normal'}
-        </span>
-      )
-    }
-  ], []);
+  const thStyle = {
+    padding: '8px 12px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#334155',
+    borderBottom: '2px solid #e2e8f0',
+    whiteSpace: 'nowrap',
+    textAlign: 'center'
+  };
+
+  const tdStyle = {
+    padding: '8px 12px',
+    fontSize: '12px',
+    color: '#0f172a',
+    borderBottom: '1px solid #f1f5f9',
+    whiteSpace: 'nowrap',
+    textAlign: 'center'
+  };
 
   const handleRowClick = (row) => {
     setSelectedRowData(row);
@@ -289,27 +291,70 @@ export default function CycleCountSection() {
         </div>
       </div>
 
-      {/* DATA GRID */}
-      <div className="cc-card" style={{ padding: 0, background: '#eceef0', border: '1px solid #e2e8f0', borderRadius: '20px', boxShadow: 'none', flex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 16px', borderBottom: '1px solid #e2e8f0' }}>
-          <h3 class="vmm-toolbar-title">
+      {/* NATIVE HTML DATA GRID */}
+      <div className="cc-card" style={{ padding: 0, background: '#eceef0', border: '1px solid #e2e8f0', borderRadius: '20px', boxShadow: 'none', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0' }}>
+          <h3 className="vmm-toolbar-title" style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1e3a8a' }}>
             LATEST CYCLE COUNT BY STORE
           </h3>
-          {/* <div style={{ display: 'flex', gap: '8px' }}>
-            <button className="cc-action-btn"><Search size={16} /></button>
-            <button className="cc-action-btn"><Filter size={16} /></button>
-            <button className="cc-action-btn cc-export-btn"><Download size={16} /> Export</button>
-          </div> */}
         </div>
-        <BaseDataTable
-          columns={tableColumns}
-          data={top5LatestData}
-          onRowClick={handleRowClick}
-          enablePagination={false}
-          ordering={false}
-          containerClassName="cc-table-scroll"
-          tableClassName="cc-table-custom"
-        />
+        
+        {/* Scrollable Wrapper - The key to native scrollbars */}
+        <div className="cc-native-table-scroll" style={{ flex: 1, padding: '0 8px 0px 8px', minWidth: 0 }}>
+          <div style={{ minWidth: '950px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', background: '#fff', borderRadius: '8px', overflow: 'hidden' }}>
+            <thead style={{ position: 'sticky', top: 0, background: '#ffffff', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <tr>
+                <th style={thStyle}>Store Code</th>
+                <th style={thStyle}>Store Name</th>
+                <th style={thStyle}>Type</th>
+                <th style={thStyle}>Ref No</th>
+                <th style={thStyle}>Date</th>
+                <th style={thStyle}>Start Time</th>
+                <th style={thStyle}>End Time</th>
+                <th style={thStyle}>Duration</th>
+                <th style={thStyle}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {top5LatestData.length === 0 ? (
+                <tr>
+                  <td colSpan={9} style={{ textAlign: 'center', padding: '30px', color: '#64748b', fontSize: '13px' }}>
+                    No cycle counts found
+                  </td>
+                </tr>
+              ) : (
+                top5LatestData.map((row, idx) => (
+                  <tr 
+                    key={idx} 
+                    style={{ borderBottom: '1px solid #e2e8f0', cursor: 'pointer', transition: 'background 0.2s' }} 
+                    onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} 
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'} 
+                    onClick={() => handleRowClick(row)}
+                  >
+                    <td style={{...tdStyle, fontWeight: 600, color: '#334155'}}>{row.STORE_CODE || '—'}</td>
+                    <td style={tdStyle}>{row.STORE_NAME || '—'}</td>
+                    <td style={tdStyle}>{row.CYCLE_COUNT_TYPE || '—'}</td>
+                    <td style={tdStyle}><span style={{ color: '#2563eb', fontWeight: 600 }}>{row.REF_NO || '—'}</span></td>
+                    <td style={tdStyle}>{row.formattedDate || '—'}</td>
+                    <td style={tdStyle}>{row.Start_DateTime || '—'}</td>
+                    <td style={tdStyle}>{row.END_DateTime || '—'}</td>
+                    <td style={tdStyle}>{row.rawDuration || '—'}</td>
+                    <td style={tdStyle}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600,
+                        ...(row.exceedsThreshold ? { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' } : { background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0' })
+                      }}>
+                        {row.exceedsThreshold ? 'Very High' : 'Normal'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+          </div>
+        </div>
       </div>
 
       {/* Modal */}

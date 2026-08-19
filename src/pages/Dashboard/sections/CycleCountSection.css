@@ -10,6 +10,8 @@
   flex-direction: column;
   gap: 5px;
   height: 100%;
+  width: 100%;
+  min-width: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: #334155;
 }
@@ -81,128 +83,6 @@
   border-radius: 20px;
 }
 
-.cc-table-scroll {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 0 5px 8px 5px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.cc-table-scroll::-webkit-scrollbar {
-  height: 8px;
-}
-.cc-table-scroll::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-.cc-table-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-.cc-table-scroll::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Force DataTables internal wrappers to allow overflow so the parent (.cc-table-scroll) handles the scrollbar */
-.cc-table-scroll .dt-container,
-.cc-table-scroll .dt-layout-row,
-.cc-table-scroll .dt-layout-cell,
-.cc-table-scroll .dt-layout-table {
-  width: 100%;
-  max-width: 100%;
-  overflow: visible !important;
-  display: block;
-}
-
-.cc-table-scroll .dt-container::-webkit-scrollbar {
-  height: 8px;
-}
-.cc-table-scroll .dt-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-.cc-table-scroll .dt-container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-/* Custom Table Styling for "Latest Cycle Count" */
-.cc-table-custom {
-  width: 100% !important;
-  border-collapse: collapse !important;
-  text-align: center;
-  min-width: 900px !important;
-  table-layout: auto !important;
-}
-
-.cc-table-custom thead {
-  background: #ffffff; /* Deep blue from image */
-}
-
-.cc-table-custom th {
-  padding: 2px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgb(0, 0, 0);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-.cc-table-custom th:last-child {
-  border-right: none;
-}
-
-.cc-table-custom tbody tr {
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.cc-table-custom td {
-  padding: 2px 10px;
-  font-size: 12px;
-  color: #334155;
-  text-align: center;
-  border-right: 1px solid #f1f5f9;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-.cc-table-custom td:last-child {
-  border-right: none;
-}
-
-.cc-ref-link {
-  color: #2563eb;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Status Pills */
-.cc-status-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.cc-status-normal {
-  background: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
-}
-
-.cc-status-high {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
 
 /* Action Buttons */
 .cc-action-btn {
@@ -285,4 +165,36 @@
   .cc-search-input {
     width: 100%;
   }
+}
+
+/* Native Table Scrollbar — must override global hiding from index.css */
+.cc-native-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: auto !important;   /* Override global * { -ms-overflow-style: none } */
+  scrollbar-width: thin !important;      /* Override global * { scrollbar-width: none } */
+  scrollbar-color: #94a3b8 #f1f5f9;      /* Firefox thumb & track colors */
+}
+
+/* Override global ::-webkit-scrollbar { display: none } */
+.cc-native-table-scroll::-webkit-scrollbar {
+  display: block !important;
+  height: 10px;
+  background-color: #f1f5f9;
+}
+.cc-native-table-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.cc-native-table-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 8px;
+  border: 2px solid #f1f5f9;
+}
+.cc-native-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
