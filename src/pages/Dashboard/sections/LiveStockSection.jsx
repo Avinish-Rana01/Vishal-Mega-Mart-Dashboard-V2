@@ -5,8 +5,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
 import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
 import KpiCard from '../../../components/charts/KpiCard';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import { generateMockData } from '../../../utils/mockLiveStock';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
+import CustomDropdown from '../../../components/common/CustomDropdown';
 import './LiveStockSection.css';
 
 // Minimalist Icons
@@ -18,6 +20,19 @@ const ArrowUpRight = () => (
 );
 
 const { mockStores, mockTotals } = generateMockData();
+
+const operatorOptions = [
+  { value: '<', label: 'Less (<)' },
+  { value: '>', label: 'Greater (>)' },
+  { value: '=', label: 'Equal (=)' }
+];
+
+const sortOptions = [
+  { value: 'CODE_ASC', label: 'Store Code (A-Z)' },
+  { value: 'DIFF_DESC', label: 'Highest Variance' },
+  { value: 'ACC_ASC', label: 'Lowest Accuracy' },
+  { value: 'SAP_DESC', label: 'Highest Volume' }
+];
 // ---------------------------
 
 export default function LiveStockSection() {
@@ -36,11 +51,9 @@ export default function LiveStockSection() {
   const [filterVal, setFilterVal] = React.useState(''); // The numerical threshold for the filter
   const [appliedFilter, setAppliedFilter] = React.useState({ field: 'ALL', op: '<', val: '' }); // The active filter currently applied to the dataset
   const [filterError, setFilterError] = React.useState(''); // Validation error messages for filter input
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false); // Controls the filter operator dropdown visibility
 
   // Sorting State
   const [sortBy, setSortBy] = React.useState('CODE_ASC'); // Active sorting metric (e.g., Variance, Accuracy)
-  const [isSortDropdownOpen, setIsSortDropdownOpen] = React.useState(false); // Controls the sort dropdown visibility
 
   /**
    * Validates and applies the user's custom filter criteria.
@@ -234,21 +247,13 @@ export default function LiveStockSection() {
       </svg>
       
       {/* Header */}
-      <div className="ds-header">
-        <div className="ds-header-text">
-          <h1>Live Stock</h1>
-          <p>Monitor SAP vs RFID inventory differences across all stores.</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ background: '#f8fafc', color: '#475569', padding: '8px 16px', borderRadius: '20px', border: '1px solid #e2e8f0', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            {new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
-          </div>
-        </div>
-      </div>
+      <SectionHeader 
+        title="Live Stock" 
+        rightContent={<DateBadge />} 
+      />
 
       <div className="ls-grid">
-        
+     
         {/* ROW 1: 4 KPI Cards */}
         <KpiCard
           title="Total SAP Stock"
@@ -290,7 +295,9 @@ export default function LiveStockSection() {
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
           <div className="ls-toolbar-header">
-            <h3 className="ls-section-title" style={{ margin: 0 }}>Store Performance</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', margin: 0 }}>
+              STORE PERFORMANCE
+            </h3>
             
             <div className="ls-toolbar-controls">
               {/* Dynamic Filter Controls */}
@@ -299,46 +306,11 @@ export default function LiveStockSection() {
                   All Stores
                 </div>
 
-                <div 
-                  style={{ position: 'relative' }}
-                  tabIndex={0}
-                  onBlur={(e) => {
-                    if (!e.currentTarget.contains(e.relatedTarget)) {
-                      setIsDropdownOpen(false);
-                    }
-                  }}
-                >
-                  <button 
-                    className="ls-filter-select"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    style={{ paddingRight: '24px' }}
-                  >
-                    {filterOp === '<' ? 'Less (<)' : filterOp === '>' ? 'Greater (>)' : 'Equal (=)'}
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div className="ls-dropdown-menu">
-                      <div 
-                        className={`ls-dropdown-item ${filterOp === '<' ? 'active' : ''}`} 
-                        onClick={() => { setFilterOp('<'); setIsDropdownOpen(false); }}
-                      >
-                        Less (&lt;)
-                      </div>
-                      <div 
-                        className={`ls-dropdown-item ${filterOp === '>' ? 'active' : ''}`} 
-                        onClick={() => { setFilterOp('>'); setIsDropdownOpen(false); }}
-                      >
-                        Greater (&gt;)
-                      </div>
-                      <div 
-                        className={`ls-dropdown-item ${filterOp === '=' ? 'active' : ''}`} 
-                        onClick={() => { setFilterOp('='); setIsDropdownOpen(false); }}
-                      >
-                        Equal (=)
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <CustomDropdown 
+                  options={operatorOptions}
+                  value={filterOp}
+                  onChange={(val) => setFilterOp(val)}
+                />
 
                 <div className="ls-filter-input-wrapper">
                   <input 
@@ -406,44 +378,14 @@ export default function LiveStockSection() {
             
             <div className="ls-toolbar-controls-left">
               {/* Sort By Controls */}
-              <div 
-                style={{ position: 'relative' }}
-                tabIndex={0}
-                onBlur={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget)) {
-                    setIsSortDropdownOpen(false);
-                  }
-                }}
-              >
-                <button 
-                  className="ls-filter-select"
-                  style={{ minWidth: '160px', paddingRight: '24px', justifyContent: 'space-between' }}
-                  onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                >
-                  <span style={{ color: '#94a3b8', marginRight: '6px' }}>Sort:</span> 
-                  {sortBy === 'CODE_ASC' ? 'Store Code (A-Z)' : 
-                   sortBy === 'DIFF_DESC' ? 'Highest Variance' : 
-                   sortBy === 'ACC_ASC' ? 'Lowest Accuracy' : 
-                   'Highest Volume'}
-                </button>
-
-                {isSortDropdownOpen && (
-                  <div className="ls-dropdown-menu" style={{ left: 0, right: 'auto', minWidth: '180px' }}>
-                    <div className={`ls-dropdown-item ${sortBy === 'CODE_ASC' ? 'active' : ''}`} onClick={() => { setSortBy('CODE_ASC'); setIsSortDropdownOpen(false); }}>
-                      Store Code (A-Z)
-                    </div>
-                    <div className={`ls-dropdown-item ${sortBy === 'DIFF_DESC' ? 'active' : ''}`} onClick={() => { setSortBy('DIFF_DESC'); setIsSortDropdownOpen(false); }}>
-                      Highest Variance
-                    </div>
-                    <div className={`ls-dropdown-item ${sortBy === 'ACC_ASC' ? 'active' : ''}`} onClick={() => { setSortBy('ACC_ASC'); setIsSortDropdownOpen(false); }}>
-                      Lowest Accuracy
-                    </div>
-                    <div className={`ls-dropdown-item ${sortBy === 'SAP_DESC' ? 'active' : ''}`} onClick={() => { setSortBy('SAP_DESC'); setIsSortDropdownOpen(false); }}>
-                      Highest Volume
-                    </div>
-                  </div>
-                )}
-              </div>
+              <CustomDropdown 
+                options={sortOptions}
+                value={sortBy}
+                onChange={(val) => setSortBy(val)}
+                prefix="Sort:"
+                buttonStyle={{ minWidth: '160px', justifyContent: 'space-between' }}
+                menuStyle={{ left: 0, right: 'auto', minWidth: '180px' }}
+              />
 
               {/* Active Filter Chip */}
               <div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
@@ -480,7 +422,7 @@ export default function LiveStockSection() {
             </div>
           </div>
 
-          <div style={{ height: '350px' }}>
+          <div style={{ height: '250px' }}>
             {barChartData.length === 0 ? (
               <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
@@ -529,9 +471,9 @@ export default function LiveStockSection() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart */}
-        <div className="ls-card" style={{ gridColumn: '1 / -1', background: '#eceef0', padding: '24px 32px' }}>
+        <div className="ls-card" style={{ gridColumn: '1 / -1', background: '#eceef0', padding: '8  px 12px' }}>
           <div className="ls-toolbar-header">
-            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', margin: 0 }}>
+            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
               COVERAGE DISTRIBUTION
             </h3>
           </div>
@@ -570,7 +512,7 @@ export default function LiveStockSection() {
               </div>
 
               {/* Right Side: Custom Legend with Progress Bars */}
-              <div style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {accuracyPieData.map((entry, idx) => {
                   const percentage = ((entry.value / totalPieStores) * 100).toFixed(2);
                   return (
@@ -587,7 +529,7 @@ export default function LiveStockSection() {
                       </div>
                       
                       {/* Horizontal Progress Bar */}
-                      <div style={{ width: '100%', height: '12px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '12px', backgroundColor: '#ffffffff', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '6px' }} />
                       </div>
                     </div>

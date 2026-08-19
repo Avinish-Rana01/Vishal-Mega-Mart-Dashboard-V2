@@ -1,211 +1,268 @@
-// Force HMR reload
 import React, { useState, useMemo } from 'react';
-import { ClipboardList, Clock, AlertTriangle, Zap, Hourglass, Filter, RefreshCw, Search } from 'lucide-react';
+import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass } from 'lucide-react';
 import KpiCard from '../../../components/charts/KpiCard';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import CycleCountModal from '../../../components/modals/CycleCountModal';
+import BaseDataTable from '../../../components/common/BaseDataTable';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
+import './CycleCountSection.css';
 
+// Generate mock data once (same pattern as LiveStock)
+const mockCycleCountData = generateMockCycleCount(20);
+
+// ---- Custom Tooltip for the Duration Bar Chart ----
+function DurationTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div className="cc-card" style={{ padding: '14px 18px', minWidth: '200px', background: '#fff', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
+      <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '8px', fontSize: '14px' }}>{d.STORE_NAME || d.STORE_CODE}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px', fontSize: '12px', color: '#475569' }}>
+        <span style={{ color: '#94a3b8' }}>Date</span>       <span style={{ fontWeight: 600 }}>{d.formattedDate}</span>
+        <span style={{ color: '#94a3b8' }}>Type</span>       <span style={{ fontWeight: 600 }}>{d.CYCLE_COUNT_TYPE || '—'}</span>
+        <span style={{ color: '#94a3b8' }}>Start</span>      <span style={{ fontWeight: 600 }}>{d.Start_DateTime || '—'}</span>
+        <span style={{ color: '#94a3b8' }}>End</span>        <span style={{ fontWeight: 600 }}>{d.END_DateTime || '—'}</span>
+        <span style={{ color: '#94a3b8' }}>Duration</span>   <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.rawDuration}</span>
+      </div>
+    </div>
+  );
+}
+
+// ---- Main Component ----
 export default function CycleCountSection() {
-  const { data, isLoading, error, refresh } = useCycleCount();
+  const { data: realData, isLoading, error, refresh } = useCycleCount();
+  const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
+  const [searchFilter, setSearchFilter] = useState('');
 
-  // Client-side filtering state
-  const [storeFilter, setStoreFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
+  // Single source of filtered data for both chart and table
+  const filteredData = useMemo(() => {
+    if (!metrics.parsedData || metrics.parsedData.length === 0) return [];
+    if (!searchFilter.trim()) return metrics.parsedData;
+    const term = searchFilter.toLowerCase();
+    return metrics.parsedData.filter(row =>
+      (row.STORE_CODE && row.STORE_CODE.toLowerCase().includes(term)) ||
+      (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term)) ||
+      (row.REF_NO && row.REF_NO.toLowerCase().includes(term))
+    );
+  }, [metrics.parsedData, searchFilter]);
+
+  // Chart data: filter valid durations, sort longest→shortest
+  const chartData = useMemo(() => {
+    return [...filteredData]
+      .filter(r => r.durationMins !== null)
+      .sort((a, b) => b.durationMins - a.durationMins);
+  }, [filteredData]);
+
+  // Table data: top 5 latest counts globally (ignores search filter)
+  const top5LatestData = useMemo(() => {
+    return [...metrics.parsedData]
+      .sort((a, b) => {
+        // Sort by DATE descending, then END_DateTime descending
+        const dateA = new Date(`${a.DATE}T${a.END_DateTime || '00:00:00'}`);
+        const dateB = new Date(`${b.DATE}T${b.END_DateTime || '00:00:00'}`);
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+  }, [metrics.parsedData]);
+
+  const chartHeight = Math.max(250, chartData.length * 32);
+
+  const tableColumns = useMemo(() => [
+    { key: 'STORE_CODE', label: 'Store', render: (val) => <span className="cc-col-store">{val || '—'}</span> },
+    { key: 'STORE_NAME', label: 'Store Name', render: (val) => val || '—' },
+    { key: 'formattedDate', label: 'Date' },
+    { key: 'CYCLE_COUNT_TYPE', label: 'Type', render: (val) => val || '—' },
+    { key: 'REF_NO', label: 'Reference No.', render: (val) => <span className="cc-col-ref">{val || '—'}</span> },
+    { key: 'Start_DateTime', label: 'Start Time', render: (val) => val || '—' },
+    { key: 'END_DateTime', label: 'End Time', render: (val) => val || '—' },
+    { key: 'rawDuration', label: 'Time Taken', render: (val) => <span className="cc-col-duration">{val || '—'}</span> }
+  ], []);
 
   const handleRowClick = (row) => {
     setSelectedRowData(row);
     setIsModalOpen(true);
   };
 
-  const columns = [
-    { key: 'DATE', label: 'Date' },
-    { key: 'STORE_CODE', label: 'Store Code' },
-    { key: 'STORE_NAME', label: 'Store Name' },
-    { key: 'CYCLE_COUNT_TYPE', label: 'Type' },
-    { key: 'REF_NO', label: 'Ref No' },
-    { key: 'Start_DateTime', label: 'Start Time' },
-    { key: 'END_DateTime', label: 'End Time' },
-    { key: 'formattedDuration', label: 'Duration' },
-    { key: 'status', label: 'Status', render: (val) => (
-      <span style={{
-        padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
-        background: val === 'Overtime' ? '#fef3c7' : '#dcfce7',
-        color: val === 'Overtime' ? '#b45309' : '#15803d'
-      }}>
-        {val}
-      </span>
-    )}
-  ];
-
+  // ---- Loading State ----
   if (isLoading) {
     return (
-      <div className="ds-section" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr', marginBottom: '0' }}>
-          <div className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
+      <div className="cc-container">
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr' }}>
+          <div className="ds-skeleton-box" style={{ height: '60px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
         </div>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)', gap: '3px', marginBottom: '0' }}>
-          {[1,2,3,4,5].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '110px' }}><div className="ds-shimmer" /></div>)}
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '5px' }}>
+          {[1,2,3,4].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '100px', borderRadius: '10px' }}><div className="ds-shimmer" /></div>)}
         </div>
-        <div className="ds-skeleton-row" style={{ display: 'flex', gap: '4px', marginBottom: '0' }}>
-          <div className="ds-skeleton-box" style={{ flex: '2 1 400px', height: '350px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
-          <div className="ds-skeleton-box" style={{ flex: '1 1 300px', height: '350px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
+        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr' }}>
+          <div className="ds-skeleton-box" style={{ height: '280px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
         </div>
       </div>
     );
   }
+
+  // ---- Error State ----
   if (error) {
-    return <div className="ds-empty-state">Error loading cycle count data: {error}</div>;
+    return (
+      <div className="cc-container">
+        <div className="cc-error">Unable to load cycle count data. Please check your connection and try again.</div>
+      </div>
+    );
   }
+
+  // ---- Empty State ----
   if (!metrics.parsedData || metrics.parsedData.length === 0) {
-    return <div className="ds-empty-state">No cycle count records found.</div>;
+    return (
+      <div className="cc-container">
+        <SectionHeader
+          title="Cycle Count"
+          rightContent={<DateBadge />}
+        />
+        <div className="cc-card">
+          <div className="cc-empty">
+            <ClipboardList size={40} />
+            <p>No cycle count data is currently available.</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Filter the data for the audit log
-  const filteredData = metrics.parsedData.filter(row => {
-    if (storeFilter && !row.STORE_CODE.toLowerCase().includes(storeFilter.toLowerCase())) return false;
-    if (typeFilter && row.CYCLE_COUNT_TYPE !== typeFilter) return false;
-    return true;
-  });
-
+  // ---- Main Render ----
   return (
-    <div className="ds-section" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-      
-      {/* HEADER & FILTERS */}
-      <div className="ds-header" style={{ alignItems: 'center', padding: '3px', background: '#fff', flexWrap: 'nowrap' }}>
-        <div className="ds-header-text">
-          <h1 style={{ whiteSpace: 'nowrap' }}>Cycle Count</h1>
-          <p>Monitor store audit activity, duration and operational exceptions.</p>
-        </div>
-        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '10px' }} />
-            <input 
-              type="text" 
-              placeholder="Filter by Store..." 
-              value={storeFilter}
-              onChange={e => setStoreFilter(e.target.value)}
-              style={{ padding: '8px 12px 8px 32px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none', minWidth: '200px' }}
-            />
-          </div>
-          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
-            <RefreshCw size={14} /> Refresh
-          </button>
-        </div>
-      </div>
+    <div className="cc-container">
 
-      {/* SECTION 1 - KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '3px' }}>
-        <KpiCard title="TOTAL AUDITS" value={metrics.totalAudits} subtext="Audit records" icon={<ClipboardList size={24} color="#64748b" />} />
-        <KpiCard title="AVG DURATION" value={metrics.avgDurationFormatted} subtext="Across all audits" icon={<Clock size={24} color="#64748b" />} />
-        <KpiCard 
-          title="OVERTIME AUDITS" 
-          value={metrics.overtimeCount} 
-          subtext="Above 4h threshold" 
-          icon={<AlertTriangle size={24} color={metrics.overtimeCount > 0 ? "#dc2626" : "#64748b"} />} 
-          badgeVariant={metrics.overtimeCount > 0 ? 'danger' : 'default'}
+      {/* HEADER — same structure as LiveStock */}
+      <SectionHeader
+        title="Cycle Count"
+        rightContent={<DateBadge />}
+      />
+
+      {/* KPI ROW — 4 cards */}
+      <div className="cc-kpi-row">
+        <KpiCard
+          title="Stores Reported"
+          value={metrics.storesReported}
+          subtext="In current view"
+          icon={<ClipboardList size={18} />}
         />
-        <KpiCard title="FASTEST AUDIT" value={metrics.fastestAuditFormatted} subtext={metrics.fastestStore} icon={<Zap size={24} color="#64748b" />} />
-        <KpiCard title="LONGEST AUDIT" value={metrics.slowestAuditFormatted} subtext={metrics.slowestStore} icon={<Hourglass size={24} color="#64748b" />} />
+        <KpiCard
+          title="Counted Today"
+          value={metrics.todayCount}
+          subtext="Audits completed today"
+          icon={<Calendar size={18} />}
+        />
+        <KpiCard
+          title="Avg Duration"
+          value={metrics.avgDurationFormatted}
+          subtext="Across reported stores"
+          icon={<Clock size={18} />}
+        />
+        <KpiCard
+          title="Longest Audit"
+          value={metrics.slowestDurationFormatted}
+          subtext={metrics.slowestStore}
+          icon={<Hourglass size={18} />}
+        />
       </div>
 
-      {/* SECTION 2 & 3 - CHARTS & EXCEPTIONS */}
-      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, minHeight: 0 }}>
-        
-        {/* MAIN VISUALIZATION: BAR CHART */}
-        <div className="ds-card" style={{ flex: '2 1 400px', padding: '24px', background: '#eceef0', borderRadius: '12px', border: '1px solid #e2e8f0', minHeight: 0 }}>
-          <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#0f172a' }}>Audit Duration by Store</h3>
-          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#64748b' }}>Sorted by duration (minutes)</p>
-          <div style={{ width: '100%', flex: 1, minHeight: 220 }}>
-            <ResponsiveContainer>
-              <BarChart data={metrics.storeDurations} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} stroke="#f1f5f9" />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 11, fill: '#475569', fontWeight: 500 }} axisLine={false} tickLine={false} width={50} />
-                <Tooltip 
-                  cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  formatter={(val, name, props) => [`${props.payload.formattedDuration} (${val}m)`, 'Duration']}
+      {/* DURATION BAR CHART */}
+      <div className="cc-card">
+
+        {/* Toolbar */}
+        <div className="cc-toolbar">
+          <h3 className="cc-toolbar-title">Audit Duration by Store</h3>
+
+          <div className="cc-search-container">
+            <span className="cc-search-icon">
+              <Search size={14} />
+            </span>
+            <input
+              type="text"
+              className="cc-search-input"
+              placeholder="Search store..."
+              value={searchFilter}
+              onChange={e => setSearchFilter(e.target.value)}
+            />
+            {searchFilter && (
+              <button
+                className="cc-search-clear"
+                onClick={() => setSearchFilter('')}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="cc-chart-scroll">
+          {chartData.length === 0 ? (
+            <div className="cc-empty">
+              <Search size={32} />
+              <p>No matching cycle count records found.</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={chartHeight}>
+              <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 80, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11, fill: '#64748b' }}
+                  axisLine={false}
+                  tickLine={false}
+                  unit="m"
                 />
-                <ReferenceLine x={metrics.OVERTIME_THRESHOLD_MINS} stroke="#dc2626" strokeDasharray="3 3" label={{ position: 'top', value: '4h Threshold', fill: '#dc2626', fontSize: 11 }} />
-                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={32}>
-                  {metrics.storeDurations.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.isOvertime ? '#ec4899' : '#4f46e5'} />
-                  ))}
+                <YAxis
+                  dataKey="STORE_CODE"
+                  type="category"
+                  tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={55}
+                />
+                <Tooltip
+                  content={<DurationTooltip />}
+                  cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
+                />
+                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff">
+                  <LabelList
+                    dataKey="rawDuration"
+                    position="right"
+                    style={{ fontSize: '12px', fontWeight: 600, fill: '#334155' }}
+                  />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* SECTION 3 - HEALTH & EXCEPTIONS */}
-        <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Operational Health */}
-          <div className="ds-card" style={{ padding: '24px', background: '#eceef0', borderRadius: '12px', border: '1px solid #e2e8f0', flex: 1 }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#0f172a' }}>Operational Health</h3>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-              <span style={{ color: '#15803d', fontWeight: 600 }}>NORMAL: {metrics.totalAudits - metrics.overtimeCount}</span>
-              <span style={{ color: '#b45309', fontWeight: 600 }}>OVERTIME: {metrics.overtimeCount}</span>
-            </div>
-            
-            {/* Segmented Bar */}
-            <div style={{ width: '100%', height: '12px', display: 'flex', borderRadius: '6px', overflow: 'hidden', marginBottom: '12px' }}>
-              <div style={{ height: '100%', background: '#22c55e', width: `${((metrics.totalAudits - metrics.overtimeCount) / metrics.totalAudits) * 100}%` }}></div>
-              <div style={{ height: '100%', background: '#f59e0b', width: `${(metrics.overtimeCount / metrics.totalAudits) * 100}%` }}></div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '14px', color: '#64748b' }}>TOTAL: {metrics.totalAudits} audits</span>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a' }}>{metrics.overtimeRate}%</div>
-                <div style={{ fontSize: '11px', color: '#94a3b8' }}>Overtime audit rate</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Exceptions Panel */}
-          {/* <div className="ds-card" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', flex: 1 }}>
-            <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertTriangle size={18} color="#dc2626" /> Requires Attention
-            </h3>
-            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b' }}>Stores exceeding the 4h threshold</p>
-            
-            {metrics.exceptions.length === 0 ? (
-              <div style={{ padding: '20px', background: '#f0fdf4', color: '#166534', borderRadius: '8px', fontSize: '14px', textAlign: 'center' }}>
-                No operational exceptions detected.
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {metrics.exceptions.map((exc, idx) => (
-                  <div key={idx} style={{ padding: '16px', background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: '8px' }}>
-                    <div style={{ fontWeight: 600, color: '#92400e', marginBottom: '8px' }}>{exc.storeName}</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
-                      <div style={{ color: '#b45309' }}>Duration: <strong style={{ color: '#92400e' }}>{exc.durationFormatted}</strong></div>
-                      <div style={{ color: '#b45309' }}>Threshold: <strong>4h</strong></div>
-                      <div style={{ color: '#dc2626', gridColumn: '1 / -1', fontWeight: 500 }}>
-                        Exceeds threshold by: {exc.exceedsByFormatted}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div> */}
-
+          )}
         </div>
       </div>
 
+      {/* DATA GRID */}
+      <div className="cc-card" style={{ padding: 10}}>
+        <div className="cc-grid-header">
+          <h3 className="cc-grid-title">Latest 5 Audits</h3>
+          <span className="cc-grid-count">{top5LatestData.length} Records</span>
+        </div>
+        <BaseDataTable
+          columns={tableColumns}
+          data={top5LatestData}
+          onRowClick={handleRowClick}
+          enablePagination={false} // Only 5 records, no need for pagination
+        />
+      </div>
+
+      {/* Modal */}
       {isModalOpen && (
-        <CycleCountModal 
-          modalData={selectedRowData} 
-          onClose={() => setIsModalOpen(false)} 
+        <CycleCountModal
+          modalData={selectedRowData}
+          onClose={() => setIsModalOpen(false)}
         />
       )}
     </div>

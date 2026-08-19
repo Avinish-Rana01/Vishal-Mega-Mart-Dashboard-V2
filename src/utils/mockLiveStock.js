@@ -4,7 +4,7 @@ export const generateMockData = () => {
   let totalSap = 0;
   let totalRfid = 0;
 
-  for (let i = 1; i <= 50; i++) {
+  for (let i = 1; i <= 20; i++) {
     const storeCode = `ST${i.toString().padStart(3, '0')}`;
     const sapStock = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
     
