@@ -214,15 +214,20 @@ export default function LiveStockSection() {
 
   if (isLoading) {
     return (
-      <div className="ls-dashboard-container" style={{ gap: '4px' }}>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '0' }}>
-          {[1,2,3,4].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>)}
-        </div>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr', marginBottom: '0' }}>
-          <div className="ds-skeleton-box" style={{ height: '280px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
-        </div>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr', marginBottom: '0' }}>
-          <div className="ds-skeleton-box" style={{ height: '350px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
+      <div className="ls-dashboard-container">
+        <SectionHeader title="Live Stock" rightContent={<DateBadge />} />
+        <div className="ls-grid">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
+              <div className="ds-shimmer" />
+            </div>
+          ))}
+          <div className="ds-skeleton-box" style={{ gridColumn: '1 / -1', height: '380px', borderRadius: '12px' }}>
+            <div className="ds-shimmer" />
+          </div>
+          <div className="ds-skeleton-box" style={{ gridColumn: '1 / -1', height: '350px', borderRadius: '12px' }}>
+            <div className="ds-shimmer" />
+          </div>
         </div>
       </div>
     );

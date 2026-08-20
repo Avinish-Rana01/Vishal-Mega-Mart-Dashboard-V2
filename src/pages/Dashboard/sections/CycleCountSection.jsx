@@ -110,7 +110,7 @@ export default function CycleCountSection() {
   // Chart data: filter valid durations, apply sorting
   const chartData = useMemo(() => {
     let result = [...filteredData].filter(r => r.durationMins !== null);
-    
+
     if (sortBy === 'DURATION_DESC') {
       result.sort((a, b) => b.durationMins - a.durationMins);
     } else if (sortBy === 'DURATION_ASC') {
@@ -118,14 +118,14 @@ export default function CycleCountSection() {
     } else if (sortBy === 'STORE_ASC') {
       result.sort((a, b) => (a.STORE_CODE || '').localeCompare(b.STORE_CODE || ''));
     }
-    
+
     return result;
   }, [filteredData, sortBy]);
 
   // Table data: top 5 based on selected sort (ignores search filter)
   const tableData = useMemo(() => {
     let sortedData = [...metrics.parsedData];
-    
+
     if (tableSort === 'latest') {
       sortedData.sort((a, b) => {
         const dateA = new Date(`${a.DATE}T${a.END_DateTime || '00:00:00'}`);
@@ -141,7 +141,7 @@ export default function CycleCountSection() {
         return valA - valB;
       });
     }
-    
+
     return sortedData.slice(0, 5);
   }, [metrics.parsedData, tableSort]);
 
@@ -158,14 +158,22 @@ export default function CycleCountSection() {
   if (isLoading) {
     return (
       <div className="cc-container">
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr' }}>
-          <div className="ds-skeleton-box" style={{ height: '60px', borderRadius: '12px' }}><div className="ds-shimmer" /></div>
+        <SectionHeader title="Cycle Count" rightContent={<DateBadge />} />
+        
+        <div className="cc-kpi-row">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
+              <div className="ds-shimmer" />
+            </div>
+          ))}
         </div>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '5px' }}>
-          {[1,2,3,4].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '100px', borderRadius: '10px' }}><div className="ds-shimmer" /></div>)}
+        
+        <div className="ds-skeleton-box" style={{ height: '380px', borderRadius: '12px' }}>
+          <div className="ds-shimmer" />
         </div>
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: '1fr' }}>
-          <div className="ds-skeleton-box" style={{ height: '280px', borderRadius: '20px' }}><div className="ds-shimmer" /></div>
+        
+        <div className="ds-skeleton-box" style={{ height: '400px', borderRadius: '12px' }}>
+          <div className="ds-shimmer" />
         </div>
       </div>
     );
@@ -244,7 +252,7 @@ export default function CycleCountSection() {
           <h3 className="vmm-toolbar-title">Audit Duration by Store</h3>
 
           <div className="vmm-toolbar-controls">
-            <CustomDropdown 
+            <CustomDropdown
               options={sortOptions}
               value={sortBy}
               onChange={(val) => setSortBy(val)}
@@ -256,7 +264,7 @@ export default function CycleCountSection() {
             <div className="vmm-search-container">
               <span className="vmm-search-icon">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8"/>
+                  <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8" />
                 </svg>
               </span>
               <input
@@ -287,7 +295,7 @@ export default function CycleCountSection() {
                 <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
               No matching cycle count records found.
-              <button 
+              <button
                 onClick={() => setSearchFilter('')}
                 style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
               >
@@ -306,73 +314,73 @@ export default function CycleCountSection() {
           <h3 className="cc-data-grid-title">
             LATEST CYCLE COUNT BY STORE
           </h3>
-          <CustomDropdown 
+          <CustomDropdown
             options={tableSortOptions}
             value={tableSort}
             onChange={(val) => setTableSort(val)}
             prefix="Sort:"
-            buttonStyle={{ minWidth: '160px', justifyContent: 'space-between', padding: '6px 12px' }}
+            buttonStyle={{ maginBottom: '10px', }}
             menuStyle={{ left: 'auto', right: 0, minWidth: '160px' }}
           />
         </div>
-        
+
         {/* Scrollable Wrapper - The key to native scrollbars */}
         <div className="cc-native-table-scroll">
           <div className="cc-data-grid-inner-wrapper">
             <table className="cc-data-grid-table">
-            <thead className="cc-data-grid-thead">
-              <tr>
-                <th className="cc-data-grid-th">Store Code</th>
-                <th className="cc-data-grid-th">Store Name</th>
-                <th className="cc-data-grid-th">Type</th>
-                <th className="cc-data-grid-th">Ref No</th>
-                <th className="cc-data-grid-th">Date</th>
-                <th className="cc-data-grid-th">Start Time</th>
-                <th className="cc-data-grid-th">End Time</th>
-                <th className="cc-data-grid-th">Duration</th>
-                <th className="cc-data-grid-th">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.length === 0 ? (
-                <motion.tr
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <td colSpan={9} className="cc-data-grid-empty-cell">
-                    No cycle counts found
-                  </td>
-                </motion.tr>
-              ) : (
-                tableData.map((row) => (
-                  <motion.tr 
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
-                    key={row.REF_NO || row.STORE_CODE} 
-                    className="cc-data-grid-tr"
-                    onClick={() => handleRowClick(row)}
+              <thead className="cc-data-grid-thead">
+                <tr>
+                  <th className="cc-data-grid-th">Store Code</th>
+                  <th className="cc-data-grid-th">Store Name</th>
+                  <th className="cc-data-grid-th">Type</th>
+                  <th className="cc-data-grid-th">Ref No</th>
+                  <th className="cc-data-grid-th">Date</th>
+                  <th className="cc-data-grid-th">Start Time</th>
+                  <th className="cc-data-grid-th">End Time</th>
+                  <th className="cc-data-grid-th">Duration</th>
+                  <th className="cc-data-grid-th">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.length === 0 ? (
+                  <motion.tr
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                   >
-                    <td className="cc-data-grid-td cc-data-grid-td-bold">{row.STORE_CODE || '—'}</td>
-                    <td className="cc-data-grid-td">{row.STORE_NAME || '—'}</td>
-                    <td className="cc-data-grid-td">{row.CYCLE_COUNT_TYPE || '—'}</td>
-                    <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
-                    <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
-                    <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
-                    <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
-                    <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
-                    <td className="cc-data-grid-td">
-                      <span className={`cc-data-grid-status-pill ${row.exceedsThreshold ? 'cc-data-grid-status-high' : 'cc-data-grid-status-normal'}`}>
-                        {row.exceedsThreshold ? 'Very High' : 'Normal'}
-                      </span>
+                    <td colSpan={9} className="cc-data-grid-empty-cell">
+                      No cycle counts found
                     </td>
                   </motion.tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  tableData.map((row) => (
+                    <motion.tr
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+                      key={row.REF_NO || row.STORE_CODE}
+                      className="cc-data-grid-tr"
+                      onClick={() => handleRowClick(row)}
+                    >
+                      <td className="cc-data-grid-td cc-data-grid-td-bold">{row.STORE_CODE || '—'}</td>
+                      <td className="cc-data-grid-td">{row.STORE_NAME || '—'}</td>
+                      <td className="cc-data-grid-td">{row.CYCLE_COUNT_TYPE || '—'}</td>
+                      <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
+                      <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
+                      <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
+                      <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
+                      <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
+                      <td className="cc-data-grid-td">
+                        <span className={`cc-data-grid-status-pill ${row.exceedsThreshold ? 'cc-data-grid-status-high' : 'cc-data-grid-status-normal'}`}>
+                          {row.exceedsThreshold ? 'Very High' : 'Normal'}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
