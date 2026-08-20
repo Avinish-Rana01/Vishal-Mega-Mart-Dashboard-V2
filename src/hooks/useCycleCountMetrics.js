@@ -121,7 +121,13 @@ export function useCycleCountMetrics(rawData) {
         formattedDuration: hasDuration ? formatDuration(durationMins) : '—',
         rawDuration: row.Time_Taken || '—',
         formattedDate: formatDate(row.DATE),
-        exceedsThreshold
+        exceedsThreshold,
+        NO_OF_ARTICLES: Number(row.NO_OF_ARTICLES) || 0,
+        SYSTEM_STOCK: Number(row.SYSTEM_STOCK) || 0,
+        SCANNED_QTY: Number(row.SCANNED_QTY) || 0,
+        NET_DIFFERENCE: Number(row.NET_DIFFERENCE) || 0,
+        SHORT_QTY: Number(row.SHORT_QTY) || 0,
+        EXCESS_QTY: Number(row.EXCESS_QTY) || 0
       };
     });
 

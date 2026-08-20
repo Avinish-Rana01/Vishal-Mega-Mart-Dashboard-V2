@@ -93,6 +93,15 @@ export function generateMockCycleCount(count = 20) {
     const type = Math.random() < (1/150) ? 'MC' : 'TA';
     const refNo = date.replace(/-/g, '') + padTwo(randomInt(0, 23)) + padTwo(randomInt(0, 59)) + padTwo(randomInt(0, 59));
 
+    const noOfArticles = randomInt(5, 50);
+    const systemStock = randomInt(50, 500);
+    // Simulate some variance
+    const varianceRatio = Math.random() < 0.2 ? randomInt(70, 130) / 100 : randomInt(95, 105) / 100;
+    const scannedQty = Math.round(systemStock * varianceRatio);
+    const netDifference = scannedQty - systemStock;
+    const shortQty = netDifference < 0 ? Math.abs(netDifference) : 0;
+    const excessQty = netDifference > 0 ? netDifference : 0;
+
     records.push({
       RowNumber: i + 1,
       DATE: date,
@@ -102,7 +111,13 @@ export function generateMockCycleCount(count = 20) {
       REF_NO: refNo,
       Start_DateTime: start,
       END_DateTime: end,
-      Time_Taken: duration
+      Time_Taken: duration,
+      NO_OF_ARTICLES: noOfArticles,
+      SYSTEM_STOCK: systemStock,
+      SCANNED_QTY: scannedQty,
+      NET_DIFFERENCE: netDifference,
+      SHORT_QTY: shortQty,
+      EXCESS_QTY: excessQty
     });
   }
 

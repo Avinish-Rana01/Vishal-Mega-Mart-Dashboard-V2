@@ -7,7 +7,7 @@ import BaseDataTable from '../../../components/common/BaseDataTable';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
@@ -111,11 +111,58 @@ const MemoizedDistributionChart = React.memo(({ distributionData }) => {
   );
 });
 
+// ---- Custom Tooltip for Cycle Info Chart ----
+function CycleInfoTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div className="cc-card" style={{ padding: '16px 20px', minWidth: '240px', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
+      <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '12px', fontSize: '15px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>
+        {d.STORE_NAME || d.STORE_CODE}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px 16px', fontSize: '13px', color: '#475569' }}>
+        <span style={{ color: '#64748b' }}>Articles</span>       <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.NO_OF_ARTICLES || 0}</span>
+        <span style={{ color: '#64748b' }}>System Stock</span>   <span style={{ fontWeight: 700, color: '#3b82f6' }}>{d.SYSTEM_STOCK || 0}</span>
+        <span style={{ color: '#64748b' }}>Scanned Qty</span>    <span style={{ fontWeight: 700, color: '#10b981' }}>{d.SCANNED_QTY || 0}</span>
+        <span style={{ color: '#64748b' }}>Difference</span>     <span style={{ fontWeight: 700, color: '#f59e0b' }}>{d.NET_DIFFERENCE || 0}</span>
+        <span style={{ color: '#64748b' }}>Short Qty</span>      <span style={{ fontWeight: 700, color: '#ef4444' }}>{d.SHORT_QTY || 0}</span>
+        <span style={{ color: '#64748b' }}>Excess Qty</span>     <span style={{ fontWeight: 700, color: '#eab308' }}>{d.EXCESS_QTY || 0}</span>
+      </div>
+    </div>
+  );
+}
+
+// ---- Memoized Cycle Info Chart Component ----
+const MemoizedCycleInfoChart = React.memo(({ chartData, chartHeight }) => {
+  return (
+    <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
+      <ResponsiveContainer width="100%" height={Math.max(chartHeight, 280)}>
+        <ComposedChart data={chartData} layout="vertical" margin={{ top: 15, right: 30, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
+          <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+          <YAxis 
+            dataKey="STORE_CODE" 
+            type="category" 
+            tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} 
+            axisLine={false} 
+            tickLine={false} 
+            width={60} 
+          />
+          <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
+          
+          <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false} />
+          <Bar dataKey="SCANNED_QTY" barSize={12} fill="#10b981" radius={[4, 4, 4, 4]} isAnimationActive={false} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+});
+
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
-  const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
-  // const data = realData;
+  // const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
+  const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -126,7 +173,8 @@ export default function CycleCountSection() {
 
   const viewOptions = useMemo(() => [
     { value: 'store', label: 'Audit Duration by Store' },
-    { value: 'distribution', label: 'Duration Distribution' }
+    { value: 'distribution', label: 'Duration Distribution' },
+    { value: 'info', label: 'Cycle Count Info' }
   ], []);
 
   const sortOptions = useMemo(() => [
@@ -384,8 +432,10 @@ export default function CycleCountSection() {
             ) : (
               <MemoizedChart chartData={chartData} chartHeight={chartHeight} />
             )
-          ) : (
+          ) : chartView === 'distribution' ? (
             <MemoizedDistributionChart distributionData={distributionData} />
+          ) : (
+            <MemoizedCycleInfoChart chartData={chartData} chartHeight={chartHeight} />
           )}
         </div>
       </div>
