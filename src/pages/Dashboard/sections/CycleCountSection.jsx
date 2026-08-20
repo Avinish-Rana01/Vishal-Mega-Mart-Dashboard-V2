@@ -8,6 +8,7 @@ import CustomDropdown from '../../../components/common/CustomDropdown';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
@@ -34,6 +35,43 @@ function DurationTooltip({ active, payload }) {
   );
 }
 
+// ---- Memoized Chart Component ----
+const MemoizedChart = React.memo(({ chartData, chartHeight }) => {
+  return (
+    <ResponsiveContainer width="100%" height={chartHeight}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 80, left: 10, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
+        <XAxis
+          type="number"
+          tick={{ fontSize: 11, fill: '#64748b' }}
+          axisLine={false}
+          tickLine={false}
+          unit="m"
+        />
+        <YAxis
+          dataKey="STORE_CODE"
+          type="category"
+          tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
+          axisLine={false}
+          tickLine={false}
+          width={55}
+        />
+        <Tooltip
+          content={<DurationTooltip />}
+          cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
+        />
+        <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff">
+          <LabelList
+            dataKey="rawDuration"
+            position="right"
+            style={{ fontSize: '12px', fontWeight: 600, fill: '#334155' }}
+          />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+});
+
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
@@ -43,11 +81,18 @@ export default function CycleCountSection() {
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('DURATION_DESC');
+  const [tableSort, setTableSort] = useState('latest');
 
   const sortOptions = useMemo(() => [
     { value: 'DURATION_DESC', label: 'Duration (Longest first)' },
     { value: 'DURATION_ASC', label: 'Duration (Shortest first)' },
     { value: 'STORE_ASC', label: 'Store Code (A-Z)' }
+  ], []);
+
+  const tableSortOptions = useMemo(() => [
+    { value: 'latest', label: 'Latest 5' },
+    { value: 'longest', label: 'Longest 5' },
+    { value: 'fastest', label: 'Fastest 5' }
   ], []);
 
   // Single source of filtered data for both chart and table
@@ -77,38 +122,32 @@ export default function CycleCountSection() {
     return result;
   }, [filteredData, sortBy]);
 
-  // Table data: top 5 latest counts globally (ignores search filter)
-  const top5LatestData = useMemo(() => {
-    return [...metrics.parsedData]
-      .sort((a, b) => {
-        // Sort by DATE descending, then END_DateTime descending
+  // Table data: top 5 based on selected sort (ignores search filter)
+  const tableData = useMemo(() => {
+    let sortedData = [...metrics.parsedData];
+    
+    if (tableSort === 'latest') {
+      sortedData.sort((a, b) => {
         const dateA = new Date(`${a.DATE}T${a.END_DateTime || '00:00:00'}`);
         const dateB = new Date(`${b.DATE}T${b.END_DateTime || '00:00:00'}`);
         return dateB - dateA;
-      })
-      .slice(0, 5);
-  }, [metrics.parsedData]);
+      });
+    } else if (tableSort === 'longest') {
+      sortedData.sort((a, b) => (b.durationMins || 0) - (a.durationMins || 0));
+    } else if (tableSort === 'fastest') {
+      sortedData.sort((a, b) => {
+        const valA = a.durationMins != null ? a.durationMins : Infinity;
+        const valB = b.durationMins != null ? b.durationMins : Infinity;
+        return valA - valB;
+      });
+    }
+    
+    return sortedData.slice(0, 5);
+  }, [metrics.parsedData, tableSort]);
 
   const chartHeight = Math.max(250, chartData.length * 32);
 
-  const thStyle = {
-    padding: '8px 12px',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#334155',
-    borderBottom: '2px solid #e2e8f0',
-    whiteSpace: 'nowrap',
-    textAlign: 'center'
-  };
 
-  const tdStyle = {
-    padding: '8px 12px',
-    fontSize: '12px',
-    color: '#0f172a',
-    borderBottom: '1px solid #f1f5f9',
-    whiteSpace: 'nowrap',
-    textAlign: 'center'
-  };
 
   const handleRowClick = (row) => {
     setSelectedRowData(row);
@@ -256,99 +295,80 @@ export default function CycleCountSection() {
               </button>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={chartHeight}>
-              <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 80, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  axisLine={false}
-                  tickLine={false}
-                  unit="m"
-                />
-                <YAxis
-                  dataKey="STORE_CODE"
-                  type="category"
-                  tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={55}
-                />
-                <Tooltip
-                  content={<DurationTooltip />}
-                  cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
-                />
-                <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff">
-                  <LabelList
-                    dataKey="rawDuration"
-                    position="right"
-                    style={{ fontSize: '12px', fontWeight: 600, fill: '#334155' }}
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <MemoizedChart chartData={chartData} chartHeight={chartHeight} />
           )}
         </div>
       </div>
 
       {/* NATIVE HTML DATA GRID */}
-      <div className="cc-card" style={{ padding: 0, background: '#eceef0', border: '1px solid #e2e8f0', borderRadius: '20px', boxShadow: 'none', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0' }}>
-          <h3 className="vmm-toolbar-title" style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1e3a8a' }}>
+      <div className="cc-data-grid-card">
+        <div className="cc-data-grid-header">
+          <h3 className="cc-data-grid-title">
             LATEST CYCLE COUNT BY STORE
           </h3>
+          <CustomDropdown 
+            options={tableSortOptions}
+            value={tableSort}
+            onChange={(val) => setTableSort(val)}
+            prefix="Sort:"
+            buttonStyle={{ minWidth: '160px', justifyContent: 'space-between', padding: '6px 12px' }}
+            menuStyle={{ left: 'auto', right: 0, minWidth: '160px' }}
+          />
         </div>
         
         {/* Scrollable Wrapper - The key to native scrollbars */}
-        <div className="cc-native-table-scroll" style={{ flex: 1, padding: '0 8px 0px 8px', minWidth: 0 }}>
-          <div style={{ minWidth: '950px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', background: '#fff', borderRadius: '8px', overflow: 'hidden' }}>
-            <thead style={{ position: 'sticky', top: 0, background: '#ffffff', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+        <div className="cc-native-table-scroll">
+          <div className="cc-data-grid-inner-wrapper">
+            <table className="cc-data-grid-table">
+            <thead className="cc-data-grid-thead">
               <tr>
-                <th style={thStyle}>Store Code</th>
-                <th style={thStyle}>Store Name</th>
-                <th style={thStyle}>Type</th>
-                <th style={thStyle}>Ref No</th>
-                <th style={thStyle}>Date</th>
-                <th style={thStyle}>Start Time</th>
-                <th style={thStyle}>End Time</th>
-                <th style={thStyle}>Duration</th>
-                <th style={thStyle}>Status</th>
+                <th className="cc-data-grid-th">Store Code</th>
+                <th className="cc-data-grid-th">Store Name</th>
+                <th className="cc-data-grid-th">Type</th>
+                <th className="cc-data-grid-th">Ref No</th>
+                <th className="cc-data-grid-th">Date</th>
+                <th className="cc-data-grid-th">Start Time</th>
+                <th className="cc-data-grid-th">End Time</th>
+                <th className="cc-data-grid-th">Duration</th>
+                <th className="cc-data-grid-th">Status</th>
               </tr>
             </thead>
             <tbody>
-              {top5LatestData.length === 0 ? (
-                <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: '30px', color: '#64748b', fontSize: '13px' }}>
+              {tableData.length === 0 ? (
+                <motion.tr
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <td colSpan={9} className="cc-data-grid-empty-cell">
                     No cycle counts found
                   </td>
-                </tr>
+                </motion.tr>
               ) : (
-                top5LatestData.map((row, idx) => (
-                  <tr 
-                    key={idx} 
-                    style={{ borderBottom: '1px solid #e2e8f0', cursor: 'pointer', transition: 'background 0.2s' }} 
-                    onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} 
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'} 
+                tableData.map((row) => (
+                  <motion.tr 
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+                    key={row.REF_NO || row.STORE_CODE} 
+                    className="cc-data-grid-tr"
                     onClick={() => handleRowClick(row)}
                   >
-                    <td style={{...tdStyle, fontWeight: 600, color: '#334155'}}>{row.STORE_CODE || '—'}</td>
-                    <td style={tdStyle}>{row.STORE_NAME || '—'}</td>
-                    <td style={tdStyle}>{row.CYCLE_COUNT_TYPE || '—'}</td>
-                    <td style={tdStyle}><span style={{ color: '#2563eb', fontWeight: 600 }}>{row.REF_NO || '—'}</span></td>
-                    <td style={tdStyle}>{row.formattedDate || '—'}</td>
-                    <td style={tdStyle}>{row.Start_DateTime || '—'}</td>
-                    <td style={tdStyle}>{row.END_DateTime || '—'}</td>
-                    <td style={tdStyle}>{row.rawDuration || '—'}</td>
-                    <td style={tdStyle}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600,
-                        ...(row.exceedsThreshold ? { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' } : { background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0' })
-                      }}>
+                    <td className="cc-data-grid-td cc-data-grid-td-bold">{row.STORE_CODE || '—'}</td>
+                    <td className="cc-data-grid-td">{row.STORE_NAME || '—'}</td>
+                    <td className="cc-data-grid-td">{row.CYCLE_COUNT_TYPE || '—'}</td>
+                    <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
+                    <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
+                    <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
+                    <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
+                    <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
+                    <td className="cc-data-grid-td">
+                      <span className={`cc-data-grid-status-pill ${row.exceedsThreshold ? 'cc-data-grid-status-high' : 'cc-data-grid-status-normal'}`}>
                         {row.exceedsThreshold ? 'Very High' : 'Normal'}
                       </span>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))
               )}
             </tbody>

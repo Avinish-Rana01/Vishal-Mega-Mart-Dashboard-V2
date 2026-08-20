@@ -458,11 +458,11 @@
   color: #3b82f6;
   outline: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .ls-filter-select:hover {
-  background: rgba(241, 245, 249, 0.8);
+  background-color: rgba(241, 245, 249, 0.8);
 }
 
 .ls-filter-input-wrapper {

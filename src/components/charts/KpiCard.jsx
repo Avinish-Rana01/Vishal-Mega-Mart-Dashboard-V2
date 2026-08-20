@@ -33,6 +33,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
       display: 'flex',
       flexDirection: 'column',
       border: '1px solid #f1f5f9',
+      borderTop: '3px solid #3174f1',
     }}>
       <h3 style={{ fontSize: '11px', fontWeight: '600', color: '#475569', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
         {title}
@@ -41,40 +42,6 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
       <div style={{ fontSize: 'clamp(18px, 4vw, 22px)', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
         {value}
       </div>
-
-      {/* <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#64748b', flexWrap: 'wrap' }}>
-        {badge && (
-          <span style={{
-            ...badgeStyles[badgeVariant],
-            padding: '2px 4px',
-            borderRadius: '4px',
-            fontSize: '10px',
-            fontWeight: '600',
-            whiteSpace: 'nowrap',
-          }}>
-            {badge}
-          </span>
-        )}
-        {subtext && <span>{subtext}</span>}
-      </div> */}
-      {/* 
-      {icon && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          right: '12px',
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '1px solid #e2e8f0',
-          color: '#64748b',
-        }}>
-          {React.cloneElement(icon, { size: 14 })}
-        </div>
-      )} */}
     </div>
   );
 }
