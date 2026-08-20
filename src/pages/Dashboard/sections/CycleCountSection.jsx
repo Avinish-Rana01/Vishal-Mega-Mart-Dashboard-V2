@@ -7,7 +7,7 @@ import BaseDataTable from '../../../components/common/BaseDataTable';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
@@ -72,16 +72,62 @@ const MemoizedChart = React.memo(({ chartData, chartHeight }) => {
   );
 });
 
+// ---- Memoized Distribution Chart Component ----
+const MemoizedDistributionChart = React.memo(({ distributionData }) => {
+  return (
+    <div style={{ height: '280px', width: '100%', paddingTop: '20px' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={distributionData} margin={{ top: 30, right: 30, left: 20, bottom: 5 }} barSize={45}>
+          <defs>
+            <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#34d399" stopOpacity={1}/>
+              <stop offset="100%" stopColor="#059669" stopOpacity={1}/>
+            </linearGradient>
+            <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#60a5fa" stopOpacity={1}/>
+              <stop offset="100%" stopColor="#2563eb" stopOpacity={1}/>
+            </linearGradient>
+            <linearGradient id="colorRed" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f87171" stopOpacity={1}/>
+              <stop offset="100%" stopColor="#dc2626" stopOpacity={1}/>
+            </linearGradient>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.1" />
+            </filter>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 600 }} dy={10} />
+          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} allowDecimals={false} />
+          <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
+          <Bar dataKey="count" radius={[8, 8, 0, 0]} isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" filter="url(#shadow)">
+            {distributionData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+            <LabelList dataKey="count" position="top" style={{ fill: '#1e293b', fontWeight: 800, fontSize: 16 }} offset={12} />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+});
+
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
   const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
+  // const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('DURATION_DESC');
   const [tableSort, setTableSort] = useState('latest');
+  const [chartView, setChartView] = useState('store');
+
+  const viewOptions = useMemo(() => [
+    { value: 'store', label: 'Audit Duration by Store' },
+    { value: 'distribution', label: 'Duration Distribution' }
+  ], []);
 
   const sortOptions = useMemo(() => [
     { value: 'DURATION_DESC', label: 'Duration (Longest first)' },
@@ -121,6 +167,26 @@ export default function CycleCountSection() {
 
     return result;
   }, [filteredData, sortBy]);
+
+  // Distribution data: categorize durations into 3 buckets (ignores search/sort)
+  const distributionData = useMemo(() => {
+    let under4 = 0;
+    let between4and8 = 0;
+    let over8 = 0;
+
+    (metrics.parsedData || []).forEach(row => {
+      if (row.durationMins == null) return;
+      if (row.durationMins < 4 * 60) under4++;
+      else if (row.durationMins <= 8 * 60) between4and8++;
+      else over8++;
+    });
+
+    return [
+      { name: '< 4 Hours', count: under4, fill: 'url(#colorGreen)' },
+      { name: '4 - 8 Hours', count: between4and8, fill: 'url(#colorBlue)' },
+      { name: '> 8 Hours', count: over8, fill: 'url(#colorRed)' }
+    ];
+  }, [metrics.parsedData]);
 
   // Table data: top 5 based on selected sort (ignores search filter)
   const tableData = useMemo(() => {
@@ -248,62 +314,78 @@ export default function CycleCountSection() {
       <div className="cc-card">
 
         {/* Toolbar */}
-        <div className="vmm-toolbar-header">
-          <h3 className="vmm-toolbar-title">Audit Duration by Store</h3>
+        <div className="vmm-toolbar-header" style={{ minHeight: '40px' }}>
+          <h3 className="vmm-toolbar-title" style={{ display: 'flex', alignItems: 'center' }}>
+            <CustomDropdown
+              options={viewOptions}
+              value={chartView}
+              onChange={(val) => setChartView(val)}
+              buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none' }}
+              menuStyle={{ left: 0, right: 'auto', minWidth: '220px' }}
+            />
+          </h3>
 
           <div className="vmm-toolbar-controls">
-            <CustomDropdown
-              options={sortOptions}
-              value={sortBy}
-              onChange={(val) => setSortBy(val)}
-              prefix="Sort:"
-              buttonStyle={{ minWidth: '200px', justifyContent: 'space-between' }}
-              menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
-            />
+            {chartView === 'store' && (
+              <>
+                <CustomDropdown
+                  options={sortOptions}
+                  value={sortBy}
+                  onChange={(val) => setSortBy(val)}
+                  prefix="Sort:"
+                  buttonStyle={{ minWidth: '200px', justifyContent: 'space-between' }}
+                  menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+                />
 
-            <div className="vmm-search-container">
-              <span className="vmm-search-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                className="vmm-search-input"
-                placeholder="Search store..."
-                value={searchFilter}
-                onChange={e => setSearchFilter(e.target.value)}
-                style={{ paddingRight: searchFilter ? '32px' : '16px' }}
-              />
-              {searchFilter && (
-                <button
-                  className="vmm-search-clear"
-                  onClick={() => setSearchFilter('')}
-                >
-                  ×
-                </button>
-              )}
-            </div>
+                <div className="vmm-search-container">
+                  <span className="vmm-search-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    className="vmm-search-input"
+                    placeholder="Search store..."
+                    value={searchFilter}
+                    onChange={e => setSearchFilter(e.target.value)}
+                    style={{ paddingRight: searchFilter ? '32px' : '16px' }}
+                  />
+                  {searchFilter && (
+                    <button
+                      className="vmm-search-clear"
+                      onClick={() => setSearchFilter('')}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
         {/* Chart */}
         <div className="cc-chart-scroll">
-          {chartData.length === 0 ? (
-            <div style={{ height: '100%', minHeight: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              No matching cycle count records found.
-              <button
-                onClick={() => setSearchFilter('')}
-                style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
-              >
-                Clear Search
-              </button>
-            </div>
+          {chartView === 'store' ? (
+            chartData.length === 0 ? (
+              <div style={{ height: '100%', minHeight: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
+                  <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                No matching cycle count records found.
+                <button
+                  onClick={() => setSearchFilter('')}
+                  style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Clear Search
+                </button>
+              </div>
+            ) : (
+              <MemoizedChart chartData={chartData} chartHeight={chartHeight} />
+            )
           ) : (
-            <MemoizedChart chartData={chartData} chartHeight={chartHeight} />
+            <MemoizedDistributionChart distributionData={distributionData} />
           )}
         </div>
       </div>

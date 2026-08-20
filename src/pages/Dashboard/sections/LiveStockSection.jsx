@@ -37,12 +37,71 @@ const sortOptions = [
 ];
 // ---------------------------
 
+// ---- Memoized Charts ----
+const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => (
+  <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
+      <ResponsiveContainer width="100%" height={Math.max(barChartData.length * 28, 240)}>
+        <BarChart 
+          layout="vertical"
+          data={barChartData} 
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
+        >
+          <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+          <YAxis 
+            type="category" 
+            dataKey="name" 
+            width={60} 
+            tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
+            axisLine={false} 
+            tickLine={false} 
+          />
+          <RechartsTooltip 
+            cursor={{ fill: '#f1f5f9' }} 
+            content={<StoreBarTooltip />}
+          />
+          
+          {/* Stacked bars: RFID on left, Difference on right */}
+          <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+          <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+        </BarChart>
+      </ResponsiveContainer>
+  </div>
+));
+
+const MemoizedPieChart = React.memo(({ accuracyPieData }) => (
+  <ResponsiveContainer width="100%" height="100%">
+    <PieChart>
+      <Pie
+        data={accuracyPieData}
+        dataKey="value"
+        nameKey="name"
+        cx="50%"
+        cy="50%"
+        innerRadius="65%"
+        outerRadius="100%"
+        paddingAngle={3}
+        stroke="none"
+        isAnimationActive={true}
+        animationDuration={800}
+        cornerRadius={5}
+      >
+        {accuracyPieData.map((entry, idx) => (
+          <Cell key={idx} fill={entry.fill} />
+        ))}
+      </Pie>
+      <RechartsTooltip content={<AccuracyTooltip />} wrapperStyle={{ zIndex: 1000, outline: 'none' }} />
+    </PieChart>
+  </ResponsiveContainer>
+));
+
 export default function LiveStockSection() {
   // === STATE MANAGEMENT ===
   // Global Data & Context
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
   const data = mockStores; // USE MOCK DATA OVERRIDE
   const totals = mockTotals;
+  // const data = realData;
+  // const totals = realTotals;
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -444,33 +503,7 @@ export default function LiveStockSection() {
                 </button>
               </div>
             ) : (
-              <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
-                  <ResponsiveContainer width="100%" height={Math.max(barChartData.length * 28, 240)}>
-                    <BarChart 
-                      layout="vertical"
-                      data={barChartData} 
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
-                    >
-                      <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                      <YAxis 
-                        type="category" 
-                        dataKey="name" 
-                        width={60} 
-                        tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
-                        axisLine={false} 
-                        tickLine={false} 
-                      />
-                      <RechartsTooltip 
-                        cursor={{ fill: '#f1f5f9' }} 
-                        content={<StoreBarTooltip />}
-                      />
-                      
-                      {/* Stacked bars: RFID on left, Difference on right */}
-                      <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={handleBarClick} />
-                      <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={handleBarClick} />
-                    </BarChart>
-                  </ResponsiveContainer>
-              </div>
+              <MemoizedLiveStockChart barChartData={barChartData} onBarClick={handleBarClick} />
             )}
           </div>
         </div>
@@ -488,28 +521,7 @@ export default function LiveStockSection() {
               
               {/* Left Side: Pie Chart */}
               <div className="ls-donut-wrapper">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={accuracyPieData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius="65%"
-                      outerRadius="100%"
-                      paddingAngle={3}
-                      stroke="none"
-                      isAnimationActive={true}
-                      cornerRadius={5}
-                    >
-                      {accuracyPieData.map((entry, idx) => (
-                        <Cell key={idx} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip content={<AccuracyTooltip />} wrapperStyle={{ zIndex: 1000, outline: 'none' }} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <MemoizedPieChart accuracyPieData={accuracyPieData} />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                   <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', lineHeight: 1 }}>{totalPieStores}</div>
                   <div style={{ fontSize: '12px', fontWeight: '500', color: '#64748b', marginTop: '6px' }}>Total Stores</div>

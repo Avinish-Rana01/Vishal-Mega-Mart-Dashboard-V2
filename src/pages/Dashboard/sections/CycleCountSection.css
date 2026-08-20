@@ -179,7 +179,6 @@
   /* Override global * { scrollbar-width: none } */
   scrollbar-color: #94a3b8 #f1f5f9;
   /* Firefox thumb & track colors */
-  flex: 1;
   min-width: 0;
   /* margin: 0 8px; */
   border-radius: 8px;

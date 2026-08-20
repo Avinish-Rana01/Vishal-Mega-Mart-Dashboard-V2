@@ -35,7 +35,7 @@ function generateDuration() {
   } else if (roll < 0.95) {
     totalSecs = randomInt(180 * 60, 300 * 60);     // 3h–5h
   } else {
-    totalSecs = randomInt(300 * 60, 480 * 60);     // 5h–8h (outlier)
+    totalSecs = randomInt(300 * 60, 600 * 60);     // 5h–10h (outlier)
   }
   const h = Math.floor(totalSecs / 3600);
   const m = Math.floor((totalSecs % 3600) / 60);
