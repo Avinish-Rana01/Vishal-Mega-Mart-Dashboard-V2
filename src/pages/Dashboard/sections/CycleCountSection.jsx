@@ -161,28 +161,21 @@ const CycleCountStockChart = React.memo(({ chartData, chartHeight }) => {
   );
 });
 
-// ---- HTML Badge Overlay for Net Difference Column ----
-const NetDifferenceBadgeOverlay = ({ chartData, chartHeight }) => {
-  const numRows = chartData.length;
-  const rowHeight = chartHeight / numRows;
-
+// ---- Flex-based Net Difference Badge Column (scrolls with chart) ----
+const NetDifferenceBadgeColumn = ({ chartData }) => {
   return (
-    <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '70px', pointerEvents: 'none', zIndex: 10 }}>
+    <div style={{ width: '75px', display: 'flex', flexDirection: 'column', pointerEvents: 'none', flexShrink: 0 }}>
       {chartData.map((d, i) => {
         const netDiff = Number(d.NET_DIFFERENCE || 0);
-        const top = i * rowHeight + (rowHeight - 26) / 2;
 
         let bgColor, textColor, icon;
         if (netDiff > 0)      { bgColor = '#00ff592b'; textColor = '#16a34a'; icon = '↑'; }
-        else if (netDiff < 0) { bgColor = '#fee2e2'; textColor = '#dc2626'; icon = '↓'; }
-        else                  { bgColor = '#f1f5f9'; textColor = '#64748b'; icon = '-'; }
+        else if (netDiff < 0) { bgColor = '#fee2e2';   textColor = '#dc2626'; icon = '↓'; }
+        else                  { bgColor = '#f1f5f9';   textColor = '#64748b'; icon = '-'; }
 
         return (
           <div key={d.STORE_CODE || i} style={{
-            position: 'absolute',
-            top: `${top}px`,
-            left: 0,
-            right: 0,
+            flex: 1,
             display: 'flex',
             alignItems: 'center',
             gap: '5px',
@@ -252,40 +245,42 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
   }, [chartData, maxShort, maxExcess]);
 
   return (
-    <div style={{ position: 'relative', height: chartHeight }}>
-      {/* Background Layer (Gray Tracks) */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: '70px', bottom: 0, pointerEvents: 'none' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={mappedData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-            <XAxis type="number" hide domain={[0, 100]} />
-            <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: 'transparent', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
-            <Bar dataKey="SHORT_BG" stackId="a" barSize={14} fill="#f1f5f9" radius={4} isAnimationActive={false} />
-            <Bar dataKey="SPACER_BG" stackId="a" fill="transparent" isAnimationActive={false} />
-            <Bar dataKey="EXCESS_BG" stackId="a" barSize={14} fill="#f1f5f9" radius={4} isAnimationActive={false} />
-          </BarChart>
-        </ResponsiveContainer>
+    <div style={{ display: 'flex', height: chartHeight }}>
+      {/* Chart layers (BG + FG) */}
+      <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
+        {/* Background Layer (Gray Tracks) */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={mappedData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+              <XAxis type="number" hide domain={[0, 100]} />
+              <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: 'transparent', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
+              <Bar dataKey="SHORT_BG" stackId="a" barSize={14} fill="#f1f5f9" radius={4} isAnimationActive={false} />
+              <Bar dataKey="SPACER_BG" stackId="a" fill="transparent" isAnimationActive={false} />
+              <Bar dataKey="EXCESS_BG" stackId="a" barSize={14} fill="#f1f5f9" radius={4} isAnimationActive={false} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Foreground Layer (Interactive Bars & Tooltip) */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={mappedData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+              <XAxis type="number" hide domain={[0, 100]} />
+              <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
+              <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
+              <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#f97316" radius={4} isAnimationActive={false}>
+                <LabelList dataKey="SHORT_VAL" content={<CustomVarianceLabel fill="#f97316" />} />
+              </Bar>
+              <Bar dataKey="SPACER_FG" stackId="a" fill="transparent" isAnimationActive={false} />
+              <Bar dataKey="EXCESS_BAR" stackId="a" barSize={14} fill="#10b981" radius={4} isAnimationActive={false}>
+                <LabelList dataKey="EXCESS_VAL" content={<CustomVarianceLabel fill="#10b981" />} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      {/* Foreground Layer (Interactive Bars & Tooltip) */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: '70px', bottom: 0 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={mappedData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-            <XAxis type="number" hide domain={[0, 100]} />
-            <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
-            <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
-            <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#f97316" radius={4} isAnimationActive={false}>
-              <LabelList dataKey="SHORT_VAL" content={<CustomVarianceLabel fill="#f97316" />} />
-            </Bar>
-            <Bar dataKey="SPACER_FG" stackId="a" fill="transparent" isAnimationActive={false} />
-            <Bar dataKey="EXCESS_BAR" stackId="a" barSize={14} fill="#10b981" radius={4} isAnimationActive={false}>
-              <LabelList dataKey="EXCESS_VAL" content={<CustomVarianceLabel fill="#10b981" />} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Net Difference Badge Column */}
-      <NetDifferenceBadgeOverlay chartData={chartData} chartHeight={chartHeight} />
+      {/* Net Difference Badge Column — in normal flow, scrolls with chart */}
+      <NetDifferenceBadgeColumn chartData={chartData} />
     </div>
   );
 });
@@ -296,7 +291,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
 
-      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px', overflowX: 'hidden' }}>
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
         <AnimatePresence mode="wait">
           {activeTab === 'system' ? (
             <motion.div 
