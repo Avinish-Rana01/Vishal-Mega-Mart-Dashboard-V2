@@ -134,7 +134,7 @@ export default function StoreValidationSection() {
               { dataKey: 'Validated', color: '#fda4af', label: 'Validated HU' }
             ]}
             height={280}
-            onBarClick={handleStoreClick}
+            /* onBarClick={handleStoreClick} */
           />
         </div>
 

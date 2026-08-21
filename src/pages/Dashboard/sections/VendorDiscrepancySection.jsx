@@ -126,7 +126,7 @@ export default function VendorDiscrepancySection() {
               { dataKey: 'Scanned', color: '#0d9488', label: 'Scanned Qty' }
             ]}
             height={280}
-            onBarClick={handleVendorClick}
+            /* onBarClick={handleVendorClick} */
           />
         </div>
 

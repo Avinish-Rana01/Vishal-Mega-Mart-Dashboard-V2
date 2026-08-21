@@ -699,7 +699,7 @@ export default function CycleCountSection() {
                       transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
                       key={row.REF_NO || row.STORE_CODE}
                       className="cc-data-grid-tr"
-                      onClick={() => handleRowClick(row)}
+                      /* onClick={() => handleRowClick(row)} */
                     >
                       <td className="cc-data-grid-td cc-data-grid-td-bold">
                         <div className="cc-row-tooltip-wrapper">

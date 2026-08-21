@@ -153,7 +153,7 @@ export default function SaleDashboardSection() {
               { dataKey: 'RFID', color: '#34d399', label: 'RFID Checkout' }
             ]}
             height={280}
-            onBarClick={handleStoreClick}
+            /* onBarClick={handleStoreClick} */
           />
         </div>
 

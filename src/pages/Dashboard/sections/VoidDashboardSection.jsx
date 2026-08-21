@@ -119,7 +119,7 @@ export default function VoidDashboardSection() {
               { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
             ]}
             height={280}
-            onBarClick={handleStoreClick}
+            /* onBarClick={handleStoreClick} */
           />
         </div>
 

@@ -124,7 +124,7 @@ export default function DcValidationSection() {
               { dataKey: 'Unprocessed', color: '#64748b', label: 'Unprocessed HU' }
             ]}
             height={280}
-            onBarClick={handleStoreClick}
+            /* onBarClick={handleStoreClick} */
           />
         </div>
 

@@ -61,8 +61,9 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => (
           />
           
           {/* Stacked bars: RFID on left, Difference on right */}
-          <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
-          <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0"  barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+          {/* Stacked bars: RFID on left, Difference on right */}
+          <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" /* onClick={onBarClick} */ isAnimationActive={true} animationDuration={800} />
+          <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0"  barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" /* onClick={onBarClick} */ isAnimationActive={true} animationDuration={800} />
         </BarChart>
       </ResponsiveContainer>
   </div>

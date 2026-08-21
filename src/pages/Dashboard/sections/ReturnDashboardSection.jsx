@@ -119,7 +119,7 @@ export default function ReturnDashboardSection() {
               { dataKey: 'Encoded', color: '#f0abfc', label: 'Encoded Qty' }
             ]}
             height={280}
-            onBarClick={handleStoreClick}
+            /* onBarClick={handleStoreClick} */
           />
         </div>
 
