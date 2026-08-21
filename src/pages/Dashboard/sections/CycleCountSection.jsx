@@ -452,7 +452,9 @@ export default function CycleCountSection() {
     return sortedData.slice(0, 5);
   }, [metrics.parsedData, tableSort]);
 
-  const chartHeight = Math.max(250, chartData.length * 32);
+  const chartHeight = chartView === 'store' 
+    ? Math.max(250, chartData.length * 30) 
+    : Math.max(280, chartData.length * 44);
 
 
 
@@ -561,7 +563,7 @@ export default function CycleCountSection() {
               options={viewOptions}
               value={chartView}
               onChange={(val) => setChartView(val)}
-              buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none' }}
+              buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase' }}
               menuStyle={{ left: 0, right: 'auto', minWidth: '260px', textTransform: 'none' }}
             />
           </h3>
