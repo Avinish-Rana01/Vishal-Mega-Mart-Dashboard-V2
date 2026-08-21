@@ -62,7 +62,7 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => (
           
           {/* Stacked bars: RFID on left, Difference on right */}
           <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
-          <Bar dataKey="Difference" stackId="a" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth={1} barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+          <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0"  barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
         </BarChart>
       </ResponsiveContainer>
   </div>
@@ -375,7 +375,15 @@ export default function LiveStockSection() {
                 <CustomDropdown 
                   options={operatorOptions}
                   value={filterOp}
-                  onChange={(val) => setFilterOp(val)}
+                  onChange={(val) => {
+                    setFilterOp(val);
+                    if (String(filterVal).trim() !== '') {
+                      const num = Number(filterVal);
+                      if (Number.isFinite(num) && num >= 0 && num <= 100) {
+                        setAppliedFilter({ field: 'Accuracy', op: val, val: num });
+                      }
+                    }
+                  }}
                 />
 
                 <div className="ls-filter-input-wrapper">
@@ -477,7 +485,7 @@ export default function LiveStockSection() {
             <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#475569', fontWeight: '500' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <svg width="14" height="14" viewBox="0 0 14 14">
-                  <circle cx="7" cy="7" r="6.5" fill="url(#striped-bar)" stroke="#e2e8f0" strokeWidth="1" />
+                  <circle cx="7" cy="7" r="6.5" fill="#ef5350" stroke="#e2e8f0" strokeWidth="1" />
                 </svg>
                 Difference
               </div>
@@ -496,7 +504,7 @@ export default function LiveStockSection() {
                 </svg>
                 No stores match your search or filter criteria.
                 <button 
-                  onClick={() => { setSearchStore(''); setAppliedFilter({ field: 'ALL', op: '<', val: '' }); }}
+                  onClick={() => { setSearchStore(''); setFilterVal(''); setAppliedFilter({ field: 'ALL', op: '<', val: '' }); }}
                   style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
                 >
                   Clear Filters

@@ -34,6 +34,7 @@ export default function Header({
       </div>
 
       <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
+        {/*
         <div className="vmm-search-box" style={{
           display: 'flex', alignItems: 'center', background: '#ffffffff', borderRadius: '20px', padding: '6px 12px', flex: '1 1 auto', minWidth: '120px', maxWidth: '250px'
         }}>
@@ -51,6 +52,7 @@ export default function Header({
             position: 'absolute', top: '-2px', right: '-2px', background: '#ef4444', width: '8px', height: '8px', borderRadius: '50%'
           }}></span>
         </button>
+        */}
 
         <div style={{ width: '1px', height: '24px', background: '#e2e8f0' }}></div>
 
@@ -76,19 +78,49 @@ export default function Header({
           </button>
 
           {showUserMenu && (
-          <div className="vmm-user-dropdown">
-            <div className="vmm-user-info">
-              <div className="vmm-user-name">{loggedInUser || 'Admin User'}</div>
-              <div className="vmm-user-role">Administrator</div>
+            <div className="vmm-user-dropdown" style={{ width: '260px', padding: '16px', borderRadius: '12px' }}>
+              {/* Profile Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
+                <div style={{ 
+                  width: '56px', height: '56px', borderRadius: '50%', background: '#dbeafe', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                }}>
+                  <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="18" r="8" fill="#94a3b8"/>
+                    <path d="M12 38C12 31.3726 17.3726 26 24 26C30.6274 26 36 31.3726 36 38V40H12V38Z" fill="#64748b"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>Welcome</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a', textDecoration: 'underline', textTransform: 'uppercase' }}>
+                    {loggedInUser || 'Admin'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Role Row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '0 4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1e293b', fontSize: '14px', fontWeight: 600 }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  Role -
+                </div>
+                <div style={{ background: '#f1f5f9', color: '#334155', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '20px' }}>
+                  Super Admin
+                </div>
+              </div>
+
+              {/* Sign Out Button */}
+              <button
+                className="vmm-dropdown-item"
+                onClick={handleLogout}
+                style={{ color: '#1e293b', fontSize: '14px', fontWeight: 600, padding: '8px 4px', gap: '8px' }}
+                onMouseOver={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#1e293b'; }}
+              >
+                <LogOut size={18} strokeWidth={2.5} /> Sign Out
+              </button>
             </div>
-            <button
-              className="vmm-dropdown-item"
-              onClick={handleLogout}
-            >
-              <LogOut size={16} /> Sign Out
-            </button>
-          </div>
-        )}
+          )}
       </div>
       </div>
     </header>

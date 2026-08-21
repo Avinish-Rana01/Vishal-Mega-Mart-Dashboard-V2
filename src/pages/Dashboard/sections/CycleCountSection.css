@@ -149,6 +149,63 @@
   color: #94a3b8;
 }
 
+/* ---- Custom Row Tooltip ---- */
+.cc-row-tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.cc-row-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  transform: translateY(10px);
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+  z-index: 1000;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.cc-row-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+.cc-row-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 19px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: #e2e8f0 transparent transparent transparent;
+  z-index: -1;
+}
+
+.cc-data-grid-tr:hover .cc-row-tooltip,
+.cc-row-tooltip-wrapper:hover .cc-row-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-8px);
+}
+
+
 .cc-error {
   padding: 20px;
   background: #fee2e2;

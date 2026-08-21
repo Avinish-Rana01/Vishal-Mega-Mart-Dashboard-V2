@@ -366,8 +366,8 @@ export default function CycleCountSection() {
 
   const viewOptions = useMemo(() => [
     { value: 'store', label: 'Audit Duration by Store' },
-    { value: 'distribution', label: 'Duration Distribution' },
-    { value: 'info', label: 'Cycle Count Info' }
+    { value: 'distribution', label: 'Duration Distribution by store' },
+    { value: 'info', label: 'Cycle Count Info by store' }
   ], []);
 
   const sortOptions = useMemo(() => [
@@ -562,7 +562,7 @@ export default function CycleCountSection() {
               value={chartView}
               onChange={(val) => setChartView(val)}
               buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none' }}
-              menuStyle={{ left: 0, right: 'auto', minWidth: '220px' }}
+              menuStyle={{ left: 0, right: 'auto', minWidth: '260px', textTransform: 'none' }}
             />
           </h3>
 
@@ -670,7 +670,6 @@ export default function CycleCountSection() {
               <thead className="cc-data-grid-thead">
                 <tr>
                   <th className="cc-data-grid-th">Store Code</th>
-                  <th className="cc-data-grid-th">Store Name</th>
                   <th className="cc-data-grid-th">Type</th>
                   <th className="cc-data-grid-th">Ref No</th>
                   <th className="cc-data-grid-th">Date</th>
@@ -702,9 +701,21 @@ export default function CycleCountSection() {
                       className="cc-data-grid-tr"
                       onClick={() => handleRowClick(row)}
                     >
-                      <td className="cc-data-grid-td cc-data-grid-td-bold">{row.STORE_CODE || '—'}</td>
-                      <td className="cc-data-grid-td">{row.STORE_NAME || '—'}</td>
-                      <td className="cc-data-grid-td">{row.CYCLE_COUNT_TYPE || '—'}</td>
+                      <td className="cc-data-grid-td cc-data-grid-td-bold">
+                        <div className="cc-row-tooltip-wrapper">
+                          {row.STORE_CODE || '—'}
+                          {row.STORE_NAME && (
+                            <div className="cc-row-tooltip">
+                              {row.STORE_CODE} - {row.STORE_NAME}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="cc-data-grid-td">
+                        {row.CYCLE_COUNT_TYPE === 'TA' ? 'Article Level' : 
+                         row.CYCLE_COUNT_TYPE === 'MC' ? 'MC Level' : 
+                         (row.CYCLE_COUNT_TYPE || '—')}
+                      </td>
                       <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
                       <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
                       <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
