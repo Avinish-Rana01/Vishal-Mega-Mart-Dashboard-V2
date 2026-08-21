@@ -34,7 +34,23 @@
   flex-direction: column;
   min-width: 0;
   overflow: visible;
-  /* margin-bottom: 10px; */
+}
+
+/* ==========================================================================
+   CYCLE COUNT SPLIT CHART LAYOUT
+   ========================================================================== */
+.cc-split-layout {
+  display: grid;
+  grid-template-columns: 57% 43%;
+  gap: 12px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .cc-split-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 
 

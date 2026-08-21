@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+  import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -7,7 +7,7 @@ import BaseDataTable from '../../../components/common/BaseDataTable';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
@@ -115,45 +115,242 @@ const MemoizedDistributionChart = React.memo(({ distributionData }) => {
 function CycleInfoTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
   const d = payload[0].payload;
+  
+  const netDiff = d.NET_DIFFERENCE || 0;
+  const netColor = netDiff > 0 ? '#10b981' : netDiff < 0 ? '#ef4444' : '#64748b';
+
   return (
-    <div className="cc-card" style={{ padding: '16px 20px', minWidth: '240px', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
-      <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '12px', fontSize: '15px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>
+    <div className="cc-card" style={{ padding: '8px 12px', minWidth: '180px', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
+      <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '6px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
         {d.STORE_NAME || d.STORE_CODE}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px 16px', fontSize: '13px', color: '#475569' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '4px 12px', fontSize: '11px', color: '#475569' }}>
         <span style={{ color: '#64748b' }}>Articles</span>       <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.NO_OF_ARTICLES || 0}</span>
-        <span style={{ color: '#64748b' }}>System Stock</span>   <span style={{ fontWeight: 700, color: '#3b82f6' }}>{d.SYSTEM_STOCK || 0}</span>
-        <span style={{ color: '#64748b' }}>Scanned Qty</span>    <span style={{ fontWeight: 700, color: '#10b981' }}>{d.SCANNED_QTY || 0}</span>
-        <span style={{ color: '#64748b' }}>Difference</span>     <span style={{ fontWeight: 700, color: '#f59e0b' }}>{d.NET_DIFFERENCE || 0}</span>
-        <span style={{ color: '#64748b' }}>Short Qty</span>      <span style={{ fontWeight: 700, color: '#ef4444' }}>{d.SHORT_QTY || 0}</span>
-        <span style={{ color: '#64748b' }}>Excess Qty</span>     <span style={{ fontWeight: 700, color: '#eab308' }}>{d.EXCESS_QTY || 0}</span>
+        <span style={{ color: '#64748b' }}>Difference</span>     <span style={{ fontWeight: 700, color: netColor }}>{netDiff > 0 ? '+' : ''}{netDiff}</span>
+        <span style={{ color: '#64748b' }}>Short Qty</span>      <span style={{ fontWeight: 700, color: '#f97316' }}>{Math.abs(d.SHORT_QTY || 0)}</span>
+        <span style={{ color: '#64748b' }}>Excess Qty</span>     <span style={{ fontWeight: 700, color: '#10b981' }}>{d.EXCESS_QTY || 0}</span>
       </div>
     </div>
   );
 }
 
-// ---- Memoized Cycle Info Chart Component ----
-const MemoizedCycleInfoChart = React.memo(({ chartData, chartHeight }) => {
+// ---- Left Chart: System vs Scanned ----
+const CycleCountStockChart = React.memo(({ chartData, chartHeight }) => {
   return (
-    <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
-      <ResponsiveContainer width="100%" height={Math.max(chartHeight, 280)}>
-        <ComposedChart data={chartData} layout="vertical" margin={{ top: 15, right: 30, left: 10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
-          <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-          <YAxis 
-            dataKey="STORE_CODE" 
-            type="category" 
-            tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} 
-            axisLine={false} 
-            tickLine={false} 
-            width={60} 
-          />
-          <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
-          
-          <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false} />
-          <Bar dataKey="SCANNED_QTY" barSize={12} fill="#10b981" radius={[4, 4, 4, 4]} isAnimationActive={false} />
-        </ComposedChart>
-      </ResponsiveContainer>
+    <ResponsiveContainer width="100%" height={chartHeight}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
+        <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+        <YAxis 
+          dataKey="STORE_CODE" 
+          type="category" 
+          tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} 
+          axisLine={false} 
+          tickLine={false} 
+          width={50} 
+        />
+        <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
+        <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false}>
+          <LabelList dataKey="SYSTEM_STOCK" position="right" fill="#3b82f6" fontSize={11} fontWeight={600} />
+        </Bar>
+        <Bar dataKey="SCANNED_QTY" barSize={12} fill="#10b981" radius={[4, 4, 4, 4]} isAnimationActive={false}>
+          <LabelList dataKey="SCANNED_QTY" position="right" fill="#10b981" fontSize={11} fontWeight={600} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+});
+
+// ---- HTML Badge Overlay for Net Difference Column ----
+const NetDifferenceBadgeOverlay = ({ chartData, chartHeight }) => {
+  const numRows = chartData.length;
+  const rowHeight = chartHeight / numRows;
+
+  return (
+    <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '70px', pointerEvents: 'none', zIndex: 10 }}>
+      {chartData.map((d, i) => {
+        const netDiff = Number(d.NET_DIFFERENCE || 0);
+        const top = i * rowHeight + (rowHeight - 26) / 2;
+
+        let bgColor, textColor, icon;
+        if (netDiff > 0)      { bgColor = '#00ff592b'; textColor = '#16a34a'; icon = '↑'; }
+        else if (netDiff < 0) { bgColor = '#fee2e2'; textColor = '#dc2626'; icon = '↓'; }
+        else                  { bgColor = '#f1f5f9'; textColor = '#64748b'; icon = '-'; }
+
+        return (
+          <div key={d.STORE_CODE || i} style={{
+            position: 'absolute',
+            top: `${top}px`,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+          }}>
+            <div style={{
+              backgroundColor: bgColor,
+              color: textColor,
+              borderRadius: '6px',
+              padding: '2px 7px',
+              fontSize: '12px',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              lineHeight: '20px',
+              minWidth: '48px',
+              textAlign: 'center',
+            }}>
+              {netDiff > 0 ? '+' : ''}{netDiff}
+            </div>
+            <span style={{ color: textColor, fontSize: '13px', fontWeight: 700 }}>{icon}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ---- Custom Labels for Recharts Stock Variance Bars ----
+const CustomVarianceLabel = (props) => {
+  const { x, y, width, height, value, fill } = props;
+  const displayVal = value > 0 ? value : '—';
+  
+  return (
+    <text x={x + width + 6} y={y + height / 2} dy={4} fill={value > 0 ? fill : '#94a3b8'} fontSize={11} fontWeight={600} textAnchor="start">
+      {displayVal}
+    </text>
+  );
+};
+
+// ---- Right Chart: Stock Variance (Recharts Stacked Implementation) ----
+const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
+  const maxShort = Math.max(0, ...chartData.map(d => Math.abs(Number(d.SHORT_QTY || 0))));
+  const maxExcess = Math.max(0, ...chartData.map(d => Number(d.EXCESS_QTY || 0)));
+
+  const mappedData = useMemo(() => {
+    return chartData.map(d => {
+      const shortQty = Math.abs(Number(d.SHORT_QTY || 0));
+      const excessQty = Number(d.EXCESS_QTY || 0);
+
+      const shortBar = maxShort > 0 ? (shortQty / maxShort) * 35 : 0;
+      const excessBar = maxExcess > 0 ? (excessQty / maxExcess) * 25 : 0;
+      
+      const finalShort = shortQty > 0 ? Math.max(shortBar, 1) : 0;
+      const finalExcess = excessQty > 0 ? Math.max(excessBar, 1) : 0;
+
+      return {
+        ...d,
+        SHORT_BG: 40,
+        SPACER_BG: 5,
+        EXCESS_BG: 30,
+        SHORT_BAR: finalShort,
+        SHORT_VAL: shortQty,
+        SPACER_FG: 45 - finalShort, 
+        EXCESS_BAR: finalExcess,
+        EXCESS_VAL: excessQty,
+      };
+    });
+  }, [chartData, maxShort, maxExcess]);
+
+  return (
+    <div style={{ position: 'relative', height: chartHeight }}>
+      {/* Background Layer (Gray Tracks) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: '70px', bottom: 0, pointerEvents: 'none' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={mappedData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+            <XAxis type="number" hide domain={[0, 100]} />
+            <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: 'transparent', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
+            <Bar dataKey="SHORT_BG" stackId="a" barSize={14} fill="#f1f5f9" radius={4} isAnimationActive={false} />
+            <Bar dataKey="SPACER_BG" stackId="a" fill="transparent" isAnimationActive={false} />
+            <Bar dataKey="EXCESS_BG" stackId="a" barSize={14} fill="#f1f5f9" radius={4} isAnimationActive={false} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Foreground Layer (Interactive Bars & Tooltip) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: '70px', bottom: 0 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={mappedData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+            <XAxis type="number" hide domain={[0, 100]} />
+            <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
+            <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
+            <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#f97316" radius={4} isAnimationActive={false}>
+              <LabelList dataKey="SHORT_VAL" content={<CustomVarianceLabel fill="#f97316" />} />
+            </Bar>
+            <Bar dataKey="SPACER_FG" stackId="a" fill="transparent" isAnimationActive={false} />
+            <Bar dataKey="EXCESS_BAR" stackId="a" barSize={14} fill="#10b981" radius={4} isAnimationActive={false}>
+              <LabelList dataKey="EXCESS_VAL" content={<CustomVarianceLabel fill="#10b981" />} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Net Difference Badge Column */}
+      <NetDifferenceBadgeOverlay chartData={chartData} chartHeight={chartHeight} />
+    </div>
+  );
+});
+
+// ---- Split Layout Wrapper (Now a Tabbed Carousel) ----
+const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab }) => {
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+
+
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px', overflowX: 'hidden' }}>
+        <AnimatePresence mode="wait">
+          {activeTab === 'system' ? (
+            <motion.div 
+              key="system"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ minWidth: 0 }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginBottom: '8px', paddingRight: '16px', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'inline-block' }}></span>
+                    System Stock
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
+                    Scanned Qty
+                  </span>
+                </div>
+              </div>
+              <CycleCountStockChart chartData={chartData} chartHeight={chartHeight} />
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="variance"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ minWidth: 0 }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginBottom: '4px', paddingRight: '16px', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#f97316', display: 'inline-block' }}></span>
+                    Short Qty
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
+                    Excess Qty
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block' }}></span>
+                    Net
+                  </span>
+                </div>
+              </div>
+              <CycleCountVarianceChart chartData={chartData} chartHeight={chartHeight} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 });
@@ -161,8 +358,8 @@ const MemoizedCycleInfoChart = React.memo(({ chartData, chartHeight }) => {
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
-  // const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
-  const data = realData;
+  const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
+  // const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -170,6 +367,7 @@ export default function CycleCountSection() {
   const [sortBy, setSortBy] = useState('DURATION_DESC');
   const [tableSort, setTableSort] = useState('latest');
   const [chartView, setChartView] = useState('store');
+  const [infoTab, setInfoTab] = useState('system');
 
   const viewOptions = useMemo(() => [
     { value: 'store', label: 'Audit Duration by Store' },
@@ -374,6 +572,20 @@ export default function CycleCountSection() {
           </h3>
 
           <div className="vmm-toolbar-controls">
+            {chartView === 'info' && (
+              <CustomDropdown
+                options={[
+                  { value: 'system', label: 'System vs Scanned' },
+                  { value: 'variance', label: 'Stock Variance' }
+                ]}
+                value={infoTab}
+                onChange={(val) => setInfoTab(val)}
+                prefix="View:"
+                buttonStyle={{ minWidth: '220px', justifyContent: 'space-between' }}
+                menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
+              />
+            )}
+            
             {chartView === 'store' && (
               <>
                 <CustomDropdown
@@ -435,7 +647,7 @@ export default function CycleCountSection() {
           ) : chartView === 'distribution' ? (
             <MemoizedDistributionChart distributionData={distributionData} />
           ) : (
-            <MemoizedCycleInfoChart chartData={chartData} chartHeight={chartHeight} />
+            <MemoizedCycleSplitCharts chartData={chartData} chartHeight={chartHeight} activeTab={infoTab} />
           )}
         </div>
       </div>
