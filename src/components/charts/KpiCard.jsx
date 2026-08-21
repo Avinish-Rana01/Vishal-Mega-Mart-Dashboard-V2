@@ -35,11 +35,11 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
       border: '1px solid #f1f5f9',
       borderTop: '3px solid #3174f1',
     }}>
-      <h3 style={{ fontSize: '11px', fontWeight: '600', color: '#475569', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+      <h3 style={{ fontSize: '9px', fontWeight: '600', color: '#475569', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
         {title}
       </h3>
 
-      <div style={{ fontSize: 'clamp(18px, 4vw, 22px)', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+      <div style={{ fontSize: 'clamp(18px, 4vw, 19px)', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
         {value}
       </div>
     </div>

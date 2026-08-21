@@ -153,6 +153,7 @@ const storeDashboardTotals = (summary) => ({
   HU_VALIDATED_QTY: summary.huValidatedQty?.toLocaleString('en-IN') || 0,
   HHT_VALIDATE_QTY: summary.hhtValidateQty?.toLocaleString('en-IN') || 0,
   HU_WRONG_QTY: summary.huWrongQty?.toLocaleString('en-IN') || 0,
+  ENCODED_QTY: summary.encodedQty?.toLocaleString('en-IN') || 0,
   STORE_PENDING_QTY: ((summary.huReceivedQty || 0) - (summary.huValidatedQty || 0)).toLocaleString('en-IN')
 });
 

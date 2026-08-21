@@ -1,4 +1,4 @@
-  import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -80,16 +80,16 @@ const MemoizedDistributionChart = React.memo(({ distributionData }) => {
         <BarChart data={distributionData} margin={{ top: 30, right: 30, left: 20, bottom: 5 }} barSize={45}>
           <defs>
             <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#34d399" stopOpacity={1}/>
-              <stop offset="100%" stopColor="#059669" stopOpacity={1}/>
+              <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+              <stop offset="100%" stopColor="#059669" stopOpacity={1} />
             </linearGradient>
             <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#60a5fa" stopOpacity={1}/>
-              <stop offset="100%" stopColor="#2563eb" stopOpacity={1}/>
+              <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
+              <stop offset="100%" stopColor="#2563eb" stopOpacity={1} />
             </linearGradient>
             <linearGradient id="colorRed" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f87171" stopOpacity={1}/>
-              <stop offset="100%" stopColor="#dc2626" stopOpacity={1}/>
+              <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
+              <stop offset="100%" stopColor="#dc2626" stopOpacity={1} />
             </linearGradient>
             <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.1" />
@@ -115,7 +115,7 @@ const MemoizedDistributionChart = React.memo(({ distributionData }) => {
 function CycleInfoTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
   const d = payload[0].payload;
-  
+
   const netDiff = d.NET_DIFFERENCE || 0;
   const netColor = netDiff > 0 ? '#10b981' : netDiff < 0 ? '#ef4444' : '#64748b';
 
@@ -141,13 +141,13 @@ const CycleCountStockChart = React.memo(({ chartData, chartHeight }) => {
       <BarChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
         <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-        <YAxis 
-          dataKey="STORE_CODE" 
-          type="category" 
-          tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} 
-          axisLine={false} 
-          tickLine={false} 
-          width={50} 
+        <YAxis
+          dataKey="STORE_CODE"
+          type="category"
+          tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
+          axisLine={false}
+          tickLine={false}
+          width={50}
         />
         <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
         <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false}>
@@ -169,9 +169,9 @@ const NetDifferenceBadgeColumn = ({ chartData }) => {
         const netDiff = Number(d.NET_DIFFERENCE || 0);
 
         let bgColor, textColor, icon;
-        if (netDiff > 0)      { bgColor = '#00ff592b'; textColor = '#16a34a'; icon = '↑'; }
-        else if (netDiff < 0) { bgColor = '#fee2e2';   textColor = '#dc2626'; icon = '↓'; }
-        else                  { bgColor = '#f1f5f9';   textColor = '#64748b'; icon = '-'; }
+        if (netDiff > 0) { bgColor = '#00ff592b'; textColor = '#16a34a'; icon = '↑'; }
+        else if (netDiff < 0) { bgColor = '#fee2e2'; textColor = '#dc2626'; icon = '↓'; }
+        else { bgColor = '#f1f5f9'; textColor = '#64748b'; icon = '-'; }
 
         return (
           <div key={d.STORE_CODE || i} style={{
@@ -206,7 +206,7 @@ const NetDifferenceBadgeColumn = ({ chartData }) => {
 const CustomVarianceLabel = (props) => {
   const { x, y, width, height, value, fill } = props;
   const displayVal = value > 0 ? value : '—';
-  
+
   return (
     <text x={x + width + 6} y={y + height / 2} dy={4} fill={value > 0 ? fill : '#94a3b8'} fontSize={11} fontWeight={600} textAnchor="start">
       {displayVal}
@@ -226,7 +226,7 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
 
       const shortBar = maxShort > 0 ? (shortQty / maxShort) * 35 : 0;
       const excessBar = maxExcess > 0 ? (excessQty / maxExcess) * 25 : 0;
-      
+
       const finalShort = shortQty > 0 ? Math.max(shortBar, 1) : 0;
       const finalExcess = excessQty > 0 ? Math.max(excessBar, 1) : 0;
 
@@ -237,7 +237,7 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
         EXCESS_BG: 30,
         SHORT_BAR: finalShort,
         SHORT_VAL: shortQty,
-        SPACER_FG: 45 - finalShort, 
+        SPACER_FG: 45 - finalShort,
         EXCESS_BAR: finalExcess,
         EXCESS_VAL: excessQty,
       };
@@ -294,7 +294,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
       <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
         <AnimatePresence mode="wait">
           {activeTab === 'system' ? (
-            <motion.div 
+            <motion.div
               key="system"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -317,7 +317,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
               <CycleCountStockChart chartData={chartData} chartHeight={chartHeight} />
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               key="variance"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -452,8 +452,8 @@ export default function CycleCountSection() {
     return sortedData.slice(0, 5);
   }, [metrics.parsedData, tableSort]);
 
-  const chartHeight = chartView === 'store' 
-    ? Math.max(250, chartData.length * 30) 
+  const chartHeight = chartView === 'store'
+    ? Math.max(250, chartData.length * 30)
     : Math.max(280, chartData.length * 44);
 
 
@@ -468,7 +468,7 @@ export default function CycleCountSection() {
     return (
       <div className="cc-container">
         <SectionHeader title="Cycle Count" rightContent={<DateBadge />} />
-        
+
         <div className="cc-kpi-row">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
@@ -476,11 +476,11 @@ export default function CycleCountSection() {
             </div>
           ))}
         </div>
-        
+
         <div className="ds-skeleton-box" style={{ height: '380px', borderRadius: '12px' }}>
           <div className="ds-shimmer" />
         </div>
-        
+
         <div className="ds-skeleton-box" style={{ height: '400px', borderRadius: '12px' }}>
           <div className="ds-shimmer" />
         </div>
@@ -551,6 +551,12 @@ export default function CycleCountSection() {
           subtext={metrics.slowestStore}
           icon={<Hourglass size={18} />}
         />
+        <KpiCard
+          title="In Progress"
+          value={metrics.inProgressCount}
+          subtext="Audits missing end time"
+          icon={<Hourglass size={18} />}
+        />
       </div>
 
       {/* DURATION BAR CHART */}
@@ -582,7 +588,7 @@ export default function CycleCountSection() {
                 menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
               />
             )}
-            
+
             {chartView === 'store' && (
               <>
                 <CustomDropdown
@@ -701,7 +707,7 @@ export default function CycleCountSection() {
                       transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
                       key={row.REF_NO || row.STORE_CODE}
                       className="cc-data-grid-tr"
-                      /* onClick={() => handleRowClick(row)} */
+                    /* onClick={() => handleRowClick(row)} */
                     >
                       <td className="cc-data-grid-td cc-data-grid-td-bold">
                         <div className="cc-row-tooltip-wrapper">
@@ -714,9 +720,9 @@ export default function CycleCountSection() {
                         </div>
                       </td>
                       <td className="cc-data-grid-td">
-                        {row.CYCLE_COUNT_TYPE === 'TA' ? 'Article Level' : 
-                         row.CYCLE_COUNT_TYPE === 'MC' ? 'MC Level' : 
-                         (row.CYCLE_COUNT_TYPE || '—')}
+                        {row.CYCLE_COUNT_TYPE === 'TA' ? 'Article Level' :
+                          row.CYCLE_COUNT_TYPE === 'MC' ? 'MC Level' :
+                            (row.CYCLE_COUNT_TYPE || '—')}
                       </td>
                       <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
                       <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>

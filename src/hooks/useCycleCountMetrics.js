@@ -131,6 +131,9 @@ export function useCycleCountMetrics(rawData) {
       };
     });
 
+    const inProgressCount = parsedData.filter(row => row.durationMins === null).length;
+
+
     const avgDuration = validDurationCount > 0 ? totalDuration / validDurationCount : null;
 
     // Sort longest → shortest for the bar chart
@@ -153,6 +156,7 @@ export function useCycleCountMetrics(rawData) {
       slowestDurationFormatted: maxDuration !== -Infinity ? formatDuration(maxDuration) : '—',
       slowestStore,
       todayCount,
+      inProgressCount,
       parsedData,
       storeDurations,
       SLA_THRESHOLD_MINS

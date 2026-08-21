@@ -213,6 +213,7 @@ export default function LiveStockSection() {
         fullName: row.STORE_NAME || row.STORE_CODE,
         PERCENTAGE: percentage,
         RFID: rfid,
+        SAP_STOCK: sap,
         Difference: difference
       };
     });
@@ -321,7 +322,16 @@ export default function LiveStockSection() {
 
       <div className="ls-grid">
      
-        {/* ROW 1: 4 KPI Cards */}
+        {/* ROW 1: 5 KPI Cards */}
+        <KpiCard
+          title="Total Stores"
+          value={data ? data.length : '0'}
+          subtext="Active stores"
+          badge="Network"
+          badgeVariant="info"
+          icon={<ArrowUpRight />}
+        />
+
         <KpiCard
           title="Total SAP Stock"
           value={totals?.SAP_STOCK || '0'}

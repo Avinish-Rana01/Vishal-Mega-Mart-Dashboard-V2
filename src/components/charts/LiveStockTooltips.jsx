@@ -34,6 +34,13 @@ export const StoreBarTooltip = React.memo(({ active, payload, label }) => {
             {Number(data.PERCENTAGE).toFixed(2)}%
           </span>
         </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+          <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#94a3b8' }}></div>
+            SAP Stock:
+          </span>
+          <span style={{ fontWeight: 600, color: '#0f172a' }}>{Number(data.SAP_STOCK || 0).toLocaleString()}</span>
+        </div>
         {payload.map((entry, index) => (
           <div key={index} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
             <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
