@@ -22,6 +22,24 @@ import './CycleCountSection.css';
 // Generate mock data once (same pattern as LiveStock)
 const mockCycleCountData = generateMockCycleCount(20);
 
+const VIEW_OPTIONS = [
+  { value: 'store', label: 'Audit Duration by Store' },
+  { value: 'distribution', label: 'Duration Distribution by store' },
+  { value: 'info', label: 'Cycle Count Info by store' }
+];
+
+const SORT_OPTIONS = [
+  { value: 'DURATION_DESC', label: 'Duration (Longest first)' },
+  { value: 'DURATION_ASC', label: 'Duration (Shortest first)' },
+  { value: 'STORE_ASC', label: 'Store Code (A-Z)' }
+];
+
+const TABLE_SORT_OPTIONS = [
+  { value: 'latest', label: 'Latest 5' },
+  { value: 'longest', label: 'Longest 5' },
+  { value: 'fastest', label: 'Fastest 5' }
+];
+
 // ---- Custom Tooltip for the Duration Bar Chart ----
 function DurationTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
@@ -369,24 +387,6 @@ export default function CycleCountSection() {
   const [chartView, setChartView] = useState('store');
   const [infoTab, setInfoTab] = useState('system');
 
-  const viewOptions = useMemo(() => [
-    { value: 'store', label: 'Audit Duration by Store' },
-    { value: 'distribution', label: 'Duration Distribution by store' },
-    { value: 'info', label: 'Cycle Count Info by store' }
-  ], []);
-
-  const sortOptions = useMemo(() => [
-    { value: 'DURATION_DESC', label: 'Duration (Longest first)' },
-    { value: 'DURATION_ASC', label: 'Duration (Shortest first)' },
-    { value: 'STORE_ASC', label: 'Store Code (A-Z)' }
-  ], []);
-
-  const tableSortOptions = useMemo(() => [
-    { value: 'latest', label: 'Latest 5' },
-    { value: 'longest', label: 'Longest 5' },
-    { value: 'fastest', label: 'Fastest 5' }
-  ], []);
-
   // Single source of filtered data for both chart and table
   const filteredData = useMemo(() => {
     if (!metrics.parsedData || metrics.parsedData.length === 0) return [];
@@ -548,7 +548,7 @@ export default function CycleCountSection() {
         <ChartToolbar
           leftContent={
             <CustomDropdown
-              options={viewOptions}
+              options={VIEW_OPTIONS}
               value={chartView}
               onChange={(val) => setChartView(val)}
               buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase' }}
@@ -573,7 +573,7 @@ export default function CycleCountSection() {
               {chartView === 'store' && (
                 <>
                   <CustomDropdown
-                    options={sortOptions}
+                    options={SORT_OPTIONS}
                     value={sortBy}
                     onChange={(val) => setSortBy(val)}
                     prefix="Sort:"
@@ -619,7 +619,7 @@ export default function CycleCountSection() {
         subtitle={`${tableData.length} records`}
         headerAction={
           <CustomDropdown
-            options={tableSortOptions}
+            options={TABLE_SORT_OPTIONS}
             value={tableSort}
             onChange={(val) => setTableSort(val)}
             prefix="Sort:"

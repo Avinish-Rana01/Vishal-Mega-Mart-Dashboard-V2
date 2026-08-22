@@ -252,7 +252,7 @@ export default function LiveStockSection() {
     return pieData;
   }, [data]);
 
-  const totalPieStores = accuracyPieData.reduce((sum, item) => sum + item.value, 0);
+  const totalPieStores = useMemo(() => accuracyPieData.reduce((sum, item) => sum + item.value, 0), [accuracyPieData]);
 
   /**
    * Navigates the user to a detailed report view for a specific store
