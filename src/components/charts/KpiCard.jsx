@@ -33,7 +33,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
       display: 'flex',
       flexDirection: 'column',
       border: '1px solid #f1f5f9',
-      borderTop: '3px solid #3174f1',
+      borderTop: '3px solid #5ea6f1',
     }}>
       <h3 style={{ fontSize: '9px', fontWeight: '600', color: '#475569', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
         {title}

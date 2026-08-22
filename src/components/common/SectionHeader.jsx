@@ -10,7 +10,7 @@ export default function SectionHeader({ title, rightContent }) {
   return (
     <div className="ds-header">
       <div className="ds-header-text">
-        <h1>{title}</h1>
+        <h3 style={{ textTransform: 'Uppercase', fontSize : '16px'}}>{title}</h3>
       </div>
       
       {rightContent && (

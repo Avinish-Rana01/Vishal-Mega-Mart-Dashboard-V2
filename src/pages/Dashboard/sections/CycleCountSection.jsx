@@ -2,6 +2,8 @@ import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
 import CycleCountModal from '../../../components/modals/CycleCountModal';
 import BaseDataTable from '../../../components/common/BaseDataTable';
 import CustomDropdown from '../../../components/common/CustomDropdown';
@@ -464,29 +466,7 @@ export default function CycleCountSection() {
   };
 
   // ---- Loading State ----
-  if (isLoading) {
-    return (
-      <div className="cc-container">
-        <SectionHeader title="Cycle Count" rightContent={<DateBadge />} />
-
-        <div className="cc-kpi-row">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
-              <div className="ds-shimmer" />
-            </div>
-          ))}
-        </div>
-
-        <div className="ds-skeleton-box" style={{ height: '380px', borderRadius: '12px' }}>
-          <div className="ds-shimmer" />
-        </div>
-
-        <div className="ds-skeleton-box" style={{ height: '400px', borderRadius: '12px' }}>
-          <div className="ds-shimmer" />
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <DashboardShimmer title="Cycle Count" />;
 
   // ---- Error State ----
   if (error) {
@@ -655,93 +635,70 @@ export default function CycleCountSection() {
         </div>
       </div>
 
-      {/* NATIVE HTML DATA GRID */}
-      <div className="cc-data-grid-card">
-        <div className="cc-data-grid-header">
-          <h3 className="cc-data-grid-title">
-            LATEST CYCLE COUNT BY STORE
-          </h3>
+
+      {/* NATIVE TABLE / DATA GRID */}
+      <DashboardDataGrid
+        title="ALL CYCLE COUNTS"
+        subtitle={`${tableData.length} records`}
+        headerAction={
           <CustomDropdown
             options={tableSortOptions}
             value={tableSort}
             onChange={(val) => setTableSort(val)}
             prefix="Sort:"
-            buttonStyle={{ maginBottom: '10px', }}
-            menuStyle={{ left: 'auto', right: 0, minWidth: '160px' }}
+            buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+            menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
           />
-        </div>
-
-        {/* Scrollable Wrapper - The key to native scrollbars */}
-        <div className="cc-native-table-scroll">
-          <div className="cc-data-grid-inner-wrapper">
-            <table className="cc-data-grid-table">
-              <thead className="cc-data-grid-thead">
-                <tr>
-                  <th className="cc-data-grid-th">Store Code</th>
-                  <th className="cc-data-grid-th">Type</th>
-                  <th className="cc-data-grid-th">Ref No</th>
-                  <th className="cc-data-grid-th">Date</th>
-                  <th className="cc-data-grid-th">Start Time</th>
-                  <th className="cc-data-grid-th">End Time</th>
-                  <th className="cc-data-grid-th">Duration</th>
-                  <th className="cc-data-grid-th">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.length === 0 ? (
-                  <motion.tr
-                    key="empty"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <td colSpan={9} className="cc-data-grid-empty-cell">
-                      No cycle counts found
-                    </td>
-                  </motion.tr>
-                ) : (
-                  tableData.map((row) => (
-                    <motion.tr
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
-                      key={row.REF_NO || row.STORE_CODE}
-                      className="cc-data-grid-tr"
-                    /* onClick={() => handleRowClick(row)} */
-                    >
-                      <td className="cc-data-grid-td cc-data-grid-td-bold">
-                        <div className="cc-row-tooltip-wrapper">
-                          {row.STORE_CODE || '—'}
-                          {row.STORE_NAME && (
-                            <div className="cc-row-tooltip">
-                              {row.STORE_CODE} - {row.STORE_NAME}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="cc-data-grid-td">
-                        {row.CYCLE_COUNT_TYPE === 'TA' ? 'Article Level' :
-                          row.CYCLE_COUNT_TYPE === 'MC' ? 'MC Level' :
-                            (row.CYCLE_COUNT_TYPE || '—')}
-                      </td>
-                      <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
-                      <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
-                      <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
-                      <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
-                      <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
-                      <td className="cc-data-grid-td">
-                        <span className={`cc-data-grid-status-pill ${row.exceedsThreshold ? 'cc-data-grid-status-high' : 'cc-data-grid-status-normal'}`}>
-                          {row.exceedsThreshold ? 'Very High' : 'Normal'}
-                        </span>
-                      </td>
-                    </motion.tr>
-                  ))
+        }
+        headers={[
+          'Store Code', 'Type', 'Ref No', 'Date', 'Start Time', 'End Time', 'Duration', 'Status'
+        ]}
+        data={tableData}
+        emptyStateContent={
+          <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <td colSpan={8} className="cc-data-grid-empty-cell">
+              No cycle counts found
+            </td>
+          </motion.tr>
+        }
+        renderRow={(row) => (
+          <motion.tr
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+            key={row.REF_NO || row.STORE_CODE}
+            className="cc-data-grid-tr"
+            /* onClick={() => handleRowClick(row)} */
+          >
+            <td className="cc-data-grid-td cc-data-grid-td-bold">
+              <div className="cc-row-tooltip-wrapper">
+                {row.STORE_CODE || '—'}
+                {row.STORE_NAME && (
+                  <div className="cc-row-tooltip">
+                    {row.STORE_CODE} - {row.STORE_NAME}
+                  </div>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              </div>
+            </td>
+            <td className="cc-data-grid-td">
+              {row.CYCLE_COUNT_TYPE === 'TA' ? 'Article Level' :
+                row.CYCLE_COUNT_TYPE === 'MC' ? 'MC Level' :
+                  (row.CYCLE_COUNT_TYPE || '—')}
+            </td>
+            <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
+            <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
+            <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
+            <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
+            <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
+            <td className="cc-data-grid-td">
+              <span className={`cc-data-grid-status-pill ${row.exceedsThreshold ? 'cc-data-grid-status-high' : 'cc-data-grid-status-normal'}`}>
+                {row.exceedsThreshold ? 'Very High' : 'Normal'}
+              </span>
+            </td>
+          </motion.tr>
+        )}
+      />
 
       {/* Modal */}
       {isModalOpen && (

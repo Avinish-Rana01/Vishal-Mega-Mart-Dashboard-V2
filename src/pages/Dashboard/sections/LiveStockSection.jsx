@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,LabelList } from 'recharts';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
 import KpiCard from '../../../components/charts/KpiCard';
@@ -273,26 +274,7 @@ export default function LiveStockSection() {
     return { rawSap: sap, rawRfid: rfid, rawDiff: diff, accuracyPercent: percent };
   }, [totals]);
 
-  if (isLoading) {
-    return (
-      <div className="ls-dashboard-container">
-        <SectionHeader title="Live Stock" rightContent={<DateBadge />} />
-        <div className="ls-grid">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
-              <div className="ds-shimmer" />
-            </div>
-          ))}
-          <div className="ds-skeleton-box" style={{ gridColumn: '1 / -1', height: '380px', borderRadius: '12px' }}>
-            <div className="ds-shimmer" />
-          </div>
-          <div className="ds-skeleton-box" style={{ gridColumn: '1 / -1', height: '350px', borderRadius: '12px' }}>
-            <div className="ds-shimmer" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <DashboardShimmer title="Live Stock" />;
 
   if (error) {
     return <div style={{ color: 'red', padding: '20px', background: '#fee2e2', borderRadius: '8px' }}>{error}</div>;
