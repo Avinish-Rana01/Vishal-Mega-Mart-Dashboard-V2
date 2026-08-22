@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useStoreDashboard } from '../../../hooks/useDashboardData';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
 import CustomDropdown from '../../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
+import ChartLegend from '../../../components/common/ChartLegend';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
@@ -161,18 +165,31 @@ const MemoizedProgressChart = React.memo(({ chartData }) => {
 });
 
 // ─── 3. Wrong HU Distribution Chart ───────────────────────────────────────────
-const MemoizedWrongHUChart = React.memo(({ chartData }) => {
+const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearch }) => {
   const ROW_HEIGHT = 20;
   const GROUP_GAP = 16;
   const filteredData = chartData.filter(d => Number(d.HU_WRONG_QTY || 0) > 0);
   const chartHeight = Math.max(220, filteredData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
 
   if (filteredData.length === 0) {
+    if (searchFilter && searchFilter.trim().length > 0) {
+      return (
+        <SearchEmptyState 
+          searchFilter={searchFilter}
+          title={`No Wrong HUs Found for "${searchFilter}"`}
+          subtitle="Try another store or clear your search."
+          onClearSearch={onClearSearch}
+        />
+      );
+    }
+
     return (
-      <div style={{ height: '250px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#10b981', fontSize: '15px', background: '#ecfdf5', borderRadius: '12px', border: '1px solid #34d399' }}>
-        <Icons.CheckCircle />
-        <span style={{ marginTop: '12px', fontWeight: 600 }}>All stores are clean! No Wrong HUs detected.</span>
-      </div>
+      <GlobalEmptyState 
+        title="No Wrong HUs Detected"
+        subtitle="All stores are currently clean"
+        icon={Icons.ShieldCheck}
+        iconColor="#059669"
+      />
     );
   }
 
@@ -207,8 +224,6 @@ const VIEW_OPTIONS = [
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function StoreValidationSection() {
   const { data: realData, totals: realTotals, isLoading, error } = useStoreDashboard();
-
-  // OVERRIDE WITH MOCK DATA FOR 20 STORES
   const data = mockStores;
   const totals = mockTotals;
 
@@ -225,6 +240,12 @@ export default function StoreValidationSection() {
 
   // Dynamically generate sort options based on current view
   const sortOptions = useMemo(() => {
+    if (chartView === 'wrong_hu') {
+      return [
+        { value: 'WRONG_DESC', label: 'Highest Wrong HU' },
+        { value: 'WRONG_ASC', label: 'Lowest Wrong HU' }
+      ];
+    }
     const baseOptions = [
       { value: 'PENDING_DESC', label: 'Highest Pending' },
       { value: 'VALIDATED_ASC', label: 'Lowest Validated' },
@@ -236,6 +257,13 @@ export default function StoreValidationSection() {
     }
     return baseOptions;
   }, [chartView]);
+
+  // Ensure current sort is valid for current view
+  useEffect(() => {
+    if (!sortOptions.find(opt => opt.value === sortBy)) {
+      setSortBy(sortOptions[0].value);
+    }
+  }, [sortOptions, sortBy]);
 
   // Filtered + sorted data for the chart
   const chartData = useMemo(() => {
@@ -258,6 +286,8 @@ export default function StoreValidationSection() {
       result.sort((a, b) => Number(a.HU_VALIDATED_QTY || 0) - Number(b.HU_VALIDATED_QTY || 0));
     } else if (sortBy === 'WRONG_DESC') {
       result.sort((a, b) => Number(b.HU_WRONG_QTY || 0) - Number(a.HU_WRONG_QTY || 0));
+    } else if (sortBy === 'WRONG_ASC') {
+      result.sort((a, b) => Number(a.HU_WRONG_QTY || 0) - Number(b.HU_WRONG_QTY || 0));
     } else {
       result.sort((a, b) => (a.STORE || '').localeCompare(b.STORE || ''));
     }
@@ -265,19 +295,12 @@ export default function StoreValidationSection() {
     return result;
   }, [data, searchFilter, sortBy]);
 
+  const hasWrongHUs = useMemo(() => chartData.some(d => Number(d.HU_WRONG_QTY || 0) > 0), [chartData]);
+
   // Separate sorted data for the Data Grid (Table)
   const tableData = useMemo(() => {
     if (!data || data.length === 0) return [];
     let result = [...data];
-
-    // Search
-    if (searchFilter.trim()) {
-      const term = searchFilter.toLowerCase();
-      result = result.filter(row =>
-        (row.STORE     && row.STORE.toLowerCase().includes(term)) ||
-        (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term))
-      );
-    }
 
     // Sort for table
     if (tableSort === 'PENDING_DESC') {
@@ -289,7 +312,7 @@ export default function StoreValidationSection() {
     }
 
     return result;
-  }, [data, searchFilter, tableSort]);
+  }, [data, tableSort]);
 
   // ─── Loading ────────────────────────────────────────────────────────────────
   if (isLoading) return <DashboardShimmer title="Store Validation" />;
@@ -341,9 +364,8 @@ export default function StoreValidationSection() {
       {/* ── Main Chart Card ──────────────────────────────────────────────── */}
       <div className="cc-card">
 
-        {/* Top Toolbar: Title dropdown (left) + Sort + Search (right) */}
-        <div className="vmm-toolbar-header" style={{ minHeight: '40px' }}>
-          <h3 className="vmm-toolbar-title" style={{ display: 'flex', alignItems: 'center' }}>
+        <ChartToolbar
+          leftContent={
             <CustomDropdown
               options={VIEW_OPTIONS}
               value={chartView}
@@ -356,92 +378,64 @@ export default function StoreValidationSection() {
               buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}
               menuStyle={{ left: 0, right: 'auto', minWidth: '260px', textTransform: 'none', letterSpacing: 'normal' }}
             />
-          </h3>
-
-          <div className="vmm-toolbar-controls">
-            <CustomDropdown
-              options={sortOptions}
-              value={sortBy}
-              onChange={setSortBy}
-              prefix="Sort:"
-              buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
-              menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
-            />
-
-            {/* Search */}
-            <div className="vmm-search-container">
-              <span className="vmm-search-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                className="vmm-search-input"
-                placeholder="Search store..."
-                value={searchFilter}
-                onChange={e => setSearchFilter(e.target.value)}
-                style={{ paddingRight: searchFilter ? '32px' : '16px' }}
+          }
+          rightContent={
+            <>
+              <CustomDropdown
+                options={sortOptions}
+                value={sortBy}
+                onChange={setSortBy}
+                prefix="Sort:"
+                buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+                menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
               />
-              {searchFilter && (
-                <button className="vmm-search-clear" onClick={() => setSearchFilter('')}>×</button>
-              )}
-            </div>
-          </div>
-        </div>
+              <ChartSearchInput
+                value={searchFilter}
+                onChange={setSearchFilter}
+                onClear={() => setSearchFilter('')}
+              />
+            </>
+          }
+        />
 
-        {/* ── Fixed Legend Strip (Dynamic based on View) ────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px', padding: '4px 8px 6px', fontSize: '12px', color: '#475569', fontWeight: 500, borderBottom: '1px solid #e8eaf0' }}>
-          {chartView === 'grouped' && (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: COLOR_RECEIVED }} /> Received HU
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: COLOR_VALIDATED }} /> Validated HU
-              </div>
-            </>
-          )}
-          {chartView === 'progress' && (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: COLOR_HHT }} /> HHT Validated
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: COLOR_PENDING }} /> Pending
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#fee2e2', border: '1.5px solid #ef4444' }} /> Wrong HU
-              </div>
-            </>
-          )}
-          {chartView === 'wrong_hu' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: COLOR_WRONG }} /> Wrong HU
+        {/* ── Legend Strip (Dynamic based on View) ────────────────── */}
+        {chartView === 'grouped' && (
+          <ChartLegend items={[
+            { color: COLOR_RECEIVED, label: 'Received HU' },
+            { color: COLOR_VALIDATED, label: 'Validated HU' },
+          ]} />
+        )}
+        {chartView === 'progress' && (
+          <ChartLegend items={[
+            { color: COLOR_HHT, label: 'HHT Validated' },
+            { color: COLOR_PENDING, label: 'Pending' },
+            { color: '#fee2e2', label: 'Wrong HU', borderColor: '#ef4444' },
+          ]} />
+        )}
+        {chartView === 'wrong_hu' && (
+          hasWrongHUs ? (
+            <ChartLegend items={[{ color: COLOR_WRONG, label: 'Wrong HU' }]} />
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', padding: '4px 8px 6px', fontSize: '12px', color: '#059669', fontWeight: 500, borderBottom: '1px solid #e8eaf0' }}>
+              <Icons.Check size={14} strokeWidth={3} /> All Clear
             </div>
-          )}
-        </div>
+          )
+        )}
 
         {/* ── Chart Scroll Area (fixed height, scrolls internally) ────────── */}
         <div className="cc-chart-scroll" style={{ minHeight: '265px', maxHeight: '265px' }}>
           {chartData.length === 0 ? (
-            <div style={{ height: '250px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              No matching stores found.
-              <button
-                onClick={() => setSearchFilter('')}
-                style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
-              >
-                Clear Search
-              </button>
-            </div>
+            <SearchEmptyState 
+              searchFilter={searchFilter}
+              title={`No Stores Found for "${searchFilter}"`}
+              subtitle="Try a different store code or clear your search."
+              onClearSearch={() => setSearchFilter('')}
+            />
           ) : (
             <>
               {chartView === 'grouped' && <MemoizedValidationChart chartData={chartData} />}
               {chartView === 'progress' && <MemoizedProgressChart chartData={chartData} />}
-              {chartView === 'wrong_hu' && <MemoizedWrongHUChart chartData={chartData} />}
+              {chartView === 'wrong_hu' && <MemoizedWrongHUChart chartData={chartData} searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />}
             </>
           )}
         </div>
@@ -475,6 +469,13 @@ export default function StoreValidationSection() {
         renderRow={(row, idx) => {
           const pending = Number(row.STORE_PENDING_QTY || 0);
           const wrong = Number(row.HU_WRONG_QTY || 0);
+          const received = Number(row.HU_RECEIVED_QTY || 0);
+          const validated = Number(row.HU_VALIDATED_QTY || 0);
+          const hhtValidated = Number(row.HHT_VALIDATE_QTY || 0);
+
+          const validatedColor = validated < received ? '#dc2626' : '#16a34a';
+          const hhtColor = hhtValidated < validated ? '#dc2626' : COLOR_HHT;
+
           return (
             <tr key={row.STORE || idx} className="cc-data-grid-tr">
               <td className="cc-data-grid-td cc-data-grid-td-bold">
@@ -491,13 +492,13 @@ export default function StoreValidationSection() {
                 {row.DATE ? row.DATE.split(' ')[0] : '—'}
               </td>
               <td className="cc-data-grid-td">
-                <span style={{ color: COLOR_RECEIVED, fontWeight: 700 }}>{Number(row.HU_RECEIVED_QTY || 0).toLocaleString('en-IN')}</span>
+                <span style={{ color: COLOR_RECEIVED, fontWeight: 700 }}>{received.toLocaleString('en-IN')}</span>
               </td>
               <td className="cc-data-grid-td">
-                <span style={{ color: COLOR_VALIDATED, fontWeight: 700 }}>{Number(row.HU_VALIDATED_QTY || 0).toLocaleString('en-IN')}</span>
+                <span style={{ color: validatedColor, fontWeight: 700 }}>{validated.toLocaleString('en-IN')}</span>
               </td>
               <td className="cc-data-grid-td">
-                <span style={{ color: COLOR_HHT, fontWeight: 700 }}>{Number(row.HHT_VALIDATE_QTY || 0).toLocaleString('en-IN')}</span>
+                <span style={{ color: hhtColor, fontWeight: 700 }}>{hhtValidated.toLocaleString('en-IN')}</span>
               </td>
               <td className="cc-data-grid-td">
                 {pending > 0 ? (

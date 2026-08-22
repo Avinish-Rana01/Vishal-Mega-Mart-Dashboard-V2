@@ -7,6 +7,9 @@ import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import { generateMockData } from '../../../utils/mockLiveStock';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
 import CustomDropdown from '../../../components/common/CustomDropdown';
@@ -353,84 +356,54 @@ export default function LiveStockSection() {
 
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="vmm-toolbar-header">
-            <h3 className="vmm-toolbar-title">
-              STORE PERFORMANCE
-            </h3>
-            
-            <div className="vmm-toolbar-controls">
-              {/* Dynamic Filter Controls */}
-              <div className="ls-filter-container">
-                <div className="ls-filter-label">
-                  All Stores
-                </div>
-
-                <CustomDropdown 
-                  options={operatorOptions}
-                  value={filterOp}
-                  onChange={(val) => {
-                    setFilterOp(val);
-                    if (String(filterVal).trim() !== '') {
-                      const num = Number(filterVal);
-                      if (Number.isFinite(num) && num >= 0 && num <= 100) {
-                        setAppliedFilter({ field: 'Accuracy', op: val, val: num });
+          <ChartToolbar
+            leftContent="STORE PERFORMANCE"
+            rightContent={
+              <>
+                {/* Accuracy Filter Controls */}
+                <div className="ls-filter-container">
+                  <div className="ls-filter-label">All Stores</div>
+                  <CustomDropdown 
+                    options={operatorOptions}
+                    value={filterOp}
+                    onChange={(val) => {
+                      setFilterOp(val);
+                      if (String(filterVal).trim() !== '') {
+                        const num = Number(filterVal);
+                        if (Number.isFinite(num) && num >= 0 && num <= 100) {
+                          setAppliedFilter({ field: 'Accuracy', op: val, val: num });
+                        }
                       }
-                    }
-                  }}
-                />
-
-                <div className="ls-filter-input-wrapper">
-                  <input 
-                    type="number" 
-                    className="ls-filter-input"
-                    value={filterVal} 
-                    onChange={(e) => {
-                      setFilterVal(e.target.value);
-                      setFilterError('');
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleApplyFilter();
-                    }}
-                    placeholder="90"
                   />
-                  <span className="ls-filter-percent">%</span>
-                </div>
-
-                <button 
-                  className="ls-filter-btn"
-                  onClick={handleApplyFilter}
-                  disabled={!String(filterVal).trim()}
-                >
-                  OK
-                </button>
-              </div>
-
-              {/* Search */}
-              <div className="vmm-search-container">
-                <span className="vmm-search-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8"/>
-                  </svg>
-                </span>
-                <input 
-                  type="text" 
-                  className="vmm-search-input"
-                  placeholder="Search Store..."
-                  value={searchStore}
-                  onChange={e => setSearchStore(e.target.value)}
-                  style={{ paddingRight: searchStore ? '32px' : '16px' }}
-                />
-                {searchStore && (
+                  <div className="ls-filter-input-wrapper">
+                    <input 
+                      type="number" 
+                      className="ls-filter-input"
+                      value={filterVal} 
+                      onChange={(e) => { setFilterVal(e.target.value); setFilterError(''); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleApplyFilter(); }}
+                      placeholder="90"
+                    />
+                    <span className="ls-filter-percent">%</span>
+                  </div>
                   <button 
-                    className="vmm-search-clear"
-                    onClick={() => setSearchStore('')}
+                    className="ls-filter-btn"
+                    onClick={handleApplyFilter}
+                    disabled={!String(filterVal).trim()}
                   >
-                    ×
+                    OK
                   </button>
-                )}
-              </div>
-            </div>
-          </div>
+                </div>
+                <ChartSearchInput
+                  value={searchStore}
+                  onChange={setSearchStore}
+                  onClear={() => setSearchStore('')}
+                  placeholder="Search Store..."
+                />
+              </>
+            }
+          />
 
           {filterError && (
             <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '8px', marginTop: '-8px' }}>
@@ -491,18 +464,12 @@ export default function LiveStockSection() {
 
           <div style={{ height: '250px' }}>
             {barChartData.length === 0 ? (
-              <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
-                  <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                No stores match your search or filter criteria.
-                <button 
-                  onClick={() => { setSearchStore(''); setFilterVal(''); setAppliedFilter({ field: 'ALL', op: '<', val: '' }); }}
-                  style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Clear Filters
-                </button>
-              </div>
+              <SearchEmptyState 
+                searchFilter={searchStore}
+                title={searchStore ? `No Stores Found for "${searchStore}"` : "No Stores Match Criteria"}
+                subtitle="Try a different search term or clear your filters."
+                onClearSearch={() => { setSearchStore(''); setFilterVal(''); setAppliedFilter({ field: 'ALL', op: '<', val: '' }); }}
+              />
             ) : (
               <MemoizedLiveStockChart barChartData={barChartData} onBarClick={handleBarClick} />
             )}

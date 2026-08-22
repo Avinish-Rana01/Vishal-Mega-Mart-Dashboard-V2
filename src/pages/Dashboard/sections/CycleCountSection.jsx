@@ -7,6 +7,9 @@ import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
 import CycleCountModal from '../../../components/modals/CycleCountModal';
 import BaseDataTable from '../../../components/common/BaseDataTable';
 import CustomDropdown from '../../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
@@ -542,9 +545,8 @@ export default function CycleCountSection() {
       {/* DURATION BAR CHART */}
       <div className="cc-card">
 
-        {/* Toolbar */}
-        <div className="vmm-toolbar-header" style={{ minHeight: '40px' }}>
-          <h3 className="vmm-toolbar-title" style={{ display: 'flex', alignItems: 'center' }}>
+        <ChartToolbar
+          leftContent={
             <CustomDropdown
               options={viewOptions}
               value={chartView}
@@ -552,78 +554,53 @@ export default function CycleCountSection() {
               buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase' }}
               menuStyle={{ left: 0, right: 'auto', minWidth: '260px', textTransform: 'none' }}
             />
-          </h3>
-
-          <div className="vmm-toolbar-controls">
-            {chartView === 'info' && (
-              <CustomDropdown
-                options={[
-                  { value: 'system', label: 'System vs Scanned' },
-                  { value: 'variance', label: 'Stock Variance' }
-                ]}
-                value={infoTab}
-                onChange={(val) => setInfoTab(val)}
-                prefix="View:"
-                buttonStyle={{ minWidth: '220px', justifyContent: 'space-between' }}
-                menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
-              />
-            )}
-
-            {chartView === 'store' && (
-              <>
+          }
+          rightContent={
+            <>
+              {chartView === 'info' && (
                 <CustomDropdown
-                  options={sortOptions}
-                  value={sortBy}
-                  onChange={(val) => setSortBy(val)}
-                  prefix="Sort:"
-                  buttonStyle={{ minWidth: '200px', justifyContent: 'space-between' }}
-                  menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+                  options={[
+                    { value: 'system', label: 'System vs Scanned' },
+                    { value: 'variance', label: 'Stock Variance' }
+                  ]}
+                  value={infoTab}
+                  onChange={(val) => setInfoTab(val)}
+                  prefix="View:"
+                  buttonStyle={{ minWidth: '220px', justifyContent: 'space-between' }}
+                  menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
                 />
-
-                <div className="vmm-search-container">
-                  <span className="vmm-search-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.8487 19 14.551 18.3729 15.9056 17.3199L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L17.3199 15.9056C18.3729 14.551 19 12.8487 19 11C19 6.58172 15.4183 3 11 3ZM5 11C5 7.68629 7.68629 5 11 5C14.3137 5 17 7.68629 17 11C17 14.3137 14.3137 17 11 17C7.68629 17 5 14.3137 5 11Z" fill="#94a3b8" />
-                    </svg>
-                  </span>
-                  <input
-                    type="text"
-                    className="vmm-search-input"
-                    placeholder="Search store..."
-                    value={searchFilter}
-                    onChange={e => setSearchFilter(e.target.value)}
-                    style={{ paddingRight: searchFilter ? '32px' : '16px' }}
+              )}
+              {chartView === 'store' && (
+                <>
+                  <CustomDropdown
+                    options={sortOptions}
+                    value={sortBy}
+                    onChange={(val) => setSortBy(val)}
+                    prefix="Sort:"
+                    buttonStyle={{ minWidth: '200px', justifyContent: 'space-between' }}
+                    menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
                   />
-                  {searchFilter && (
-                    <button
-                      className="vmm-search-clear"
-                      onClick={() => setSearchFilter('')}
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+                  <ChartSearchInput
+                    value={searchFilter}
+                    onChange={setSearchFilter}
+                    onClear={() => setSearchFilter('')}
+                  />
+                </>
+              )}
+            </>
+          }
+        />
 
         {/* Chart */}
         <div className="cc-chart-scroll">
           {chartView === 'store' ? (
             chartData.length === 0 ? (
-              <div style={{ height: '100%', minHeight: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
-                  <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                No matching cycle count records found.
-                <button
-                  onClick={() => setSearchFilter('')}
-                  style={{ marginTop: '16px', background: '#fff', border: '1px solid #e2e8f0', color: '#4338ca', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Clear Search
-                </button>
-              </div>
+              <SearchEmptyState 
+                searchFilter={searchFilter}
+                title={`No Cycle Count Records Found for "${searchFilter}"`}
+                subtitle="Try a different search term or clear your filters."
+                onClearSearch={() => setSearchFilter('')}
+              />
             ) : (
               <MemoizedChart chartData={chartData} chartHeight={chartHeight} />
             )

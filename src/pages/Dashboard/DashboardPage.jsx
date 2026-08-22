@@ -31,13 +31,13 @@ export default function DashboardPage() {
             <div className="vmm-grid-cell">
               <CycleCountSection />
             </div>
-            {/* <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell">
               <StoreValidationSection />
             </div>
             <div className="vmm-grid-cell">
               <SaleDashboardSection />
             </div>
-            <div className="vmm-grid-cell">
+            {/* <div className="vmm-grid-cell">
               <VoidDashboardSection />
             </div>
             <div className="vmm-grid-cell">
