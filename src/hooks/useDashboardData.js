@@ -162,6 +162,8 @@ export const useStoreDashboard = () => useDashboardFetch(getStoreDashboard, stor
 // ==========================================
 // 5. Sale Dashboard
 // ==========================================
+import { generateMockSaleDashboard } from '../utils/mockSaleDashboard';
+
 const saleDashboardFilter = (row, term) => 
   (row.STORE && row.STORE.toLowerCase().includes(term)) ||
   (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term)) ||
@@ -177,7 +179,12 @@ const saleDashboardTotals = (summary) => ({
   TOTAL_VOID: summary.totalVoid?.toLocaleString('en-IN') || 0
 });
 
-export const useSaleDashboard = () => useDashboardFetch(getSaleDashboard, saleDashboardFilter, saleDashboardTotals);
+// Temporarily mock getSaleDashboard for 20 stores due to empty backend data
+const mockGetSaleDashboard = async (signal) => {
+  return generateMockSaleDashboard(20);
+};
+
+export const useSaleDashboard = () => useDashboardFetch(mockGetSaleDashboard, saleDashboardFilter, saleDashboardTotals);
 
 // ==========================================
 // 6. Void Dashboard
