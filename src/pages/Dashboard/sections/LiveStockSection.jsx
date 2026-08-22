@@ -16,6 +16,7 @@ import CustomDropdown from '../../../components/common/CustomDropdown';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './LiveStockSection.css';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
 
 // Minimalist Icons
 const ArrowUpRight = () => (
@@ -42,62 +43,74 @@ const sortOptions = [
 // ---------------------------
 
 // ---- Memoized Charts ----
-const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => (
-  <div style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
-      <ResponsiveContainer width="100%" height={Math.max(barChartData.length * 28, 240)}>
-        <BarChart 
-          layout="vertical"
-          data={barChartData} 
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
-        >
-          <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-          <YAxis 
-            type="category" 
-            dataKey="name" 
-            width={60} 
-            tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
-            axisLine={false} 
-            tickLine={false} 
-          />
-          <RechartsTooltip 
-            cursor={{ fill: '#f1f5f9' }} 
-            content={<StoreBarTooltip />}
-          />
-          
-          {/* Stacked bars: RFID on left, Difference on right */}
-          {/* Stacked bars: RFID on left, Difference on right */}
-          <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" /* onClick={onBarClick} */ isAnimationActive={true} animationDuration={800} />
-          <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0"  barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" /* onClick={onBarClick} */ isAnimationActive={true} animationDuration={800} />
-        </BarChart>
-      </ResponsiveContainer>
-  </div>
-));
+const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => {
+  const [ref, hasBeenVisible] = useIsInViewport();
+  const height = Math.max(barChartData.length * 28, 240);
+  return (
+    <div ref={ref} style={{ height: '100%', overflowY: 'auto', paddingRight: '10px', minHeight: '240px' }}>
+      {hasBeenVisible && (
+        <ResponsiveContainer width="100%" height={height}>
+          <BarChart 
+            layout="vertical"
+            data={barChartData} 
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
+          >
+            <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis 
+              type="category" 
+              dataKey="name" 
+              width={60} 
+              tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
+              axisLine={false} 
+              tickLine={false} 
+            />
+            <RechartsTooltip 
+              cursor={{ fill: '#f1f5f9' }} 
+              content={<StoreBarTooltip />}
+            />
+            
+            {/* Stacked bars: RFID on left, Difference on right */}
+            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
+            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0"  barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+});
 
-const MemoizedPieChart = React.memo(({ accuracyPieData }) => (
-  <ResponsiveContainer width="100%" height="100%">
-    <PieChart>
-      <Pie
-        data={accuracyPieData}
-        dataKey="value"
-        nameKey="name"
-        cx="50%"
-        cy="50%"
-        innerRadius="65%"
-        outerRadius="100%"
-        paddingAngle={3}
-        stroke="none"
-        isAnimationActive={true}
-        animationDuration={800}
-        cornerRadius={5}
-      >
-        {accuracyPieData.map((entry, idx) => (
-          <Cell key={idx} fill={entry.fill} />
-        ))}
-      </Pie>
-      <RechartsTooltip content={<AccuracyTooltip />} wrapperStyle={{ zIndex: 1000, outline: 'none' }} />
-    </PieChart>
-  </ResponsiveContainer>
-));
+const MemoizedPieChart = React.memo(({ accuracyPieData }) => {
+  const [ref, hasBeenVisible] = useIsInViewport();
+  return (
+    <div ref={ref} style={{ width: '100%', height: '100%', minHeight: '200px' }}>
+      {hasBeenVisible && (
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={accuracyPieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius="65%"
+              outerRadius="100%"
+              paddingAngle={3}
+              stroke="none"
+              isAnimationActive={true}
+              animationDuration={800}
+              cornerRadius={5}
+            >
+              {accuracyPieData.map((entry, idx) => (
+                <Cell key={idx} fill={entry.fill} />
+              ))}
+            </Pie>
+            <RechartsTooltip content={<AccuracyTooltip />} wrapperStyle={{ zIndex: 1000, outline: 'none' }} />
+          </PieChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+});
 
 export default function LiveStockSection() {
   // === STATE MANAGEMENT ===

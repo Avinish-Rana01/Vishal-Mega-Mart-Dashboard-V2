@@ -12,6 +12,7 @@ import ChartToolbar from '../../../components/common/ChartToolbar';
 import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import { useCycleCount } from '../../../hooks/useDashboardData';
 import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
@@ -60,76 +61,84 @@ function DurationTooltip({ active, payload }) {
 
 // ---- Memoized Chart Component ----
 const MemoizedChart = React.memo(({ chartData, chartHeight }) => {
+  const [ref, hasBeenVisible] = useIsInViewport();
   return (
-    <ResponsiveContainer width="100%" height={chartHeight}>
-      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 80, left: 10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
-        <XAxis
-          type="number"
-          tick={{ fontSize: 11, fill: '#64748b' }}
-          axisLine={false}
-          tickLine={false}
-          unit="m"
-        />
-        <YAxis
-          dataKey="STORE_CODE"
-          type="category"
-          tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
-          axisLine={false}
-          tickLine={false}
-          width={55}
-        />
-        <Tooltip
-          content={<DurationTooltip />}
-          cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
-        />
-        <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff">
-          <LabelList
-            dataKey="rawDuration"
-            position="right"
-            style={{ fontSize: '12px', fontWeight: 600, fill: '#334155' }}
-          />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div ref={ref} style={{ width: '100%', minHeight: chartHeight }}>
+      {hasBeenVisible && (
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 80, left: 10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
+            <XAxis
+              type="number"
+              tick={{ fontSize: 11, fill: '#64748b' }}
+              axisLine={false}
+              tickLine={false}
+              unit="m"
+            />
+            <YAxis
+              dataKey="STORE_CODE"
+              type="category"
+              tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
+              axisLine={false}
+              tickLine={false}
+              width={55}
+            />
+            <Tooltip
+              content={<DurationTooltip />}
+              cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
+            />
+            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff" isAnimationActive={true}>
+              <LabelList
+                dataKey="rawDuration"
+                position="right"
+                style={{ fontSize: '12px', fontWeight: 600, fill: '#334155' }}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
   );
 });
 
 // ---- Memoized Distribution Chart Component ----
 const MemoizedDistributionChart = React.memo(({ distributionData }) => {
+  const [ref, hasBeenVisible] = useIsInViewport();
   return (
-    <div style={{ height: '280px', width: '100%', paddingTop: '20px' }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={distributionData} margin={{ top: 30, right: 30, left: 20, bottom: 5 }} barSize={45}>
-          <defs>
-            <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
-              <stop offset="100%" stopColor="#059669" stopOpacity={1} />
-            </linearGradient>
-            <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
-              <stop offset="100%" stopColor="#2563eb" stopOpacity={1} />
-            </linearGradient>
-            <linearGradient id="colorRed" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
-              <stop offset="100%" stopColor="#dc2626" stopOpacity={1} />
-            </linearGradient>
-            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.1" />
-            </filter>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 600 }} dy={10} />
-          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} allowDecimals={false} />
-          <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
-          <Bar dataKey="count" radius={[8, 8, 0, 0]} isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" filter="url(#shadow)">
-            {distributionData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.fill} />
-            ))}
-            <LabelList dataKey="count" position="top" style={{ fill: '#1e293b', fontWeight: 800, fontSize: 16 }} offset={12} />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div ref={ref} style={{ height: '280px', width: '100%', paddingTop: '20px' }}>
+      {hasBeenVisible && (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={distributionData} margin={{ top: 30, right: 30, left: 20, bottom: 5 }} barSize={45}>
+            <defs>
+              <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+                <stop offset="100%" stopColor="#059669" stopOpacity={1} />
+              </linearGradient>
+              <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
+                <stop offset="100%" stopColor="#2563eb" stopOpacity={1} />
+              </linearGradient>
+              <linearGradient id="colorRed" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
+                <stop offset="100%" stopColor="#dc2626" stopOpacity={1} />
+              </linearGradient>
+              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.1" />
+              </filter>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 600 }} dy={10} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} allowDecimals={false} />
+            <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
+            <Bar dataKey="count" radius={[8, 8, 0, 0]} isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" filter="url(#shadow)">
+              {distributionData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+              <LabelList dataKey="count" position="top" style={{ fill: '#1e293b', fontWeight: 800, fontSize: 16 }} offset={12} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 });

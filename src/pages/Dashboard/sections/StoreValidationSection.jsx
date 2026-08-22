@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useStoreDashboard } from '../../../hooks/useDashboardData';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
@@ -105,25 +106,28 @@ const MemoizedValidationChart = React.memo(({ chartData }) => {
   const ROW_HEIGHT = 16;
   const GROUP_GAP = 16;
   const chartHeight = Math.max(220, chartData.length * (ROW_HEIGHT * 2 + GROUP_GAP) + 40);
+  const [ref, hasBeenVisible] = useIsInViewport();
 
   return (
-    <div style={{ display: 'flex', width: '100%' }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 80, left: 0, bottom: 5 }} barCategoryGap="20%">
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
-            <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-            <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
-            <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
-            <Bar dataKey="HU_RECEIVED_QTY" name="Received HU" barSize={ROW_HEIGHT} fill={COLOR_RECEIVED} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
-              <LabelList dataKey="HU_RECEIVED_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_RECEIVED }} />
-            </Bar>
-            <Bar dataKey="HU_VALIDATED_QTY" name="Validated HU" barSize={ROW_HEIGHT} fill={COLOR_VALIDATED} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
-              <LabelList dataKey="HU_VALIDATED_QTY" content={<CustomGapLabel data={chartData} />} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+    <div ref={ref} style={{ display: 'flex', width: '100%', minHeight: chartHeight }}>
+      {hasBeenVisible && (
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 80, left: 0, bottom: 5 }} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
+              <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
+              <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
+              <Bar dataKey="HU_RECEIVED_QTY" name="Received HU" barSize={ROW_HEIGHT} fill={COLOR_RECEIVED} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                <LabelList dataKey="HU_RECEIVED_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_RECEIVED }} />
+              </Bar>
+              <Bar dataKey="HU_VALIDATED_QTY" name="Validated HU" barSize={ROW_HEIGHT} fill={COLOR_VALIDATED} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                <LabelList dataKey="HU_VALIDATED_QTY" content={<CustomGapLabel data={chartData} />} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 });
@@ -133,26 +137,31 @@ const MemoizedProgressChart = React.memo(({ chartData }) => {
   const ROW_HEIGHT = 20;
   const GROUP_GAP = 16;
   const chartHeight = Math.max(220, chartData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
+  const [ref, hasBeenVisible] = useIsInViewport();
 
   return (
-    <div style={{ display: 'flex', width: '100%' }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 5 }} barCategoryGap="20%">
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
-            <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-            <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
-            <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
-            <Bar dataKey="HHT_VALIDATE_QTY" stackId="a" name="HHT Validated" barSize={ROW_HEIGHT} fill={COLOR_HHT} radius={[4,0,0,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
-              <LabelList dataKey="HHT_VALIDATE_QTY" position="insideLeft" style={{ fontSize: '11px', fontWeight: 600, fill: '#fff' }} formatter={(val) => val > 0 ? val : ''} />
-            </Bar>
-            <Bar dataKey="STORE_PENDING_QTY" stackId="a" name="Pending" barSize={ROW_HEIGHT} fill={COLOR_PENDING} radius={[0,4,4,0]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
-              <LabelList dataKey="STORE_PENDING_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: '#d97706' }} formatter={(val) => val > 0 ? val : ''} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <WrongHUBadgeColumn chartData={chartData} chartHeight={chartHeight} showPending={false} />
+    <div ref={ref} style={{ display: 'flex', width: '100%', minHeight: chartHeight }}>
+      {hasBeenVisible && (
+        <>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height={chartHeight}>
+              <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 5 }} barCategoryGap="20%">
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
+                <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
+                <Bar dataKey="HHT_VALIDATE_QTY" stackId="a" name="HHT Validated" barSize={ROW_HEIGHT} fill={COLOR_HHT} radius={[4,0,0,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                  <LabelList dataKey="HHT_VALIDATE_QTY" position="insideLeft" style={{ fontSize: '11px', fontWeight: 600, fill: '#fff' }} formatter={(val) => val > 0 ? val : ''} />
+                </Bar>
+                <Bar dataKey="STORE_PENDING_QTY" stackId="a" name="Pending" barSize={ROW_HEIGHT} fill={COLOR_PENDING} radius={[0,4,4,0]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                  <LabelList dataKey="STORE_PENDING_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: '#d97706' }} formatter={(val) => val > 0 ? val : ''} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <WrongHUBadgeColumn chartData={chartData} chartHeight={chartHeight} showPending={false} />
+        </>
+      )}
     </div>
   );
 });
@@ -163,6 +172,7 @@ const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearc
   const GROUP_GAP = 16;
   const filteredData = chartData.filter(d => Number(d.HU_WRONG_QTY || 0) > 0);
   const chartHeight = Math.max(220, filteredData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
+  const [ref, hasBeenVisible] = useIsInViewport();
 
   if (filteredData.length === 0) {
     if (searchFilter && searchFilter.trim().length > 0) {
@@ -187,20 +197,22 @@ const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearc
   }
 
   return (
-    <div style={{ display: 'flex', width: '100%' }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={filteredData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 5 }} barCategoryGap="20%">
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
-            <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-            <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
-            <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(254,226,226,0.6)' }} />
-            <Bar dataKey="HU_WRONG_QTY" name="Wrong HU" barSize={ROW_HEIGHT} fill={COLOR_WRONG} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
-              <LabelList dataKey="HU_WRONG_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_WRONG }} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+    <div ref={ref} style={{ display: 'flex', width: '100%', minHeight: chartHeight }}>
+      {hasBeenVisible && (
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart data={filteredData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 5 }} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
+              <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
+              <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(254,226,226,0.6)' }} />
+              <Bar dataKey="HU_WRONG_QTY" name="Wrong HU" barSize={ROW_HEIGHT} fill={COLOR_WRONG} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                <LabelList dataKey="HU_WRONG_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_WRONG }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 });
