@@ -25,16 +25,16 @@ export default function DashboardPage() {
         <Header />
         <main className="vmm-dashboard-body">
           <div className="vmm-dashboard-grid">
-            {/* <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell">
               <LiveStockSection />
-            </div> */}
+            </div>
             <div className="vmm-grid-cell">
               <CycleCountSection />
             </div>
-            <div className="vmm-grid-cell">
+            {/* <div className="vmm-grid-cell">
               <StoreValidationSection />
             </div>
-            {/* <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell">
               <SaleDashboardSection />
             </div>
             <div className="vmm-grid-cell">
