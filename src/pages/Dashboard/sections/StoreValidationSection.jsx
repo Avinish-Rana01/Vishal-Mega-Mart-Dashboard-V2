@@ -495,7 +495,7 @@ export default function StoreValidationSection() {
                   {row.STORE || '—'}
                   {row.STORE_NAME && (
                     <div className="cc-row-tooltip">
-                      {row.STORE} - {row.STORE_NAME}
+                      {row.STORE_NAME}
                     </div>
                   )}
                 </div>

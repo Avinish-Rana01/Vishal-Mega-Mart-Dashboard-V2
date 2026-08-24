@@ -662,7 +662,7 @@ export default function CycleCountSection() {
                 {row.STORE_CODE || '—'}
                 {row.STORE_NAME && (
                   <div className="cc-row-tooltip">
-                    {row.STORE_CODE} - {row.STORE_NAME}
+                    {row.STORE_NAME}
                   </div>
                 )}
               </div>

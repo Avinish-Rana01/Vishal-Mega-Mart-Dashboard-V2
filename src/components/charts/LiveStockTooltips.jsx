@@ -41,15 +41,20 @@ export const StoreBarTooltip = React.memo(({ active, payload, label }) => {
           </span>
           <span style={{ fontWeight: 600, color: '#0f172a' }}>{Number(data.SAP_STOCK || 0).toLocaleString()}</span>
         </div>
-        {payload.map((entry, index) => (
-          <div key={index} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-            <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: entry.fill === 'url(#striped-bar)' ? '#ff5c5c' : '#406bde' }}></div>
-              {entry.name}:
-            </span>
-            <span style={{ fontWeight: 600, color: '#0f172a' }}>{entry.value.toLocaleString()}</span>
-          </div>
-        ))}
+        {payload.map((entry, index) => {
+          const isDifference = entry.name === 'Difference';
+          const textColor = isDifference ? '#dc2626' : '#2563eb';
+          const dotColor = isDifference ? '#ff5c5c' : '#2563eb';
+          return (
+            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: textColor }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: dotColor }}></div>
+                {entry.name}:
+              </span>
+              <span style={{ fontWeight: 600 }}>{entry.value.toLocaleString()}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
