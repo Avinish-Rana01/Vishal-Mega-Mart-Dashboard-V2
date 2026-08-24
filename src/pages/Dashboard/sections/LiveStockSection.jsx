@@ -517,7 +517,7 @@ export default function LiveStockSection() {
                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', fontSize: '16px', gap: '10px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>
-                          <div style={{ width: '10px', height: '10px', backgroundColor: entry.fill, borderRadius: '50%', flexShrink: 0 }} />
+                          <div style={{ width: '8px', height: '8px', backgroundColor: entry.fill, borderRadius: '50%', flexShrink: 0 }} />
                           <span>{entry.name}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -527,7 +527,7 @@ export default function LiveStockSection() {
                       </div>
 
                       {/* Horizontal Progress Bar */}
-                      <div style={{ width: '100%', height: '12px', backgroundColor: '#ffffffff', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '6px' }} />
                       </div>
                     </div>

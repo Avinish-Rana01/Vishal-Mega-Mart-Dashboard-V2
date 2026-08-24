@@ -11,6 +11,7 @@ import ChartToolbar from '../../../components/common/ChartToolbar';
 import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import WorkInProgress from '../../../components/common/WorkInProgress';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
@@ -71,54 +72,59 @@ export default function SaleDashboardSection() {
   const { barData, tableData } = useMemo(() => {
     if (!data || !totals) return { barData: [], tableData: [] };
 
-    let filteredData = [...data];
-    if (searchFilter.trim()) {
-      const term = searchFilter.toLowerCase();
-      filteredData = filteredData.filter(row => 
-        (row.STORE && row.STORE.toLowerCase().includes(term)) ||
-        (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term))
-      );
-    }
+    const term = searchFilter.trim().toLowerCase();
+
+    // Parse numbers once and filter in a single pass (O(N))
+    const parsedData = data.reduce((acc, row) => {
+      const storeCode = (row.STORE || '').toLowerCase();
+      const storeName = (row.STORE_NAME || '').toLowerCase();
+      
+      if (!term || storeCode.includes(term) || storeName.includes(term)) {
+        acc.push({
+          ...row, // Keep original data for table rendering
+          _DPOS: Number(row.TOTAL_DPOS_SALE || 0),
+          _RFID: Number(row.TOTAL_RFID_CHECKOUT || 0),
+          _Taffeta: Number(row.TOTAL_TAFFETA_SALE || 0),
+          _Manual: Number(row.TOTAL_MANUAL_SALE || 0)
+        });
+      }
+      return acc;
+    }, []);
+
+    // Reusable fast sorting function
+    const sortArray = (arr, sortType) => {
+      return [...arr].sort((a, b) => {
+        switch (sortType) {
+          case 'DPOS_DESC': return b._DPOS - a._DPOS;
+          case 'DPOS_ASC': return a._DPOS - b._DPOS;
+          case 'RFID_DESC': return b._RFID - a._RFID;
+          case 'RFID_ASC': return a._RFID - b._RFID;
+          case 'TAFFETA_DESC': return b._Taffeta - a._Taffeta;
+          case 'TAFFETA_ASC': return a._Taffeta - b._Taffeta;
+          case 'MANUAL_DESC': return b._Manual - a._Manual;
+          case 'MANUAL_ASC': return a._Manual - b._Manual;
+          default: return 0;
+        }
+      });
+    };
 
     // 1. Sort Data for Chart
-    const chartSortedData = [...filteredData].sort((a, b) => {
-      if (sortBy === 'DPOS_DESC') return Number(b.TOTAL_DPOS_SALE || 0) - Number(a.TOTAL_DPOS_SALE || 0);
-      if (sortBy === 'DPOS_ASC') return Number(a.TOTAL_DPOS_SALE || 0) - Number(b.TOTAL_DPOS_SALE || 0);
-      if (sortBy === 'RFID_DESC') return Number(b.TOTAL_RFID_CHECKOUT || 0) - Number(a.TOTAL_RFID_CHECKOUT || 0);
-      if (sortBy === 'RFID_ASC') return Number(a.TOTAL_RFID_CHECKOUT || 0) - Number(b.TOTAL_RFID_CHECKOUT || 0);
-      if (sortBy === 'TAFFETA_DESC') return Number(b.TOTAL_TAFFETA_SALE || 0) - Number(a.TOTAL_TAFFETA_SALE || 0);
-      if (sortBy === 'TAFFETA_ASC') return Number(a.TOTAL_TAFFETA_SALE || 0) - Number(b.TOTAL_TAFFETA_SALE || 0);
-      if (sortBy === 'MANUAL_DESC') return Number(b.TOTAL_MANUAL_SALE || 0) - Number(a.TOTAL_MANUAL_SALE || 0);
-      if (sortBy === 'MANUAL_ASC') return Number(a.TOTAL_MANUAL_SALE || 0) - Number(b.TOTAL_MANUAL_SALE || 0);
-      return 0;
-    });
-
+    const chartSortedData = sortArray(parsedData, sortBy);
     const barData = chartSortedData.map(row => ({
       name: row.STORE,
       fullName: row.STORE_NAME,
-      DPOS: Number(row.TOTAL_DPOS_SALE || 0),
-      RFID: Number(row.TOTAL_RFID_CHECKOUT || 0),
-      Taffeta: Number(row.TOTAL_TAFFETA_SALE || 0),
-      Manual: Number(row.TOTAL_MANUAL_SALE || 0)
+      DPOS: row._DPOS,
+      RFID: row._RFID,
+      Taffeta: row._Taffeta,
+      Manual: row._Manual
     }));
 
     // 2. Sort Data for Table
-    const tableData = [...filteredData].sort((a, b) => {
-      if (tableSort === 'DPOS_DESC') return Number(b.TOTAL_DPOS_SALE || 0) - Number(a.TOTAL_DPOS_SALE || 0);
-      if (tableSort === 'DPOS_ASC') return Number(a.TOTAL_DPOS_SALE || 0) - Number(b.TOTAL_DPOS_SALE || 0);
-      if (tableSort === 'RFID_DESC') return Number(b.TOTAL_RFID_CHECKOUT || 0) - Number(a.TOTAL_RFID_CHECKOUT || 0);
-      if (tableSort === 'RFID_ASC') return Number(a.TOTAL_RFID_CHECKOUT || 0) - Number(b.TOTAL_RFID_CHECKOUT || 0);
-      if (tableSort === 'TAFFETA_DESC') return Number(b.TOTAL_TAFFETA_SALE || 0) - Number(a.TOTAL_TAFFETA_SALE || 0);
-      if (tableSort === 'TAFFETA_ASC') return Number(a.TOTAL_TAFFETA_SALE || 0) - Number(b.TOTAL_TAFFETA_SALE || 0);
-      if (tableSort === 'MANUAL_DESC') return Number(b.TOTAL_MANUAL_SALE || 0) - Number(a.TOTAL_MANUAL_SALE || 0);
-      if (tableSort === 'MANUAL_ASC') return Number(a.TOTAL_MANUAL_SALE || 0) - Number(b.TOTAL_MANUAL_SALE || 0);
-      return 0;
-    });
+    // If the sort keys are identical, we can just reuse the chartSortedData!
+    const tableData = sortBy === tableSort ? chartSortedData : sortArray(parsedData, tableSort);
 
     return { barData, tableData };
   }, [data, totals, searchFilter, sortBy, tableSort]);
-
-
 
   // Loading Skeleton
   if (isLoading) return <DashboardShimmer title="Sale Operations" />;
@@ -129,9 +135,9 @@ export default function SaleDashboardSection() {
     return (
       <div className="cc-container">
         <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
-        <GlobalEmptyState 
-          title="No Sales Data Available" 
-          subtitle="There is currently no sales data for today." 
+        <GlobalEmptyState
+          title="No Sales Data Available"
+          subtitle="There is currently no sales data for today."
         />
       </div>
     );
@@ -140,137 +146,147 @@ export default function SaleDashboardSection() {
   return (
     <div className="cc-container">
       <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
-
-      {/* 1. KPI Row */}
-      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-        <KpiCard
-          title="Total DPOS Sale"
-          value={totals?.TOTAL_DPOS_SALE || '0'}
-          badgeVariant="default"
-          icon={<Icons.Cart />}
-        />
-        <KpiCard
-          title="Total RFID Checkout"
-          value={totals?.TOTAL_RFID_CHECKOUT || '0'}
-          badgeVariant="info"
-          icon={<Icons.Tag />}
-        />
-        <KpiCard
-          title="Taffeta Sales"
-          value={totals?.TOTAL_TAFFETA_SALE || '0'}
-          badgeVariant="success"
-          icon={<Icons.Star />}
-        />
-        <KpiCard
-          title="Manual Sales"
-          value={totals?.TOTAL_MANUAL_SALE || '0'}
-          badgeVariant="warning"
-          icon={<Icons.Manual />}
-        />
-        <KpiCard
-          title="RFID Sales Share"
-          value={totals?.RFID_SALES_SHARE || '0%'}
-          badgeVariant="default"
-          icon={<Icons.Tag />}
-        />
-      </div>
-
-      {/* 2. Charts Row (Full Width Stacked Bar) */}
-      <div className="cc-card">
-        <ChartToolbar 
-          leftContent={
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span style={{ fontWeight: 600, color: '#1e293b' }}>Sales Breakdown by Store</span>
-              <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} width={220} />
-            </div>
-          }
-          rightContent={
-            <ChartSearchInput 
-              value={searchFilter} 
-              onChange={setSearchFilter} 
-              onClear={() => setSearchFilter('')} 
-              placeholder="Search Store..." 
-            />
-          } 
-        />
-        <div className="cc-chart-scroll">
-          {barData.length === 0 ? (
-            <SearchEmptyState searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />
-          ) : (
-            <div style={{ minWidth: `${Math.max(100, barData.length * 60)}px` }}>
-              <GroupedBarChart
-                data={barData}
-                stacked={true}
-                customTooltip={<CustomTooltip />}
-                bars={[
-                  { dataKey: 'RFID', color: '#10b981', label: 'RFID Checkout' },
-                  { dataKey: 'Taffeta', color: '#8b5cf6', label: 'Taffeta Sale' },
-                  { dataKey: 'Manual', color: '#f59e0b', label: 'Manual Sale' }
-                ]}
-                height={280}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 3. NATIVE TABLE / DATA GRID */}
-      <DashboardDataGrid
-        title="ALL STORES DATA"
-        subtitle={`${tableData.length} records`}
-        headerAction={
-          <CustomDropdown
-            options={SORT_OPTIONS}
-            value={tableSort}
-            onChange={(val) => setTableSort(val)}
-            prefix="Sort:"
-            buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
-            menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
-          />
-        }
-        headers={[
-          'Store Code', 'Date', 'Total Sales', 'RFID Checkout', 'Taffeta Sales', 'Manual Sales'
-        ]}
-        data={tableData}
-        emptyStateContent={
-          <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <td colSpan={6} className="cc-data-grid-empty-cell">
-              No sales data found
-            </td>
-          </motion.tr>
-        }
-        renderRow={(row) => (
-          <motion.tr
-            layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
-            key={row.STORE}
-            className="cc-data-grid-tr"
-          >
-            <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ padding: '8px' }}>
-              <div className="cc-row-tooltip-wrapper">
-                {row.STORE || '—'}
-                {row.STORE_NAME && (
-                  <div className="cc-row-tooltip">
-                    {row.STORE_NAME}
-                  </div>
-                )}
-              </div>
-            </td>
-            <td className="cc-data-grid-td" style={{ padding: '8px', fontSize: '12px', color: '#64748b' }}>
-              {row.DATE ? row.DATE.split(' ')[0] : '—'}
-            </td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_DPOS_SALE || '0'}</td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_RFID_CHECKOUT || '0'}</td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_TAFFETA_SALE || '0'}</td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_MANUAL_SALE || '0'}</td>
-          </motion.tr>
-        )}
+      <WorkInProgress 
+        title="Revamping Sale Operations"
+        message="We're engineering a more powerful, insightful, and dynamic analytics experience for this section. Hang tight!"
+        version="V2.0"
       />
-
     </div>
   );
+
+  // return (
+  //   <div className="cc-container">
+  //     <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
+
+  //     {/* 1. KPI Row */}
+  //     <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+  //       <KpiCard
+  //         title="Total DPOS Sale"
+  //         value={totals?.TOTAL_DPOS_SALE || '0'}
+  //         badgeVariant="default"
+  //         icon={<Icons.Cart />}
+  //       />
+  //       <KpiCard
+  //         title="Total RFID Checkout"
+  //         value={totals?.TOTAL_RFID_CHECKOUT || '0'}
+  //         badgeVariant="info"
+  //         icon={<Icons.Tag />}
+  //       />
+  //       <KpiCard
+  //         title="Taffeta Sales"
+  //         value={totals?.TOTAL_TAFFETA_SALE || '0'}
+  //         badgeVariant="success"
+  //         icon={<Icons.Star />}
+  //       />
+  //       <KpiCard
+  //         title="Manual Sales"
+  //         value={totals?.TOTAL_MANUAL_SALE || '0'}
+  //         badgeVariant="warning"
+  //         icon={<Icons.Manual />}
+  //       />
+  //       <KpiCard
+  //         title="RFID Sales Share"
+  //         value={totals?.RFID_SALES_SHARE || '0%'}
+  //         badgeVariant="default"
+  //         icon={<Icons.Tag />}
+  //       />
+  //     </div>
+
+  //     {/* 2. Charts Row (Full Width Stacked Bar) */}
+  //     <div className="cc-card">
+  //       <ChartToolbar
+  //         leftContent={
+  //           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+  //             <span style={{ fontWeight: 600, color: '#1e293b' }}>Sales Breakdown by Store</span>
+  //             <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} width={220} />
+  //           </div>
+  //         }
+  //         rightContent={
+  //           <ChartSearchInput
+  //             value={searchFilter}
+  //             onChange={setSearchFilter}
+  //             onClear={() => setSearchFilter('')}
+  //             placeholder="Search Store..."
+  //           />
+  //         }
+  //       />
+  //       <div className="cc-chart-scroll">
+  //         {barData.length === 0 ? (
+  //           <SearchEmptyState searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />
+  //         ) : (
+  //           <div style={{ minWidth: `${Math.max(100, barData.length * 60)}px` }}>
+  //             <GroupedBarChart
+  //               data={barData}
+  //               stacked={true}
+  //               customTooltip={<CustomTooltip />}
+  //               bars={[
+  //                 { dataKey: 'RFID', color: '#10b981', label: 'RFID Checkout' },
+  //                 { dataKey: 'Taffeta', color: '#8b5cf6', label: 'Taffeta Sale' },
+  //                 { dataKey: 'Manual', color: '#f59e0b', label: 'Manual Sale' }
+  //               ]}
+  //               height={280}
+  //             />
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+
+  //     {/* 3. NATIVE TABLE / DATA GRID */}
+  //     <DashboardDataGrid
+  //       title="ALL STORES DATA"
+  //       subtitle={`${tableData.length} records`}
+  //       headerAction={
+  //         <CustomDropdown
+  //           options={SORT_OPTIONS}
+  //           value={tableSort}
+  //           onChange={(val) => setTableSort(val)}
+  //           prefix="Sort:"
+  //           buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+  //           menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
+  //         />
+  //       }
+  //       headers={[
+  //         'Store Code', 'Date', 'Total Sales', 'RFID Checkout', 'Taffeta Sales', 'Manual Sales'
+  //       ]}
+  //       data={tableData}
+  //       emptyStateContent={
+  //         <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+  //           <td colSpan={6} className="cc-data-grid-empty-cell">
+  //             No sales data found
+  //           </td>
+  //         </motion.tr>
+  //       }
+  //       renderRow={(row) => (
+  //         <motion.tr
+  //           layout
+  //           initial={{ opacity: 0, y: 10 }}
+  //           animate={{ opacity: 1, y: 0 }}
+  //           transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+  //           key={row.STORE}
+  //           className="cc-data-grid-tr"
+  //         >
+  //           <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ padding: '8px' }}>
+  //             <div className="cc-row-tooltip-wrapper">
+  //               {row.STORE || '—'}
+  //               {row.STORE_NAME && (
+  //                 <div className="cc-row-tooltip">
+  //                   {row.STORE_NAME}
+  //                 </div>
+  //               )}
+  //             </div>
+  //           </td>
+  //           <td className="cc-data-grid-td" style={{ padding: '8px', fontSize: '12px', color: '#64748b' }}>
+  //             {row.DATE ? row.DATE.split(' ')[0] : '—'}
+  //           </td>
+  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_DPOS_SALE || '0'}</td>
+  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_RFID_CHECKOUT || '0'}</td>
+  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_TAFFETA_SALE || '0'}</td>
+  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_MANUAL_SALE || '0'}</td>
+  //         </motion.tr>
+  //       )}
+  //     />
+
+
+  //   </div>
+  // );
 }
-
-
