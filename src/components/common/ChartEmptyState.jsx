@@ -9,7 +9,7 @@ export function SearchEmptyState({
   minHeight = '200px' 
 }) {
   return (
-    <div style={{ height: '100%', minHeight, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '14px', background: 'transparent', borderRadius: '12px', border: '3px solid #cbd5e1' }}>
+    <div style={{ height: '100%', minHeight, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '14px', background: '#eceef0', borderRadius: '12px' }}>
       <div style={{ marginBottom: '12px' }}>
         <Icons.Search size={44} strokeWidth={1.5} color="#94a3b8" />
       </div>

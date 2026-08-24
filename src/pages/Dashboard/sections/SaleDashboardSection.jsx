@@ -74,22 +74,14 @@ export default function SaleDashboardSection() {
 
     const term = searchFilter.trim().toLowerCase();
 
-    // Parse numbers once and filter in a single pass (O(N))
-    const parsedData = data.reduce((acc, row) => {
-      const storeCode = (row.STORE || '').toLowerCase();
-      const storeName = (row.STORE_NAME || '').toLowerCase();
-      
-      if (!term || storeCode.includes(term) || storeName.includes(term)) {
-        acc.push({
-          ...row, // Keep original data for table rendering
-          _DPOS: Number(row.TOTAL_DPOS_SALE || 0),
-          _RFID: Number(row.TOTAL_RFID_CHECKOUT || 0),
-          _Taffeta: Number(row.TOTAL_TAFFETA_SALE || 0),
-          _Manual: Number(row.TOTAL_MANUAL_SALE || 0)
-        });
-      }
-      return acc;
-    }, []);
+    // Parse all numbers once without filtering (O(N))
+    const parsedData = data.map(row => ({
+      ...row, // Keep original data for table rendering
+      _DPOS: Number(row.TOTAL_DPOS_SALE || 0),
+      _RFID: Number(row.TOTAL_RFID_CHECKOUT || 0),
+      _Taffeta: Number(row.TOTAL_TAFFETA_SALE || 0),
+      _Manual: Number(row.TOTAL_MANUAL_SALE || 0)
+    }));
 
     // Reusable fast sorting function
     const sortArray = (arr, sortType) => {
@@ -108,8 +100,17 @@ export default function SaleDashboardSection() {
       });
     };
 
-    // 1. Sort Data for Chart
-    const chartSortedData = sortArray(parsedData, sortBy);
+    // 1. Filter and Sort Data for Chart
+    let chartDataUnsorted = parsedData;
+    if (term) {
+      chartDataUnsorted = parsedData.filter(row => {
+        const storeCode = (row.STORE || '').toLowerCase();
+        const storeName = (row.STORE_NAME || '').toLowerCase();
+        return storeCode.includes(term) || storeName.includes(term);
+      });
+    }
+    const chartSortedData = sortArray(chartDataUnsorted, sortBy);
+    
     const barData = chartSortedData.map(row => ({
       name: row.STORE,
       fullName: row.STORE_NAME,
@@ -119,9 +120,8 @@ export default function SaleDashboardSection() {
       Manual: row._Manual
     }));
 
-    // 2. Sort Data for Table
-    // If the sort keys are identical, we can just reuse the chartSortedData!
-    const tableData = sortBy === tableSort ? chartSortedData : sortArray(parsedData, tableSort);
+    // 2. Sort Data for Table (completely unaffected by chart search)
+    const tableData = sortArray(parsedData, tableSort);
 
     return { barData, tableData };
   }, [data, totals, searchFilter, sortBy, tableSort]);
@@ -197,7 +197,7 @@ export default function SaleDashboardSection() {
   //       <ChartToolbar
   //         leftContent={
   //           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-  //             <span style={{ fontWeight: 600, color: '#1e293b' }}>Sales Breakdown by Store</span>
+  //             <h3 className="cc-data-grid-title" style={{ margin: 0 }}>Sales Breakdown by Store</h3>
   //             <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} width={220} />
   //           </div>
   //         }
