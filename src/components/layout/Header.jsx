@@ -54,7 +54,7 @@ export default function Header({
         </button>
         */}
 
-        <div style={{ width: '1px', height: '24px', background: '#e2e8f0' }}></div>
+        {/* <div style={{ width: '1px', height: '24px', background: '#e2e8f0' }}></div>  */}
 
         <div className="vmm-header-user" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '12px' }}>
           {showBackButton && (

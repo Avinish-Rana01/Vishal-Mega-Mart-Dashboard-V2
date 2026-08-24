@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveStock } from '../../../hooks/useDashboardData';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
@@ -50,28 +50,28 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => {
     <div ref={ref} style={{ height: '100%', overflowY: 'auto', paddingRight: '10px', minHeight: '240px' }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height={height}>
-          <BarChart 
+          <BarChart
             layout="vertical"
-            data={barChartData} 
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }} 
+            data={barChartData}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
           >
             <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <YAxis 
-              type="category" 
-              dataKey="name" 
-              width={60} 
-              tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} 
-              axisLine={false} 
-              tickLine={false} 
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={60}
+              tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }}
+              axisLine={false}
+              tickLine={false}
             />
-            <RechartsTooltip 
-              cursor={{ fill: '#f1f5f9' }} 
+            <RechartsTooltip
+              cursor={{ fill: '#f1f5f9' }}
               content={<StoreBarTooltip />}
             />
-            
+
             {/* Stacked bars: RFID on left, Difference on right */}
             <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
-            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0"  barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
+            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -171,7 +171,7 @@ export default function LiveStockSection() {
     // Step 1: Text Search
     if (searchStore.trim()) {
       const term = searchStore.toLowerCase();
-      result = result.filter(row => 
+      result = result.filter(row =>
         (row.STORE_CODE && row.STORE_CODE.toLowerCase().includes(term)) ||
         (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term))
       );
@@ -191,7 +191,7 @@ export default function LiveStockSection() {
           const rfid = Number(row.RFID_STOCK) || 0;
           fieldVal = sap > rfid ? sap - rfid : 0;
         }
-        
+
         if (appliedFilter.op === '<') return fieldVal < appliedFilter.val;
         if (appliedFilter.op === '>') return fieldVal > appliedFilter.val;
         if (appliedFilter.op === '=') return fieldVal === appliedFilter.val;
@@ -224,7 +224,7 @@ export default function LiveStockSection() {
       const sap = Number(row.SAP_STOCK) || 0;
       const rfid = Number(row.RFID_STOCK) || 0;
       const difference = sap > rfid ? sap - rfid : 0;
-      
+
       return {
         name: row.STORE_CODE,
         fullName: row.STORE_NAME || row.STORE_CODE,
@@ -242,7 +242,7 @@ export default function LiveStockSection() {
    */
   const accuracyPieData = useMemo(() => {
     if (!data || data.length === 0) return [];
-    
+
     let excellent = 0; // >= 95%
     let good = 0;      // 90 - 94.99%
     let average = 0;   // 80 - 89.99%
@@ -311,15 +311,15 @@ export default function LiveStockSection() {
           </linearGradient>
         </defs>
       </svg>
-      
+
       {/* Header */}
-      <SectionHeader 
-        title="Live Stock" 
-        rightContent={<DateBadge />} 
+      <SectionHeader
+        title="Live Stock"
+        rightContent={<DateBadge />}
       />
 
       <div className="ls-grid">
-     
+
         {/* ROW 1: 5 KPI Cards */}
         <KpiCard
           title="Total Stores"
@@ -376,7 +376,7 @@ export default function LiveStockSection() {
                 {/* Accuracy Filter Controls */}
                 <div className="ls-filter-container">
                   <div className="ls-filter-label">All Stores</div>
-                  <CustomDropdown 
+                  <CustomDropdown
                     options={operatorOptions}
                     value={filterOp}
                     onChange={(val) => {
@@ -390,17 +390,17 @@ export default function LiveStockSection() {
                     }}
                   />
                   <div className="ls-filter-input-wrapper">
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       className="ls-filter-input"
-                      value={filterVal} 
+                      value={filterVal}
                       onChange={(e) => { setFilterVal(e.target.value); setFilterError(''); }}
                       onKeyDown={(e) => { if (e.key === 'Enter') handleApplyFilter(); }}
                       placeholder="90"
                     />
                     <span className="ls-filter-percent">%</span>
                   </div>
-                  <button 
+                  <button
                     className="ls-filter-btn"
                     onClick={handleApplyFilter}
                     disabled={!String(filterVal).trim()}
@@ -428,10 +428,10 @@ export default function LiveStockSection() {
 
           {/* Sticky Legend & Active Filter Bar */}
           <div className="ls-toolbar-secondary">
-            
+
             <div className="ls-toolbar-controls-left">
               {/* Sort By Controls */}
-              <CustomDropdown 
+              <CustomDropdown
                 options={sortOptions}
                 value={sortBy}
                 onChange={(val) => setSortBy(val)}
@@ -445,12 +445,12 @@ export default function LiveStockSection() {
                 {appliedFilter.field !== 'ALL' && (
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0e7ff', color: '#4338ca', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
                     Accuracy {appliedFilter.op} {appliedFilter.val}%
-                    <button 
+                    <button
                       onClick={() => {
                         setFilterVal('');
                         setAppliedFilter({ field: 'ALL', op: '<', val: '' });
                         setFilterError('');
-                      }} 
+                      }}
                       style={{ background: 'transparent', border: 'none', color: '#4338ca', cursor: 'pointer', padding: '0 2px', fontSize: '16px', lineHeight: 1 }}
                     >
                       ×
@@ -477,7 +477,7 @@ export default function LiveStockSection() {
 
           <div style={{ height: '250px' }}>
             {barChartData.length === 0 ? (
-              <SearchEmptyState 
+              <SearchEmptyState
                 searchFilter={searchStore}
                 title={searchStore ? `No Stores Found for "${searchStore}"` : "No Stores Match Criteria"}
                 subtitle="Try a different search term or clear your filters."
@@ -490,7 +490,7 @@ export default function LiveStockSection() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart */}
-        <div className="ls-card" style={{ gridColumn: '1 / -1', background: '#eceef0', padding: '8  px 12px' }}>
+        <div className="ls-card" style={{ gridColumn: '1 / -1', background: '#f9f9fb', padding: '8  px 12px' }}>
           <div className="ls-toolbar-header">
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
               COVERAGE DISTRIBUTION
@@ -499,7 +499,7 @@ export default function LiveStockSection() {
 
           {accuracyPieData.length > 0 && totalPieStores > 0 ? (
             <div className="ls-donut-container">
-              
+
               {/* Left Side: Pie Chart */}
               <div className="ls-donut-wrapper">
                 <MemoizedPieChart accuracyPieData={accuracyPieData} />
@@ -525,7 +525,7 @@ export default function LiveStockSection() {
                           <span style={{ color: '#94a3b8', fontSize: '14px', minWidth: '45px', textAlign: 'right' }}>{percentage}%</span>
                         </div>
                       </div>
-                      
+
                       {/* Horizontal Progress Bar */}
                       <div style={{ width: '100%', height: '12px', backgroundColor: '#ffffffff', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '6px' }} />

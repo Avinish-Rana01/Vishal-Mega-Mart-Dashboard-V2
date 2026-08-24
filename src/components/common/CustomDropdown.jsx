@@ -9,8 +9,9 @@ import React, { useState } from 'react';
  * @param {string} prefix - Optional text prefix (e.g. "Sort:").
  * @param {object} buttonStyle - Optional inline styles for the trigger button.
  * @param {object} menuStyle - Optional inline styles for the dropdown menu container.
+ * @param {number|string} width - Optional custom width for the dropdown container.
  */
-export default function CustomDropdown({ options, value, onChange, prefix, buttonStyle, menuStyle }) {
+export default function CustomDropdown({ options, value, onChange, prefix, buttonStyle, menuStyle, width }) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Find the selected option's label to display in the button
@@ -19,7 +20,7 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
 
   return (
     <div 
-      style={{ position: 'relative' }}
+      style={{ position: 'relative', width: width ? width : 'auto' }}
       tabIndex={0}
       onBlur={(e) => {
         // Close dropdown when focus leaves the component
@@ -30,7 +31,7 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
     >
       <button 
         className="ls-filter-select"
-        style={{ paddingRight: '24px', ...buttonStyle }}
+        style={{ paddingRight: '24px', width: '100%', textAlign: 'left', ...buttonStyle }}
         onClick={() => setIsOpen(!isOpen)}
       >
         {prefix && <span style={{ color: '#94a3b8', marginRight: '6px' }}>{prefix}</span>}
@@ -38,11 +39,12 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
       </button>
 
       {isOpen && (
-        <div className="ls-dropdown-menu" style={{ ...menuStyle }}>
+        <div className="ls-dropdown-menu" style={{ ...menuStyle, minWidth: '100%', maxHeight: '180px', overflowY: 'auto' }}>
           {options.map((opt) => (
             <div 
               key={opt.value}
               className={`ls-dropdown-item ${value === opt.value ? 'active' : ''}`} 
+              style={{ whiteSpace: 'nowrap' }}
               onClick={() => { 
                 onChange(opt.value); 
                 setIsOpen(false); 

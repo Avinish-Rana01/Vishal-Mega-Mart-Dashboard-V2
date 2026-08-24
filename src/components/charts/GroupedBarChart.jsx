@@ -26,6 +26,9 @@ export default function GroupedBarChart({
   tooltipFormatter,
   emptyText = 'No data available.',
   onBarClick,
+  stacked = false,
+  customTooltip,
+  maxBarWidth,
 }) {
   if (!data || data.length === 0) {
     return (
@@ -78,8 +81,9 @@ export default function GroupedBarChart({
             />
             <Tooltip
               cursor={{ fill: 'rgba(241,245,249,0.7)' }}
-              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
-              formatter={tooltipFormatter || ((value) => value.toLocaleString('en-IN'))}
+              content={customTooltip ? customTooltip : undefined}
+              contentStyle={customTooltip ? undefined : { borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+              formatter={customTooltip ? undefined : (tooltipFormatter || ((value) => value.toLocaleString('en-IN')))}
             />
             <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }} />
 
@@ -88,9 +92,10 @@ export default function GroupedBarChart({
                 key={bar.dataKey}
                 dataKey={bar.dataKey}
                 name={bar.label || bar.dataKey}
+                stackId={stacked ? "a" : undefined}
                 fill={striped && idx === 0 ? 'url(#gchart-stripe)' : bar.color}
-                radius={12}
-                maxBarSize={32}
+                radius={stacked ? 0 : 12}
+                maxBarSize={maxBarWidth || (stacked ? 32 : 24)}
                 onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
                 cursor={onBarClick ? 'pointer' : 'default'}
               />

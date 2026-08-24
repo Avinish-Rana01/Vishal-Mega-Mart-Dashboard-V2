@@ -10,9 +10,9 @@ export default function SectionHeader({ title, rightContent }) {
   return (
     <div className="ds-header">
       <div className="ds-header-text">
-        <h3 style={{ textTransform: 'Uppercase', fontSize : '16px'}}>{title}</h3>
+        <h3 style={{ textTransform: 'Uppercase', fontSize: '16px' }}>{title}</h3>
       </div>
-      
+
       {rightContent && (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           {rightContent}
@@ -28,18 +28,16 @@ export default function SectionHeader({ title, rightContent }) {
  */
 export function DateBadge() {
   return (
-    <div style={{ 
-      background: '#ffffffff', 
-      color: '#475569', 
-      padding: '8px 16px', 
-      borderRadius: '20px', 
-      border: '1px solid #eceef0', 
-      fontSize: '13px', 
-      fontWeight: '600', 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '8px', 
-      boxShadow: '0 1px 2px rgba(0,0,0,0.05)' 
+    <div style={{
+      background: '#ffffffff',
+      color: '#475569',
+      padding: '8px 16px',
+      borderRadius: '20px',
+      fontSize: '13px',
+      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
     }}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>

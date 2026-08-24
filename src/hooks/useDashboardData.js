@@ -169,15 +169,19 @@ const saleDashboardFilter = (row, term) =>
   (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term)) ||
   (row.DATE && row.DATE.toLowerCase().includes(term));
 
-const saleDashboardTotals = (summary) => ({
-  STORE: 'TOTAL',
-  TOTAL_DPOS_SALE: summary.totalDposSale?.toLocaleString('en-IN') || 0,
-  TOTAL_RFID_CHECKOUT: summary.totalRfidCheckout?.toLocaleString('en-IN') || 0,
-  RFID_CHECKOUT_MATCHING_WITH_DPOS_SALE: summary.totalRfidCheckoutMatch?.toLocaleString('en-IN') || 0,
-  RFID_CHECKOUT_NOT_MATCHING_WITH_DPOS_SALE: summary.totalRfidCheckoutNotMatch?.toLocaleString('en-IN') || 0,
-  TOTAL_MANUAL_SALE: summary.totalManualSale?.toLocaleString('en-IN') || 0,
-  TOTAL_VOID: summary.totalVoid?.toLocaleString('en-IN') || 0
-});
+const saleDashboardTotals = (summary) => {
+  const dpos = summary.totalDposSale || 0;
+  const rfid = summary.totalRfidCheckout || 0;
+  
+  return {
+    STORE: 'TOTAL',
+    TOTAL_DPOS_SALE: dpos.toLocaleString('en-IN'),
+    TOTAL_RFID_CHECKOUT: rfid.toLocaleString('en-IN'),
+    TOTAL_TAFFETA_SALE: summary.totalTaffetaSale?.toLocaleString('en-IN') || 0,
+    TOTAL_MANUAL_SALE: summary.totalManualSale?.toLocaleString('en-IN') || 0,
+    RFID_SALES_SHARE: dpos === 0 ? 'N/A' : `${Math.round((rfid / dpos) * 100)}%`
+  };
+};
 
 // Temporarily mock getSaleDashboard for 20 stores due to empty backend data
 const mockGetSaleDashboard = async (signal) => {

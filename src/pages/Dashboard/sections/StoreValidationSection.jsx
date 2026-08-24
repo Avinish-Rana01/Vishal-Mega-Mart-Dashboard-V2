@@ -255,7 +255,7 @@ export default function StoreValidationSection() {
     const baseOptions = [
       { value: 'PENDING_DESC', label: 'Highest Pending' },
       { value: 'VALIDATED_ASC', label: 'Lowest Validated' },
-      { value: 'STORE_ASC',     label: 'Store Code (A-Z)' },
+      { value: 'VALIDATED_DESC', label: 'Highest Validated' },
     ];
     if (chartView !== 'grouped') {
       // Insert Wrong HU option before Store Code (spread, no mutation)
@@ -298,6 +298,8 @@ export default function StoreValidationSection() {
       result.sort((a, b) => Number(b.HU_WRONG_QTY || 0) - Number(a.HU_WRONG_QTY || 0));
     } else if (sortBy === 'WRONG_ASC') {
       result.sort((a, b) => Number(a.HU_WRONG_QTY || 0) - Number(b.HU_WRONG_QTY || 0));
+    } else if (sortBy === 'VALIDATED_DESC') {
+      result.sort((a, b) => Number(b.HU_VALIDATED_QTY || 0) - Number(a.HU_VALIDATED_QTY || 0));
     } else {
       result.sort((a, b) => (a.STORE || '').localeCompare(b.STORE || ''));
     }
