@@ -29,15 +29,16 @@ export default function SectionHeader({ title, rightContent }) {
 export function DateBadge() {
   return (
     <div style={{
-      background: '#ffffffff',
+      // background: '#ffffffff',
       color: '#475569',
-      padding: '8px 16px',
+      padding: '6px 16px',
       borderRadius: '20px',
       fontSize: '13px',
       fontWeight: '600',
       display: 'flex',
       alignItems: 'center',
-      gap: '8px'
+      gap: '8px',
+      border: 'solid 1px #e2e8f0'
     }}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>

@@ -352,7 +352,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #ffffff;
+  background-color: #eceef0;
   display: flex;
   flex-direction: column;
   padding: 16px 12px;
@@ -409,7 +409,7 @@
 
 /* Shared styles for Grid Cells and Section Headers */
 .vmm-grid-cell, .ds-header {
-  background-color: #eceef0 !important; /* Forces this color across both classes */
+  background-color: #ffffff !important; /* Forces this color across both classes */
 }
 
 .vmm-grid-cell {

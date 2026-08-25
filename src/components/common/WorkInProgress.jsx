@@ -18,7 +18,8 @@ export default function WorkInProgress({
       // border: '1px dashed #cbd5e1',
       margin: '0',
       padding: '40px',
-      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+      // boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+      border: 'solid 1px #e2e8f0'
     }}>
       <motion.div
         animate={{ rotate: 360 }}

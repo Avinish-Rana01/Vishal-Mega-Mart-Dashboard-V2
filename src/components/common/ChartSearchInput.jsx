@@ -28,7 +28,7 @@ export default function ChartSearchInput({ value, onChange, onClear, placeholder
         placeholder={placeholder}
         value={value}
         onChange={e => onChange(e.target.value)}
-        style={{ paddingRight: value ? '32px' : '16px' }}
+        style={{ paddingRight: value ? '25px' : '6px' }}
       />
       {value && (
         <button className="vmm-search-clear" onClick={onClear}>×</button>
