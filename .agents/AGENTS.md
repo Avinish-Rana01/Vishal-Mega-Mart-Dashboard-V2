@@ -16,12 +16,14 @@
   1. KPI Row (`ds-kpi-row`) — summary numbers at the top.
   2. Charts Row (`ds-charts-row`) — main visualizations.
   3. List Row — a compact `StoreRankList`, NOT a full table.
+- Every section MUST start with the `SectionHeader` component for consistent titles and actions.
 
 ## Component Rules (V2 Chart Library)
 ALL visual sections in the V2 Dashboard MUST use these reusable components from `src/components/charts/`:
 
 | Component | File | Use Case |
 |---|---|---|
+| `SectionHeader` | `common/SectionHeader.jsx` | The main header at the top of every section |
 | `CurvedCard` | `common/CurvedCard.jsx` | Primary (dark gradient) KPI metric card |
 | `KpiCard` | `charts/KpiCard.jsx` | Secondary (white) KPI metric cards |
 | `StoreRankList` | `charts/StoreRankList.jsx` | Ranked list of stores/vendors with colored badges |
@@ -67,3 +69,10 @@ ALL visual sections in the V2 Dashboard MUST use these reusable components from 
 - **`POS_Web_Application React` (Tabular App)**: This is the strict 1:1 replication of the legacy tabular UI. It is built with React + JSON + caching to solve legacy speed issues, but the UI itself must remain entirely tabular for power users. No new visual charts or complex dashboard designs should be introduced here.
 - **`POS_Web_Application React V2` (Graphical App)**: This is the modern, management-facing dashboard. This project replaces massive datatables with high-level charts, KPI cards, and visual analytics using Recharts. It requires iterative design work and is a separate initiative from the tabular replication.
 - **Rule of Thumb**: If you are working in a folder WITHOUT "V2" in the name, your priority is high-performance, strictly tabular data binding. If the folder HAS "V2", focus on modern dashboard charts and polished UI/UX aesthetics.
+
+## Strict Flexbox Chart Constraints
+When rendering responsive charts (especially with Recharts) inside flex containers, you MUST strictly pass flex constraints down the DOM tree to prevent collapsing or infinite expansion:
+1. **Flex Chain**: The parent card/wrapper must have `display: flex; flex-direction: column`.
+2. **Scroll Containers**: Any scrollable wrapper inside the flex container MUST use `flex: 1; min-height: 0` (or `min-width: 0` for rows). 
+3. **Avoid height: 100% alone**: Never rely solely on `height: 100%` for a chart wrapper inside a flex item, as it will often collapse. Always use `flex: 1; min-height: 0`.
+4. **Recharts ResponsiveContainer**: Ensure the `ResponsiveContainer` is wrapped in a rigidly constrained `flex: 1; min-height: 0` container. If the chart needs to scroll, apply `overflow: auto` to that specific wrapper.

@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function WorkInProgress({ 
-  title = "Work in Progress", 
+export default function WorkInProgress({
+  title = "Work in Progress",
   message = "We're engineering a more powerful, insightful, and dynamic analytics experience for this section. Hang tight!",
   version = "V2.0"
 }) {
@@ -15,7 +15,7 @@ export default function WorkInProgress({
       flex: 1,
       background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
       borderRadius: '24px',
-      border: '1px dashed #cbd5e1',
+      // border: '1px dashed #cbd5e1',
       margin: '0',
       padding: '40px',
       boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'

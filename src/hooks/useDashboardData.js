@@ -205,7 +205,13 @@ const voidDashboardTotals = (summary) => ({
   DIFFERENCE_QTY: (summary.pendingQty ?? summary.DIFFERENCE_QTY ?? 0).toLocaleString('en-IN')
 });
 
-export const useVoidDashboard = () => useDashboardFetch(getVoidDashboard, voidDashboardFilter, voidDashboardTotals);
+import { generateMockVoidDashboard } from '../utils/mockVoidDashboard';
+
+const mockGetVoidDashboard = async (signal) => {
+  return generateMockVoidDashboard(20);
+};
+
+export const useVoidDashboard = () => useDashboardFetch(mockGetVoidDashboard, voidDashboardFilter, voidDashboardTotals);
 
 // ==========================================
 // 7. Return Dashboard

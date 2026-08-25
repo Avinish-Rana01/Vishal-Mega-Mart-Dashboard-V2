@@ -29,6 +29,8 @@ export default function GroupedBarChart({
   stacked = false,
   customTooltip,
   maxBarWidth,
+  barCategoryGap = '10%',
+  barGap = 2,
 }) {
   if (!data || data.length === 0) {
     return (
@@ -53,7 +55,7 @@ export default function GroupedBarChart({
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
+          <BarChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
             <defs>
               <pattern id="gchart-stripe" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                 <rect width="10" height="10" fill="#f8fafc" />
