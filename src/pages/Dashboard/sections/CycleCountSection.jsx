@@ -47,7 +47,12 @@ function DurationTooltip({ active, payload }) {
   const d = payload[0].payload;
   return (
     <div className="cc-card" style={{ padding: '14px 18px', minWidth: '200px', background: '#fff', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
-      <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '8px', fontSize: '14px' }}>{d.STORE_NAME || d.STORE_CODE}</div>
+      <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '8px', fontSize: '14px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>{d.STORE_NAME || d.STORE_CODE}</span>
+        {d.STORE_CODE && d.STORE_CODE !== d.STORE_NAME && (
+          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{d.STORE_CODE}</span>
+        )}
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px', fontSize: '12px', color: '#475569' }}>
         <span style={{ color: '#94a3b8' }}>Date</span>       <span style={{ fontWeight: 600 }}>{d.formattedDate}</span>
         <span style={{ color: '#94a3b8' }}>Type</span>       <span style={{ fontWeight: 600 }}>{d.CYCLE_COUNT_TYPE || '—'}</span>
@@ -153,8 +158,11 @@ function CycleInfoTooltip({ active, payload }) {
 
   return (
     <div className="cc-card" style={{ padding: '8px 12px', minWidth: '180px', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
-      <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '6px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
-        {d.STORE_NAME || d.STORE_CODE}
+      <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '6px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>{d.STORE_NAME || d.STORE_CODE}</span>
+        {d.STORE_CODE && d.STORE_CODE !== d.STORE_NAME && (
+          <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{d.STORE_CODE}</span>
+        )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '4px 12px', fontSize: '11px', color: '#475569' }}>
         <span style={{ color: '#64748b' }}>Articles</span>       <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.NO_OF_ARTICLES || 0}</span>

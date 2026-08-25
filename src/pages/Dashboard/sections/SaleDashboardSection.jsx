@@ -41,8 +41,11 @@ const CustomTooltip = ({ active, payload, label }) => {
     const data = payload[0].payload;
     return (
       <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', minWidth: '180px' }}>
-        <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: '8px', fontSize: '14px' }}>
-          {data.fullName || label}
+        <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: '8px', fontSize: '14px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span>{data.fullName || label}</span>
+          {data.name && data.name !== data.fullName && (
+            <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
+          )}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
           <span style={{ color: '#64748b' }}>Total DPOS Sale:</span>
@@ -197,7 +200,7 @@ export default function SaleDashboardSection() {
   //       <ChartToolbar
   //         leftContent={
   //           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-  //             <h3 className="cc-data-grid-title" style={{ margin: 0 }}>Sales Breakdown by Store</h3>
+  //             <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sales Breakdown by Store</h3>
   //             <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} width={220} />
   //           </div>
   //         }

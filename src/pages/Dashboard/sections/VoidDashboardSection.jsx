@@ -10,6 +10,8 @@ import SectionHeader, { DateBadge } from '../../../components/common/SectionHead
 import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import WorkInProgress from '../../../components/common/WorkInProgress';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
@@ -28,11 +30,40 @@ const VIEW_OPTIONS = [
   { value: 'encoding', label: 'Highest Encoding Rates' },
 ];
 
+const SORT_OPTIONS = [
+  { value: 'VOID_DESC', label: 'Sort: Highest Voids' },
+  { value: 'ENCODE_DESC', label: 'Sort: Highest Encoded' },
+  { value: 'PENDING_DESC', label: 'Sort: Highest Pending' },
+  { value: 'RATE_DESC', label: 'Sort: Highest Rate' },
+  { value: 'STORE_ASC', label: 'Sort: Store (A-Z)' },
+];
+
+const VoidVsEncodedTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div style={{ background: 'white', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', minWidth: '160px' }}>
+        <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span>{data.fullName || data.name}</span>
+          {data.name && data.name !== data.fullName && (
+            <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
+          )}
+        </div>
+        <div style={{ fontSize: '13px', color: '#d97706', marginBottom: '4px' }}>Void Qty : <span style={{ fontWeight: 600 }}>{data.Void}</span></div>
+        <div style={{ fontSize: '13px', color: '#eab308', marginBottom: '8px' }}>Encoded Qty : <span style={{ fontWeight: 600 }}>{data.Encoded}</span></div>
+        <div style={{ height: '1px', background: '#f1f5f9', margin: '4px 0 8px 0' }}></div>
+        <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Voids : <span style={{ fontWeight: 600 }}>{data.Difference}</span></div>
+      </div>
+    );
+  }
+  return null;
+};
+
 const MemoizedPendingChart = React.memo(({ data }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
-  const height = Math.max(data.length * 35, 240);
+  const height = Math.max(data.length * 35, 300);
   return (
-    <div ref={ref} style={{ flex: 1, minHeight: '240px', position: 'relative' }}>
+    <div ref={ref} style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
       {hasBeenVisible && (
         <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', paddingRight: '10px' }}>
           <ResponsiveContainer width="100%" height={height}>
@@ -44,7 +75,12 @@ const MemoizedPendingChart = React.memo(({ data }) => {
                 const data = payload[0].payload;
                 return (
                   <div style={{ background: 'white', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '8px' }}>{data.fullName}</div>
+                    <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>{data.fullName || data.name}</span>
+                      {data.name && data.name !== data.fullName && (
+                        <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
+                      )}
+                    </div>
                     <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Voids: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
                   </div>
                 );
@@ -62,9 +98,9 @@ const MemoizedPendingChart = React.memo(({ data }) => {
 
 const MemoizedEncodingChart = React.memo(({ data }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
-  const height = Math.max(data.length * 35, 240);
+  const height = Math.max(data.length * 35, 300);
   return (
-    <div ref={ref} style={{ flex: 1, minHeight: '240px', position: 'relative' }}>
+    <div ref={ref} style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
       {hasBeenVisible && (
         <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', paddingRight: '10px' }}>
           <ResponsiveContainer width="100%" height={height}>
@@ -76,7 +112,12 @@ const MemoizedEncodingChart = React.memo(({ data }) => {
                 const data = payload[0].payload;
                 return (
                   <div style={{ background: 'white', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '8px' }}>{data.fullName}</div>
+                    <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>{data.fullName || data.name}</span>
+                      {data.name && data.name !== data.fullName && (
+                        <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
+                      )}
+                    </div>
                     <div style={{ fontSize: '13px', color: '#10b981' }}>Encode Rate: <span style={{ fontWeight: 600 }}>{data.rate.toFixed(1)}%</span></div>
                   </div>
                 );
@@ -97,18 +138,39 @@ const MemoizedEncodingChart = React.memo(({ data }) => {
 export default function VoidDashboardSection() {
   const { data, totals, isLoading, error, refresh } = useVoidDashboard();
   const [chartView, setChartView] = React.useState('grouped');
+  const [sortBy, setSortBy] = React.useState('VOID_DESC');
+
+  // Smart defaults for sorting when switching views
+  React.useEffect(() => {
+    if (chartView === 'grouped') setSortBy('VOID_DESC');
+    if (chartView === 'pending') setSortBy('PENDING_DESC');
+    if (chartView === 'encoding') setSortBy('RATE_DESC');
+  }, [chartView]);
 
   // Derived Metrics for Charts & Lists
   const { barData, rankList, encodePercent, totalVoidRaw, encodeRaw, pendingChartData, encodingChartData } = useMemo(() => {
     if (!data || !totals) return { barData: [], rankList: [], encodePercent: 0, totalVoidRaw: 0, encodeRaw: 0, pendingChartData: [], encodingChartData: [] };
 
-    // 1. Bar Chart Data (Top 10 stores by Void Qty)
-    const sortedData = [...data].sort((a, b) => Number(b.VOID_QTY || 0) - Number(a.VOID_QTY || 0));
+    const sortFn = (a, b) => {
+      if (sortBy === 'STORE_ASC') return (a.STORE || '').localeCompare(b.STORE || '');
+      if (sortBy === 'ENCODE_DESC') return Number(b.ENCODE_QTY || 0) - Number(a.ENCODE_QTY || 0);
+      if (sortBy === 'PENDING_DESC') return Number(b.DIFFERENCE_QTY || 0) - Number(a.DIFFERENCE_QTY || 0);
+      if (sortBy === 'RATE_DESC') {
+         const rateA = Number(a.VOID_QTY || 0) > 0 ? (Number(a.ENCODE_QTY || 0)/Number(a.VOID_QTY || 0)) : 0;
+         const rateB = Number(b.VOID_QTY || 0) > 0 ? (Number(b.ENCODE_QTY || 0)/Number(b.VOID_QTY || 0)) : 0;
+         return rateB - rateA;
+      }
+      return Number(b.VOID_QTY || 0) - Number(a.VOID_QTY || 0); // default VOID_DESC
+    };
+
+    // 1. Bar Chart Data (Sorted dynamically)
+    const sortedData = [...data].sort(sortFn);
     const barData = sortedData.map(row => ({
       name: row.STORE,
       fullName: row.STORE_NAME,
       Void: Number(row.VOID_QTY || 0),
-      Encoded: Number(row.ENCODE_QTY || 0)
+      Encoded: Number(row.ENCODE_QTY || 0),
+      Difference: Number(row.DIFFERENCE_QTY || 0)
     }));
 
     // 2. Global Breakdown for SemiDonut
@@ -116,7 +178,7 @@ export default function VoidDashboardSection() {
     const encodeRaw = Number((totals.ENCODE_QTY || '0').replace(/,/g, ''));
     const encodePercent = totalVoidRaw > 0 ? ((encodeRaw / totalVoidRaw) * 100) : 0;
 
-    // 3. Rank List (Stores with Highest Pending/Difference)
+    // 3. Rank List (Stores with Highest Pending/Difference) - Always Top 3 pending
     const rankList = [...data]
       .filter(row => Number(row.DIFFERENCE_QTY || 0) > 0)
       .sort((a, b) => Number(b.DIFFERENCE_QTY || 0) - Number(a.DIFFERENCE_QTY || 0))
@@ -125,39 +187,27 @@ export default function VoidDashboardSection() {
     // 4. Pending Voids Chart Data (Horizontal)
     const pendingChartData = [...data]
       .filter(row => Number(row.DIFFERENCE_QTY || 0) > 0)
-      .sort((a, b) => Number(b.DIFFERENCE_QTY || 0) - Number(a.DIFFERENCE_QTY || 0))
+      .sort(sortFn)
       .map(row => ({ name: row.STORE, fullName: row.STORE_NAME, pending: Number(row.DIFFERENCE_QTY || 0) }));
 
     // 5. Encoding Rates Chart Data (Horizontal)
     const encodingChartData = [...data]
+      .sort(sortFn)
       .map(row => {
         const voidQ = Number(row.VOID_QTY || 0);
         const encQ = Number(row.ENCODE_QTY || 0);
         const rate = voidQ > 0 ? (encQ / voidQ) * 100 : 0;
         return { name: row.STORE, fullName: row.STORE_NAME, rate: rate };
-      })
-      .sort((a, b) => b.rate - a.rate);
+      });
 
     return { barData, rankList, encodePercent, totalVoidRaw, encodeRaw, pendingChartData, encodingChartData };
-  }, [data, totals]);
+  }, [data, totals, sortBy]);
 
   const handleStoreClick = (storeData) => {
     console.log('Navigate to store void report:', storeData.STORE || storeData.name);
   };
 
-  if (isLoading) {
-    return (
-      <section className="ds-section">
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-          {[1,2,3].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px' }}><div className="ds-shimmer" /></div>)}
-        </div>
-        <div className="ds-skeleton-row ds-charts-row--equal">
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
-        </div>
-      </section>
-    );
-  }
+  if (isLoading) return <DashboardShimmer title="Void Dashboard" />;
 
   if (error) {
     return <div className="ds-error">{error}</div>;
@@ -212,7 +262,7 @@ export default function VoidDashboardSection() {
 
       {/* 2. Charts Row (Full Width Bar Chart) */}
       <div className="ds-charts-row ds-grow">
-        <div className="ds-card ds-grow">
+        <div className="ds-card ds-grow" style={{height: '359px'}}>
           <ChartToolbar
             leftContent={
               <CustomDropdown
@@ -223,20 +273,31 @@ export default function VoidDashboardSection() {
                 menuStyle={{ left: 0, right: 'auto', textTransform: 'none', letterSpacing: 'normal' }}
               />
             }
+            rightContent={
+              <CustomDropdown
+                options={SORT_OPTIONS}
+                value={sortBy}
+                onChange={setSortBy}
+                buttonStyle={{ backgroundColor: 'transparent', border: 'none', padding: '4px 32px 4px 8px', fontSize: '12px', fontWeight: 500, color: '#64748b', boxShadow: 'none' }}
+                menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
+              />
+            }
           />
-          <div style={{ flex: 1, minHeight: 0, marginTop: '10px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column' }}>
             {chartView === 'grouped' && (
-              <div style={{ flex: 1, minHeight: '240px', overflowX: 'auto', overflowY: 'hidden' }}>
-                <div style={{ minWidth: `${Math.max(100, barData.length * 80)}px`, height: '100%' }}>
-                  <GroupedBarChart
-                    data={barData}
-                    bars={[
-                      { dataKey: 'Void', color: '#d97706', label: 'Void Qty' },
-                      { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
-                    ]}
-                    height="100%"
-                    barCategoryGap="35%"
-                  />
+              <div style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
+                <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
+                  <div style={{ minWidth: `${Math.max(800, barData.length * 70)}px`, height: '100%' }}>
+                    <GroupedBarChart
+                      data={barData}
+                      bars={[
+                        { dataKey: 'Void', color: '#d97706', label: 'Void Qty' },
+                        { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
+                      ]}
+                      height="100%"
+                      customTooltip={<VoidVsEncodedTooltip />}
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -247,10 +308,10 @@ export default function VoidDashboardSection() {
       </div>
 
       {/* 3. Quick-List & Donut Row */}
-      <div className="ds-charts-row ds-charts-row--equal" style={{ height: '350px', flexShrink: 0 }}>
+      <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
         {/* Left: Store Rank List */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title">Action Required: Highest Pending Voids</h3>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Pending Voids</h3>
           <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
             <StoreRankList
               items={rankList}
@@ -267,7 +328,7 @@ export default function VoidDashboardSection() {
 
         {/* Right: SemiDonut Chart */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title">Overall Encoding Completion</h3>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Overall Encoding Completion</h3>
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SemiDonutChart
               value={encodeRaw}

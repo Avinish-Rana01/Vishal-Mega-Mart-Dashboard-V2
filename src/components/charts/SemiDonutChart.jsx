@@ -55,6 +55,7 @@ export default function SemiDonutChart({
               <Tooltip
                 formatter={(val, name) => [`${Number(val).toFixed(1)}%`, name]}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+                itemStyle={{ color: '#0f172a' }}
               />
             </PieChart>
           </ResponsiveContainer>

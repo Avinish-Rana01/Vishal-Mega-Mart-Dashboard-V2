@@ -36,8 +36,11 @@ function ValidationTooltip({ active, payload }) {
   const wrong   = Number(d.HU_WRONG_QTY || 0);
   return (
     <div style={{ padding: '12px 16px', minWidth: '210px', background: '#fff', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
-      <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '10px', fontSize: '13px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-        {d.STORE_NAME || d.STORE}
+      <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '10px', fontSize: '13px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>{d.STORE_NAME || d.STORE}</span>
+        {d.STORE && d.STORE !== d.STORE_NAME && (
+          <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{d.STORE}</span>
+        )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 14px', fontSize: '12px' }}>
         <span style={{ color: '#94a3b8' }}>Received HU</span>  <span style={{ fontWeight: 700, color: COLOR_RECEIVED }}>{Number(d.HU_RECEIVED_QTY || 0).toLocaleString('en-IN')}</span>

@@ -1,11 +1,16 @@
+import { STORE_MAPPING } from '../config/constants';
+
 // --- MOCK DATA GENERATOR ---
 export const generateMockData = () => {
   const stores = [];
   let totalSap = 0;
   let totalRfid = 0;
+  
+  const storeCodes = Object.keys(STORE_MAPPING);
+  const count = Math.min(20, storeCodes.length);
 
-  for (let i = 1; i <= 20; i++) {
-    const storeCode = `ST${i.toString().padStart(3, '0')}`;
+  for (let i = 0; i < count; i++) {
+    const storeCode = storeCodes[i];
     const sapStock = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
     
     // Distribute accuracy: 46% >=95, 26% 90-95, 17% 80-90, 11% <80
@@ -25,7 +30,7 @@ export const generateMockData = () => {
 
     stores.push({
       STORE_CODE: storeCode,
-      STORE_NAME: `${storeCode} - Mock Store ${i}`,
+      STORE_NAME: STORE_MAPPING[storeCode],
       SAP_STOCK: sapStock,
       RFID_STOCK: rfidStock,
       DIFFERENCE: diff,

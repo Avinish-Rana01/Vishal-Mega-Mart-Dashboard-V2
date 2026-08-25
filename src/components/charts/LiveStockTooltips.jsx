@@ -24,8 +24,11 @@ export const StoreBarTooltip = React.memo(({ active, payload, label }) => {
   const data = payload[0].payload;
   return (
     <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', minWidth: '180px' }}>
-      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-        {data.fullName || label}
+      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>{data.fullName || label}</span>
+        {data.name && data.name !== data.fullName && (
+          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{data.name}</span>
+        )}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>

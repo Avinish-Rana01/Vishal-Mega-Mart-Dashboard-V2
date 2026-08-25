@@ -12,7 +12,7 @@ import {
   getWarehouseEncoding,
   getDcValidation
 } from '../services/stockService';
-import { API_DEFAULTS } from '../config/constants';
+import { API_DEFAULTS, STORE_MAPPING } from '../config/constants';
 
 /**
  * Generic hook for dashboard table endpoints.
@@ -47,6 +47,16 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_
           const term = searchQuery.toLowerCase();
           items = items.filter(row => filterFn(row, term));
         }
+
+        // Apply CEO Store Name Mapping globally to all dashboard data
+        items = items.map(row => {
+          const code = row.STORE_CODE || row.STORE || row.Store_Code;
+          if (code && STORE_MAPPING[code]) {
+            return { ...row, STORE_NAME: STORE_MAPPING[code] };
+          }
+          return row;
+        });
+
         setData(items);
 
         if (response.summary) {

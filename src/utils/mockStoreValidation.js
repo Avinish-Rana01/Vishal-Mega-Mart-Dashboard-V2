@@ -1,4 +1,8 @@
+import { STORE_MAPPING } from '../config/constants';
+
 export function generateMockStoreValidation(count = 20) {
+  const storeCodes = Object.keys(STORE_MAPPING);
+  const actualCount = Math.min(count, storeCodes.length);
   const stores = [];
   let totalReceived = 0;
   let totalValidated = 0;
@@ -6,8 +10,8 @@ export function generateMockStoreValidation(count = 20) {
   let totalWrong = 0;
   let totalPending = 0;
 
-  for (let i = 1; i <= count; i++) {
-    const storeCode = `HD${Math.floor(Math.random() * 900) + 100}`;
+  for (let i = 0; i < actualCount; i++) {
+    const storeCode = storeCodes[i];
     const received = Math.floor(Math.random() * 500) + 100;
     
     // Validated is usually somewhat less than or equal to received
@@ -29,7 +33,7 @@ export function generateMockStoreValidation(count = 20) {
 
     stores.push({
       STORE: storeCode,
-      STORE_NAME: `Store ${storeCode}`,
+      STORE_NAME: STORE_MAPPING[storeCode],
       DATE: new Date().toISOString().replace('T', ' ').substring(0, 19),
       HU_RECEIVED_QTY: received,
       HU_VALIDATED_QTY: validated,

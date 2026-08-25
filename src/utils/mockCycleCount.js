@@ -2,12 +2,7 @@
 // Generates realistic cycle count records for ~20 stores
 // to demonstrate the dashboard at scale during demo.
 
-const STORE_NAMES = [
-  'Uttam Nagar 2', 'Dwarka', 'Dundahera', 'Rohini Sec 11', 'Janakpuri',
-  'Lajpat Nagar', 'Pitampura', 'Rajouri Garden', 'Nehru Place', 'Saket',
-  'Vasant Kunj', 'Noida Sec 18', 'Gurgaon DLF', 'Faridabad NIT', 'Ghaziabad Indirapuram',
-  'Greater Noida', 'Meerut Cantt', 'Agra MG Road', 'Lucknow Gomti', 'Varanasi BHU'
-];
+import { STORE_MAPPING } from '../config/constants';
 
 function padTwo(n) {
   return n.toString().padStart(2, '0');
@@ -80,13 +75,13 @@ function generateRecentDate() {
 }
 
 export function generateMockCycleCount(count = 20) {
+  const storeCodes = Object.keys(STORE_MAPPING);
+  const actualCount = Math.min(count, storeCodes.length);
   const records = [];
 
-  for (let i = 0; i < count; i++) {
-    const storeNum = i + 1;
-    const prefix = storeNum <= 10 ? 'HD' : 'HH';
-    const storeCode = `${prefix}${storeNum.toString().padStart(2, '0')}`;
-    const storeName = `${storeCode} - ${STORE_NAMES[i % STORE_NAMES.length]}`;
+  for (let i = 0; i < actualCount; i++) {
+    const storeCode = storeCodes[i];
+    const storeName = STORE_MAPPING[storeCode];
     const date = generateRecentDate();
     const duration = generateDuration();
     const { start, end } = generateTimes(duration);

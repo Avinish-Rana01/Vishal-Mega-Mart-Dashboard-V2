@@ -39,7 +39,7 @@
   align-items: center;
   padding: 20px 0;
   z-index: 100;
-  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1); */
   position: relative;
   overflow: hidden;
 }
@@ -407,8 +407,12 @@
   display: none;
 }
 
+/* Shared styles for Grid Cells and Section Headers */
+.vmm-grid-cell, .ds-header {
+  background-color: #eceef0 !important; /* Forces this color across both classes */
+}
+
 .vmm-grid-cell {
-  background: #eceef0;
   border-radius: 25px;
   /* border: 1px solid #cbd5e1; */
   /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); */

@@ -1,10 +1,8 @@
-  export const generateMockSaleDashboard = (count = 20) => {
-  const storeNames = [
-    'Uttam Nagar', 'Dwarka', 'Dundahera', 'Lajpat Nagar', 'Karol Bagh',
-    'Rohini Sector 15', 'Janakpuri', 'Vasant Kunj', 'Saket', 'Gurugram Sector 14',
-    'Noida Sector 18', 'Faridabad', 'Ghaziabad', 'Connaught Place', 'South Extension',
-    'Rajouri Garden', 'Kamla Nagar', 'Preet Vihar', 'Pitampura', 'Chandni Chowk'
-  ];
+import { STORE_MAPPING } from '../config/constants';
+
+export const generateMockSaleDashboard = (count = 20) => {
+  const storeCodes = Object.keys(STORE_MAPPING);
+  const actualCount = Math.min(count, storeCodes.length);
 
   let totals = {
     recordCount: count,
@@ -14,9 +12,9 @@
     totalManualSale: 0
   };
 
-  const items = Array.from({ length: count }, (_, i) => {
-    const storeCode = `HD${(10 + i).toString().padStart(2, '0')}`;
-    const storeName = storeNames[i % storeNames.length];
+  const items = Array.from({ length: actualCount }, (_, i) => {
+    const storeCode = storeCodes[i];
+    const storeName = STORE_MAPPING[storeCode];
     
     // Generate realistic numbers
     const totalDposSale = Math.floor(Math.random() * 500) + 100;
