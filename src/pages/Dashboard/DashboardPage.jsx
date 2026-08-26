@@ -37,12 +37,12 @@ export default function DashboardPage() {
             <div className="vmm-grid-cell">
               <SaleDashboardSection />
             </div>
-            {/* <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell">
               <VoidDashboardSection />
             </div>
             <div className="vmm-grid-cell">
               <ReturnDashboardSection />
-            </div> */}
+            </div>
             {/* <div className="vmm-grid-cell">
               <DcValidationSection />
             </div>
