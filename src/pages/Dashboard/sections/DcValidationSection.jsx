@@ -112,167 +112,167 @@ export default function DcValidationSection() {
     </div>
   );
 
-  return (
-    <div className="cc-container">
-      <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
+  // return (
+  //   <div className="cc-container">
+  //     <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
 
-      {/* 1. KPI Row */}
-      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-        <KpiCard
-          title="Processed HUs"
-          value={processedTotal.toLocaleString('en-IN')}
-          badgeVariant="success"
-          icon={<Icons.CheckSquare />}
-        />
-        <KpiCard
-          title="Unprocessed HUs"
-          value={unprocessedTotal.toLocaleString('en-IN')}
-          badge="Backlog"
-          badgeVariant="warning"
-          icon={<Icons.Package />}
-        />
-        <KpiCard
-          title="Validated Articles"
-          value={Number(totals?.PROCESSED_ARTICLE_QTY || 0).toLocaleString('en-IN')}
-          subtext="Total items inside processed HUs"
-          badgeVariant="info"
-          icon={<Icons.Layers />}
-        />
-        <KpiCard
-          title="Processing Rate"
-          value={`${processingRate}%`}
-          badgeVariant={processingRate >= 95 ? "success" : processingRate >= 80 ? "warning" : "danger"}
-          icon={<Icons.CheckSquare />}
-        />
-      </div>
+  //     {/* 1. KPI Row */}
+  //     <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+  //       <KpiCard
+  //         title="Processed HUs"
+  //         value={processedTotal.toLocaleString('en-IN')}
+  //         badgeVariant="success"
+  //         icon={<Icons.CheckSquare />}
+  //       />
+  //       <KpiCard
+  //         title="Unprocessed HUs"
+  //         value={unprocessedTotal.toLocaleString('en-IN')}
+  //         badge="Backlog"
+  //         badgeVariant="warning"
+  //         icon={<Icons.Package />}
+  //       />
+  //       <KpiCard
+  //         title="Validated Articles"
+  //         value={Number(totals?.PROCESSED_ARTICLE_QTY || 0).toLocaleString('en-IN')}
+  //         subtext="Total items inside processed HUs"
+  //         badgeVariant="info"
+  //         icon={<Icons.Layers />}
+  //       />
+  //       <KpiCard
+  //         title="Processing Rate"
+  //         value={`${processingRate}%`}
+  //         badgeVariant={processingRate >= 95 ? "success" : processingRate >= 80 ? "warning" : "danger"}
+  //         icon={<Icons.CheckSquare />}
+  //       />
+  //     </div>
 
-      {/* 2. Charts Row */}
-      <div className="cc-card">
-        <ChartToolbar
-          leftContent={
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Processed vs Unprocessed HU
-              </h3>
-            </div>
-          }
-          rightContent={
-            <>
-              <CustomDropdown
-                options={sortOptions}
-                value={sortBy}
-                onChange={setSortBy}
-                prefix="Sort:"
-                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-                menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
-              />
-              <ChartSearchInput
-                value={searchFilter}
-                onChange={setSearchFilter}
-                onClear={() => setSearchFilter('')}
-              />
-            </>
-          }
-        />
+  //     {/* 2. Charts Row */}
+  //     <div className="cc-card">
+  //       <ChartToolbar
+  //         leftContent={
+  //           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+  //             <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+  //               Processed vs Unprocessed HU
+  //             </h3>
+  //           </div>
+  //         }
+  //         rightContent={
+  //           <>
+  //             <CustomDropdown
+  //               options={sortOptions}
+  //               value={sortBy}
+  //               onChange={setSortBy}
+  //               prefix="Sort:"
+  //               buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+  //               menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+  //             />
+  //             <ChartSearchInput
+  //               value={searchFilter}
+  //               onChange={setSearchFilter}
+  //               onClear={() => setSearchFilter('')}
+  //             />
+  //           </>
+  //         }
+  //       />
 
-        {/* Legend */}
-        <ChartLegend items={[
-          { color: COLOR_PROCESSED, label: 'Processed HU' },
-          { color: COLOR_UNPROCESSED, label: 'Unprocessed HU' },
-        ]} />
+  //       {/* Legend */}
+  //       <ChartLegend items={[
+  //         { color: COLOR_PROCESSED, label: 'Processed HU' },
+  //         { color: COLOR_UNPROCESSED, label: 'Unprocessed HU' },
+  //       ]} />
 
-        {/* Chart Scroll Area */}
-        <div className="cc-chart-scroll" style={{ minHeight: '275px', maxHeight: '275px', overflowY: 'hidden' }}>
-          {chartData.length === 0 ? (
-            <SearchEmptyState 
-              searchFilter={searchFilter}
-              title={`No Stores Found for "${searchFilter}"`}
-              subtitle="Try a different store code or clear your search."
-              onClearSearch={() => setSearchFilter('')}
-            />
-          ) : (
-            <div style={{ minWidth: `max(100%, ${chartData.length * 60}px)`, height: '100%' }}>
-              <GroupedBarChart
-                data={chartData}
-                bars={[
-                  { dataKey: 'Processed', color: COLOR_PROCESSED, label: 'Processed HU' },
-                  { dataKey: 'Unprocessed', color: COLOR_UNPROCESSED, label: 'Unprocessed HU' }
-                ]}
-                height="100%"
-                hideLegend={true}
-                showValues={true}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+  //       {/* Chart Scroll Area */}
+  //       <div className="cc-chart-scroll" style={{ minHeight: '275px', maxHeight: '275px', overflowY: 'hidden' }}>
+  //         {chartData.length === 0 ? (
+  //           <SearchEmptyState 
+  //             searchFilter={searchFilter}
+  //             title={`No Stores Found for "${searchFilter}"`}
+  //             subtitle="Try a different store code or clear your search."
+  //             onClearSearch={() => setSearchFilter('')}
+  //           />
+  //         ) : (
+  //           <div style={{ minWidth: `max(100%, ${chartData.length * 60}px)`, height: '100%' }}>
+  //             <GroupedBarChart
+  //               data={chartData}
+  //               bars={[
+  //                 { dataKey: 'Processed', color: COLOR_PROCESSED, label: 'Processed HU' },
+  //                 { dataKey: 'Unprocessed', color: COLOR_UNPROCESSED, label: 'Unprocessed HU' }
+  //               ]}
+  //               height="100%"
+  //               hideLegend={true}
+  //               showValues={true}
+  //             />
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
 
-      {/* 3. Data Grid */}
-      <DashboardDataGrid
-        title="DC VALIDATION SUMMARY"
-        subtitle={`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
-        innerWrapperStyle={{ minWidth: 'auto' }}
-        tableStyle={{ width: 'auto', margin: '0 auto' }}
-        headerAction={
-          <CustomDropdown
-            options={sortOptions}
-            value={tableSort}
-            onChange={setTableSort}
-            prefix="Sort:"
-            buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-            menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
-          />
-        }
-        headers={[
-          <div style={{ width: '100px' }}>Store</div>,
-          <div style={{ width: '130px', textAlign: 'center' }}>Processed HU Qty</div>,
-          <div style={{ width: '150px', textAlign: 'center' }}>Unprocessed HU Qty</div>,
-          <div style={{ width: '150px', textAlign: 'center', whiteSpace: 'normal' }}>Validated HU Article Qty</div>
-        ]}
-        data={tableData}
-        emptyStateContent={
-          <tr>
-            <td colSpan={4} className="cc-data-grid-empty-cell">
-              No validation data found
-            </td>
-          </tr>
-        }
-        renderRow={(row, idx) => {
-          const processed = Number(row.PROCESSED_HU || 0);
-          const unprocessed = Number(row.UNPROCESSED_HU || 0);
-          const articles = Number(row.PROCESSED_ARTICLE_QTY || 0);
+  //     {/* 3. Data Grid */}
+  //     <DashboardDataGrid
+  //       title="DC VALIDATION SUMMARY"
+  //       subtitle={`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
+  //       innerWrapperStyle={{ minWidth: 'auto' }}
+  //       tableStyle={{ width: 'auto', margin: '0 auto' }}
+  //       headerAction={
+  //         <CustomDropdown
+  //           options={sortOptions}
+  //           value={tableSort}
+  //           onChange={setTableSort}
+  //           prefix="Sort:"
+  //           buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+  //           menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+  //         />
+  //       }
+  //       headers={[
+  //         <div style={{ width: '100px' }}>Store</div>,
+  //         <div style={{ width: '130px', textAlign: 'center' }}>Processed HU Qty</div>,
+  //         <div style={{ width: '150px', textAlign: 'center' }}>Unprocessed HU Qty</div>,
+  //         <div style={{ width: '150px', textAlign: 'center', whiteSpace: 'normal' }}>Validated HU Article Qty</div>
+  //       ]}
+  //       data={tableData}
+  //       emptyStateContent={
+  //         <tr>
+  //           <td colSpan={4} className="cc-data-grid-empty-cell">
+  //             No validation data found
+  //           </td>
+  //         </tr>
+  //       }
+  //       renderRow={(row, idx) => {
+  //         const processed = Number(row.PROCESSED_HU || 0);
+  //         const unprocessed = Number(row.UNPROCESSED_HU || 0);
+  //         const articles = Number(row.PROCESSED_ARTICLE_QTY || 0);
 
-          return (
-            <tr key={row.Reciving_Plant || idx} className="cc-data-grid-tr">
-              <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ width: '100px' }}>
-                <div className="cc-row-tooltip-wrapper">
-                  {row.Reciving_Plant || '—'}
-                  {row.STORE_NAME && (
-                    <div className="cc-row-tooltip">
-                      {row.STORE_NAME}
-                    </div>
-                  )}
-                </div>
-              </td>
-              <td className="cc-data-grid-td" style={{ width: '130px', textAlign: 'center' }}>
-                <span style={{ color: COLOR_PROCESSED, fontWeight: 700 }}>{processed.toLocaleString('en-IN')}</span>
-              </td>
-              <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
-                {unprocessed > 0 ? (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>
-                    {unprocessed.toLocaleString('en-IN')}
-                  </span>
-                ) : (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clear</span>
-                )}
-              </td>
-              <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
-                <span style={{ fontWeight: 600 }}>{articles.toLocaleString('en-IN')}</span>
-              </td>
-            </tr>
-          );
-        }}
-      />
-    </div>
-  );
+  //         return (
+  //           <tr key={row.Reciving_Plant || idx} className="cc-data-grid-tr">
+  //             <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ width: '100px' }}>
+  //               <div className="cc-row-tooltip-wrapper">
+  //                 {row.Reciving_Plant || '—'}
+  //                 {row.STORE_NAME && (
+  //                   <div className="cc-row-tooltip">
+  //                     {row.STORE_NAME}
+  //                   </div>
+  //                 )}
+  //               </div>
+  //             </td>
+  //             <td className="cc-data-grid-td" style={{ width: '130px', textAlign: 'center' }}>
+  //               <span style={{ color: COLOR_PROCESSED, fontWeight: 700 }}>{processed.toLocaleString('en-IN')}</span>
+  //             </td>
+  //             <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
+  //               {unprocessed > 0 ? (
+  //                 <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>
+  //                   {unprocessed.toLocaleString('en-IN')}
+  //                 </span>
+  //               ) : (
+  //                 <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clear</span>
+  //               )}
+  //             </td>
+  //             <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
+  //               <span style={{ fontWeight: 600 }}>{articles.toLocaleString('en-IN')}</span>
+  //             </td>
+  //           </tr>
+  //         );
+  //       }}
+  //     />
+  //   </div>
+  // );
 }
