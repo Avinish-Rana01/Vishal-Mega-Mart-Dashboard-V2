@@ -103,7 +103,7 @@ export default function DcValidationSection() {
 
       return (
     <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', height: '700px', backgroundColor: '#fff' }}>
-      <SectionHeader title="Return Dashboard" rightContent={<DateBadge />} />
+      <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
       <WorkInProgress 
         title="Revamping DC Validation Dashboard"
         message="We are currently building this dashboard. It will be available on 27 AUG 2026 12:00 PM."
