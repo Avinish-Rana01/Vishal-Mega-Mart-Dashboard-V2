@@ -11,7 +11,7 @@ import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
-import WorkInProgress from '../../../components/common/WorkInProgress';
+
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
@@ -223,22 +223,22 @@ export default function VoidDashboardSection() {
       </section>
     );
   }
-  return (
-    <div className="cc-container">
-      <SectionHeader title="Void Dashboard" rightContent={<DateBadge />} />
-      <WorkInProgress 
-        title="Revamping Void Dashboard"
-        message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
-        version="V2.0"
-      />
-    </div>
-  );
+  // return (
+  //   <div className="cc-container">
+  //     <SectionHeader title="Void Dashboard" rightContent={<DateBadge />} />
+  //     <WorkInProgress 
+  //       title="Revamping Void Dashboard"
+  //       message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
+  //       version="V2.0"
+  //     />
+  //   </div>
+  // );
 
   return (
     <section className="ds-section">
       <SectionHeader 
         title="Void Dashboard"
-        subtitle="Track voided transactions vs successfully encoded items."
+        // subtitle="Track voided transactions vs successfully encoded items."
         rightContent={<DateBadge />}
       />
 

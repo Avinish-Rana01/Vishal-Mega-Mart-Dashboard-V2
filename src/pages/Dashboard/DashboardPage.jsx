@@ -43,9 +43,9 @@ export default function DashboardPage() {
             <div className="vmm-grid-cell">
               <ReturnDashboardSection />
             </div>
-            {/* <div className="vmm-grid-cell">
+            <div className="vmm-grid-cell">
               <DcValidationSection />
-            </div> */}
+            </div>
             {/* <div className="vmm-grid-cell">
               <DcEncodingSection />
             </div> */}

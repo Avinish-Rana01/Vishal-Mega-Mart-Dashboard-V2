@@ -217,170 +217,170 @@ export default function ReturnDashboardSection() {
     );
   }
 
-    return (
-    <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', height: '700px', backgroundColor: '#fff' }}>
-      <SectionHeader title="Return Dashboard" rightContent={<DateBadge />} />
-      <WorkInProgress 
-        title="Revamping Return Dashboard"
-        message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
-        version="V2.0"
-      />
-    </div>
-  );
-
-  // return (
-  //   <section className="ds-section">
-  //     <SectionHeader 
-  //       title="Return Dashboard" 
-  //       subtitle="Track customer returns vs successfully encoded items." 
-  //       rightContent={<DateBadge />} 
+  //   return (
+  //   <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', height: '700px', backgroundColor: '#fff' }}>
+  //     <SectionHeader title="Return Dashboard" rightContent={<DateBadge />} />
+  //     <WorkInProgress 
+  //       title="Revamping Return Dashboard"
+  //       message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
+  //       version="V2.0"
   //     />
-
-  //     {/* 1. KPI Row */}
-  //     <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-  //       {/* <CurvedCard
-  //         title="Total Return Qty"
-  //         value={totals?.RETURN_QTY || '0'}
-  //         waveColor={['#a21caf', '#f6afffff']} // Fuchsia gradient
-  //         icon={<Icons.CornerUpLeft />}
-  //       /> */}
-  //        <KpiCard
-  //         title="Total Return Qty"
-  //         value={totals?.RETURN_QTY || '0'}
-  //         badgeVariant="success"
-  //         icon={<Icons.Barcode />}
-  //       />
-  //       <KpiCard
-  //         title="Encoded Qty"
-  //         value={totals?.ENCODE_QTY || '0'}
-  //         badgeVariant="success"
-  //         icon={<Icons.Barcode />}
-  //       />
-  //       <KpiCard
-  //         title="Pending Returns"
-  //         value={totals?.DIFFERENCE_QTY || '0'}
-  //         badge="Action Needed"
-  //         badgeVariant="danger"
-  //         icon={<Icons.Alert />}
-  //       />
-  //       <KpiCard
-  //         title="Encoding Rate"
-  //         value={`${encodePercent.toFixed(1)}%`}
-  //         badge={encodePercent >= 90 ? "Excellent" : encodePercent >= 70 ? "Good" : "Low"}
-  //         badgeVariant={encodePercent >= 90 ? "success" : encodePercent >= 70 ? "warning" : "danger"}
-  //         icon={<Icons.Percent />}
-  //       />
-  //     </div>
-
-  //     {/* 2. Charts Row (Full Width Bar Chart) */}
-  //     <div className="ds-charts-row ds-grow">
-  //       <div className="ds-card ds-grow" style={{height: '359px'}}>
-  //         <ChartToolbar
-  //           leftContent={
-  //             <CustomDropdown
-  //               options={VIEW_OPTIONS}
-  //               value={chartView}
-  //               onChange={setChartView}
-  //               buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-  //               menuStyle={{ left: 0, right: 'auto', textTransform: 'none', letterSpacing: 'normal' }}
-  //             />
-  //           }
-  //           rightContent={
-  //             <CustomDropdown
-  //               options={SORT_OPTIONS}
-  //               value={sortBy}
-  //               onChange={setSortBy}
-  //               buttonStyle={{ backgroundColor: 'transparent', border: 'none', padding: '4px 32px 4px 8px', fontSize: '12px', fontWeight: 500, color: '#64748b', boxShadow: 'none' }}
-  //               menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
-  //             />
-  //           }
-  //         />
-  //         <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            
-  //           {/* Custom Sticky Legend */}
-  //           <div style={{ position: 'absolute', top: -5, right: 10, display: 'flex', gap: '16px', zIndex: 10 }}>
-  //             {chartView === 'grouped' && (
-  //               <>
-  //                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-  //                   <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f0abfc' }} />
-  //                   <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encoded Qty</span>
-  //                 </div>
-  //                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-  //                   <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#c026d3' }} />
-  //                   <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Return Qty</span>
-  //                 </div>
-  //               </>
-  //             )}
-  //             {chartView === 'pending' && (
-  //               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-  //                 <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ec4899' }} />
-  //                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Pending Returns</span>
-  //               </div>
-  //             )}
-  //             {chartView === 'encoding' && (
-  //               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-  //                 <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981' }} />
-  //                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encode Rate</span>
-  //               </div>
-  //             )}
-  //           </div>
-
-  //           {chartView === 'grouped' && (
-  //             <div style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
-  //               <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
-  //                 <div style={{ minWidth: `max(100%, ${barData.length * 70}px)`, height: '100%' }}>
-  //                   <GroupedBarChart
-  //                     data={barData}
-  //                     bars={[
-  //                       { dataKey: 'Return', color: '#c026d3', label: 'Return Qty' },
-  //                       { dataKey: 'Encoded', color: '#f0abfc', label: 'Encoded Qty' }
-  //                     ]}
-  //                     height="100%"
-  //                     hideLegend={true}
-  //                     customTooltip={<ReturnVsEncodedTooltip />}
-  //                   />
-  //                 </div>
-  //               </div>
-  //             </div>
-  //           )}
-  //           {chartView === 'pending' && <MemoizedPendingChart data={pendingChartData} />}
-  //           {chartView === 'encoding' && <MemoizedEncodingChart data={encodingChartData} />}
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     {/* 3. Quick-List & Donut Row */}
-  //     <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
-  //       {/* Left: Store Rank List */}
-  //       <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-  //         <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Pending Returns</h3>
-  //         <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
-  //           <StoreRankList
-  //             items={rankList}
-  //             labelKey="STORE_NAME"
-  //             sublabelKey="Store_Code"
-  //             valueKey="DIFFERENCE_QTY"
-  //             diffKey="RETURN_QTY"
-  //             diffLabel="Total Returns:"
-  //             statusFn={() => 'danger'}
-  //             formatValue={(val) => `${val} Pending`}
-  //           />
-  //         </div>
-  //       </div>
-
-  //       {/* Right: SemiDonut Chart */}
-  //       <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-  //         <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Overall Encoding Completion</h3>
-  //         <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-  //           <SemiDonutChart
-  //             value={encodeRaw}
-  //             maxValue={totalReturnRaw}
-  //             centerLabel="Encoded"
-  //             primaryColor="#c026d3"
-  //           />
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </section>
+  //   </div>
   // );
+
+  return (
+    <section className="ds-section">
+      <SectionHeader 
+        title="Return Dashboard" 
+        // subtitle="Track customer returns vs successfully encoded items." 
+        rightContent={<DateBadge />} 
+      />
+
+      {/* 1. KPI Row */}
+      <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+        {/* <CurvedCard
+          title="Total Return Qty"
+          value={totals?.RETURN_QTY || '0'}
+          waveColor={['#a21caf', '#f6afffff']} // Fuchsia gradient
+          icon={<Icons.CornerUpLeft />}
+        /> */}
+         <KpiCard
+          title="Total Return Qty"
+          value={totals?.RETURN_QTY || '0'}
+          badgeVariant="success"
+          icon={<Icons.Barcode />}
+        />
+        <KpiCard
+          title="Encoded Qty"
+          value={totals?.ENCODE_QTY || '0'}
+          badgeVariant="success"
+          icon={<Icons.Barcode />}
+        />
+        <KpiCard
+          title="Pending Returns"
+          value={totals?.DIFFERENCE_QTY || '0'}
+          badge="Action Needed"
+          badgeVariant="danger"
+          icon={<Icons.Alert />}
+        />
+        <KpiCard
+          title="Encoding Rate"
+          value={`${encodePercent.toFixed(1)}%`}
+          badge={encodePercent >= 90 ? "Excellent" : encodePercent >= 70 ? "Good" : "Low"}
+          badgeVariant={encodePercent >= 90 ? "success" : encodePercent >= 70 ? "warning" : "danger"}
+          icon={<Icons.Percent />}
+        />
+      </div>
+
+      {/* 2. Charts Row (Full Width Bar Chart) */}
+      <div className="ds-charts-row ds-grow">
+        <div className="ds-card ds-grow" style={{height: '359px'}}>
+          <ChartToolbar
+            leftContent={
+              <CustomDropdown
+                options={VIEW_OPTIONS}
+                value={chartView}
+                onChange={setChartView}
+                buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                menuStyle={{ left: 0, right: 'auto', textTransform: 'none', letterSpacing: 'normal' }}
+              />
+            }
+            rightContent={
+              <CustomDropdown
+                options={SORT_OPTIONS}
+                value={sortBy}
+                onChange={setSortBy}
+                buttonStyle={{ backgroundColor: 'transparent', border: 'none', padding: '4px 32px 4px 8px', fontSize: '12px', fontWeight: 500, color: '#64748b', boxShadow: 'none' }}
+                menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
+              />
+            }
+          />
+          <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            
+            {/* Custom Sticky Legend */}
+            <div style={{ position: 'absolute', top: -5, right: 10, display: 'flex', gap: '16px', zIndex: 10 }}>
+              {chartView === 'grouped' && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f0abfc' }} />
+                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encoded Qty</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#c026d3' }} />
+                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Return Qty</span>
+                  </div>
+                </>
+              )}
+              {chartView === 'pending' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ec4899' }} />
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Pending Returns</span>
+                </div>
+              )}
+              {chartView === 'encoding' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981' }} />
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encode Rate</span>
+                </div>
+              )}
+            </div>
+
+            {chartView === 'grouped' && (
+              <div style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
+                <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
+                  <div style={{ minWidth: `max(100%, ${barData.length * 70}px)`, height: '100%' }}>
+                    <GroupedBarChart
+                      data={barData}
+                      bars={[
+                        { dataKey: 'Return', color: '#c026d3', label: 'Return Qty' },
+                        { dataKey: 'Encoded', color: '#f0abfc', label: 'Encoded Qty' }
+                      ]}
+                      height="100%"
+                      hideLegend={true}
+                      customTooltip={<ReturnVsEncodedTooltip />}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            {chartView === 'pending' && <MemoizedPendingChart data={pendingChartData} />}
+            {chartView === 'encoding' && <MemoizedEncodingChart data={encodingChartData} />}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Quick-List & Donut Row */}
+      <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
+        {/* Left: Store Rank List */}
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Pending Returns</h3>
+          <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
+            <StoreRankList
+              items={rankList}
+              labelKey="STORE_NAME"
+              sublabelKey="Store_Code"
+              valueKey="DIFFERENCE_QTY"
+              diffKey="RETURN_QTY"
+              diffLabel="Total Returns:"
+              statusFn={() => 'danger'}
+              formatValue={(val) => `${val} Pending`}
+            />
+          </div>
+        </div>
+
+        {/* Right: SemiDonut Chart */}
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Overall Encoding Completion</h3>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <SemiDonutChart
+              value={encodeRaw}
+              maxValue={totalReturnRaw}
+              centerLabel="Encoded"
+              primaryColor="#c026d3"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
