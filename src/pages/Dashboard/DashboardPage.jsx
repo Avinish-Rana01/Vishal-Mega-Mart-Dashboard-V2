@@ -45,11 +45,11 @@ export default function DashboardPage() {
             </div>
             {/* <div className="vmm-grid-cell">
               <DcValidationSection />
-            </div>
-            <div className="vmm-grid-cell">
+            </div> */}
+            {/* <div className="vmm-grid-cell">
               <DcEncodingSection />
-            </div>
-            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
+            </div> */}
+            {/* <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
               <TagManagementSection />
             </div>
             <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>

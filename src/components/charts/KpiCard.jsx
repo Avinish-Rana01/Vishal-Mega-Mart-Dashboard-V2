@@ -49,7 +49,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
     <div style={{
       background: cardColor.bg,
       borderRadius: '10px',
-      padding: '10px',
+      padding: '10px 0 10px 10px',
       boxShadow: '0 2px 8px -2px rgba(0,0,0,0.03)',
       position: 'relative',
       display: 'flex',

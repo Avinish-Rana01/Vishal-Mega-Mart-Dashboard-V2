@@ -218,7 +218,7 @@ export default function ReturnDashboardSection() {
   }
 
     return (
-    <div className="cc-container">
+    <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', height: '700px', backgroundColor: '#fff' }}>
       <SectionHeader title="Return Dashboard" rightContent={<DateBadge />} />
       <WorkInProgress 
         title="Revamping Return Dashboard"

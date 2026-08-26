@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useDcValidation } from '../../../hooks/useDashboardData';
-import CurvedCard from '../../../components/common/CurvedCard';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import '../../../components/charts/DashboardSection.css';
+import './CycleCountSection.css';
 
 // SVG Icons
 const Icons = {
@@ -72,25 +73,15 @@ export default function DcValidationSection() {
   }
 
   return (
-    <section className="ds-section">
-      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
-        <div className="ds-header-text">
-          <h1 style={{ whiteSpace: 'nowrap' }}>DC Validation</h1>
-          <p>Track store-bound handling unit validation and processing volume.</p>
-        </div>
-        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
-          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
-            <RefreshCw size={14} /> Refresh
-          </button>
-        </div>
-      </div>
+    <div className="cc-container">
+      <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row (3 cols) */}
-      <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-        <CurvedCard
+      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <KpiCard
           title="Processed HUs"
           value={Number(totals?.PROCESSED_HU || 0).toLocaleString('en-IN')}
-          waveColor={['#0891b2', '#9fe5f8ff']} // Cyan gradient
+          badgeVariant="success"
           icon={<Icons.CheckSquare />}
         />
         <KpiCard
@@ -143,6 +134,6 @@ export default function DcValidationSection() {
       {/* 3. Quick-List Row */}
 
 
-    </section>
+    </div>
   );
 }
