@@ -222,7 +222,7 @@ export default function ReturnDashboardSection() {
       <SectionHeader title="Return Dashboard" rightContent={<DateBadge />} />
       <WorkInProgress 
         title="Revamping Return Dashboard"
-        message="We are currently building this dashboard. It will be available on 26 AUG 2026 2:00 PM."
+        message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
         version="V2.0"
       />
     </div>
