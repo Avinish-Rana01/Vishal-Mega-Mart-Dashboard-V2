@@ -1,92 +1,120 @@
-import React, { useMemo } from 'react';
-import { RefreshCw } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { useDcValidation } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
-import DonutChart from '../../../components/charts/DonutChart';
-import StoreRankList from '../../../components/charts/StoreRankList';
+import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
+import ChartLegend from '../../../components/common/ChartLegend';
+import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import '../../../components/charts/DashboardSection.css';
 import './CycleCountSection.css';
+import * as Icons from 'lucide-react';
 
-// SVG Icons
-const Icons = {
-  CheckSquare: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>,
-  Package: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>,
-  Layers: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>,
-};
+const COLOR_PROCESSED = '#06b6d4'; // Cyan
+const COLOR_UNPROCESSED = '#64748b'; // Gray
 
 export default function DcValidationSection() {
-  const { data, totals, isLoading, error, refresh } = useDcValidation();
+  const { data, totals, isLoading, error } = useDcValidation();
 
-  // Derived Metrics for Charts & Lists
-  const { barData, donutData, rankList } = useMemo(() => {
-    if (!data || !totals) return { barData: [], donutData: [], rankList: [] };
+  const [searchFilter, setSearchFilter] = useState('');
+  const [sortBy, setSortBy] = useState('UNPROCESSED_DESC');
+  const [tableSort, setTableSort] = useState('UNPROCESSED_DESC');
 
-    // 1. Bar Chart Data (Top 10 stores by Processed HU)
-    const sortedData = [...data].sort((a, b) => Number(b.PROCESSED_HU || 0) - Number(a.PROCESSED_HU || 0));
-    const barData = sortedData.slice(0, 10).map(row => ({
-      name: row.Reciving_Plant?.substring(0, 8),
-      fullName: row.Reciving_Plant,
+  const sortOptions = useMemo(() => [
+    { value: 'PROCESSED_DESC', label: 'Most Processed HU' },
+    { value: 'PROCESSED_ASC', label: 'Least Processed HU' },
+    { value: 'UNPROCESSED_DESC', label: 'Most Unprocessed HU' },
+    { value: 'UNPROCESSED_ASC', label: 'Least Unprocessed HU' },
+    { value: 'ARTICLES_DESC', label: 'Highest Article Qty' }
+  ], []);
+
+  // Filtered + sorted data for the chart
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    let result = [...data];
+
+    // Search
+    if (searchFilter.trim()) {
+      const term = searchFilter.toLowerCase();
+      result = result.filter(row =>
+        (row.Reciving_Plant && row.Reciving_Plant.toLowerCase().includes(term)) ||
+        (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term))
+      );
+    }
+
+    // Sort
+    if (sortBy === 'PROCESSED_DESC') {
+      result.sort((a, b) => Number(b.PROCESSED_HU || 0) - Number(a.PROCESSED_HU || 0));
+    } else if (sortBy === 'PROCESSED_ASC') {
+      result.sort((a, b) => Number(a.PROCESSED_HU || 0) - Number(b.PROCESSED_HU || 0));
+    } else if (sortBy === 'UNPROCESSED_DESC') {
+      result.sort((a, b) => Number(b.UNPROCESSED_HU || 0) - Number(a.UNPROCESSED_HU || 0));
+    } else if (sortBy === 'UNPROCESSED_ASC') {
+      result.sort((a, b) => Number(a.UNPROCESSED_HU || 0) - Number(b.UNPROCESSED_HU || 0));
+    } else if (sortBy === 'ARTICLES_DESC') {
+      result.sort((a, b) => Number(b.PROCESSED_ARTICLE_QTY || 0) - Number(a.PROCESSED_ARTICLE_QTY || 0));
+    }
+
+    // Format for GroupedBarChart
+    return result.map(row => ({
+      name: row.Reciving_Plant, 
+      fullName: row.STORE_NAME || row.Reciving_Plant,
       Processed: Number(row.PROCESSED_HU || 0),
       Unprocessed: Number(row.UNPROCESSED_HU || 0)
     }));
+  }, [data, searchFilter, sortBy]);
 
-    // 2. Donut Chart Data (Global Breakdowns)
-    const processedRaw = Number(totals.PROCESSED_HU || 0);
-    const unprocessedRaw = Number(totals.UNPROCESSED_HU || 0);
-    
-    const donutData = [
-      { name: 'Processed HU', value: processedRaw, color: '#06b6d4' },
-      { name: 'Unprocessed HU', value: unprocessedRaw, color: '#64748b' },
-    ].filter(d => d.value > 0);
+  // Separate sorted data for the Data Grid
+  const tableData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    let result = [...data];
 
-    // 3. Rank List (Stores with Highest Unprocessed HU)
-    const rankList = [...data]
-      .filter(row => Number(row.UNPROCESSED_HU || 0) > 0)
-      .sort((a, b) => Number(b.UNPROCESSED_HU || 0) - Number(a.UNPROCESSED_HU || 0))
-      .slice(0, 5);
+    // Sort for table
+    if (tableSort === 'PROCESSED_DESC') {
+      result.sort((a, b) => Number(b.PROCESSED_HU || 0) - Number(a.PROCESSED_HU || 0));
+    } else if (tableSort === 'PROCESSED_ASC') {
+      result.sort((a, b) => Number(a.PROCESSED_HU || 0) - Number(b.PROCESSED_HU || 0));
+    } else if (tableSort === 'UNPROCESSED_DESC') {
+      result.sort((a, b) => Number(b.UNPROCESSED_HU || 0) - Number(a.UNPROCESSED_HU || 0));
+    } else if (tableSort === 'UNPROCESSED_ASC') {
+      result.sort((a, b) => Number(a.UNPROCESSED_HU || 0) - Number(b.UNPROCESSED_HU || 0));
+    } else if (tableSort === 'ARTICLES_DESC') {
+      result.sort((a, b) => Number(b.PROCESSED_ARTICLE_QTY || 0) - Number(a.PROCESSED_ARTICLE_QTY || 0));
+    }
 
-    return { barData, donutData, rankList };
-  }, [data, totals]);
+    return result;
+  }, [data, tableSort]);
 
-  const handleStoreClick = (storeData) => {
-    console.log('Navigate to DC validation store:', storeData.fullName || storeData.Reciving_Plant);
-  };
-
-  if (isLoading) {
-    return (
-      <section className="ds-section">
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-          {[1,2,3].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px' }}><div className="ds-shimmer" /></div>)}
-        </div>
-        <div className="ds-skeleton-row ds-charts-row--2col">
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
-        </div>
-      </section>
-    );
-  }
+  if (isLoading) return <DashboardShimmer title="DC Validation" />;
 
   if (error) {
     return <div className="ds-error">{error}</div>;
   }
 
+  const processedTotal = Number(totals?.PROCESSED_HU || 0);
+  const unprocessedTotal = Number(totals?.UNPROCESSED_HU || 0);
+  const totalHUs = processedTotal + unprocessedTotal;
+  const processingRate = totalHUs > 0 ? ((processedTotal / totalHUs) * 100).toFixed(2) : 0;
+
   return (
     <div className="cc-container">
       <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
 
-      {/* 1. KPI Row (3 cols) */}
-      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      {/* 1. KPI Row */}
+      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
         <KpiCard
           title="Processed HUs"
-          value={Number(totals?.PROCESSED_HU || 0).toLocaleString('en-IN')}
+          value={processedTotal.toLocaleString('en-IN')}
           badgeVariant="success"
           icon={<Icons.CheckSquare />}
         />
         <KpiCard
           title="Unprocessed HUs"
-          value={Number(totals?.UNPROCESSED_HU || 0).toLocaleString('en-IN')}
+          value={unprocessedTotal.toLocaleString('en-IN')}
           badge="Backlog"
           badgeVariant="warning"
           icon={<Icons.Package />}
@@ -98,42 +126,141 @@ export default function DcValidationSection() {
           badgeVariant="info"
           icon={<Icons.Layers />}
         />
+        <KpiCard
+          title="Processing Rate"
+          value={`${processingRate}%`}
+          badgeVariant={processingRate >= 95 ? "success" : processingRate >= 80 ? "warning" : "danger"}
+          icon={<Icons.CheckSquare />}
+        />
       </div>
 
       {/* 2. Charts Row */}
-      <div className="ds-charts-row ds-charts-row--2col">
-        {/* Left: Grouped Bar Chart */}
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Processed vs Unprocessed HU (Top 10 Stores)</h3>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Click a bar for details</span>
-          </div>
-          <GroupedBarChart
-            data={barData}
-            bars={[
-              { dataKey: 'Processed', color: '#06b6d4', label: 'Processed HU' },
-              { dataKey: 'Unprocessed', color: '#64748b', label: 'Unprocessed HU' }
-            ]}
-            height={280}
-            /* onBarClick={handleStoreClick} */
-          />
-        </div>
+      <div className="cc-card">
+        <ChartToolbar
+          leftContent={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Processed vs Unprocessed HU
+              </h3>
+            </div>
+          }
+          rightContent={
+            <>
+              <CustomDropdown
+                options={sortOptions}
+                value={sortBy}
+                onChange={setSortBy}
+                prefix="Sort:"
+                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+                menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+              />
+              <ChartSearchInput
+                value={searchFilter}
+                onChange={setSearchFilter}
+                onClear={() => setSearchFilter('')}
+              />
+            </>
+          }
+        />
 
-        {/* Right: Donut Chart Breakdown */}
-        <div className="ds-card">
-          <h3 className="ds-card-title">Global HU Validation</h3>
-          <DonutChart
-            segments={donutData}
-            centerText={Number((totals?.PROCESSED_HU || 0) + (totals?.UNPROCESSED_HU || 0)).toLocaleString('en-IN')}
-            centerSubtext="Total Handling Units"
-            height={280}
-          />
+        {/* Legend */}
+        <ChartLegend items={[
+          { color: COLOR_PROCESSED, label: 'Processed HU' },
+          { color: COLOR_UNPROCESSED, label: 'Unprocessed HU' },
+        ]} />
+
+        {/* Chart Scroll Area */}
+        <div className="cc-chart-scroll" style={{ minHeight: '275px', maxHeight: '275px', overflowY: 'hidden' }}>
+          {chartData.length === 0 ? (
+            <SearchEmptyState 
+              searchFilter={searchFilter}
+              title={`No Stores Found for "${searchFilter}"`}
+              subtitle="Try a different store code or clear your search."
+              onClearSearch={() => setSearchFilter('')}
+            />
+          ) : (
+            <div style={{ minWidth: `max(100%, ${chartData.length * 60}px)`, height: '100%' }}>
+              <GroupedBarChart
+                data={chartData}
+                bars={[
+                  { dataKey: 'Processed', color: COLOR_PROCESSED, label: 'Processed HU' },
+                  { dataKey: 'Unprocessed', color: COLOR_UNPROCESSED, label: 'Unprocessed HU' }
+                ]}
+                height="100%"
+                hideLegend={true}
+                showValues={true}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 3. Quick-List Row */}
+      {/* 3. Data Grid */}
+      <DashboardDataGrid
+        title="DC VALIDATION SUMMARY"
+        subtitle={`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
+        innerWrapperStyle={{ minWidth: 'auto' }}
+        tableStyle={{ width: 'auto', margin: '0 auto' }}
+        headerAction={
+          <CustomDropdown
+            options={sortOptions}
+            value={tableSort}
+            onChange={setTableSort}
+            prefix="Sort:"
+            buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+            menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+          />
+        }
+        headers={[
+          <div style={{ width: '100px' }}>Store</div>,
+          <div style={{ width: '130px', textAlign: 'center' }}>Processed HU Qty</div>,
+          <div style={{ width: '150px', textAlign: 'center' }}>Unprocessed HU Qty</div>,
+          <div style={{ width: '150px', textAlign: 'center', whiteSpace: 'normal' }}>Validated HU Article Qty</div>
+        ]}
+        data={tableData}
+        emptyStateContent={
+          <tr>
+            <td colSpan={4} className="cc-data-grid-empty-cell">
+              No validation data found
+            </td>
+          </tr>
+        }
+        renderRow={(row, idx) => {
+          const processed = Number(row.PROCESSED_HU || 0);
+          const unprocessed = Number(row.UNPROCESSED_HU || 0);
+          const articles = Number(row.PROCESSED_ARTICLE_QTY || 0);
 
-
+          return (
+            <tr key={row.Reciving_Plant || idx} className="cc-data-grid-tr">
+              <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ width: '100px' }}>
+                <div className="cc-row-tooltip-wrapper">
+                  {row.Reciving_Plant || '—'}
+                  {row.STORE_NAME && (
+                    <div className="cc-row-tooltip">
+                      {row.STORE_NAME}
+                    </div>
+                  )}
+                </div>
+              </td>
+              <td className="cc-data-grid-td" style={{ width: '130px', textAlign: 'center' }}>
+                <span style={{ color: COLOR_PROCESSED, fontWeight: 700 }}>{processed.toLocaleString('en-IN')}</span>
+              </td>
+              <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
+                {unprocessed > 0 ? (
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>
+                    {unprocessed.toLocaleString('en-IN')}
+                  </span>
+                ) : (
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clear</span>
+                )}
+              </td>
+              <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
+                <span style={{ fontWeight: 600 }}>{articles.toLocaleString('en-IN')}</span>
+              </td>
+            </tr>
+          );
+        }}
+      />
     </div>
   );
 }

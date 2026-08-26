@@ -20,7 +20,9 @@ export default function DashboardDataGrid({
   emptyStateContent,
   pagination = false,
   rowsPerPage = 5,
-  tableScrollStyle = {}
+  tableScrollStyle = {},
+  innerWrapperStyle = {},
+  tableStyle = {}
 }) {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -53,8 +55,8 @@ export default function DashboardDataGrid({
       </div>
 
       <div className="cc-native-table-scroll" style={{ overflowY: 'auto', ...tableScrollStyle }}>
-        <div className="cc-data-grid-inner-wrapper">
-          <table className="cc-data-grid-table">
+        <div className="cc-data-grid-inner-wrapper" style={innerWrapperStyle}>
+          <table className="cc-data-grid-table" style={tableStyle}>
             <thead className="cc-data-grid-thead">
               <tr>
                 {headers.map((header, idx) => (

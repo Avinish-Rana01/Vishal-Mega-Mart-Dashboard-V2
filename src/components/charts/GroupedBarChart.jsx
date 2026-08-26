@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Cell
+  Tooltip, Legend, ResponsiveContainer, Cell, LabelList
 } from 'recharts';
 import { useIsInViewport } from '../../hooks/useIsInViewport';
 
@@ -32,6 +32,7 @@ export default function GroupedBarChart({
   barCategoryGap = '10%',
   barGap = 2,
   hideLegend = false,
+  showValues = false,
 }) {
   if (!data || data.length === 0) {
     return (
@@ -56,7 +57,7 @@ export default function GroupedBarChart({
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
+          <BarChart data={data} margin={{ top: 30, right: 0, left: -20, bottom: 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
             <defs>
               <pattern id="gchart-stripe" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                 <rect width="10" height="10" fill="#f8fafc" />
@@ -101,7 +102,16 @@ export default function GroupedBarChart({
                 barSize={maxBarWidth || (stacked ? 32 : 24)}
                 onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
                 cursor={onBarClick ? 'pointer' : 'default'}
-              />
+              >
+                {showValues && (
+                  <LabelList 
+                    dataKey={bar.dataKey} 
+                    position="top" 
+                    style={{ fontSize: '11px', fontWeight: 600, fill: bar.color }}
+                    formatter={(val) => val > 0 ? val.toLocaleString('en-IN') : ''}
+                  />
+                )}
+              </Bar>
             ))}
           </BarChart>
         </ResponsiveContainer>

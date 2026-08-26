@@ -260,7 +260,13 @@ const dcValidationTotals = (summary) => ({
   PROCESSED_ARTICLE_QTY: summary.articleQty || 0
 });
 
-export const useDcValidation = () => useDashboardFetch(getDcValidation, dcValidationFilter, dcValidationTotals);
+import { generateMockDcValidation } from '../utils/mockDcValidation';
+
+const mockGetDcValidation = async (searchQuery, pageIndex, pageSize, signal) => {
+  return generateMockDcValidation(20);
+};
+
+export const useDcValidation = () => useDashboardFetch(mockGetDcValidation, dcValidationFilter, dcValidationTotals);
 
 // ==========================================
 // 9. Tag Management Charts (NOT REFACTORED)
