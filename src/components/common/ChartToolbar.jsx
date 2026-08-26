@@ -13,7 +13,7 @@ import React from 'react';
  */
 export default function ChartToolbar({ leftContent, rightContent, style }) {
   return (
-    <div className="vmm-toolbar-header" style={{ minHeight: '40px', ...style }}>
+    <div className="vmm-toolbar-header" style={{ minHeight: '40px', position: 'relative', zIndex: 20, ...style }}>
       <h3 className="vmm-toolbar-title" style={{ display: 'flex', alignItems: 'center' }}>
         {leftContent}
       </h3>

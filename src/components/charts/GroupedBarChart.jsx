@@ -31,6 +31,7 @@ export default function GroupedBarChart({
   maxBarWidth,
   barCategoryGap = '10%',
   barGap = 2,
+  hideLegend = false,
 }) {
   if (!data || data.length === 0) {
     return (
@@ -87,7 +88,7 @@ export default function GroupedBarChart({
               contentStyle={customTooltip ? undefined : { borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
               formatter={customTooltip ? undefined : (tooltipFormatter || ((value) => value.toLocaleString('en-IN')))}
             />
-            <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }} />
+            {!hideLegend && <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }} />}
 
             {bars.map((bar, idx) => (
               <Bar
@@ -97,7 +98,7 @@ export default function GroupedBarChart({
                 stackId={stacked ? "a" : undefined}
                 fill={striped && idx === 0 ? 'url(#gchart-stripe)' : bar.color}
                 radius={stacked ? 0 : 12}
-                maxBarSize={maxBarWidth || (stacked ? 32 : 24)}
+                barSize={maxBarWidth || (stacked ? 32 : 24)}
                 onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
                 cursor={onBarClick ? 'pointer' : 'default'}
               />

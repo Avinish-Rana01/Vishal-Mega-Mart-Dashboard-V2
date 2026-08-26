@@ -146,150 +146,169 @@ export default function SaleDashboardSection() {
     );
   }
 
-  return (
-    <div className="cc-container">
-      <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
-      <WorkInProgress 
-        title="Revamping Sale Operations"
-        message="We're engineering a more powerful, insightful, and dynamic analytics experience for this section. Hang tight!"
-        version="V2.0"
-      />
-    </div>
-  );
-
   // return (
   //   <div className="cc-container">
   //     <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
-
-  //     {/* 1. KPI Row */}
-  //     <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-  //       <KpiCard
-  //         title="Total DPOS Sale"
-  //         value={totals?.TOTAL_DPOS_SALE || '0'}
-  //         badgeVariant="default"
-  //         icon={<Icons.Cart />}
-  //       />
-  //       <KpiCard
-  //         title="Total RFID Checkout"
-  //         value={totals?.TOTAL_RFID_CHECKOUT || '0'}
-  //         badgeVariant="info"
-  //         icon={<Icons.Tag />}
-  //       />
-  //       <KpiCard
-  //         title="Taffeta Sales"
-  //         value={totals?.TOTAL_TAFFETA_SALE || '0'}
-  //         badgeVariant="success"
-  //         icon={<Icons.Star />}
-  //       />
-  //       <KpiCard
-  //         title="Manual Sales"
-  //         value={totals?.TOTAL_MANUAL_SALE || '0'}
-  //         badgeVariant="warning"
-  //         icon={<Icons.Manual />}
-  //       />
-  //       <KpiCard
-  //         title="RFID Sales Share"
-  //         value={totals?.RFID_SALES_SHARE || '0%'}
-  //         badgeVariant="default"
-  //         icon={<Icons.Tag />}
-  //       />
-  //     </div>
-
-  //     {/* 2. Charts Row (Full Width Stacked Bar) */}
-  //     <div className="cc-card">
-  //       <ChartToolbar
-  //         leftContent={
-  //           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-  //             <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sales Breakdown by Store</h3>
-  //             <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} width={220} />
-  //           </div>
-  //         }
-  //         rightContent={
-  //           <ChartSearchInput
-  //             value={searchFilter}
-  //             onChange={setSearchFilter}
-  //             onClear={() => setSearchFilter('')}
-  //             placeholder="Search Store..."
-  //           />
-  //         }
-  //       />
-  //       <div className="cc-chart-scroll">
-  //         {barData.length === 0 ? (
-  //           <SearchEmptyState searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />
-  //         ) : (
-  //           <div style={{ minWidth: `${Math.max(100, barData.length * 60)}px` }}>
-  //             <GroupedBarChart
-  //               data={barData}
-  //               stacked={true}
-  //               customTooltip={<CustomTooltip />}
-  //               bars={[
-  //                 { dataKey: 'RFID', color: '#10b981', label: 'RFID Checkout' },
-  //                 { dataKey: 'Taffeta', color: '#8b5cf6', label: 'Taffeta Sale' },
-  //                 { dataKey: 'Manual', color: '#f59e0b', label: 'Manual Sale' }
-  //               ]}
-  //               height={280}
-  //             />
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-
-  //     {/* 3. NATIVE TABLE / DATA GRID */}
-  //     <DashboardDataGrid
-  //       title="ALL STORES DATA"
-  //       subtitle={`${tableData.length} records`}
-  //       headerAction={
-  //         <CustomDropdown
-  //           options={SORT_OPTIONS}
-  //           value={tableSort}
-  //           onChange={(val) => setTableSort(val)}
-  //           prefix="Sort:"
-  //           buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
-  //           menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
-  //         />
-  //       }
-  //       headers={[
-  //         'Store Code', 'Date', 'Total Sales', 'RFID Checkout', 'Taffeta Sales', 'Manual Sales'
-  //       ]}
-  //       data={tableData}
-  //       emptyStateContent={
-  //         <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-  //           <td colSpan={6} className="cc-data-grid-empty-cell">
-  //             No sales data found
-  //           </td>
-  //         </motion.tr>
-  //       }
-  //       renderRow={(row) => (
-  //         <motion.tr
-  //           layout
-  //           initial={{ opacity: 0, y: 10 }}
-  //           animate={{ opacity: 1, y: 0 }}
-  //           transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
-  //           key={row.STORE}
-  //           className="cc-data-grid-tr"
-  //         >
-  //           <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ padding: '8px' }}>
-  //             <div className="cc-row-tooltip-wrapper">
-  //               {row.STORE || '—'}
-  //               {row.STORE_NAME && (
-  //                 <div className="cc-row-tooltip">
-  //                   {row.STORE_NAME}
-  //                 </div>
-  //               )}
-  //             </div>
-  //           </td>
-  //           <td className="cc-data-grid-td" style={{ padding: '8px', fontSize: '12px', color: '#64748b' }}>
-  //             {row.DATE ? row.DATE.split(' ')[0] : '—'}
-  //           </td>
-  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_DPOS_SALE || '0'}</td>
-  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_RFID_CHECKOUT || '0'}</td>
-  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_TAFFETA_SALE || '0'}</td>
-  //           <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_MANUAL_SALE || '0'}</td>
-  //         </motion.tr>
-  //       )}
+  //     <WorkInProgress 
+  //       title="Revamping Sale Operations"
+  //       message="We're engineering a more powerful, insightful, and dynamic analytics experience for this section. Hang tight!"
+  //       version="V2.0"
   //     />
-
-
   //   </div>
   // );
+
+  return (
+    <div className="cc-container">
+      <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
+
+      {/* 1. KPI Row */}
+      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+        <KpiCard
+          title="Total DPOS Sale"
+          value={totals?.TOTAL_DPOS_SALE || '0'}
+          badgeVariant="default"
+          icon={<Icons.Cart />}
+        />
+        <KpiCard
+          title="Total RFID Checkout"
+          value={totals?.TOTAL_RFID_CHECKOUT || '0'}
+          badgeVariant="info"
+          icon={<Icons.Tag />}
+        />
+        <KpiCard
+          title="Taffeta Sales"
+          value={totals?.TOTAL_TAFFETA_SALE || '0'}
+          badgeVariant="success"
+          icon={<Icons.Star />}
+        />
+        <KpiCard
+          title="Manual Sales"
+          value={totals?.TOTAL_MANUAL_SALE || '0'}
+          badgeVariant="warning"
+          icon={<Icons.Manual />}
+        />
+        <KpiCard
+          title="RFID Sales Share"
+          value={totals?.RFID_SALES_SHARE || '0%'}
+          badgeVariant="default"
+          icon={<Icons.Tag />}
+        />
+      </div>
+
+      {/* 2. Charts Row (Full Width Stacked Bar) */}
+      <div className="cc-card">
+        <ChartToolbar
+          leftContent={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sales Breakdown by Store</h3>
+              <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} menuStyle={{ minWidth: '240px' }} />
+            </div>
+          }
+          rightContent={
+            <ChartSearchInput
+              value={searchFilter}
+              onChange={setSearchFilter}
+              onClear={() => setSearchFilter('')}
+              placeholder="Search Store..."
+            />
+          }
+        />
+        <div style={{ position: 'relative' }}>
+          {barData.length > 0 && (
+            <div style={{ position: 'absolute', top: -5, right: 10, display: 'flex', gap: '16px', zIndex: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Manual Sale</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Taffeta Sale</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981' }} />
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>RFID Checkout</span>
+              </div>
+            </div>
+          )}
+          <div className="cc-chart-scroll">
+            {barData.length === 0 ? (
+              <SearchEmptyState searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />
+            ) : (
+              <div style={{ minWidth: `max(100%, ${barData.length * 60}px)` }}>
+                <GroupedBarChart
+                  data={barData}
+                  stacked={true}
+                  customTooltip={<CustomTooltip />}
+                  bars={[
+                    { dataKey: 'RFID', color: '#10b981', label: 'RFID Checkout' },
+                    { dataKey: 'Taffeta', color: '#8b5cf6', label: 'Taffeta Sale' },
+                    { dataKey: 'Manual', color: '#f59e0b', label: 'Manual Sale' }
+                  ]}
+                  height={280}
+                  hideLegend={true}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. NATIVE TABLE / DATA GRID */}
+      <DashboardDataGrid
+        title="ALL STORES DATA"
+        subtitle={`${tableData.length} records`}
+        headerAction={
+          <CustomDropdown
+            options={SORT_OPTIONS}
+            value={tableSort}
+            onChange={(val) => setTableSort(val)}
+            prefix="Sort:"
+            buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+            menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
+          />
+        }
+        headers={[
+          'Store Code', 'Date', 'Total Sales', 'RFID Checkout', 'Taffeta Sales', 'Manual Sales'
+        ]}
+        data={tableData}
+        emptyStateContent={
+          <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <td colSpan={6} className="cc-data-grid-empty-cell">
+              No sales data found
+            </td>
+          </motion.tr>
+        }
+        renderRow={(row) => (
+          <motion.tr
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+            key={row.STORE}
+            className="cc-data-grid-tr"
+          >
+            <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ padding: '8px' }}>
+              <div className="cc-row-tooltip-wrapper">
+                {row.STORE || '—'}
+                {row.STORE_NAME && (
+                  <div className="cc-row-tooltip">
+                    {row.STORE_NAME}
+                  </div>
+                )}
+              </div>
+            </td>
+            <td className="cc-data-grid-td" style={{ padding: '8px', fontSize: '12px', color: '#64748b' }}>
+              {row.DATE ? row.DATE.split(' ')[0] : '—'}
+            </td>
+            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_DPOS_SALE || '0'}</td>
+            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_RFID_CHECKOUT || '0'}</td>
+            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_TAFFETA_SALE || '0'}</td>
+            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_MANUAL_SALE || '0'}</td>
+          </motion.tr>
+        )}
+      />
+
+
+    </div>
+  );
 }

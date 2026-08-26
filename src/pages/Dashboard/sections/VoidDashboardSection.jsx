@@ -283,11 +283,40 @@ export default function VoidDashboardSection() {
               />
             }
           />
-          <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            
+            {/* Custom Sticky Legend */}
+            <div style={{ position: 'absolute', top: -5, right: 10, display: 'flex', gap: '16px', zIndex: 10 }}>
+              {chartView === 'grouped' && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#fcd34d' }} />
+                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encoded Qty</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#d97706' }} />
+                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Void Qty</span>
+                  </div>
+                </>
+              )}
+              {chartView === 'pending' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ef4444' }} />
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Pending Voids</span>
+                </div>
+              )}
+              {chartView === 'encoding' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981' }} />
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encode Rate</span>
+                </div>
+              )}
+            </div>
+
             {chartView === 'grouped' && (
               <div style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
-                  <div style={{ minWidth: `${Math.max(800, barData.length * 70)}px`, height: '100%' }}>
+                  <div style={{ minWidth: `max(100%, ${barData.length * 70}px)`, height: '100%' }}>
                     <GroupedBarChart
                       data={barData}
                       bars={[
@@ -295,6 +324,7 @@ export default function VoidDashboardSection() {
                         { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
                       ]}
                       height="100%"
+                      hideLegend={true}
                       customTooltip={<VoidVsEncodedTooltip />}
                     />
                   </div>
@@ -334,7 +364,7 @@ export default function VoidDashboardSection() {
               value={encodeRaw}
               maxValue={totalVoidRaw}
               centerLabel="Encoded"
-              primaryColor="#8b5cf6"
+              primaryColor="#d97706"
             />
           </div>
         </div>

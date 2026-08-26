@@ -16,11 +16,16 @@ export const generateMockSaleDashboard = (count = 20) => {
     const storeCode = storeCodes[i];
     const storeName = STORE_MAPPING[storeCode];
     
-    // Generate realistic numbers
-    const totalDposSale = Math.floor(Math.random() * 500) + 100;
-    const totalRfidCheckout = totalDposSale + Math.floor(Math.random() * 20) - 10;
-    const manualSale = Math.floor(Math.random() * 50);
-    const taffetaSale = Math.floor(Math.random() * 15);
+    // Generate realistic base total DPOS sale (e.g. 300 to 1200 items)
+    const totalDposSale = Math.floor(Math.random() * 800) + 400;
+
+    // Realistic split: ~0.5% Manual, ~9.5% Taffeta, and the remaining ~90% RFID Checkout
+    const manualRate = 0.003 + Math.random() * 0.004; // 0.3% - 0.7%
+    const taffetaRate = 0.085 + Math.random() * 0.02;  // 8.5% - 10.5%
+    
+    const manualSale = Math.max(1, Math.round(totalDposSale * manualRate));
+    const taffetaSale = Math.round(totalDposSale * taffetaRate);
+    const totalRfidCheckout = totalDposSale - taffetaSale - manualSale;
 
     totals.totalDposSale += totalDposSale;
     totals.totalRfidCheckout += totalRfidCheckout;
@@ -30,7 +35,7 @@ export const generateMockSaleDashboard = (count = 20) => {
     return {
       RowNumber: i + 1,
       STORE: storeCode,
-      STORE_NAME: `${storeCode} - ${storeName}`,
+      STORE_NAME: storeName,
       DATE: "2026-08-23 12:00 AM Sunday",
       LASTDATE: "2026-08-16 12:00 AM Sunday",
       TOTAL_DPOS_SALE: totalDposSale,

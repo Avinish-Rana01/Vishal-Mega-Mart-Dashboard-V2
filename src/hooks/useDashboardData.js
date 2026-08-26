@@ -189,7 +189,7 @@ const saleDashboardTotals = (summary) => {
     TOTAL_RFID_CHECKOUT: rfid.toLocaleString('en-IN'),
     TOTAL_TAFFETA_SALE: summary.totalTaffetaSale?.toLocaleString('en-IN') || 0,
     TOTAL_MANUAL_SALE: summary.totalManualSale?.toLocaleString('en-IN') || 0,
-    RFID_SALES_SHARE: dpos === 0 ? 'N/A' : `${Math.round((rfid / dpos) * 100)}%`
+    RFID_SALES_SHARE: dpos === 0 ? 'N/A' : `${((rfid / dpos) * 100).toFixed(1)}%`
   };
 };
 
@@ -238,7 +238,13 @@ const returnDashboardTotals = (summary) => ({
   DIFFERENCE_QTY: (summary.pendingQty ?? summary.DIFFERENCE_QTY ?? 0).toLocaleString('en-IN')
 });
 
-export const useReturnDashboard = () => useDashboardFetch(getReturnDashboard, returnDashboardFilter, returnDashboardTotals);
+import { generateMockReturnDashboard } from '../utils/mockReturnDashboard';
+
+const mockGetReturnDashboard = async (signal) => {
+  return generateMockReturnDashboard();
+};
+
+export const useReturnDashboard = () => useDashboardFetch(mockGetReturnDashboard, returnDashboardFilter, returnDashboardTotals);
 
 // ==========================================
 // 8. DC Validation
