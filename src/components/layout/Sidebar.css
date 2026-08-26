@@ -1,0 +1,86 @@
+/* ---- Sidebar Nav Tooltip ---- */
+.vmm-sidebar {
+  overflow: visible !important;
+}
+
+.vmm-nav-dropdown {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vmm-nav-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%) translateX(10px);
+  background-color: #ffffff;
+  color: #1e293b;
+  min-width: 140px;
+  padding: 8px 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  z-index: 1000;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.vmm-nav-dropdown:hover .vmm-nav-tooltip,
+.vmm-nav-tooltip.force-show {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) translateX(15px);
+}
+
+.vmm-nav-tooltip-title {
+  margin: 0 0 4px 0;
+  padding: 4px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.vmm-nav-tooltip ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vmm-nav-tooltip li {
+  padding: 0;
+}
+
+.vmm-nav-tooltip-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #334155;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.vmm-nav-tooltip-link:hover, .vmm-nav-tooltip-link.active {
+  background: #f8fafc;
+  color: #3b82f6;
+}
+
+.vmm-nav-tooltip-link::before {
+  content: '•';
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+/* Bridge the gap so hovering off the icon into the tooltip doesn't close it */
+.vmm-nav-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -20px;
+  width: 20px;
+  height: 100%;
+}

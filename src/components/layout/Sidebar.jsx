@@ -1,8 +1,13 @@
-import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Store, Tags, Settings } from 'lucide-react';
+import './Sidebar.css';
 
 export default function Sidebar() {
+  const location = useLocation();
+  const isDashboardActive = location.pathname.startsWith('/dashboard');
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+
   return (
     <aside className="vmm-sidebar">
       <div className="vmm-sidebar-logo" title="Vishal Mega Mart">
@@ -11,13 +16,36 @@ export default function Sidebar() {
         </Link>
       </div>
       <nav className="vmm-sidebar-nav">
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) => `vmm-nav-item ${isActive ? 'active' : ''}`}
-          title="Dashboard Home"
+        <div 
+          className="vmm-nav-dropdown"
+          onMouseEnter={() => setIsTooltipOpen(true)}
+          onMouseLeave={() => setIsTooltipOpen(false)}
         >
-          <LayoutDashboard size={24} strokeWidth={2} />
-        </NavLink>
+          <div
+            className={`vmm-nav-item ${isDashboardActive ? 'active' : ''}`}
+            title="Dashboard Menu"
+            style={{ cursor: 'pointer' }}
+            onClick={() => setIsTooltipOpen(!isTooltipOpen)}
+            tabIndex="0"
+          >
+            <LayoutDashboard size={24} strokeWidth={2} />
+          </div>
+          <div className={`vmm-nav-tooltip ${isTooltipOpen ? 'force-show' : ''}`}>
+            <h4 className="vmm-nav-tooltip-title">Home</h4>
+            <ul>
+              <li>
+                <NavLink to="/dashboard" end className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
+                  Dashboard
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard-2" className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
+                  Dashboard 2
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+        </div>
         <NavLink
           to="/stores"
           className={({ isActive }) => `vmm-nav-item ${isActive ? 'active' : ''}`}

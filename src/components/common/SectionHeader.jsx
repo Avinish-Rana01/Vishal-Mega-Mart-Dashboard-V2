@@ -6,11 +6,33 @@ import React from 'react';
  * @param {string} title - The main heading (e.g., "Live Stock")
  * @param {React.ReactNode} rightContent - Optional content for the right side (like a date badge or refresh button)
  */
-export default function SectionHeader({ title, rightContent }) {
+export default function SectionHeader({ title, subtitle, icon, rightContent }) {
   return (
-    <div className="ds-header">
-      <div className="ds-header-text">
-        <h3 style={{ textTransform: 'Uppercase', fontSize: '16px' }}>{title}</h3>
+    <div className="ds-header" style={{ padding: '4px 8px 24px 8px', background: 'transparent', border: 'none', alignItems: 'center' }}>
+      <div className="ds-header-text" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {icon && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {icon}
+          </div>
+        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <h1 style={{ 
+            fontSize: '18px', 
+            fontWeight: '700', 
+            color: '#0f172a', 
+            margin: 0, 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.04em',
+            lineHeight: 1
+          }}>
+            {title}
+          </h1>
+          {subtitle && (
+            <span style={{ fontSize: '15px', color: '#64748b', fontWeight: '500', lineHeight: 1 }}>
+              {subtitle}
+            </span>
+          )}
+        </div>
       </div>
 
       {rightContent && (

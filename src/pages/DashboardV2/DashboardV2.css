@@ -1,0 +1,32 @@
+.vmm-dashboard-body-v2 {
+  /* padding: 24px; */
+  background-color: #eceef0;
+  overflow-y: auto;
+  height: 100%;
+  
+}
+
+.vmm-dashboard-stack {
+  display: flex;
+  flex-direction: column;
+  /* gap: 24px; */
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  /* margin: 20px; */
+  border: solid rgb(232, 232, 232) 2px;
+  padding: 14px;
+  border-radius: 18px;
+  background-color: #ffffff;
+  
+}
+.ls-grid2 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+/* Ensure any copied section cards take up full width in V2 */
+.vmm-dashboard-stack > * {
+  width: 100%;
+}
