@@ -530,7 +530,7 @@ export default function LiveStockSectionV2() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart (40% width, positioned left) */}
-        <div className="ls-card" style={{ flex: '1 1 400px', padding: '4px 4px', order: 1, minWidth: 0, margin: 0 }}>
+        <div className="ls-card" style={{ flex: '1 1 400px', padding: '4px 4px', order: 1, minWidth: 0,padding: '10px', margin: 0 }}>
           <div className="ls-toolbar-header">
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
               COVERAGE DISTRIBUTION SUMMARY

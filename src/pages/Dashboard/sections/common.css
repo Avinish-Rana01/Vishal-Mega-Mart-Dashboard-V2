@@ -24,8 +24,8 @@
 }
 
 .vmm-toolbar-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  /* font-weight: 700; */
   color: #1e3a8a;
   text-transform: uppercase;
   margin: 0;
