@@ -292,9 +292,9 @@ export default function LiveStockSection() {
 
   if (isLoading) return <DashboardShimmer title="Live Stock" />;
 
-  if (error) {
-    return <div style={{ color: 'red', padding: '20px', background: '#fee2e2', borderRadius: '8px' }}>{error}</div>;
-  }
+  // if (error) {
+  //   return <div style={{ color: 'red', padding: '20px', background: '#fee2e2', borderRadius: '8px' }}>{error}</div>;
+  // }
 
   return (
     <div className="ls-dashboard-container">

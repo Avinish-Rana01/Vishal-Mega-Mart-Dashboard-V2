@@ -332,7 +332,7 @@ export default function StoreValidationSection() {
   // ─── Loading ────────────────────────────────────────────────────────────────
   if (isLoading) return <DashboardShimmer title="Store Validation" />;
 
-  if (error) return <div className="ds-error">{error}</div>;
+  // if (error) return <div className="ds-error">{error}</div>;
 
   return (
     <section className="cc-container">

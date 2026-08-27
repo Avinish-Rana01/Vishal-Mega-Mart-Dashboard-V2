@@ -58,9 +58,9 @@ export default function VendorDiscrepancySection() {
     );
   }
 
-  if (error) {
-    return <div className="ds-error">{error}</div>;
-  }
+  // if (error) {
+  //   return <div className="ds-error">{error}</div>;
+  // }
 
   return (
     <section className="ds-section">

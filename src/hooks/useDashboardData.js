@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { mockTagLocation, mockTagCycleCount } from '../config/mockData';
 import {
   getLiveStock,
   getCycleCount,
@@ -285,10 +286,12 @@ export const useTagCharts = () => {
     const fetchTagCharts = async () => {
       setIsLoading(true);
       try {
-        const [locData, cycData] = await Promise.all([
-          getTagLocation(controller.signal),
-          getTagCycleCount(controller.signal)
-        ]);
+        // const [locData, cycData] = await Promise.all([
+        //   getTagLocation(controller.signal),
+        //   getTagCycleCount(controller.signal)
+        // ]);
+        const locData = mockTagLocation;
+        const cycData = mockTagCycleCount;
 
         if (controller.signal.aborted) return;
 

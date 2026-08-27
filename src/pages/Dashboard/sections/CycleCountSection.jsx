@@ -489,13 +489,13 @@ export default function CycleCountSection() {
   if (isLoading) return <DashboardShimmer title="Cycle Count" />;
 
   // ---- Error State ----
-  if (error) {
-    return (
-      <div className="cc-container">
-        <div className="cc-error">Unable to load cycle count data. Please check your connection and try again.</div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="cc-container">
+  //       <div className="cc-error">Unable to load cycle count data. Please check your connection and try again.</div>
+  //     </div>
+  //   );
+  // }
 
   // ---- Empty State ----
   if (!metrics.parsedData || metrics.parsedData.length === 0) {
