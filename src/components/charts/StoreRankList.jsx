@@ -66,15 +66,15 @@ export default function StoreRankList({
               padding: '12px 10px',
               flex: 1,
               borderBottom: i < displayItems.length - 1 ? '1px solid #f1f5f9' : 'none',
-              cursor: onItemClick ? 'pointer' : 'default',
+              cursor: 'pointer',
               borderRadius: '8px',
-              transition: 'background 0.2s',
+              transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => {
-              if (onItemClick) e.currentTarget.style.background = '#f8fafc';
+              e.currentTarget.style.background = '#f8fafc';
             }}
             onMouseLeave={(e) => {
-              if (onItemClick) e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.background = 'transparent';
             }}
           >
             {/* Avatar */}

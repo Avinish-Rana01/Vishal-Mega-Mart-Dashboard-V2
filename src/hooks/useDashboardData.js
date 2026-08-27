@@ -379,18 +379,18 @@ export const useWarehouseEncoding = () => {
           
           response = {
             summary: {
-              hour8To9: 45,
-              hour9To10: 120,
-              hour10To11: 340,
-              hour11To12: 560,
-              hour12To13: 410,
-              hour13To14: 215,
-              hour14To15: 390,
-              hour15To16: 485,
-              hour16To17: 290,
-              hour17To18: 155,
-              hour18To19: 80,
-              hour19To20: 30
+              hour8To9: 25,
+              hour9To10: 90,
+              hour10To11: 240,
+              hour11To12: 420,
+              hour12To13: 310,
+              hour13To14: 155,
+              hour14To15: 290,
+              hour15To16: 385,
+              hour16To17: 190,
+              hour17To18: 105,
+              hour18To19: 50,
+              hour19To20: 20
             }
           };
         } else {

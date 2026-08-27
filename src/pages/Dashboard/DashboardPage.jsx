@@ -49,10 +49,10 @@ export default function DashboardPage() {
             <div className="vmm-grid-cell">
               <DcEncodingSection />
             </div>
-            {/* <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
+            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
               <TagManagementSection />
             </div>
-            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
+            {/* <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
               <VendorDiscrepancySection />
             </div> */}
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard from '../../../components/charts/KpiCard';
 import StoreRankList from '../../../components/charts/StoreRankList';
@@ -17,7 +18,8 @@ const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f
 
 export default function DcEncodingSection() {
   const { chartData: apiData, isLoading, error } = useWarehouseEncoding();
-  
+  const [chartRef, chartVisible] = useIsInViewport({ threshold: 0.1 });
+
   const { totalEncoded, peakHour, peakCount, avgPerHour, rankList, chartData, donutData } = useMemo(() => {
     if (!apiData || apiData.length === 0) return { totalEncoded: 0, peakHour: 'None', peakCount: 0, avgPerHour: 0, rankList: [], chartData: [], donutData: [] };
 
@@ -39,19 +41,19 @@ export default function DcEncodingSection() {
         max = c;
         peak = d.timeBlock;
       }
-      
+
       const startHour = parseInt(d.timeBlock.split('-')[0].trim(), 10);
       if (startHour < 12) {
-         amCount += c;
+        amCount += c;
       } else {
-         pmCount += c;
+        pmCount += c;
       }
 
       formattedChart.push({
         name: d.timeBlock,
         Encoded: c
       });
-      
+
       formattedTable.push({
         timeBlock: d.timeBlock,
         count: c
@@ -72,7 +74,7 @@ export default function DcEncodingSection() {
   const memoizedChart = useMemo(() => {
     if (chartData.length === 0) {
       return (
-        <SearchEmptyState 
+        <SearchEmptyState
           title="No Encoding Data Found"
           subtitle="There is no encoding activity for today."
         />
@@ -106,9 +108,9 @@ export default function DcEncodingSection() {
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
               ))}
-              <LabelList 
-                dataKey="Encoded" 
-                position="top" 
+              <LabelList
+                dataKey="Encoded"
+                position="top"
                 style={{ fontSize: '11px', fontWeight: 600, fill: '#64748b' }}
                 formatter={(val) => val > 0 ? val.toLocaleString('en-IN') : ''}
               />
@@ -127,17 +129,17 @@ export default function DcEncodingSection() {
     return <div className="ds-error">{error}</div>;
   }
 
-  
-      return (
-    <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
-      <SectionHeader title="DC ENCODING" rightContent={<DateBadge />} />
-      <WorkInProgress 
-        title="Revamping DC DC ENCODING"
-        message="We are currently building this dashboard. It will be available on 27 AUG 2026 4:00 PM."
-        version="V2.0"
-      />
-    </div>
-  );
+
+  // return (
+  //   <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+  //     <SectionHeader title="DC ENCODING" rightContent={<DateBadge />} />
+  //     <WorkInProgress
+  //       title="Revamping DC DC ENCODING"
+  //       message="We are currently building this dashboard. It will be available on 27 AUG 2026 4:00 PM."
+  //       version="V2.0"
+  //     />
+  //   </div>
+  // );
 
   return (
     <div className="vmm-section-container ds-section">
@@ -174,15 +176,15 @@ export default function DcEncodingSection() {
               </div>
             }
           />
-          
+
           {/* Legend */}
           <ChartLegend items={[
             { color: '#0ea5e9', label: 'Tags Encoded' }
           ]} />
 
-          <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+          <div style={{ flex: 1, minHeight: 0, position: 'relative' }} ref={chartRef}>
             <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-              {memoizedChart}
+              {chartVisible && memoizedChart}
             </div>
           </div>
         </div>
@@ -195,7 +197,7 @@ export default function DcEncodingSection() {
           <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
             Most Active Hours
           </h3>
-          <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
+          <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto', overflowX: 'hidden' }}>
             <StoreRankList
               items={rankList}
               labelKey="timeBlock"
@@ -208,18 +210,41 @@ export default function DcEncodingSection() {
           </div>
         </div>
 
-        {/* Right: AM vs PM Distribution */}
+        {/* Right: Target Progress */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
           <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
-            Overall Encoding Breakdown
+            Encoding Target Progress
           </h3>
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <DonutChart
-              segments={donutData}
-              centerText={totalEncoded.toLocaleString('en-IN')}
-              centerSubtext="Total Tags"
-              height={220}
-            />
+            {(() => {
+              const TARGET_ENCODING = 2500; // Adjusted for mock data volume
+              const percent = totalEncoded > 0 ? Math.min((totalEncoded / TARGET_ENCODING) * 100, 100).toFixed(0) : 0;
+              const remaining = Math.max(TARGET_ENCODING - totalEncoded, 0);
+              
+              return (
+                <DonutChart
+                  segments={[
+                    { name: 'Encoded', value: totalEncoded, color: '#c026d3' },
+                    { name: 'Remaining', value: remaining, color: '#e2e8f0' }
+                  ]}
+                  centerText={`${percent}%`}
+                  centerSubtext={
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                      <span>{`${totalEncoded.toLocaleString('en-IN')} / ${TARGET_ENCODING.toLocaleString('en-IN')}`}</span>
+                      {/* <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>Encoded</span> */}
+                    </div>
+                  }
+                  height={220}
+                  showLegend={false}
+                  halfCircle={true}
+                  tooltipFormatter={(value, name) => 
+                    name === 'Encoded' 
+                      ? `${value.toLocaleString('en-IN')} / ${TARGET_ENCODING.toLocaleString('en-IN')}` 
+                      : value.toLocaleString('en-IN')
+                  }
+                />
+              );
+            })()}
           </div>
         </div>
       </div>

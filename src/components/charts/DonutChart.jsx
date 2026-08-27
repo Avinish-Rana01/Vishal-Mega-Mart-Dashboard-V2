@@ -17,6 +17,8 @@ export default function DonutChart({
   centerSubtext,
   height = 220,
   showLegend = true,
+  halfCircle = false,
+  tooltipFormatter = (value) => value.toLocaleString('en-IN'),
 }) {
   if (!segments || segments.length === 0) {
     return (
@@ -44,21 +46,25 @@ export default function DonutChart({
               <Pie
                 data={segments}
                 cx="50%"
-                cy="45%"
+                cy={halfCircle ? "75%" : (showLegend ? "45%" : "50%")}
+                startAngle={halfCircle ? 180 : 360}
+                endAngle={0}
                 innerRadius="55%"
                 outerRadius="80%"
-                paddingAngle={3}
+                paddingAngle={1.5}
                 dataKey="value"
                 stroke="none"
-                cornerRadius={6}
+                cornerRadius={4}
               >
                 {segments.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value) => value.toLocaleString('en-IN')}
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+                formatter={tooltipFormatter}
+                contentStyle={{ zIndex: 1000, backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+                itemStyle={{ color: '#0f172a', fontWeight: 600 }}
+                wrapperStyle={{ zIndex: 1000 }}
               />
               {showLegend && (
                 <Legend
@@ -74,11 +80,12 @@ export default function DonutChart({
           {(centerText || centerSubtext) && (
             <div style={{
               position: 'absolute',
-              top: '40%',
+              top: halfCircle ? '70%' : (showLegend ? '45%' : '50%'),
               left: '50%',
               transform: 'translate(-50%, -50%)',
               textAlign: 'center',
               pointerEvents: 'none',
+              zIndex: 0,
             }}>
               {centerText && (
                 <div style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>

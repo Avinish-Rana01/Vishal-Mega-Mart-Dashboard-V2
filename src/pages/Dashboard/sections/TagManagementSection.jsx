@@ -1,11 +1,11 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
 import { useTagCharts } from '../../../hooks/useDashboardData';
-import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import WorkInProgress from '../../../components/common/WorkInProgress';
 import '../../../components/charts/DashboardSection.css';
 
 // SVG Icons
@@ -22,15 +22,14 @@ export default function TagManagementSection() {
     cycleData,
     cycleTotal,
     avgRecycle,
-    isLoading,
-    refresh
+    isLoading
   } = useTagCharts();
 
   if (isLoading) {
     return (
       <section className="ds-section">
         <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-          {[1,2,3].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px' }}><div className="ds-shimmer" /></div>)}
+          {[1, 2, 3].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px' }}><div className="ds-shimmer" /></div>)}
         </div>
         <div className="ds-skeleton-row ds-charts-row--equal">
           <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
@@ -51,24 +50,22 @@ export default function TagManagementSection() {
 
   return (
     <section className="ds-section">
-      <div className="ds-header" style={{ alignItems: 'center', padding: '20px', background: '#fff', flexWrap: 'nowrap' }}>
-        <div className="ds-header-text">
-          <h1 style={{ whiteSpace: 'nowrap' }}>Tag Management</h1>
-          <p>Monitor RFID tag locations, lifecycle, and recycling metrics.</p>
-        </div>
-        <div className="ds-header-actions" style={{ alignItems: 'center', gap: '12px', flexWrap: 'nowrap' }}>
-          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>
-            <RefreshCw size={14} /> Refresh
-          </button>
-        </div>
+      <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
+      <div style={{ height: '370px' }}>
+        <WorkInProgress title="Tag Management" description="We are currently upgrading this section." />
       </div>
+    </section>
+  );
+
+  return (
+    <section className="ds-section">
+      <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-        <CurvedCard
+        <KpiCard
           title="Total Tags"
           value={locationTotal.toLocaleString('en-IN')}
-          waveColor={['#8b5cf6', '#e9cfffff']} // Purple gradient
           icon={<Icons.Tag />}
         />
         <KpiCard
@@ -90,36 +87,87 @@ export default function TagManagementSection() {
       {/* 2. Charts Row */}
       <div className="ds-charts-row ds-charts-row--equal">
         {/* Left: Donut Chart for Location */}
-        <div className="ds-card">
-          <h3 className="ds-card-title">Tag Location Distribution</h3>
-          <DonutChart
-            segments={locationData}
-            centerText={locationTotal.toLocaleString('en-IN')}
-            centerSubtext="Total Tags"
-            height={280}
-          />
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 className="ds-card-title">Inventory Breakdown</h3>
+          <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b' }}>Tag distribution across sites</p>
+
+          <div style={{ display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', gap: '16px' }}>
+            {/* Donut Chart */}
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+              <DonutChart
+                segments={locationData}
+                centerText={locationTotal.toLocaleString('en-IN')}
+                centerSubtext="Total Tags"
+                height={250}
+                showLegend={false}
+              />
+            </div>
+
+            {/* Progress Bars */}
+            <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {locationData.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.color }} />
+                      <span style={{ fontSize: '15px', color: '#475569', fontWeight: 500 }}>{item.name}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{item.displayValue}</span>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', width: '52px', textAlign: 'right' }}>{item.percent}%</span>
+                    </div>
+                  </div>
+                  <div style={{ height: '10px', backgroundColor: '#e2e8f0', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${item.percent}%`, backgroundColor: item.color, borderRadius: '5px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Right: Grouped Bar Chart for Cycle Count */}
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Tag Recycling Distribution</h3>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Total Valid Tags: {cycleTotal.toLocaleString('en-IN')}</span>
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="ds-card-title--flex" style={{ marginBottom: '1px' }}>
+            <h3 className="ds-card-title" style={{ margin: 0 }}>Tag Recycling Distribution</h3>
           </div>
-          <GroupedBarChart
-            data={barData}
-            bars={[
-              { dataKey: 'Count', color: '#8b5cf6', label: 'Number of Tags' }
-            ]}
-            height={280}
-            tooltipFormatter={(val) => [`${Number(val).toLocaleString('en-IN')} Tags`, '']}
-          />
+
+          <div style={{ display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', gap: '8px' }}>
+            {/* Semi Donut Chart */}
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+              <DonutChart
+                segments={cycleData}
+                centerText={cycleTotal.toLocaleString('en-IN')}
+                centerSubtext="Total Tag Count"
+                height={250}
+                showLegend={false}
+                halfCircle={true}
+              />
+            </div>
+
+            {/* Progress Bars */}
+            <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {cycleData.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.color }} />
+                      <span style={{ fontSize: '15px', color: '#475569', fontWeight: 500 }}>{item.name}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{item.displayValue}</span>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', width: '52px', textAlign: 'right' }}>{item.percent}%</span>
+                    </div>
+                  </div>
+                  <div style={{ height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${item.percent}%`, backgroundColor: item.color, borderRadius: '4px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* 3. Quick-List Row */}
-
-
     </section>
   );
 }
