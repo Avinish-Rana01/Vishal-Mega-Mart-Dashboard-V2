@@ -14,7 +14,6 @@ import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
 import './CycleCountSection.css';
-import WorkInProgress from '../../../components/common/WorkInProgress';
 
 // SVG Icons
 const Icons = {
@@ -217,16 +216,7 @@ export default function ReturnDashboardSection() {
     );
   }
 
-  //   return (
-  //   <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', height: '700px', backgroundColor: '#fff' }}>
-  //     <SectionHeader title="Return Dashboard" rightContent={<DateBadge />} />
-  //     <WorkInProgress 
-  //       title="Revamping Return Dashboard"
-  //       message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
-  //       version="V2.0"
-  //     />
-  //   </div>
-  // );
+
 
   return (
     <section className="ds-section">

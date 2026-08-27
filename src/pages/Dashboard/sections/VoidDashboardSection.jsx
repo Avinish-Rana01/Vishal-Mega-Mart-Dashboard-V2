@@ -223,16 +223,7 @@ export default function VoidDashboardSection() {
       </section>
     );
   }
-  // return (
-  //   <div className="cc-container">
-  //     <SectionHeader title="Void Dashboard" rightContent={<DateBadge />} />
-  //     <WorkInProgress 
-  //       title="Revamping Void Dashboard"
-  //       message="We are currently building this dashboard. It will be available on 26 AUG 2026 3:00 PM."
-  //       version="V2.0"
-  //     />
-  //   </div>
-  // );
+
 
   return (
     <section className="ds-section">

@@ -11,7 +11,6 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import '../../../components/charts/DashboardSection.css';
-import WorkInProgress from '../../../components/common/WorkInProgress';
 import './CycleCountSection.css';
 import * as Icons from 'lucide-react';
 
@@ -101,16 +100,7 @@ export default function DcValidationSection() {
   const totalHUs = processedTotal + unprocessedTotal;
   const processingRate = totalHUs > 0 ? ((processedTotal / totalHUs) * 100).toFixed(2) : 0;
 
-  //     return (
-  //   <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', height: '700px', backgroundColor: '#fff' }}>
-  //     <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
-  //     <WorkInProgress 
-  //       title="Revamping DC Validation Dashboard"
-  //       message="We are currently building this dashboard. It will be available on 27 AUG 2026 12:00 PM."
-  //       version="V2.0"
-  //     />
-  //   </div>
-  // );
+
 
   return (
     <div className="cc-container">

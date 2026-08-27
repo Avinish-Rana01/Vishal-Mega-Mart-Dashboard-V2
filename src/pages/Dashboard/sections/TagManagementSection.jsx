@@ -5,14 +5,15 @@ import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import WorkInProgress from '../../../components/common/WorkInProgress';
+
 import '../../../components/charts/DashboardSection.css';
 
 // SVG Icons
 const Icons = {
   Tag: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>,
   Refresh: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>,
-  Store: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+  Store: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
+  Warehouse: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path></svg>
 };
 
 export default function TagManagementSection() {
@@ -28,12 +29,21 @@ export default function TagManagementSection() {
   if (isLoading) {
     return (
       <section className="ds-section">
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-          {[1, 2, 3].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px' }}><div className="ds-shimmer" /></div>)}
+        <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
+        <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
+              <div className="ds-shimmer" />
+            </div>
+          ))}
         </div>
         <div className="ds-skeleton-row ds-charts-row--equal">
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
+          <div className="ds-skeleton-box" style={{ height: '330px', borderRadius: '20px' }}>
+            <div className="ds-shimmer" />
+          </div>
+          <div className="ds-skeleton-box" style={{ height: '330px', borderRadius: '20px' }}>
+            <div className="ds-shimmer" />
+          </div>
         </div>
       </section>
     );
@@ -47,22 +57,14 @@ export default function TagManagementSection() {
 
   // Find store and warehouse totals for KPIs
   const storeInv = locationData.find(d => d.name.includes('Store'))?.value || 0;
-
-  return (
-    <section className="ds-section">
-      <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
-      <div style={{ height: '370px' }}>
-        <WorkInProgress title="Tag Management" description="We are currently upgrading this section." />
-      </div>
-    </section>
-  );
+  const whInv = locationData.find(d => d.name.includes('Warehouse'))?.value || 0;
 
   return (
     <section className="ds-section">
       <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
-      <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
         <KpiCard
           title="Total Tags"
           value={locationTotal.toLocaleString('en-IN')}
@@ -76,10 +78,17 @@ export default function TagManagementSection() {
           icon={<Icons.Store />}
         />
         <KpiCard
-          title="Average Recycle Count"
-          value={`${avgRecycle}x`}
-          subtext="across all active tags"
+          title="Warehouse Inventory"
+          value={whInv.toLocaleString('en-IN')}
+          badge={`${((whInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="info"
+          icon={<Icons.Warehouse />}
+        />
+        <KpiCard
+          title="Average Recycle Count"
+          value={`${Number(avgRecycle || 0).toFixed(2)}`}
+          subtext="across all active tags"
+          badgeVariant="warning"
           icon={<Icons.Refresh />}
         />
       </div>

@@ -303,7 +303,7 @@ export const useTagCharts = () => {
 
         const cycTotal = cycData.summary?.recordCount || 0;
         setCycleTotal(cycTotal);
-        setAvgRecycle(cycData.summary?.avgTagPercentage || 0);
+        setAvgRecycle(cycData.summary?.exactAverage || 0);
 
         const colors = ['#4ade80', '#fbbf24', '#2dd4bf', '#60a5fa', '#c084fc'];
         if (cycData.distribution) {

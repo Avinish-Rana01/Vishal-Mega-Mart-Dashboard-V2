@@ -11,7 +11,6 @@ import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartLegend from '../../../components/common/ChartLegend';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
-import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
 
 const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f472b6', '#2dd4bf', '#fb923c', '#818cf8', '#a3e635', '#22d3ee', '#facc15'];
@@ -130,16 +129,7 @@ export default function DcEncodingSection() {
   }
 
 
-  // return (
-  //   <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
-  //     <SectionHeader title="DC ENCODING" rightContent={<DateBadge />} />
-  //     <WorkInProgress
-  //       title="Revamping DC DC ENCODING"
-  //       message="We are currently building this dashboard. It will be available on 27 AUG 2026 4:00 PM."
-  //       version="V2.0"
-  //     />
-  //   </div>
-  // );
+
 
   return (
     <div className="vmm-section-container ds-section">

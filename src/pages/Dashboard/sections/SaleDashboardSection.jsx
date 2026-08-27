@@ -11,7 +11,6 @@ import ChartToolbar from '../../../components/common/ChartToolbar';
 import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
-import WorkInProgress from '../../../components/common/WorkInProgress';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
@@ -146,16 +145,7 @@ export default function SaleDashboardSection() {
     );
   }
 
-  // return (
-  //   <div className="cc-container">
-  //     <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
-  //     <WorkInProgress 
-  //       title="Revamping Sale Operations"
-  //       message="We're engineering a more powerful, insightful, and dynamic analytics experience for this section. Hang tight!"
-  //       version="V2.0"
-  //     />
-  //   </div>
-  // );
+
 
   return (
     <div className="cc-container">
