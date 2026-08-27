@@ -341,7 +341,7 @@ export default function LiveStockSectionV2() {
       {/* Header */}
       <SectionHeader
         title="Live Stock"
-        subtitle="Real-time overview of stock status across all stores"
+        subtitle="Overview of stock status across all stores"
         icon={<ClipboardChartIcon />}
         rightContent={<DateBadge />}
       />
@@ -401,7 +401,7 @@ export default function LiveStockSectionV2() {
           highVarianceCount={3}
           pendingCount={2}
           above95Count={7}
-          onViewAll={() => console.log('View All Alerts clicked')}
+          // onViewAll={() => console.log('View All Alerts clicked')}
         />
       </div>
 

@@ -60,10 +60,10 @@ export default function ActionAlertBar({
         </div>
       </div>
 
-      <div style={{ width: '1px', height: '36px', background: '#ffe4e6' }} />
+      {/* <div style={{ width: '1px', height: '36px', background: '#ffe4e6' }} /> */}
 
       {/* Metric 3 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      {/* <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
           <span style={{ fontWeight: '800', fontSize: '18px', marginTop: '-2px' }}>!</span>
         </div>
@@ -73,7 +73,7 @@ export default function ActionAlertBar({
             Stores pending stock validation
           </span>
         </div>
-      </div>
+      </div> */}
 
       <div style={{ width: '1px', height: '36px', background: '#ffe4e6' }} />
 

@@ -370,8 +370,33 @@ export const useWarehouseEncoding = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await getWarehouseEncoding(fromDate, toDate, controller.signal);
-        if (controller.signal.aborted) return;
+        const USE_MOCK_DATA = true;
+        let response = {};
+
+        if (USE_MOCK_DATA) {
+          await new Promise(resolve => setTimeout(resolve, 600)); // Simulate delay
+          if (controller.signal.aborted) return;
+          
+          response = {
+            summary: {
+              hour8To9: 45,
+              hour9To10: 120,
+              hour10To11: 340,
+              hour11To12: 560,
+              hour12To13: 410,
+              hour13To14: 215,
+              hour14To15: 390,
+              hour15To16: 485,
+              hour16To17: 290,
+              hour17To18: 155,
+              hour18To19: 80,
+              hour19To20: 30
+            }
+          };
+        } else {
+          response = await getWarehouseEncoding(fromDate, toDate, controller.signal);
+          if (controller.signal.aborted) return;
+        }
         
         // Transform the summary object into an array for both table and chart
         if (response.summary) {

@@ -1,138 +1,228 @@
-import React, { useMemo } from 'react';
-import { RefreshCw } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
-import CurvedCard from '../../../components/common/CurvedCard';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard from '../../../components/charts/KpiCard';
-import TimelineChart from '../../../components/charts/TimelineChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
+import DonutChart from '../../../components/charts/DonutChart';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartLegend from '../../../components/common/ChartLegend';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
+import WorkInProgress from '../../../components/common/WorkInProgress';
+import * as Icons from 'lucide-react';
 
-// SVG Icons
-const Icons = {
-  Barcode: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5v14M8 5v14M12 5v14M17 5v14M21 5v14"></path></svg>,
-  TrendingUp: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
-  Activity: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>,
-};
+const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f472b6', '#2dd4bf', '#fb923c', '#818cf8', '#a3e635', '#22d3ee', '#facc15'];
 
 export default function DcEncodingSection() {
-  const { chartData, isLoading, error, fromDate, setFromDate, toDate, setToDate, refresh } = useWarehouseEncoding();
-
-  // Derived Metrics
-  const { totalEncoded, peakHour, avgPerHour, topHours } = useMemo(() => {
-    if (!chartData || chartData.length === 0) return { totalEncoded: 0, peakHour: 'None', avgPerHour: 0, topHours: [] };
+  const { chartData: apiData, isLoading, error } = useWarehouseEncoding();
+  
+  const { totalEncoded, peakHour, peakCount, avgPerHour, rankList, chartData, donutData } = useMemo(() => {
+    if (!apiData || apiData.length === 0) return { totalEncoded: 0, peakHour: 'None', peakCount: 0, avgPerHour: 0, rankList: [], chartData: [], donutData: [] };
 
     let total = 0;
     let max = 0;
     let peak = 'None';
     let activeHoursCount = 0;
+    const formattedTable = [];
+    const formattedChart = [];
 
-    const topHoursData = [...chartData]
-      .filter(d => {
-        const c = Number(d.count);
-        total += c;
-        if (c > 0) activeHoursCount++;
-        if (c > max) {
-          max = c;
-          peak = d.timeBlock;
-        }
-        return c > 0; // Filter out 0 hours for the ranking list
-      })
-      .sort((a, b) => Number(b.count) - Number(a.count))
-      .slice(0, 5); // Top 5 busiest hours
+    let amCount = 0;
+    let pmCount = 0;
+
+    apiData.forEach(d => {
+      const c = Number(d.count);
+      total += c;
+      if (c > 0) activeHoursCount++;
+      if (c > max) {
+        max = c;
+        peak = d.timeBlock;
+      }
+      
+      const startHour = parseInt(d.timeBlock.split('-')[0].trim(), 10);
+      if (startHour < 12) {
+         amCount += c;
+      } else {
+         pmCount += c;
+      }
+
+      formattedChart.push({
+        name: d.timeBlock,
+        Encoded: c
+      });
+      
+      formattedTable.push({
+        timeBlock: d.timeBlock,
+        count: c
+      });
+    });
 
     const avg = activeHoursCount > 0 ? (total / activeHoursCount).toFixed(0) : 0;
+    formattedTable.sort((a, b) => b.count - a.count);
 
-    return { totalEncoded: total, peakHour: peak, avgPerHour: avg, topHours: topHoursData };
+    const donutSegments = [
+      { name: 'Morning', value: amCount, color: '#60a5fa' },
+      { name: 'Afternoon', value: pmCount, color: '#f87171' }
+    ];
+
+    return { totalEncoded: total, peakHour: peak, peakCount: max, avgPerHour: avg, rankList: formattedTable, chartData: formattedChart, donutData: donutSegments };
+  }, [apiData]);
+
+  const memoizedChart = useMemo(() => {
+    if (chartData.length === 0) {
+      return (
+        <SearchEmptyState 
+          title="No Encoding Data Found"
+          subtitle="There is no encoding activity for today."
+        />
+      );
+    }
+    return (
+      <div style={{ width: '100%', height: '100%' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 30, right: 0, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11, fill: '#94a3b8' }}
+              axisLine={false}
+              tickLine={false}
+              interval={0}
+              tickFormatter={(val) => val && val.length > 10 ? val.substring(0, 10) + '…' : val}
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: '#94a3b8' }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}
+            />
+            <Tooltip
+              cursor={{ fill: 'rgba(241,245,249,0.7)' }}
+              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+              formatter={(value) => value.toLocaleString('en-IN')}
+            />
+            <Bar dataKey="Encoded" name="Tags Encoded" radius={12} barSize={24} isAnimationActive={true}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+              ))}
+              <LabelList 
+                dataKey="Encoded" 
+                position="top" 
+                style={{ fontSize: '11px', fontWeight: 600, fill: '#64748b' }}
+                formatter={(val) => val > 0 ? val.toLocaleString('en-IN') : ''}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
   }, [chartData]);
 
   if (isLoading) {
-    return (
-      <section className="ds-section">
-        <div className="ds-skeleton-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-          {[1,2,3].map(i => <div key={i} className="ds-skeleton-box" style={{ height: '140px' }}><div className="ds-shimmer" /></div>)}
-        </div>
-        <div className="ds-skeleton-row ds-charts-row--single">
-          <div className="ds-skeleton-box" style={{ height: '350px' }}><div className="ds-shimmer" /></div>
-        </div>
-      </section>
-    );
+    return <DashboardShimmer />;
   }
 
   if (error) {
     return <div className="ds-error">{error}</div>;
   }
 
-  return (
-    <section className="ds-section">
-      
-      {/* Interactive Header with Date Pickers */}
-      <div className="ds-header" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', background: '#fff', borderRadius: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-          <div className="ds-header-text">
-            <h1 style={{ whiteSpace: 'nowrap' }}>DC Encoding</h1>
-            <p>Track warehouse encoding throughput and hourly trends.</p>
-          </div>
-          <button onClick={refresh} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: '#0f172a', fontWeight: '500', whiteSpace: 'nowrap' }}>
-            <RefreshCw size={14} /> Refresh
-          </button>
-        </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>From:</span>
-            <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-          </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>To:</span>
-            <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-          </div>
-        </div>
-      </div>
+  
+      return (
+    <div className="cc-container" style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+      <SectionHeader title="DC ENCODING" rightContent={<DateBadge />} />
+      <WorkInProgress 
+        title="Revamping DC DC ENCODING"
+        message="We are currently building this dashboard. It will be available on 27 AUG 2026 4:00 PM."
+        version="V2.0"
+      />
+    </div>
+  );
 
-      {/* 1. KPI Row (3 cols) */}
-      <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-        <CurvedCard
+  return (
+    <div className="vmm-section-container ds-section">
+      <SectionHeader title="DC Encoding" rightContent={<DateBadge />} />
+
+      <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '5px' }}>
+        <KpiCard
           title="Tags Encoded"
           value={totalEncoded.toLocaleString('en-IN')}
-          waveColor={['#3b82f6', '#ffffffff']} // Orange gradient
-          icon={<Icons.Barcode />}
         />
         <KpiCard
           title="Peak Encoding Hour"
           value={peakHour}
-          badge="Busiest Block"
-          badgeVariant="warning"
-          icon={<Icons.TrendingUp />}
+        />
+        <KpiCard
+          title="Peak Hour Volume"
+          value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'}
         />
         <KpiCard
           title="Average Encoding / Hour"
           value={Number(avgPerHour).toLocaleString('en-IN')}
-          subtext="across active hours"
-          badgeVariant="info"
-          icon={<Icons.Activity />}
         />
       </div>
 
-      {/* 2. Charts Row (Full Width Timeline) */}
-      <div className="ds-charts-row ds-charts-row--single">
-        <div className="ds-card">
-          <div className="ds-card-title--flex">
-            <h3>Hourly Encoding Activity</h3>
-          </div>
-          <TimelineChart
-            data={chartData}
-            dataKey="count"
-            labelKey="timeBlock"
-            color="#3b82f6" // blue
-            highlightColor="#f59e0b" // amber peak
-            height={280}
-            tooltipLabel="Tags Encoded"
+      {/* 2. Charts Row */}
+      <div className="ds-charts-row" style={{ height: '370px' }}>
+        <div className="ds-card ds-card--main" style={{ display: 'flex', flexDirection: 'column' }}>
+          <ChartToolbar
+            leftContent={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
+                  Hourly Encoding Activity
+                </h3>
+              </div>
+            }
           />
+          
+          {/* Legend */}
+          <ChartLegend items={[
+            { color: '#0ea5e9', label: 'Tags Encoded' }
+          ]} />
+
+          <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+            <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+              {memoizedChart}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 3. Quick-List Row */}
+      {/* 3. Split Layout (Rank List & Donut Chart) */}
+      <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
+        {/* Left: Most Active Hours */}
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
+            Most Active Hours
+          </h3>
+          <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
+            <StoreRankList
+              items={rankList}
+              labelKey="timeBlock"
+              sublabelKey=""
+              valueKey="count"
+              statusFn={() => 'info'}
+              formatValue={(val) => `${val} Tags`}
+              maxItems={3}
+            />
+          </div>
+        </div>
 
-
-    </section>
+        {/* Right: AM vs PM Distribution */}
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
+            Overall Encoding Breakdown
+          </h3>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <DonutChart
+              segments={donutData}
+              centerText={totalEncoded.toLocaleString('en-IN')}
+              centerSubtext="Total Tags"
+              height={220}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

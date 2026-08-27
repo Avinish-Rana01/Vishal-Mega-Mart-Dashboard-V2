@@ -13,6 +13,7 @@ export default function WorkInProgress({
       alignItems: 'center',
       justifyContent: 'center',
       flex: 1,
+      height: '100%',
       background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
       borderRadius: '24px',
       // border: '1px dashed #cbd5e1',

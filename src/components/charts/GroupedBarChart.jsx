@@ -75,7 +75,7 @@ export default function GroupedBarChart({
               axisLine={false}
               tickLine={false}
               interval={0}
-              tickFormatter={(val) => val.length > 6 ? val.substring(0, 6) + '…' : val}
+              tickFormatter={(val) => val && val.length > 10 ? val.substring(0, 10) + '…' : val}
             />
             <YAxis
               tick={{ fontSize: 11, fill: '#94a3b8' }}
