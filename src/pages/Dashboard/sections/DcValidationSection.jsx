@@ -142,7 +142,7 @@ export default function DcValidationSection() {
           leftContent={
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Processed vs Unprocessed HU
+                Processed vs Unprocessed
               </h3>
             </div>
           }

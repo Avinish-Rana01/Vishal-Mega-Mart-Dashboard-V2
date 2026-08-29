@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { mockTagLocation, mockTagCycleCount } from '../config/mockData';
+import { mockTagLocation, mockTagCycleCount, mockVendorDiscrepancy } from '../config/mockData';
 import {
   getLiveStock,
   getCycleCount,
@@ -148,7 +148,11 @@ const vendorTotals = (summary) => ({
   DIFF_TILL_DATE: summary.differenceQtyTillDate?.toLocaleString('en-IN') || 0
 });
 
-export const useVendorDiscrepancy = () => useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals);
+const mockGetVendorDiscrepancy = async (searchQuery, pageIndex, pageSize, signal) => {
+  return mockVendorDiscrepancy;
+};
+
+export const useVendorDiscrepancy = () => useDashboardFetch(mockGetVendorDiscrepancy, vendorFilter, vendorTotals);
 
 // ==========================================
 // 4. Store Dashboard

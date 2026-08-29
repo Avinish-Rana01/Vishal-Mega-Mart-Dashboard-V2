@@ -33,6 +33,8 @@ export default function GroupedBarChart({
   barGap = 2,
   hideLegend = false,
   showValues = false,
+  margin,
+  xAxisTickFormatter
 }) {
   if (!data || data.length === 0) {
     return (
@@ -57,7 +59,7 @@ export default function GroupedBarChart({
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 30, right: 0, left: -20, bottom: 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
+          <BarChart data={data} margin={margin || { top: 30, right: 0, left: -20, bottom: 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
             <defs>
               <pattern id="gchart-stripe" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                 <rect width="10" height="10" fill="#f8fafc" />
@@ -75,7 +77,7 @@ export default function GroupedBarChart({
               axisLine={false}
               tickLine={false}
               interval={0}
-              tickFormatter={(val) => val && val.length > 10 ? val.substring(0, 10) + '…' : val}
+              tickFormatter={xAxisTickFormatter || ((val) => val && val.length > 10 ? val.substring(0, 10) + '…' : val)}
             />
             <YAxis
               tick={{ fontSize: 11, fill: '#94a3b8' }}
