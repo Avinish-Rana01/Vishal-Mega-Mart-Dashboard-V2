@@ -1,10 +1,13 @@
 import React, { useMemo } from 'react';
+import { useCountUp } from '../../hooks/useCountUp';
 
 export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2777'], icon, progress, progressText }) {
   // Ensure we have an array for gradient, fallback to same color if string passed
   const colors = Array.isArray(waveColor) ? waveColor : [waveColor, waveColor];
   // We need a unique ID for the SVG gradient so they don't clash on the page
   const gradientId = `wave-grad-${title.replace(/[^a-zA-Z0-9]/g, '')}`;
+
+  const { ref, animatedValue } = useCountUp(value, 1000);
 
   // Generate a smooth random wave path on mount using summed sine waves
   const wavePath = useMemo(() => {
@@ -47,11 +50,11 @@ export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2
   }, []);
 
   return (
-    <div className="curve-card" style={{ backgroundColor: '#ffffff', borderTop: 'none' }}>
+    <div ref={ref} className="curve-card" style={{ backgroundColor: '#ffffff', borderTop: 'none' }}>
       <div className="card-top">
         <div className="card-content" style={{ flex: 1, marginRight: '16px' }}>
           <p>{title}</p>
-          <h3 style={{ marginBottom: progress !== undefined ? '8px' : '0' }}>{value}</h3>
+          <h3 style={{ marginBottom: progress !== undefined ? '8px' : '0' }}>{animatedValue}</h3>
           
           {progress !== undefined && (
             <div style={{ width: '100%', maxWidth: '200px' }}>

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useCountUp } from '../../hooks/useCountUp';
 
 /**
  * KpiCard - A clean white stat card for secondary KPI metrics.
@@ -37,6 +38,8 @@ function getCardColor(title) {
 
 export default function KpiCard({ title, value, subtext, badge, badgeVariant = 'default', icon }) {
   const cardColor = useMemo(() => getCardColor(title), [title]);
+  const { ref, animatedValue } = useCountUp(value, 1000);
+  
   const badgeStyles = {
     default: { background: '#dcfce7', color: '#166534' },
     success: { background: '#dcfce7', color: '#15803d' },
@@ -46,7 +49,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
   };
 
   return (
-    <div style={{
+    <div ref={ref} style={{
       background: cardColor.bg,
       borderRadius: '10px',
       padding: '10px 0 10px 10px',
@@ -62,7 +65,7 @@ export default function KpiCard({ title, value, subtext, badge, badgeVariant = '
       </h3>
 
       <div style={{ fontSize: 'clamp(18px, 4vw, 19px)', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-        {value}
+        {animatedValue}
       </div>
     </div>
   );
