@@ -370,7 +370,7 @@ export default function LiveStockSection() {
         {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
         <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
           <ChartToolbar
-            leftContent="STORE PERFORMANCE"
+            leftContent={<span style={{ margin: '4px 0 4px 4px', display: 'inline-block' }}>STORE PERFORMANCE</span>}
             rightContent={
               <>
                 {/* Accuracy Filter Controls */}
@@ -408,12 +408,7 @@ export default function LiveStockSection() {
                     OK
                   </button>
                 </div>
-                <ChartSearchInput
-                  value={searchStore}
-                  onChange={setSearchStore}
-                  onClear={() => setSearchStore('')}
-                  placeholder="Search Store..."
-                />
+
               </>
             }
           />
@@ -436,13 +431,22 @@ export default function LiveStockSection() {
                 value={sortBy}
                 onChange={(val) => setSortBy(val)}
                 prefix="Sort:"
-                buttonStyle={{ minWidth: '160px', justifyContent: 'space-between' }}
+                buttonStyle={{ minWidth: 'auto', width: 'auto', gap: '8px' }}
                 menuStyle={{ left: 0, right: 'auto', minWidth: '180px' }}
               />
 
+              <div className="ls-search-wrapper" style={{ flex: 1, minWidth: 0 }}>
+                <ChartSearchInput
+                  value={searchStore}
+                  onChange={setSearchStore}
+                  onClear={() => setSearchStore('')}
+                  placeholder="Search Store..."
+                />
+              </div>
+
               {/* Active Filter Chip */}
-              <div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
-                {appliedFilter.field !== 'ALL' && (
+              {appliedFilter.field !== 'ALL' && (
+                <div style={{ height: '28px', display: 'flex', alignItems: 'center', width: '100%', marginTop: '6px' }}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0e7ff', color: '#4338ca', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
                     Accuracy {appliedFilter.op} {appliedFilter.val}%
                     <button
@@ -456,8 +460,8 @@ export default function LiveStockSection() {
                       ×
                     </button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Custom Chart Legend */}
@@ -490,9 +494,9 @@ export default function LiveStockSection() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart */}
-        <div className="ls-card" style={{ gridColumn: '1 / -1', padding: '8  px 12px' }}>
-          <div className="ls-toolbar-header">
-            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
+        <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="ls-toolbar-header" style={{ marginBottom: '14px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', margin: '4px 0 0 4px' }}>
               COVERAGE DISTRIBUTION
             </h3>
           </div>
@@ -510,24 +514,24 @@ export default function LiveStockSection() {
               </div>
 
               {/* Right Side: Custom Legend with Progress Bars */}
-              <div style={{ flex: 1, minWidth: '200px', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="ls-coverage-legend" style={{ flex: 1, minWidth: '200px', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {accuracyPieData.map((entry, idx) => {
                   const percentage = ((entry.value / totalPieStores) * 100).toFixed(2);
                   return (
-                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', fontSize: '16px', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>
+                    <div key={idx} className="ls-coverage-item" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="ls-coverage-label-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', fontSize: '16px', gap: '10px' }}>
+                        <div className="ls-coverage-name" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>
                           <div style={{ width: '8px', height: '8px', backgroundColor: entry.fill, borderRadius: '50%', flexShrink: 0 }} />
                           <span>{entry.name}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        <div className="ls-coverage-values" style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                           <span style={{ fontWeight: '700', color: '#0f172a' }}>{entry.value}</span>
                           <span style={{ color: '#94a3b8', fontSize: '14px', minWidth: '45px', textAlign: 'right' }}>{percentage}%</span>
                         </div>
                       </div>
 
                       {/* Horizontal Progress Bar */}
-                      <div style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div className="ls-coverage-bar-track" style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '6px' }} />
                       </div>
                     </div>

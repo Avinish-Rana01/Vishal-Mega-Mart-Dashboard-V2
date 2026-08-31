@@ -136,6 +136,7 @@
     z-index: 1000;
     padding: 0;
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%) !important;
   }
 
   .vmm-sidebar-logo {

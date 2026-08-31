@@ -70,7 +70,7 @@ export default function VendorDiscrepancySection() {
         <SectionHeader title="VENDOR DISCREPANCY" rightContent={<DateBadge />} />
 
         {/* 1. KPI Skeleton Row */}
-        <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+        <div className="ds-kpi-row">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
               <div className="ds-shimmer" />
@@ -113,7 +113,7 @@ export default function VendorDiscrepancySection() {
       <SectionHeader title="VENDOR DISCREPANCY" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
-      <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+      <div className="ds-kpi-row">
         <KpiCard
           title="Total Expected Qty"
           value={totals?.ACTUAL_QTY || '0'}
@@ -147,44 +147,42 @@ export default function VendorDiscrepancySection() {
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
           <ChartToolbar
             leftContent={
-              <h3 className="ds-card-title" style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
-                <CustomDropdown
-                  options={[
-                    { value: 'volume', label: 'Expected vs Scanned (Top 10 Vendors)' },
-                    { value: 'variance', label: 'Discrepancy Data (Top 10 Vendors)' }
-                  ]}
-                  value={chartView}
-                  onChange={setChartView}
-                  buttonStyle={{
-                    backgroundColor: 'transparent',
-                    backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")',
-                    backgroundPosition: 'right 4px center',
-                    border: 'none',
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                    paddingLeft: 0,
-                    paddingRight: '18px',
-                    fontSize: 'inherit',
-                    fontWeight: 'inherit',
-                    color: 'inherit',
-                    boxShadow: 'none',
-                    textTransform: 'uppercase'
-                  }}
-                  menuStyle={{ left: 0, right: 'auto', minWidth: '320px', textTransform: 'none' }}
-                />
-              </h3>
+              <CustomDropdown
+                options={[
+                  { value: 'volume', label: 'Expected vs Scanned' },
+                  { value: 'variance', label: 'Discrepancy Data' }
+                ]}
+                value={chartView}
+                onChange={setChartView}
+                buttonStyle={{
+                  backgroundColor: 'transparent',
+                  backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")',
+                  backgroundPosition: 'right 4px center',
+                  border: 'none',
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  paddingLeft: 0,
+                  paddingRight: '18px',
+                  fontSize: 'inherit',
+                  fontWeight: 'inherit',
+                  color: 'inherit',
+                  boxShadow: 'none',
+                  textTransform: 'uppercase'
+                }}
+                menuStyle={{ left: 0, right: 'auto', minWidth: '320px', textTransform: 'none' }}
+              />
             }
             rightContent={
               <CustomDropdown
                 options={[
-                  { value: 'EXPECTED_DESC', label: 'Expected Qty (Highest)' },
-                  { value: 'DIFF_QTY_DESC', label: 'Discrepancy Volume (Worst)' },
-                  { value: 'DIFF_PER_DESC', label: 'Discrepancy % (Worst)' }
+                  { value: 'EXPECTED_DESC', label: 'Highest Expected' },
+                  { value: 'DIFF_QTY_DESC', label: 'Highest Variance' },
+                  { value: 'DIFF_PER_DESC', label: 'Highest Discrepancy %' }
                 ]}
                 value={sortBy}
                 onChange={setSortBy}
                 prefix="Sort:"
-                buttonStyle={{ minWidth: '220px', justifyContent: 'space-between' }}
+                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
                 menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
               />
             }

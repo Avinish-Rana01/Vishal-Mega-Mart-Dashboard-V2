@@ -8,7 +8,7 @@ import React from 'react';
  */
 export default function SectionHeader({ title, subtitle, icon, rightContent }) {
   return (
-    <div className="ds-header" style={{ padding: '4px 8px 24px 8px', background: 'transparent', border: 'none', alignItems: 'center' }}>
+    <div className="ds-header" style={{ padding: '4px 0 20px 0', width: '100%', boxSizing: 'border-box', background: 'transparent', border: 'none', alignItems: 'center', justifyContent: 'space-between' }}>
       <div className="ds-header-text" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         {icon && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

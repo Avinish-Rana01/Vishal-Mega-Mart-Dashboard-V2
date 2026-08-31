@@ -235,15 +235,23 @@
   }
 }
 
-@media (max-width: 768px) {
-  .ds-kpi-row {
-    grid-template-columns: 1fr;
+@media (max-width: 767px) {
+  .ds-kpi-row, .cc-kpi-row, .ds-charts-row--kpi {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Automatically stretch the last KPI card if there are an odd number of cards */
+  .ds-kpi-row > *:last-child:nth-child(odd),
+  .cc-kpi-row > *:last-child:nth-child(odd),
+  .ds-charts-row--kpi > *:last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
   }
 
   .ds-charts-row--equal,
   .ds-charts-row--2col,
   .ds-charts-row--3col {
     grid-template-columns: 1fr;
+    height: auto !important;
   }
 
   .ds-header-text h1 {

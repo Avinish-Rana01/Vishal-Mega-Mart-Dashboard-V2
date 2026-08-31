@@ -107,7 +107,7 @@ export default function DcValidationSection() {
       <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
-      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="cc-kpi-row">
         <KpiCard
           title="Processed HUs"
           value={processedTotal.toLocaleString('en-IN')}
@@ -199,8 +199,16 @@ export default function DcValidationSection() {
 
       {/* 3. Data Grid */}
       <DashboardDataGrid
-        title="DC VALIDATION SUMMARY"
-        subtitle={`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
+        title={
+          <span>
+            DC VALIDATION <span className="hide-on-mobile">SUMMARY</span>
+          </span>
+        }
+        subtitle={
+          <span className="hide-on-mobile">
+            {`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
+          </span>
+        }
         innerWrapperStyle={{ minWidth: 'auto' }}
         tableStyle={{ width: 'auto', margin: '0 auto' }}
         headerAction={

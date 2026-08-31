@@ -34,7 +34,7 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
         style={{ paddingRight: '24px', width: '100%', textAlign: 'left', ...buttonStyle }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {prefix && <span style={{ color: '#94a3b8', marginRight: '6px' }}>{prefix}</span>}
+        {prefix && <span className="cd-prefix" style={{ color: '#94a3b8', marginRight: '6px' }}>{prefix}</span>}
         {displayLabel}
       </button>
 

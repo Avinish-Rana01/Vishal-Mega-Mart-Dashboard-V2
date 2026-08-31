@@ -583,7 +583,7 @@ export default function CycleCountSection() {
                   value={infoTab}
                   onChange={(val) => setInfoTab(val)}
                   prefix="View:"
-                  buttonStyle={{ minWidth: '220px', justifyContent: 'space-between' }}
+                  buttonStyle={{ minWidth: 'auto', gap: '8px' }}
                   menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
                 />
               )}
@@ -594,8 +594,8 @@ export default function CycleCountSection() {
                     value={sortBy}
                     onChange={(val) => setSortBy(val)}
                     prefix="Sort:"
-                    buttonStyle={{ minWidth: '200px', justifyContent: 'space-between' }}
-                    menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+                    buttonStyle={{ justifyContent: 'space-between' }}
+                    menuStyle={{ left: 'auto', right: 0, minWidth: '150px' }}
                   />
                   <ChartSearchInput
                     value={searchFilter}
@@ -633,15 +633,19 @@ export default function CycleCountSection() {
       {/* NATIVE TABLE / DATA GRID */}
       <DashboardDataGrid
         title="ALL CYCLE COUNTS"
-        subtitle={`${tableData.length} records`}
+        subtitle={
+          <span className="hide-on-mobile">
+            {`${tableData.length} records`}
+          </span>
+        }
         headerAction={
           <CustomDropdown
             options={TABLE_SORT_OPTIONS}
             value={tableSort}
             onChange={(val) => setTableSort(val)}
             prefix="Sort:"
-            buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
-            menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
+            buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+            menuStyle={{ left: 'auto', right: 0, minWidth: '150px' }}
           />
         }
         headers={[

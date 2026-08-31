@@ -82,15 +82,14 @@ export default function DcEncodingSection() {
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 30, right: 0, left: -20, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 25, right: 10, left: -15, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              axisLine={false}
+              tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }}
+              axisLine={{ stroke: '#e2e8f0' }}
               tickLine={false}
               interval={0}
-              tickFormatter={(val) => val && val.length > 10 ? val.substring(0, 10) + '…' : val}
             />
             <YAxis
               tick={{ fontSize: 11, fill: '#94a3b8' }}
@@ -135,7 +134,7 @@ export default function DcEncodingSection() {
     <div className="vmm-section-container ds-section">
       <SectionHeader title="DC Encoding" rightContent={<DateBadge />} />
 
-      <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '5px' }}>
+      <div className="ds-kpi-row">
         <KpiCard
           title="Tags Encoded"
           value={totalEncoded.toLocaleString('en-IN')}
@@ -173,8 +172,10 @@ export default function DcEncodingSection() {
           ]} />
 
           <div style={{ flex: 1, minHeight: 0, position: 'relative' }} ref={chartRef}>
-            <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-              {chartVisible && memoizedChart}
+            <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
+              <div style={{ minWidth: `max(100%, ${chartData.length * 56}px)`, height: '100%' }}>
+                {chartVisible && memoizedChart}
+              </div>
             </div>
           </div>
         </div>

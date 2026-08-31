@@ -240,6 +240,46 @@
   .cc-search-input {
     width: 100%;
   }
+
+  .cc-card .vmm-toolbar-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .cc-card .vmm-toolbar-controls {
+    display: contents;
+  }
+
+  .cc-card .vmm-search-container {
+    order: 3;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .cc-card .vmm-toolbar-title {
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  .cc-card .vmm-toolbar-controls > div:first-child {
+    flex: none !important;
+    width: auto !important;
+    max-width: 60% !important;
+  }
+
+  .cc-card .vmm-toolbar-title > div {
+    max-width: 100%;
+  }
+
+  .cc-card .ls-filter-select {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
 }
 
 /* Native Table Scrollbar — must override global hiding from index.css */
@@ -309,7 +349,6 @@
   font-size: 15px;
   font-weight: 700;
   color: #1e3a8a;
-  margin-bottom: 5px;
 }
 
 .cc-data-grid-inner-wrapper {

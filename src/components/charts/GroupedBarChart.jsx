@@ -54,12 +54,19 @@ export default function GroupedBarChart({
   }
 
   const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={margin || { top: 30, right: 0, left: -20, bottom: 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
+          <BarChart data={data} margin={margin ? { ...margin, bottom: isMobile ? Math.max(margin.bottom || 0, 50) : margin.bottom } : { top: 30, right: 0, left: -20, bottom: isMobile ? 50 : 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
             <defs>
               <pattern id="gchart-stripe" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                 <rect width="10" height="10" fill="#f8fafc" />
@@ -73,7 +80,7 @@ export default function GroupedBarChart({
 
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
+              tick={{ fontSize: 11, fill: '#94a3b8', angle: isMobile ? -45 : 0, textAnchor: isMobile ? 'end' : 'middle', dy: isMobile ? 10 : 0 }}
               axisLine={false}
               tickLine={false}
               interval={0}

@@ -152,7 +152,7 @@ export default function SaleDashboardSection() {
       <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
-      <div className="cc-kpi-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+      <div className="cc-kpi-row">
         <KpiCard
           title="Total DPOS Sale"
           value={totals?.TOTAL_DPOS_SALE || '0'}
@@ -189,23 +189,31 @@ export default function SaleDashboardSection() {
       <div className="cc-card">
         <ChartToolbar
           leftContent={
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sales Breakdown by Store</h3>
-              <CustomDropdown options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} menuStyle={{ minWidth: '240px' }} />
-            </div>
+            <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Sales Breakdown <span className="hide-on-mobile">by Store</span>
+            </h3>
           }
           rightContent={
-            <ChartSearchInput
-              value={searchFilter}
-              onChange={setSearchFilter}
-              onClear={() => setSearchFilter('')}
-              placeholder="Search Store..."
-            />
+            <>
+              <CustomDropdown
+                options={SORT_OPTIONS}
+                value={sortBy}
+                onChange={setSortBy}
+                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+                menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+              />
+              <ChartSearchInput
+                value={searchFilter}
+                onChange={setSearchFilter}
+                onClear={() => setSearchFilter('')}
+                placeholder="Search Store..."
+              />
+            </>
           }
         />
         <div style={{ position: 'relative' }}>
           {barData.length > 0 && (
-            <div style={{ position: 'absolute', top: -5, right: 10, display: 'flex', gap: '16px', zIndex: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '14px', margin: '4px 0 10px 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Manual Sale</span>
@@ -245,15 +253,23 @@ export default function SaleDashboardSection() {
 
       {/* 3. NATIVE TABLE / DATA GRID */}
       <DashboardDataGrid
-        title="ALL STORES DATA"
-        subtitle={`${tableData.length} records`}
+        title={
+          <span>
+            ALL STORES <span className="hide-on-mobile">DATA</span>
+          </span>
+        }
+        subtitle={
+          <span className="hide-on-mobile">
+            {`${tableData.length} records`}
+          </span>
+        }
         headerAction={
           <CustomDropdown
             options={SORT_OPTIONS}
             value={tableSort}
             onChange={(val) => setTableSort(val)}
             prefix="Sort:"
-            buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+            buttonStyle={{ minWidth: 'auto', gap: '8px' }}
             menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
           />
         }

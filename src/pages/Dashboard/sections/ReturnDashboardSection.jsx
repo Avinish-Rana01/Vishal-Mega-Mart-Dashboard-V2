@@ -30,11 +30,11 @@ const VIEW_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: 'RETURN_DESC', label: 'Sort: Highest Returns' },
-  { value: 'ENCODE_DESC', label: 'Sort: Highest Encoded' },
-  { value: 'PENDING_DESC', label: 'Sort: Highest Pending' },
-  { value: 'RATE_DESC', label: 'Sort: Highest Rate' },
-  { value: 'STORE_ASC', label: 'Sort: Store (A-Z)' },
+  { value: 'RETURN_DESC', label: 'Highest Returns' },
+  { value: 'ENCODE_DESC', label: 'Highest Encoded' },
+  { value: 'PENDING_DESC', label: 'Highest Pending' },
+  { value: 'RATE_DESC', label: 'Highest Rate' },
+  { value: 'STORE_ASC', label: 'Store (A-Z)' },
 ];
 
 const ReturnVsEncodedTooltip = ({ active, payload }) => {
@@ -227,7 +227,7 @@ export default function ReturnDashboardSection() {
       />
 
       {/* 1. KPI Row */}
-      <div className="ds-kpi-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="ds-kpi-row">
         {/* <CurvedCard
           title="Total Return Qty"
           value={totals?.RETURN_QTY || '0'}
@@ -280,7 +280,8 @@ export default function ReturnDashboardSection() {
                 options={SORT_OPTIONS}
                 value={sortBy}
                 onChange={setSortBy}
-                buttonStyle={{ backgroundColor: 'transparent', border: 'none', padding: '4px 32px 4px 8px', fontSize: '12px', fontWeight: 500, color: '#64748b', boxShadow: 'none' }}
+                prefix="Sort:"
+                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
                 menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
               />
             }
@@ -343,7 +344,7 @@ export default function ReturnDashboardSection() {
       <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
         {/* Left: Store Rank List */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Pending Returns</h3>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Returns</h3>
           <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
             <StoreRankList
               items={rankList}

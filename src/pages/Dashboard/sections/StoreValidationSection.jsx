@@ -401,7 +401,7 @@ export default function StoreValidationSection() {
                 value={sortBy}
                 onChange={setSortBy}
                 prefix="Sort:"
-                buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
                 menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
               />
               <ChartSearchInput
@@ -458,15 +458,22 @@ export default function StoreValidationSection() {
 
       {/* ── Native Data Grid ─────────────────────────────────────────────── */}
       <DashboardDataGrid
-        title="ALL STORES · VALIDATION SUMMARY"
-        subtitle={`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
+        title={
+          <span>
+            STORE VALIDATION{' '}
+            <span className="hide-on-mobile">SUMMARY </span>
+            <span className="hide-on-mobile" style={{ fontSize: '12px', fontWeight: 500, color: '#64748b', textTransform: 'none' }}>
+              ({tableData.length} store{tableData.length !== 1 ? 's' : ''})
+            </span>
+          </span>
+        }
         headerAction={
           <CustomDropdown
             options={tableSortOptions}
             value={tableSort}
             onChange={(val) => setTableSort(val)}
             prefix="Sort:"
-            buttonStyle={{ minWidth: '180px', justifyContent: 'space-between' }}
+            buttonStyle={{ minWidth: 'auto', gap: '8px' }}
             menuStyle={{ left: 'auto', right: 0, minWidth: '180px' }}
           />
         }
