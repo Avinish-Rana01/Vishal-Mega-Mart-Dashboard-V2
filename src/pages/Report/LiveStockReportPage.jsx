@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
+import AppLayout from '../../components/layout/AppLayout';
 import LiveStockTableView from '../Dashboard/sections/components/LiveStockTableView';
 
 export default function LiveStockReportPage() {
@@ -13,22 +11,17 @@ export default function LiveStockReportPage() {
   const { store: initialStore = 'HD44', date: initialDate = new Date().toISOString().split('T')[0] } = location.state || {};
 
   return (
-    <div className="vmm-dashboard-layout">
-      <Sidebar />
-
-      <div className="vmm-main-wrapper">
-        <Header 
-          breadcrumb={<>HOME - PAGES - REPORT - <span className="active">LIVE STOCK REPORT</span></>}
-          showBackButton={true}
-          onBackClick={() => navigate('/dashboard')}
-        />
-
-        <main className="vmm-dashboard-body" style={{ display: 'flex', flexDirection: 'column' }}>
-          <LiveStockTableView initialStore={initialStore} initialDate={initialDate} />
-        </main>
-
-        <Footer />
+    <AppLayout 
+      headerProps={{
+        breadcrumb: <>HOME - PAGES - REPORT - <span className="active">LIVE STOCK REPORT</span></>,
+        showBackButton: true,
+        onBackClick: () => navigate('/dashboard')
+      }}
+      mainClassName="flex-col-main"
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}>
+        <LiveStockTableView initialStore={initialStore} initialDate={initialDate} />
       </div>
-    </div>
+    </AppLayout>
   );
 }

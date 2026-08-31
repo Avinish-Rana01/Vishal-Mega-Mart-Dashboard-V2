@@ -276,11 +276,10 @@ export default function VendorDiscrepancySection() {
           </div>
         </div>
 
-        {/* Right: SemiDonut Chart */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
           <h3 className="ds-card-title">Global Receiving Accuracy</h3>
-          <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b' }}>Overall receipt fulfillment rate across all vendor shipments</p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b' }}>Overall receipt fulfillment rate across all vendor shipments</p>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
             <SemiDonutChart
               value={totalScannedRaw}
               maxValue={totalExpectedRaw}

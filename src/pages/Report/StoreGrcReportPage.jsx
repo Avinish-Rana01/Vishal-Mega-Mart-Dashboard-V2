@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
+import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CurvedCard from '../../components/common/CurvedCard';
@@ -181,16 +179,13 @@ export default function StoreGrcReportPage() {
   ];
 
   return (
-    <div className="vmm-dashboard-layout">
-      <Sidebar />
-
-      <div className="vmm-main-wrapper">
-        <Header 
-          breadcrumb={<>HOME - PAGES - REPORT - <span className="active">STORE GRC REPORT</span></>}
-          showBackButton={true}
-          onBackClick={() => navigate('/dashboard')}
-        />
-
+    <AppLayout 
+      headerProps={{
+        breadcrumb: <>HOME - PAGES - REPORT - <span className="active">STORE GRC REPORT</span></>,
+        showBackButton: true,
+        onBackClick: () => navigate('/dashboard')
+      }}
+    >
         <main className="vmm-dashboard-body">
           {/* Search Card */}
           <div className="report-search-card">
@@ -344,9 +339,6 @@ export default function StoreGrcReportPage() {
             />
           </div>
         </main>
-
-        <Footer />
-      </div>
-    </div>
+    </AppLayout>
   );
 }

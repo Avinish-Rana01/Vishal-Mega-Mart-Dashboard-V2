@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
+import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CycleCountModal from '../../components/modals/CycleCountModal';
@@ -131,17 +129,13 @@ export default function CycleCountReportPage() {
   const storeDisplay = storeOptions.find(s => s.value === selectedStore)?.text || selectedStore;
 
   return (
-    <div className="vmm-dashboard-layout">
-      <Sidebar />
-      <div className="vmm-main-wrapper">
-        <Header 
-          breadcrumb={<>HOME - PAGES - REPORT - <span className="active">CYCLE COUNT REPORT</span></>}
-          showBackButton={true}
-          onBackClick={() => window.history.back()}
-        />
-        
-        <main className="vmm-dashboard-body">
-
+    <AppLayout 
+      headerProps={{
+        breadcrumb: <>HOME - PAGES - REPORT - <span className="active">CYCLE COUNT REPORT</span></>,
+        showBackButton: true,
+        onBackClick: () => window.history.back()
+      }}
+    >
           {/* Filter Bar */}
           <div className="report-search-card">
             <div className="report-search-header">
@@ -211,16 +205,12 @@ export default function CycleCountReportPage() {
             />
           </div>
 
-        </main>
-        <Footer />
-      </div>
-
       {isModalOpen && (
         <CycleCountModal 
           modalData={selectedRowData}
           onClose={() => setIsModalOpen(false)} 
         />
       )}
-    </div>
+    </AppLayout>
   );
 }

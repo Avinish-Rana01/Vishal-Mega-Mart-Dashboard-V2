@@ -1,7 +1,5 @@
 import React from 'react';
-import Sidebar from '../../components/layout/Sidebar';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
+import AppLayout from '../../components/layout/AppLayout';
 import '../TagManagement/TagManagement.css';
 import './Dashboard.css';
 
@@ -19,47 +17,39 @@ import VendorDiscrepancySection from './sections/VendorDiscrepancySection';
 
 export default function DashboardPage() {
   return (
-    <div className="vmm-dashboard-layout">
-      <Sidebar />
-      <div className="vmm-main-wrapper">
-        <Header />
-        <main className="vmm-dashboard-body">
-          <div className="vmm-dashboard-grid">
-            <div className="vmm-grid-cell">
-              <LiveStockSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <CycleCountSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <StoreValidationSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <SaleDashboardSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <VoidDashboardSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <ReturnDashboardSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <DcValidationSection />
-            </div>
-            <div className="vmm-grid-cell">
-              <DcEncodingSection />
-            </div>
-            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
-              <TagManagementSection />
-            </div>
-            <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
-              <VendorDiscrepancySection />
-            </div>
-          </div>
-
-        </main>
-        <Footer />
+    <AppLayout>
+      <div className="vmm-dashboard-grid">
+        <div className="vmm-grid-cell">
+          <LiveStockSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <CycleCountSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <StoreValidationSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <SaleDashboardSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <VoidDashboardSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <ReturnDashboardSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <DcValidationSection />
+        </div>
+        <div className="vmm-grid-cell">
+          <DcEncodingSection />
+        </div>
+        <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
+          <TagManagementSection />
+        </div>
+        <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
+          <VendorDiscrepancySection />
+        </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

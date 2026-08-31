@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Store, Tags, Settings } from 'lucide-react';
 import './Sidebar.css';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const isDashboardActive = location.pathname.startsWith('/dashboard');
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
+  // Close tooltip whenever the sidebar closes on mobile
+  useEffect(() => {
+    if (!isOpen) {
+      setIsTooltipOpen(false);
+    }
+  }, [isOpen]);
+
   return (
-    <aside className="vmm-sidebar">
+    <aside className={`vmm-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="vmm-sidebar-logo" title="Vishal Mega Mart">
         <Link to="/dashboard">
           <img src="/assets/images/vishal_mega_mart_icon.png" alt="VMM Icon" />

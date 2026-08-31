@@ -84,4 +84,3 @@
   width: 20px;
   height: 100%;
 }
-@media (max-width: 767px) { .vmm-nav-tooltip { top: auto; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(10px); } .vmm-nav-dropdown:hover .vmm-nav-tooltip, .vmm-nav-tooltip.force-show { transform: translateX(-50%) translateY(-10px); } }

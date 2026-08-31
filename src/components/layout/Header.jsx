@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Search, Bell } from 'lucide-react';
+import { User, LogOut, Search, Bell, Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
 
 export default function Header({ 
   breadcrumb = 'HOME - PAGES - DASHBOARD',
   showBackButton = false,
-  onBackClick 
+  onBackClick,
+  onMenuClick 
 }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { loggedInUser, logout } = useAuth();
@@ -22,14 +23,35 @@ export default function Header({
   return (
     <header className="vmm-top-header">
       <div className="vmm-brand-section">
-        <h1 className="vmm-brand-title" style={{
-          background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          display: 'inline-block'
-        }}>
-          {APP_INFO.TITLE}
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {onMenuClick && (
+            <button 
+              className="vmm-mobile-menu-btn" 
+              onClick={onMenuClick}
+              title="Open Menu"
+              style={{ 
+                background: 'transparent', 
+                border: 'none', 
+                color: '#1e3a8a', 
+                cursor: 'pointer',
+                marginRight: '12px',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <Menu size={26} strokeWidth={2.5} />
+            </button>
+          )}
+          <h1 className="vmm-brand-title" style={{
+            background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            display: 'inline-block'
+          }}>
+            {APP_INFO.TITLE}
+          </h1>
+        </div>
         <div className="vmm-breadcrumbs">{breadcrumb}</div>
       </div>
 
