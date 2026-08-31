@@ -31,18 +31,18 @@ export default function SemiDonutChart({
   const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', height: '190px', width: '100%' }}>
+    <div ref={containerRef} style={{ position: 'relative', height: '140px', width: '100%', maxWidth: '280px', margin: '0 auto' }}>
       {hasBeenVisible && (
         <>
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <Pie
                 data={pieData}
                 cx="50%"
-                cy="75%"
+                cy="88%"
                 startAngle={180}
                 endAngle={0}
-                innerRadius="65%"
+                innerRadius="68%"
                 outerRadius="100%"
                 paddingAngle={0}
                 dataKey="value"
@@ -63,13 +63,13 @@ export default function SemiDonutChart({
           {/* Center text overlay */}
           <div style={{
             position: 'absolute',
-            bottom: '8px',
+            bottom: '0px',
             left: 0,
             right: 0,
             textAlign: 'center',
             pointerEvents: 'none',
           }}>
-            <div style={{ fontSize: '30px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
+            <div style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
               {percent.toFixed(0)}%
             </div>
             <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>

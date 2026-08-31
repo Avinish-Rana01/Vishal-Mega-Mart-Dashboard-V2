@@ -30,7 +30,7 @@ export default function TagManagementSection() {
     return (
       <section className="ds-section">
         <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
-        <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+        <div className="ds-kpi-row">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
               <div className="ds-shimmer" />
@@ -64,7 +64,7 @@ export default function TagManagementSection() {
       <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
-      <div className="ds-charts-row ds-charts-row--kpi" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+      <div className="ds-kpi-row">
         <KpiCard
           title="Total Tags"
           value={locationTotal.toLocaleString('en-IN')}
@@ -100,34 +100,34 @@ export default function TagManagementSection() {
           <h3 className="ds-card-title">Inventory Breakdown</h3>
           <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b' }}>Tag distribution across sites</p>
 
-          <div style={{ display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', gap: '16px' }}>
+          <div className="ds-donut-layout">
             {/* Donut Chart */}
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <div className="ds-donut-chart-box">
               <DonutChart
                 segments={locationData}
                 centerText={locationTotal.toLocaleString('en-IN')}
                 centerSubtext="Total Tags"
-                height={250}
+                height={220}
                 showLegend={false}
               />
             </div>
 
             {/* Progress Bars */}
-            <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="ds-donut-legend-box">
               {locationData.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.color }} />
-                      <span style={{ fontSize: '15px', color: '#475569', fontWeight: 500 }}>{item.name}</span>
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '14px', color: '#475569', fontWeight: 500, whiteSpace: 'nowrap' }}>{item.name}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                       <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{item.displayValue}</span>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', width: '52px', textAlign: 'right' }}>{item.percent}%</span>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', minWidth: '45px', textAlign: 'right' }}>{item.percent}%</span>
                     </div>
                   </div>
-                  <div style={{ height: '10px', backgroundColor: '#e2e8f0', borderRadius: '5px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${item.percent}%`, backgroundColor: item.color, borderRadius: '5px' }} />
+                  <div style={{ height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${item.percent}%`, backgroundColor: item.color, borderRadius: '4px' }} />
                   </div>
                 </div>
               ))}
@@ -141,35 +141,37 @@ export default function TagManagementSection() {
             <h3 className="ds-card-title" style={{ margin: 0 }}>Tag Recycling Distribution</h3>
           </div>
 
-          <div style={{ display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', gap: '8px' }}>
+          <div className="ds-donut-layout">
             {/* Semi Donut Chart */}
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <div className="ds-donut-chart-box">
               <DonutChart
                 segments={cycleData}
                 centerText={cycleTotal.toLocaleString('en-IN')}
                 centerSubtext="Total Tag Count"
-                height={250}
+                height={220}
                 showLegend={false}
                 halfCircle={true}
               />
             </div>
 
-            {/* Progress Bars */}
-            <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {/* Progress Bars (2x2 Grid on Mobile) */}
+            <div className="ds-donut-legend-box ds-donut-legend-grid">
               {cycleData.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.color }} />
-                      <span style={{ fontSize: '15px', color: '#475569', fontWeight: 500 }}>{item.name}</span>
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: item.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', color: '#475569', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {isNaN(item.name) ? item.name : `${item.name} ${item.name === '1' ? 'Cycle' : 'Cycles'}`}
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{item.displayValue}</span>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', width: '52px', textAlign: 'right' }}>{item.percent}%</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{item.displayValue}</span>
+                      <span style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'right' }}>{item.percent}%</span>
                     </div>
                   </div>
-                  <div style={{ height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${item.percent}%`, backgroundColor: item.color, borderRadius: '4px' }} />
+                  <div style={{ height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${item.percent}%`, backgroundColor: item.color, borderRadius: '3px' }} />
                   </div>
                 </div>
               ))}

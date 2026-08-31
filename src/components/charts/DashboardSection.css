@@ -254,7 +254,72 @@
     height: auto !important;
   }
 
-  .ds-header-text h1 {
-    font-size: 22px;
+  .ds-donut-layout {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 20px !important;
   }
+
+  .ds-donut-chart-box {
+    width: 100% !important;
+    height: 200px !important;
+  }
+
+  .ds-donut-legend-box {
+    width: 100% !important;
+  }
+
+  .ds-donut-legend-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .ds-donut-legend-grid > *:last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .ds-header-text h1,
+  .ds-section-title {
+    font-size: 15px !important;
+  }
+
+  .ds-date-badge {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+.ds-section-title {
+  font-size: 18px;
+}
+
+.ds-date-badge {
+  padding: 6px 14px;
+}
+
+/* Donut & Progress Bar Flex Layout */
+.ds-donut-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  gap: 16px;
+}
+
+.ds-donut-chart-box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ds-donut-legend-box {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
