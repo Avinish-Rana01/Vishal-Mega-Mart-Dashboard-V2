@@ -120,7 +120,7 @@ export default function VendorDiscrepancySection() {
           icon={<Icons.Truck size={20} />}
         />
         <KpiCard
-          title="Total Scanned Qty"
+          title="Total Actual Qty"
           value={totals?.SCANNED_QTY || '0'}
           badgeVariant="success"
           icon={<Icons.PackageCheck size={20} />}
@@ -149,7 +149,7 @@ export default function VendorDiscrepancySection() {
             leftContent={
               <CustomDropdown
                 options={[
-                  { value: 'volume', label: 'Expected vs Scanned' },
+                  { value: 'volume', label: 'Expected vs Actual' },
                   { value: 'variance', label: 'Discrepancy Data' }
                 ]}
                 value={chartView}
@@ -202,7 +202,7 @@ export default function VendorDiscrepancySection() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0d9488' }}></span>
-                  Scanned Qty
+                  Actual Qty
                 </div>
               </div>
             ) : (
@@ -227,7 +227,7 @@ export default function VendorDiscrepancySection() {
                   data={barData}
                   bars={[
                     { dataKey: 'Expected', color: '#94a3b8', label: 'Expected Qty' },
-                    { dataKey: 'Scanned', color: '#0d9488', label: 'Scanned Qty' }
+                    { dataKey: 'Scanned', color: '#0d9488', label: 'Actual Qty' }
                   ]}
                   height={220}
                   hideLegend={true}

@@ -107,7 +107,7 @@ export default function DcValidationSection() {
       <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
 
       {/* 1. KPI Row */}
-      <div className="cc-kpi-row">
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard
           title="Processed HUs"
           value={processedTotal.toLocaleString('en-IN')}

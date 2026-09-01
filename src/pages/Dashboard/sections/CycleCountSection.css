@@ -19,7 +19,7 @@
 /* ---- KPI Grid ---- */
 .cc-kpi-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(var(--kpi-cols, 5), 1fr);
   gap: 5px;
 }
 
