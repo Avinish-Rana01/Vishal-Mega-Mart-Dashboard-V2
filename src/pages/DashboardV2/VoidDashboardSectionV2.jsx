@@ -1,20 +1,21 @@
 import React, { useMemo } from 'react';
+import './VoidDashboardSectionV2.css';
 import { RefreshCw } from 'lucide-react';
-import { useVoidDashboard } from '../../../hooks/useDashboardData';
+import { useVoidDashboard } from '../../hooks/useDashboardData';
 
-import KpiCard from '../../../components/charts/KpiCard';
-import GroupedBarChart from '../../../components/charts/GroupedBarChart';
-import SemiDonutChart from '../../../components/charts/SemiDonutChart';
-import StoreRankList from '../../../components/charts/StoreRankList';
-import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
-import ChartToolbar from '../../../components/common/ChartToolbar';
-import CustomDropdown from '../../../components/common/CustomDropdown';
-import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import KpiCard2 from '../../components/charts/KpiCard2';
+import GroupedBarChart from '../../components/charts/GroupedBarChart';
+import SemiDonutChart from '../../components/charts/SemiDonutChart';
+import StoreRankList from '../../components/charts/StoreRankList';
+import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
+import { GlobalEmptyState } from '../../components/common/ChartEmptyState';
+import ChartToolbar from '../../components/common/ChartToolbar';
+import CustomDropdown from '../../components/common/CustomDropdown';
+import DashboardShimmer from '../../components/common/DashboardShimmer';
 
-import { useIsInViewport } from '../../../hooks/useIsInViewport';
+import { useIsInViewport } from '../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
-import '../../../components/charts/DashboardSection.css';
+import '../../components/charts/DashboardSection.css';
 
 // SVG Icons
 const Icons = {
@@ -135,7 +136,7 @@ const MemoizedEncodingChart = React.memo(({ data }) => {
   );
 });
 
-export default function VoidDashboardSection() {
+export default function VoidDashboardSectionV2() {
   const { data, totals, isLoading, error, refresh } = useVoidDashboard();
   const [chartView, setChartView] = React.useState('grouped');
   const [sortBy, setSortBy] = React.useState('VOID_DESC');
@@ -235,25 +236,25 @@ export default function VoidDashboardSection() {
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Total Void Qty"
           value={totals?.VOID_QTY || '0'}
           icon={<Icons.Trash />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encoded Qty"
           value={totals?.ENCODE_QTY || '0'}
           badgeVariant="success"
           icon={<Icons.Barcode />}
         />
-        <KpiCard
+        <KpiCard2
           title="Pending Voids"
           value={totals?.DIFFERENCE_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
           icon={<Icons.Alert />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encode Rate"
           value={`${encodePercent.toFixed(1)}%`}
           badgeVariant="info"

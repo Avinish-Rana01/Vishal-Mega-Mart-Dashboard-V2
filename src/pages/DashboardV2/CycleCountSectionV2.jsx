@@ -1,24 +1,24 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
-import KpiCard from '../../../components/charts/KpiCard';
-import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import DashboardShimmer from '../../../components/common/DashboardShimmer';
-import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
-import CycleCountModal from '../../../components/modals/CycleCountModal';
-import BaseDataTable from '../../../components/common/BaseDataTable';
-import CustomDropdown from '../../../components/common/CustomDropdown';
-import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
-import ChartToolbar from '../../../components/common/ChartToolbar';
-import ChartSearchInput from '../../../components/common/ChartSearchInput';
-import { useCycleCount } from '../../../hooks/useDashboardData';
-import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
-import { useIsInViewport } from '../../../hooks/useIsInViewport';
+import KpiCard2 from '../../components/charts/KpiCard2';
+import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
+import DashboardShimmer from '../../components/common/DashboardShimmer';
+import DashboardDataGrid from '../../components/charts/DashboardDataGrid';
+import CycleCountModal from '../../components/modals/CycleCountModal';
+import BaseDataTable from '../../components/common/BaseDataTable';
+import CustomDropdown from '../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../components/common/ChartEmptyState';
+import ChartToolbar from '../../components/common/ChartToolbar';
+import ChartSearchInput from '../../components/common/ChartSearchInput';
+import { useCycleCount } from '../../hooks/useDashboardData';
+import { useCycleCountMetrics } from '../../hooks/useCycleCountMetrics';
+import { useIsInViewport } from '../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateMockCycleCount } from '../../../utils/mockCycleCount';
-import '../../../components/charts/DashboardSection.css';
-import './common.css';
-import './CycleCountSection.css';
+import { generateMockCycleCount } from '../../utils/mockCycleCount';
+import '../../components/charts/DashboardSection.css';
+import '../Dashboard/sections/common.css';
+import './CycleCountSectionV2.css';
 
 // Generate mock data once (same pattern as LiveStock)
 const mockCycleCountData = generateMockCycleCount(20);
@@ -391,7 +391,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 });
 
 // ---- Main Component ----
-export default function CycleCountSection() {
+export default function CycleCountSectionV2() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
   const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
   // const data = realData;
@@ -527,31 +527,31 @@ export default function CycleCountSection() {
 
       {/* KPI ROW — 4 cards */}
       <div className="cc-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Stores Reported"
           value={metrics.storesReported}
           subtext="In current view"
           icon={<ClipboardList size={18} />}
         />
-        <KpiCard
+        <KpiCard2
           title="Counted Today"
           value={metrics.todayCount}
           subtext="Audits completed today"
           icon={<Calendar size={18} />}
         />
-        <KpiCard
+        <KpiCard2
           title="Avg Duration"
           value={metrics.avgDurationFormatted}
           subtext="Across reported stores"
           icon={<Clock size={18} />}
         />
-        <KpiCard
+        <KpiCard2
           title="Longest Audit"
           value={metrics.slowestDurationFormatted}
           subtext={metrics.slowestStore}
           icon={<Hourglass size={18} />}
         />
-        <KpiCard
+        <KpiCard2
           title="In Progress"
           value={metrics.inProgressCount}
           subtext="Audits missing end time"

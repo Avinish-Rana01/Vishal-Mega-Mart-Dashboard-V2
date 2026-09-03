@@ -1,19 +1,20 @@
 import React, { useState, useMemo } from 'react';
+import './SaleDashboardSectionV2.css';
 import { useNavigate } from 'react-router-dom';
-import { useSaleDashboard } from '../../../hooks/useDashboardData';
-import KpiCard from '../../../components/charts/KpiCard';
-import GroupedBarChart from '../../../components/charts/GroupedBarChart';
+import { useSaleDashboard } from '../../hooks/useDashboardData';
+import KpiCard2 from '../../components/charts/KpiCard2';
+import GroupedBarChart from '../../components/charts/GroupedBarChart';
 import { motion } from 'framer-motion';
-import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
-import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import DashboardShimmer from '../../../components/common/DashboardShimmer';
-import ChartToolbar from '../../../components/common/ChartToolbar';
-import ChartSearchInput from '../../../components/common/ChartSearchInput';
-import CustomDropdown from '../../../components/common/CustomDropdown';
-import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
-import '../../../components/charts/DashboardSection.css';
-import './common.css';
-import './CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
+import DashboardDataGrid from '../../components/charts/DashboardDataGrid';
+import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
+import DashboardShimmer from '../../components/common/DashboardShimmer';
+import ChartToolbar from '../../components/common/ChartToolbar';
+import ChartSearchInput from '../../components/common/ChartSearchInput';
+import CustomDropdown from '../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../components/common/ChartEmptyState';
+import '../../components/charts/DashboardSection.css';
+import '../Dashboard/sections/common.css';
+import '../Dashboard/sections/CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
 
 // SVG Icons
 const Icons = {
@@ -63,7 +64,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function SaleDashboardSection() {
+export default function SaleDashboardSectionV2() {
   const { data, totals, isLoading, error } = useSaleDashboard();
   const navigate = useNavigate();
   const [searchFilter, setSearchFilter] = useState('');
@@ -153,31 +154,31 @@ export default function SaleDashboardSection() {
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Total DPOS Sale"
           value={totals?.TOTAL_DPOS_SALE || '0'}
           badgeVariant="default"
           icon={<Icons.Cart />}
         />
-        <KpiCard
+        <KpiCard2
           title="Total RFID Checkout"
           value={totals?.TOTAL_RFID_CHECKOUT || '0'}
           badgeVariant="info"
           icon={<Icons.Tag />}
         />
-        <KpiCard
+        <KpiCard2
           title="Taffeta Sales"
           value={totals?.TOTAL_TAFFETA_SALE || '0'}
           badgeVariant="success"
           icon={<Icons.Star />}
         />
-        <KpiCard
+        <KpiCard2
           title="Manual Sales"
           value={totals?.TOTAL_MANUAL_SALE || '0'}
           badgeVariant="warning"
           icon={<Icons.Manual />}
         />
-        <KpiCard
+        <KpiCard2
           title="RFID Sales Share"
           value={totals?.RFID_SALES_SHARE || '0%'}
           badgeVariant="default"

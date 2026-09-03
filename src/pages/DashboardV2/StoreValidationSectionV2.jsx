@@ -1,21 +1,22 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useStoreDashboard } from '../../../hooks/useDashboardData';
-import { useIsInViewport } from '../../../hooks/useIsInViewport';
-import KpiCard from '../../../components/charts/KpiCard';
-import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import DashboardShimmer from '../../../components/common/DashboardShimmer';
-import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
-import CustomDropdown from '../../../components/common/CustomDropdown';
-import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
-import ChartToolbar from '../../../components/common/ChartToolbar';
-import ChartSearchInput from '../../../components/common/ChartSearchInput';
-import ChartLegend from '../../../components/common/ChartLegend';
+import './StoreValidationSectionV2.css';
+import { useStoreDashboard } from '../../hooks/useDashboardData';
+import { useIsInViewport } from '../../hooks/useIsInViewport';
+import KpiCard2 from '../../components/charts/KpiCard2';
+import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
+import DashboardShimmer from '../../components/common/DashboardShimmer';
+import DashboardDataGrid from '../../components/charts/DashboardDataGrid';
+import CustomDropdown from '../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../components/common/ChartEmptyState';
+import ChartToolbar from '../../components/common/ChartToolbar';
+import ChartSearchInput from '../../components/common/ChartSearchInput';
+import ChartLegend from '../../components/common/ChartLegend';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-import '../../../components/charts/DashboardSection.css';
+import '../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
-import { generateMockStoreValidation } from '../../../utils/mockStoreValidation';
-import './common.css';
-import './CycleCountSection.css';
+import { generateMockStoreValidation } from '../../utils/mockStoreValidation';
+import '../Dashboard/sections/common.css';
+import '../Dashboard/sections/CycleCountSection.css';
 
 const { mockStores, mockTotals } = generateMockStoreValidation(20);
 
@@ -230,7 +231,7 @@ const VIEW_OPTIONS = [
 // Note: SORT_OPTIONS is generated dynamically inside the component based on view
 
 // ═══════════════════════════════════════════════════════════════════════════════
-export default function StoreValidationSection() {
+export default function StoreValidationSectionV2() {
   // eslint-disable-next-line no-unused-vars
   const { data: _realData, totals: _realTotals, isLoading, error } = useStoreDashboard();
   const data = mockStores;
@@ -340,35 +341,35 @@ export default function StoreValidationSection() {
 
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
       <div className="cc-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="HU Received"
           value={totals?.HU_RECEIVED_QTY || '0'}
           badge="Expected"
           badgeVariant="default"
           icon={<Icons.Box />}
         />
-        <KpiCard
+        <KpiCard2
           title="HU Validated"
           value={totals?.HU_VALIDATED_QTY || '0'}
           badge="Processed"
           badgeVariant="success"
           icon={<Icons.CheckCircle />}
         />
-        <KpiCard
+        <KpiCard2
           title="HHT Validated"
           value={totals?.HHT_VALIDATE_QTY || '0'}
           badge="Scanned"
           badgeVariant="info"
           icon={<Icons.Smartphone />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encoded Qty"
           value={totals?.ENCODED_QTY || '0'}
           badge="Tags"
           badgeVariant="neutral"
           icon={<Icons.Tag />}
         />
-        <KpiCard
+        <KpiCard2
           title="Wrong / Error HU"
           value={totals?.HU_WRONG_QTY || '0'}
           badgeVariant="danger"
