@@ -41,15 +41,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             <h4 className="vmm-nav-tooltip-title">Home</h4>
             <ul>
               <li>
-                <NavLink to="/dashboard" end className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
-                  Dashboard
+                <NavLink to="/dashboard" className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
+                  Dashboard V2
                 </NavLink>
               </li>
-              <li>
-                <NavLink to="/dashboard-2" className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
-                  Dashboard 2
+              {/* <li>
+                <NavLink to="/dashboard-old" end className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
+                  Legacy Dashboard
                 </NavLink>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -393,8 +393,8 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
-  const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
-  // const data = realData;
+  // const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
+  const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -527,35 +527,35 @@ export default function CycleCountSection() {
 
       {/* KPI ROW — 4 cards */}
       <div className="cc-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Stores Reported"
           value={metrics.storesReported}
           subtext="In current view"
-          icon={<ClipboardList size={18} />}
+          icon={<ClipboardList />}
         />
-        <KpiCard
+        <KpiCard2
           title="Counted Today"
           value={metrics.todayCount}
           subtext="Audits completed today"
-          icon={<Calendar size={18} />}
+          icon={<Calendar />}
         />
-        <KpiCard
+        <KpiCard2
           title="Avg Duration"
           value={metrics.avgDurationFormatted}
           subtext="Across reported stores"
-          icon={<Clock size={18} />}
+          icon={<Clock />}
         />
-        <KpiCard
+        <KpiCard2
           title="Longest Audit"
           value={metrics.slowestDurationFormatted}
           subtext={metrics.slowestStore}
-          icon={<Hourglass size={18} />}
+          icon={<Hourglass />}
         />
-        <KpiCard
+        <KpiCard2
           title="In Progress"
           value={metrics.inProgressCount}
           subtext="Audits missing end time"
-          icon={<Hourglass size={18} />}
+          icon={<Hourglass />}
         />
       </div>
 
@@ -708,4 +708,8 @@ export default function CycleCountSection() {
     </div>
   );
 }
+
+
+
+
 

@@ -1,5 +1,9 @@
 import React from 'react';
 import AppLayout from '../../components/layout/AppLayout';
+import '../TagManagement/TagManagement.css';
+import './DashboardOld.css';
+
+// Direct imports for all sections (no lazy loading)
 import LiveStockSection from './sections/LiveStockSection';
 import CycleCountSection from './sections/CycleCountSection';
 import StoreValidationSection from './sections/StoreValidationSection';
@@ -11,46 +15,42 @@ import DcEncodingSection from './sections/DcEncodingSection';
 import TagManagementSection from './sections/TagManagementSection';
 import VendorDiscrepancySection from './sections/VendorDiscrepancySection';
 
-import './Dashboard-core.css'; // Core layout styles (decoupled)
-import './Dashboard.css'; // V2 specific layout overrides
-
-export default function DashboardPage() {
+export default function DashboardOldPage() {
   return (
-    <AppLayout mainClassName="vmm-dashboard-body-v2">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
-        <div className="vmm-dashboard-stack">
+    <AppLayout>
+      <div className="vmm-dashboard-grid">
+        <div className="vmm-grid-cell">
           <LiveStockSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <CycleCountSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <StoreValidationSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <SaleDashboardSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <VoidDashboardSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <ReturnDashboardSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <DcValidationSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell">
           <DcEncodingSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
           <TagManagementSection />
         </div>
-        <div className="vmm-dashboard-stack">
+        <div className="vmm-grid-cell" style={{ gridColumn: '1 / -1' }}>
           <VendorDiscrepancySection />
         </div>
       </div>
     </AppLayout>
   );
 }
-
 

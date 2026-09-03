@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
+import './ReturnDashboardSection.css';
 import { useReturnDashboard } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import CurvedCard from '../../../components/common/CurvedCard';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
@@ -13,7 +14,7 @@ import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
-import './CycleCountSection.css';
+import './CycleCountShared.css';
 
 // SVG Icons
 const Icons = {
@@ -234,26 +235,26 @@ export default function ReturnDashboardSection() {
           waveColor={['#a21caf', '#f6afffff']} // Fuchsia gradient
           icon={<Icons.CornerUpLeft />}
         /> */}
-         <KpiCard
+         <KpiCard2
           title="Total Return Qty"
           value={totals?.RETURN_QTY || '0'}
           badgeVariant="success"
           icon={<Icons.Barcode />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encoded Qty"
           value={totals?.ENCODE_QTY || '0'}
           badgeVariant="success"
           icon={<Icons.Barcode />}
         />
-        <KpiCard
+        <KpiCard2
           title="Pending Returns"
           value={totals?.DIFFERENCE_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
           icon={<Icons.Alert />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encoding Rate"
           value={`${encodePercent.toFixed(1)}%`}
           badge={encodePercent >= 90 ? "Excellent" : encodePercent >= 70 ? "Good" : "Low"}
@@ -375,4 +376,10 @@ export default function ReturnDashboardSection() {
     </section>
   );
 }
+
+
+
+
+
+
 

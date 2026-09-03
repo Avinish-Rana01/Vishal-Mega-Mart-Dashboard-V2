@@ -148,11 +148,11 @@ const vendorTotals = (summary) => ({
   DIFF_TILL_DATE: summary.differenceQtyTillDate?.toLocaleString('en-IN') || 0
 });
 
-const mockGetVendorDiscrepancy = async (searchQuery, pageIndex, pageSize, signal) => {
-  return mockVendorDiscrepancy;
-};
+// const mockGetVendorDiscrepancy = async (searchQuery, pageIndex, pageSize, signal) => {
+//   return mockVendorDiscrepancy;
+// };
 
-export const useVendorDiscrepancy = () => useDashboardFetch(mockGetVendorDiscrepancy, vendorFilter, vendorTotals);
+export const useVendorDiscrepancy = () => useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals);
 
 // ==========================================
 // 4. Store Dashboard
@@ -199,11 +199,11 @@ const saleDashboardTotals = (summary) => {
 };
 
 // Temporarily mock getSaleDashboard for 20 stores due to empty backend data
-const mockGetSaleDashboard = async (signal) => {
-  return generateMockSaleDashboard(20);
-};
+// const mockGetSaleDashboard = async (signal) => {
+//   return generateMockSaleDashboard(20);
+// };
 
-export const useSaleDashboard = () => useDashboardFetch(mockGetSaleDashboard, saleDashboardFilter, saleDashboardTotals);
+export const useSaleDashboard = () => useDashboardFetch(getSaleDashboard, saleDashboardFilter, saleDashboardTotals);
 
 // ==========================================
 // 6. Void Dashboard
@@ -222,11 +222,11 @@ const voidDashboardTotals = (summary) => ({
 
 import { generateMockVoidDashboard } from '../utils/mockVoidDashboard';
 
-const mockGetVoidDashboard = async (signal) => {
-  return generateMockVoidDashboard(20);
-};
+// const mockGetVoidDashboard = async (signal) => {
+//   return generateMockVoidDashboard(20);
+// };
 
-export const useVoidDashboard = () => useDashboardFetch(mockGetVoidDashboard, voidDashboardFilter, voidDashboardTotals);
+export const useVoidDashboard = () => useDashboardFetch(getVoidDashboard, voidDashboardFilter, voidDashboardTotals);
 
 // ==========================================
 // 7. Return Dashboard
@@ -245,11 +245,11 @@ const returnDashboardTotals = (summary) => ({
 
 import { generateMockReturnDashboard } from '../utils/mockReturnDashboard';
 
-const mockGetReturnDashboard = async (signal) => {
-  return generateMockReturnDashboard();
-};
+// const mockGetReturnDashboard = async (signal) => {
+//   return generateMockReturnDashboard();
+// };
 
-export const useReturnDashboard = () => useDashboardFetch(mockGetReturnDashboard, returnDashboardFilter, returnDashboardTotals);
+export const useReturnDashboard = () => useDashboardFetch(getReturnDashboard, returnDashboardFilter, returnDashboardTotals);
 
 // ==========================================
 // 8. DC Validation
@@ -267,11 +267,11 @@ const dcValidationTotals = (summary) => ({
 
 import { generateMockDcValidation } from '../utils/mockDcValidation';
 
-const mockGetDcValidation = async (searchQuery, pageIndex, pageSize, signal) => {
-  return generateMockDcValidation(20);
-};
+// const mockGetDcValidation = async (searchQuery, pageIndex, pageSize, signal) => {
+//   return generateMockDcValidation(20);
+// };
 
-export const useDcValidation = () => useDashboardFetch(mockGetDcValidation, dcValidationFilter, dcValidationTotals);
+export const useDcValidation = () => useDashboardFetch(getDcValidation, dcValidationFilter, dcValidationTotals);
 
 // ==========================================
 // 9. Tag Management Charts (NOT REFACTORED)
@@ -290,12 +290,12 @@ export const useTagCharts = () => {
     const fetchTagCharts = async () => {
       setIsLoading(true);
       try {
-        // const [locData, cycData] = await Promise.all([
-        //   getTagLocation(controller.signal),
-        //   getTagCycleCount(controller.signal)
-        // ]);
-        const locData = mockTagLocation;
-        const cycData = mockTagCycleCount;
+        const [locData, cycData] = await Promise.all([
+          getTagLocation(controller.signal),
+          getTagCycleCount(controller.signal)
+        ]);
+        // const locData = mockTagLocation;
+        // const cycData = mockTagCycleCount;
 
         if (controller.signal.aborted) return;
 
@@ -377,7 +377,7 @@ export const useWarehouseEncoding = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const USE_MOCK_DATA = true;
+        const USE_MOCK_DATA = false;
         let response = {};
 
         if (USE_MOCK_DATA) {

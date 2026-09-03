@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
-import { RefreshCw, Store, Database, LineChart, Target } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
-import KpiCard2 from '../../../components/charts/KpiCard2';
-import ActionAlertBar from '../../../components/common/ActionAlertBar';
+import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
@@ -15,40 +14,15 @@ import { generateMockData } from '../../../utils/mockLiveStock';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import '../../../components/charts/DashboardSection.css';
-import './commonV2.css';
-import './LiveStockSectionV2.css';
+import './common.css';
+import './LiveStockSection.css';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
-import '../DashboardV2.css'
 
-// Custom RFID Icon
-const RfidIcon = ({ size = 24, strokeWidth = 2, color = "currentColor", ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M4 9a10 10 0 0 1 16 0" />
-    <path d="M7 13a6 6 0 0 1 10 0" />
-    <path d="M10 17a2 2 0 0 1 4 0" />
-    <text x="12" y="23" fontSize="6" fontWeight="800" textAnchor="middle" fill={color} stroke="none">RFID</text>
-  </svg>
-);
-
-// Custom Clipboard Chart Icon matching exact design
-const ClipboardChartIcon = ({ size = 44, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    {/* Board Body */}
-    <path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"></path>
-    {/* Clip Bar */}
-    <rect x="8" y="3" width="8" height="4" rx="1.5"></rect>
-    {/* Clip Top Bump */}
-    <path d="M10 3V2a2 2 0 0 1 4 0v1"></path>
-    
-    {/* Vertical Bars */}
-    <line x1="8" y1="17" x2="8" y2="14"></line>
-    <line x1="12" y1="17" x2="12" y2="11"></line>
-    <line x1="16" y1="17" x2="16" y2="13"></line>
-    
-    {/* Wavy Line Chart */}
-    <path d="M6 12c1.5-1.5 2.5-3 4-1 1.5 2 2.5-2 5-3.5"></path>
-    {/* Line Chart Dot */}
-    <circle cx="15" cy="7.5" r="1.5" fill={color} stroke="none"></circle>
+// Minimalist Icons
+const ArrowUpRight = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="7" y1="17" x2="17" y2="7"></line>
+    <polyline points="7 7 17 7 17 17"></polyline>
   </svg>
 );
 
@@ -138,7 +112,7 @@ const MemoizedPieChart = React.memo(({ accuracyPieData }) => {
   );
 });
 
-export default function LiveStockSectionV2() {
+export default function LiveStockSection() {
   // === STATE MANAGEMENT ===
   // Global Data & Context
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
@@ -318,9 +292,9 @@ export default function LiveStockSectionV2() {
 
   if (isLoading) return <DashboardShimmer title="Live Stock" />;
 
-  if (error) {
-    return <div style={{ color: 'red', padding: '20px', background: '#fee2e2', borderRadius: '8px' }}>{error}</div>;
-  }
+  // if (error) {
+  //   return <div style={{ color: 'red', padding: '20px', background: '#fee2e2', borderRadius: '8px' }}>{error}</div>;
+  // }
 
   return (
     <div className="ls-dashboard-container">
@@ -341,76 +315,62 @@ export default function LiveStockSectionV2() {
       {/* Header */}
       <SectionHeader
         title="Live Stock"
-        subtitle="Overview of stock status across all stores"
-        icon={<ClipboardChartIcon />}
         rightContent={<DateBadge />}
       />
 
-      <div className="ls-grid2">
+      <div className="ls-grid">
 
         {/* ROW 1: 5 KPI Cards */}
-        <KpiCard2
+        <KpiCard
           title="Total Stores"
           value={data ? data.length : '0'}
           subtext="Active stores"
           badge="Network"
           badgeVariant="info"
-          icon={<Store />}
+          icon={<ArrowUpRight />}
         />
 
-        <KpiCard2
+        <KpiCard
           title="Total SAP Stock"
           value={totals?.SAP_STOCK || '0'}
           subtext="Total expected volume"
           badge="System Data"
           badgeVariant="default"
-          icon={<Database />}
+          icon={<ArrowUpRight />}
         />
 
-        <KpiCard2
+        <KpiCard
           title="Total RFID Scanned"
           value={totals?.RFID_STOCK || '0'}
           subtext="Actual scanned items"
           badge="Physical"
           badgeVariant="default"
-          icon={<RfidIcon />}
+          icon={<ArrowUpRight />}
         />
 
-        <KpiCard2
+        <KpiCard
           title="Global Variance"
           value={totals?.DIFFERENCE || '0'}
           subtext="Items missing"
           badge="Gap"
           badgeVariant="warning"
-          icon={<LineChart />}
+          icon={<ArrowUpRight />}
         />
 
         {/* Overall Accuracy */}
-        <KpiCard2
+        <KpiCard
           title="Overall Accuracy"
           value={`${accuracyPercent}%`}
           subtext="Current global accuracy"
           badge="Live"
           badgeVariant="info"
-          icon={<Target />}
+          icon={<ArrowUpRight />}
         />
 
-      <div style={{ gridColumn: '1 / -1' }}>
-        <ActionAlertBar 
-          below80Count={5}
-          highVarianceCount={3}
-          pendingCount={2}
-          above95Count={7}
-          // onViewAll={() => console.log('View All Alerts clicked')}
-        />
-      </div>
-
-      {/* ROW 2 & 3 Flex Container */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', gridColumn: '1 / -1', width: '100%' }}>
-          {/* ROW 2: Store Performance Bar Chart (60% width, positioned right) */}
-          <div className="ls-card" style={{ flex: '1.5 1 500px', order: 2, minWidth: 0, margin: 0 }}>
+        {/* ROW 2: Store Performance Bar Chart (Span 3 columns) */}
+        <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
           <ChartToolbar
-            leftContent="STORE PERFORMANCE"
+            leftContent={<span style={{ margin: '4px 0 4px 4px', display: 'inline-block' }}>STORE PERFORMANCE</span>}
             rightContent={
               <>
                 {/* Accuracy Filter Controls */}
@@ -448,12 +408,7 @@ export default function LiveStockSectionV2() {
                     OK
                   </button>
                 </div>
-                <ChartSearchInput
-                  value={searchStore}
-                  onChange={setSearchStore}
-                  onClear={() => setSearchStore('')}
-                  placeholder="Search Store..."
-                />
+
               </>
             }
           />
@@ -476,13 +431,22 @@ export default function LiveStockSectionV2() {
                 value={sortBy}
                 onChange={(val) => setSortBy(val)}
                 prefix="Sort:"
-                buttonStyle={{ minWidth: '160px', justifyContent: 'space-between' }}
+                buttonStyle={{ minWidth: 'auto', width: 'auto', gap: '8px' }}
                 menuStyle={{ left: 0, right: 'auto', minWidth: '180px' }}
               />
 
+              <div className="ls-search-wrapper" style={{ flex: 1, minWidth: 0 }}>
+                <ChartSearchInput
+                  value={searchStore}
+                  onChange={setSearchStore}
+                  onClear={() => setSearchStore('')}
+                  placeholder="Search Store..."
+                />
+              </div>
+
               {/* Active Filter Chip */}
-              <div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
-                {appliedFilter.field !== 'ALL' && (
+              {appliedFilter.field !== 'ALL' && (
+                <div style={{ height: '28px', display: 'flex', alignItems: 'center', width: '100%', marginTop: '6px' }}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0e7ff', color: '#4338ca', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
                     Accuracy {appliedFilter.op} {appliedFilter.val}%
                     <button
@@ -496,8 +460,8 @@ export default function LiveStockSectionV2() {
                       ×
                     </button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Custom Chart Legend */}
@@ -529,16 +493,16 @@ export default function LiveStockSectionV2() {
           </div>
         </div>
 
-        {/* ROW 3: Coverage Distribution Donut Chart (40% width, positioned left) */}
-        <div className="ls-card" style={{ flex: '1 1 400px', padding: '4px 4px', order: 1, minWidth: 0,padding: '10px', margin: 0 }}>
-          <div className="ls-toolbar-header">
-            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
-              COVERAGE DISTRIBUTION SUMMARY
+        {/* ROW 3: Coverage Distribution Donut Chart */}
+        <div className="ls-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="ls-toolbar-header" style={{ marginBottom: '14px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', margin: '4px 0 0 4px' }}>
+              COVERAGE DISTRIBUTION
             </h3>
           </div>
 
           {accuracyPieData.length > 0 && totalPieStores > 0 ? (
-            <div className="ls-donut-container" style={{ gap: '14px', flexWrap: 'nowrap' , padding: '2px'}}>
+            <div className="ls-donut-container">
 
               {/* Left Side: Pie Chart */}
               <div className="ls-donut-wrapper">
@@ -550,24 +514,24 @@ export default function LiveStockSectionV2() {
               </div>
 
               {/* Right Side: Custom Legend with Progress Bars */}
-              <div style={{ flex: 1, minWidth: '150px', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="ls-coverage-legend" style={{ flex: 1, minWidth: '200px', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {accuracyPieData.map((entry, idx) => {
                   const percentage = ((entry.value / totalPieStores) * 100).toFixed(2);
                   return (
-                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', fontSize: '16px', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>
+                    <div key={idx} className="ls-coverage-item" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="ls-coverage-label-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', fontSize: '16px', gap: '10px' }}>
+                        <div className="ls-coverage-name" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>
                           <div style={{ width: '8px', height: '8px', backgroundColor: entry.fill, borderRadius: '50%', flexShrink: 0 }} />
                           <span>{entry.name}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        <div className="ls-coverage-values" style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                           <span style={{ fontWeight: '700', color: '#0f172a' }}>{entry.value}</span>
                           <span style={{ color: '#94a3b8', fontSize: '14px', minWidth: '45px', textAlign: 'right' }}>{percentage}%</span>
                         </div>
                       </div>
 
                       {/* Horizontal Progress Bar */}
-                      <div style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div className="ls-coverage-bar-track" style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: entry.fill, borderRadius: '6px' }} />
                       </div>
                     </div>
@@ -589,10 +553,8 @@ export default function LiveStockSectionV2() {
           </div> */}
         </div>
 
-        </div> {/* End Side-by-Side Wrapper */}
       </div>
     </div>
   );
 }
-
 

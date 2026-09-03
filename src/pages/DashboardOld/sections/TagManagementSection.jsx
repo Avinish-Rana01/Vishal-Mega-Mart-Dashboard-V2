@@ -1,7 +1,6 @@
 import React from 'react';
-import './TagManagementSectionV2.css';
 import { useTagCharts } from '../../../hooks/useDashboardData';
-import KpiCard2 from '../../../components/charts/KpiCard2';
+import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
@@ -17,7 +16,7 @@ const Icons = {
   Warehouse: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path></svg>
 };
 
-export default function TagManagementSectionV2() {
+export default function TagManagementSection() {
   const {
     locationData,
     locationTotal,
@@ -66,26 +65,26 @@ export default function TagManagementSectionV2() {
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        <KpiCard2
+        <KpiCard
           title="Total Tags"
           value={locationTotal.toLocaleString('en-IN')}
           icon={<Icons.Tag />}
         />
-        <KpiCard2
+        <KpiCard
           title="Store Inventory"
           value={storeInv.toLocaleString('en-IN')}
           badge={`${((storeInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="success"
           icon={<Icons.Store />}
         />
-        <KpiCard2
+        <KpiCard
           title="Warehouse Inventory"
           value={whInv.toLocaleString('en-IN')}
           badge={`${((whInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="info"
           icon={<Icons.Warehouse />}
         />
-        <KpiCard2
+        <KpiCard
           title="Average Recycle Count"
           value={`${Number(avgRecycle || 0).toFixed(2)}`}
           subtext="across all active tags"
@@ -183,9 +182,5 @@ export default function TagManagementSectionV2() {
     </section>
   );
 }
-
-
-
-
 
 

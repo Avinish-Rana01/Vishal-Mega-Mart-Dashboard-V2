@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import './VendorDiscrepancySectionV2.css';
 import { useVendorDiscrepancy } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import KpiCard2 from '../../../components/charts/KpiCard2';
+import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import ComposedChart from '../../../components/charts/ComposedChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
@@ -12,7 +11,7 @@ import '../../../components/charts/DashboardSection.css';
 import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
 
-export default function VendorDiscrepancySectionV2() {
+export default function VendorDiscrepancySection() {
   const { data, totals, isLoading, error } = useVendorDiscrepancy();
   const [chartView, setChartView] = useState('volume');
   const [sortBy, setSortBy] = useState('EXPECTED_DESC');
@@ -115,30 +114,30 @@ export default function VendorDiscrepancySectionV2() {
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        <KpiCard2
+        <KpiCard
           title="Total Expected Qty"
           value={totals?.ACTUAL_QTY || '0'}
-          icon={<Icons.Truck />}
+          icon={<Icons.Truck size={20} />}
         />
-        <KpiCard2
+        <KpiCard
           title="Total Actual Qty"
           value={totals?.SCANNED_QTY || '0'}
           badgeVariant="success"
-          icon={<Icons.PackageCheck />}
+          icon={<Icons.PackageCheck size={20} />}
         />
-        <KpiCard2
+        <KpiCard
           title="Current Discrepancy"
           value={totals?.DIFF_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
-          icon={<Icons.AlertTriangle />}
+          icon={<Icons.AlertTriangle size={20} />}
         />
-        <KpiCard2
+        <KpiCard
           title="Discrepancy Rate"
           value={discrepancyPercent}
           subtext="Overall % of missing items"
           badgeVariant="warning"
-          icon={<Icons.Percent />}
+          icon={<Icons.Percent size={20} />}
         />
       </div>
 
@@ -293,7 +292,5 @@ export default function VendorDiscrepancySectionV2() {
     </section>
   );
 }
-
-
 
 

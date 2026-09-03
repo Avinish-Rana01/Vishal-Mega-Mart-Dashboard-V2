@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import './DcValidationSection.css';
 import { useDcValidation } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
 import CustomDropdown from '../../../components/common/CustomDropdown';
@@ -11,7 +12,7 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import '../../../components/charts/DashboardSection.css';
-import './CycleCountSection.css';
+import './CycleCountShared.css';
 import * as Icons from 'lucide-react';
 
 const COLOR_PROCESSED = '#06b6d4'; // Cyan
@@ -108,27 +109,27 @@ export default function DcValidationSection() {
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
-        <KpiCard
+        <KpiCard2
           title="Processed HUs"
           value={processedTotal.toLocaleString('en-IN')}
           badgeVariant="success"
           icon={<Icons.CheckSquare />}
         />
-        <KpiCard
+        <KpiCard2
           title="Unprocessed HUs"
           value={unprocessedTotal.toLocaleString('en-IN')}
           badge="Backlog"
           badgeVariant="warning"
           icon={<Icons.Package />}
         />
-        <KpiCard
+        <KpiCard2
           title="Validated Articles"
           value={Number(totals?.PROCESSED_ARTICLE_QTY || 0).toLocaleString('en-IN')}
           subtext="Total items inside processed HUs"
           badgeVariant="info"
           icon={<Icons.Layers />}
         />
-        <KpiCard
+        <KpiCard2
           title="Processing Rate"
           value={`${processingRate}%`}
           badgeVariant={processingRate >= 95 ? "success" : processingRate >= 80 ? "warning" : "danger"}
@@ -274,4 +275,7 @@ export default function DcValidationSection() {
     </div>
   );
 }
+
+
+
 

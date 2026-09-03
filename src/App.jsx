@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/Login/LoginPage';
+import DashboardOldPage from './pages/DashboardOld/DashboardOldPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
-import DashboardPage2 from './pages/DashboardV2/DashboardPage2';
 import LiveStockReportPage from './pages/Report/LiveStockReportPage';
 import GrcReportPage from './pages/Report/GrcReportPage';
 import StoreGrcReportPage from './pages/Report/StoreGrcReportPage';
@@ -22,20 +22,20 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             
+            {/* <Route 
+              path="/dashboard-old" 
+              element={
+                <ProtectedRoute>
+                  <DashboardOldPage />
+                </ProtectedRoute>
+              } 
+            /> */}
+
             <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <DashboardPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/dashboard-2" 
-              element={
-                <ProtectedRoute>
-                  <DashboardPage2 />
                 </ProtectedRoute>
               } 
             />

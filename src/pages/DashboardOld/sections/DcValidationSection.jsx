@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import './DcValidationSectionV2.css';
 import { useDcValidation } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import KpiCard2 from '../../../components/charts/KpiCard2';
+import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
 import CustomDropdown from '../../../components/common/CustomDropdown';
@@ -12,13 +11,13 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import '../../../components/charts/DashboardSection.css';
-import './CycleCountSharedV2.css';
+import './CycleCountSection.css';
 import * as Icons from 'lucide-react';
 
 const COLOR_PROCESSED = '#06b6d4'; // Cyan
 const COLOR_UNPROCESSED = '#64748b'; // Gray
 
-export default function DcValidationSectionV2() {
+export default function DcValidationSection() {
   const { data, totals, isLoading, error } = useDcValidation();
 
   const [searchFilter, setSearchFilter] = useState('');
@@ -109,27 +108,27 @@ export default function DcValidationSectionV2() {
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
-        <KpiCard2
+        <KpiCard
           title="Processed HUs"
           value={processedTotal.toLocaleString('en-IN')}
           badgeVariant="success"
           icon={<Icons.CheckSquare />}
         />
-        <KpiCard2
+        <KpiCard
           title="Unprocessed HUs"
           value={unprocessedTotal.toLocaleString('en-IN')}
           badge="Backlog"
           badgeVariant="warning"
           icon={<Icons.Package />}
         />
-        <KpiCard2
+        <KpiCard
           title="Validated Articles"
           value={Number(totals?.PROCESSED_ARTICLE_QTY || 0).toLocaleString('en-IN')}
           subtext="Total items inside processed HUs"
           badgeVariant="info"
           icon={<Icons.Layers />}
         />
-        <KpiCard2
+        <KpiCard
           title="Processing Rate"
           value={`${processingRate}%`}
           badgeVariant={processingRate >= 95 ? "success" : processingRate >= 80 ? "warning" : "danger"}
@@ -275,6 +274,5 @@ export default function DcValidationSectionV2() {
     </div>
   );
 }
-
 
 

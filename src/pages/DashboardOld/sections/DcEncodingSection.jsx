@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import './DcEncodingSectionV2.css';
 import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import KpiCard2 from '../../../components/charts/KpiCard2';
+import KpiCard from '../../../components/charts/KpiCard';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import DonutChart from '../../../components/charts/DonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
@@ -16,7 +15,7 @@ import * as Icons from 'lucide-react';
 
 const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f472b6', '#2dd4bf', '#fb923c', '#818cf8', '#a3e635', '#22d3ee', '#facc15'];
 
-export default function DcEncodingSectionV2() {
+export default function DcEncodingSection() {
   const { chartData: apiData, isLoading, error } = useWarehouseEncoding();
   const [chartRef, chartVisible] = useIsInViewport({ threshold: 0.1 });
 
@@ -136,10 +135,22 @@ export default function DcEncodingSectionV2() {
       <SectionHeader title="DC Encoding" rightContent={<DateBadge />} />
 
       <div className="ds-kpi-row">
-        <KpiCard2 title="Tags Encoded" value={totalEncoded.toLocaleString('en-IN')} icon={<Icons.Tag />} />
-        <KpiCard2 title="Peak Encoding Hour" value={peakHour} icon={<Icons.Clock />} />
-        <KpiCard2 title="Peak Hour Volume" value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'} icon={<Icons.Activity />} />
-        <KpiCard2 title="Average Encoding / Hour" value={Number(avgPerHour).toLocaleString('en-IN')} icon={<Icons.TrendingUp />} />
+        <KpiCard
+          title="Tags Encoded"
+          value={totalEncoded.toLocaleString('en-IN')}
+        />
+        <KpiCard
+          title="Peak Encoding Hour"
+          value={peakHour}
+        />
+        <KpiCard
+          title="Peak Hour Volume"
+          value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'}
+        />
+        <KpiCard
+          title="Average Encoding / Hour"
+          value={Number(avgPerHour).toLocaleString('en-IN')}
+        />
       </div>
 
       {/* 2. Charts Row */}
@@ -231,7 +242,5 @@ export default function DcEncodingSectionV2() {
     </div>
   );
 }
-
-
 
 

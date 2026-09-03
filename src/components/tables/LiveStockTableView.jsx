@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ReportDataTableCard from '../../../../components/common/ReportDataTableCard';
-import SearchableDropdown from '../../../../components/common/SearchableDropdown';
-import CurvedCard from '../../../../components/common/CurvedCard';
-import { getReportStores, searchReportArticles, getReportLiveStock } from '../../../../services/stockService';
+import ReportDataTableCard from "../common/ReportDataTableCard";
+import SearchableDropdown from "../common/SearchableDropdown";
+import CurvedCard from "../common/CurvedCard";
+import { getReportStores, searchReportArticles, getReportLiveStock } from "../../services/stockService";
 import './LiveStockTableView.css'; // We'll copy LiveStockReport.css styles here
 
 export default function LiveStockTableView({ initialStore = 'HD44', initialDate = new Date().toISOString().split('T')[0] }) {

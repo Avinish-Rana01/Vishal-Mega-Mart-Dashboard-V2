@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
-import LiveStockTableView from '../Dashboard/sections/components/LiveStockTableView';
+import LiveStockTableView from '../../components/tables/LiveStockTableView';
 
 export default function LiveStockReportPage() {
   const location = useLocation();

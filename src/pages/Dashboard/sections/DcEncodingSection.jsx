@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import './DcEncodingSection.css';
 import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import DonutChart from '../../../components/charts/DonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
@@ -135,22 +136,10 @@ export default function DcEncodingSection() {
       <SectionHeader title="DC Encoding" rightContent={<DateBadge />} />
 
       <div className="ds-kpi-row">
-        <KpiCard
-          title="Tags Encoded"
-          value={totalEncoded.toLocaleString('en-IN')}
-        />
-        <KpiCard
-          title="Peak Encoding Hour"
-          value={peakHour}
-        />
-        <KpiCard
-          title="Peak Hour Volume"
-          value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'}
-        />
-        <KpiCard
-          title="Average Encoding / Hour"
-          value={Number(avgPerHour).toLocaleString('en-IN')}
-        />
+        <KpiCard2 title="Tags Encoded" value={totalEncoded.toLocaleString('en-IN')} icon={<Icons.Tag />} />
+        <KpiCard2 title="Peak Encoding Hour" value={peakHour} icon={<Icons.Clock />} />
+        <KpiCard2 title="Peak Hour Volume" value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'} icon={<Icons.Activity />} />
+        <KpiCard2 title="Average Encoding / Hour" value={Number(avgPerHour).toLocaleString('en-IN')} icon={<Icons.TrendingUp />} />
       </div>
 
       {/* 2. Charts Row */}
@@ -242,4 +231,8 @@ export default function DcEncodingSection() {
     </div>
   );
 }
+
+
+
+
 

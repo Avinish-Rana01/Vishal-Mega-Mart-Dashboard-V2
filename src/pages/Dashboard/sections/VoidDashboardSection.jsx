@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
+import './VoidDashboardSection.css';
 import { RefreshCw } from 'lucide-react';
 import { useVoidDashboard } from '../../../hooks/useDashboardData';
 
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
@@ -235,25 +236,25 @@ export default function VoidDashboardSection() {
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Total Void Qty"
           value={totals?.VOID_QTY || '0'}
           icon={<Icons.Trash />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encoded Qty"
           value={totals?.ENCODE_QTY || '0'}
           badgeVariant="success"
           icon={<Icons.Barcode />}
         />
-        <KpiCard
+        <KpiCard2
           title="Pending Voids"
           value={totals?.DIFFERENCE_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
           icon={<Icons.Alert />}
         />
-        <KpiCard
+        <KpiCard2
           title="Encode Rate"
           value={`${encodePercent.toFixed(1)}%`}
           badgeVariant="info"
@@ -375,4 +376,10 @@ export default function VoidDashboardSection() {
     </section>
   );
 }
+
+
+
+
+
+
 

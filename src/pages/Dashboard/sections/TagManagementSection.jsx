@@ -1,6 +1,7 @@
 import React from 'react';
+import './TagManagementSection.css';
 import { useTagCharts } from '../../../hooks/useDashboardData';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
@@ -65,26 +66,26 @@ export default function TagManagementSection() {
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Total Tags"
           value={locationTotal.toLocaleString('en-IN')}
           icon={<Icons.Tag />}
         />
-        <KpiCard
+        <KpiCard2
           title="Store Inventory"
           value={storeInv.toLocaleString('en-IN')}
           badge={`${((storeInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="success"
           icon={<Icons.Store />}
         />
-        <KpiCard
+        <KpiCard2
           title="Warehouse Inventory"
           value={whInv.toLocaleString('en-IN')}
           badge={`${((whInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="info"
           icon={<Icons.Warehouse />}
         />
-        <KpiCard
+        <KpiCard2
           title="Average Recycle Count"
           value={`${Number(avgRecycle || 0).toFixed(2)}`}
           subtext="across all active tags"
@@ -182,4 +183,10 @@ export default function TagManagementSection() {
     </section>
   );
 }
+
+
+
+
+
+
 

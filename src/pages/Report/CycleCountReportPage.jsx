@@ -5,7 +5,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CycleCountModal from '../../components/modals/CycleCountModal';
 import { getCycleCountReport, getBindStores } from '../../services/stockService';
-import { dateRenderer, numRenderer } from '../Dashboard/dashboardColumns';
+import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
 
 export default function CycleCountReportPage() {
   const location = useLocation();

@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import './SaleDashboardSectionV2.css';
 import { useNavigate } from 'react-router-dom';
 import { useSaleDashboard } from '../../../hooks/useDashboardData';
-import KpiCard2 from '../../../components/charts/KpiCard2';
+import KpiCard from '../../../components/charts/KpiCard';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import { motion } from 'framer-motion';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -13,8 +12,8 @@ import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import '../../../components/charts/DashboardSection.css';
-import './commonV2.css';
-import './CycleCountSharedV2.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
+import './common.css';
+import './CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
 
 // SVG Icons
 const Icons = {
@@ -64,7 +63,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function SaleDashboardSectionV2() {
+export default function SaleDashboardSection() {
   const { data, totals, isLoading, error } = useSaleDashboard();
   const navigate = useNavigate();
   const [searchFilter, setSearchFilter] = useState('');
@@ -154,31 +153,31 @@ export default function SaleDashboardSectionV2() {
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row">
-        <KpiCard2
+        <KpiCard
           title="Total DPOS Sale"
           value={totals?.TOTAL_DPOS_SALE || '0'}
           badgeVariant="default"
           icon={<Icons.Cart />}
         />
-        <KpiCard2
+        <KpiCard
           title="Total RFID Checkout"
           value={totals?.TOTAL_RFID_CHECKOUT || '0'}
           badgeVariant="info"
           icon={<Icons.Tag />}
         />
-        <KpiCard2
+        <KpiCard
           title="Taffeta Sales"
           value={totals?.TOTAL_TAFFETA_SALE || '0'}
           badgeVariant="success"
           icon={<Icons.Star />}
         />
-        <KpiCard2
+        <KpiCard
           title="Manual Sales"
           value={totals?.TOTAL_MANUAL_SALE || '0'}
           badgeVariant="warning"
           icon={<Icons.Manual />}
         />
-        <KpiCard2
+        <KpiCard
           title="RFID Sales Share"
           value={totals?.RFID_SALES_SHARE || '0%'}
           badgeVariant="default"
@@ -319,9 +318,5 @@ export default function SaleDashboardSectionV2() {
     </div>
   );
 }
-
-
-
-
 
 

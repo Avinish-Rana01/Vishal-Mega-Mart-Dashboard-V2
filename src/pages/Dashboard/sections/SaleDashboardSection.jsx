@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import './SaleDashboardSection.css';
 import { useNavigate } from 'react-router-dom';
 import { useSaleDashboard } from '../../../hooks/useDashboardData';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import { motion } from 'framer-motion';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -13,7 +14,7 @@ import CustomDropdown from '../../../components/common/CustomDropdown';
 import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
-import './CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
+import './CycleCountShared.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
 
 // SVG Icons
 const Icons = {
@@ -153,31 +154,31 @@ export default function SaleDashboardSection() {
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Total DPOS Sale"
           value={totals?.TOTAL_DPOS_SALE || '0'}
           badgeVariant="default"
           icon={<Icons.Cart />}
         />
-        <KpiCard
+        <KpiCard2
           title="Total RFID Checkout"
           value={totals?.TOTAL_RFID_CHECKOUT || '0'}
           badgeVariant="info"
           icon={<Icons.Tag />}
         />
-        <KpiCard
+        <KpiCard2
           title="Taffeta Sales"
           value={totals?.TOTAL_TAFFETA_SALE || '0'}
           badgeVariant="success"
           icon={<Icons.Star />}
         />
-        <KpiCard
+        <KpiCard2
           title="Manual Sales"
           value={totals?.TOTAL_MANUAL_SALE || '0'}
           badgeVariant="warning"
           icon={<Icons.Manual />}
         />
-        <KpiCard
+        <KpiCard2
           title="RFID Sales Share"
           value={totals?.RFID_SALES_SHARE || '0%'}
           badgeVariant="default"
@@ -318,4 +319,10 @@ export default function SaleDashboardSection() {
     </div>
   );
 }
+
+
+
+
+
+
 

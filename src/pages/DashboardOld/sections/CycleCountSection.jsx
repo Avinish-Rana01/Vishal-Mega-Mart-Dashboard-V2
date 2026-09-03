@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
-import KpiCard2 from '../../../components/charts/KpiCard2';
+import KpiCard from '../../../components/charts/KpiCard';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -17,8 +17,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
-import './commonV2.css';
-import './CycleCountSectionV2.css';
+import './common.css';
+import './CycleCountSection.css';
 
 // Generate mock data once (same pattern as LiveStock)
 const mockCycleCountData = generateMockCycleCount(20);
@@ -391,7 +391,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 });
 
 // ---- Main Component ----
-export default function CycleCountSectionV2() {
+export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
   const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
   // const data = realData;
@@ -527,35 +527,35 @@ export default function CycleCountSectionV2() {
 
       {/* KPI ROW — 4 cards */}
       <div className="cc-kpi-row">
-        <KpiCard2
+        <KpiCard
           title="Stores Reported"
           value={metrics.storesReported}
           subtext="In current view"
-          icon={<ClipboardList />}
+          icon={<ClipboardList size={18} />}
         />
-        <KpiCard2
+        <KpiCard
           title="Counted Today"
           value={metrics.todayCount}
           subtext="Audits completed today"
-          icon={<Calendar />}
+          icon={<Calendar size={18} />}
         />
-        <KpiCard2
+        <KpiCard
           title="Avg Duration"
           value={metrics.avgDurationFormatted}
           subtext="Across reported stores"
-          icon={<Clock />}
+          icon={<Clock size={18} />}
         />
-        <KpiCard2
+        <KpiCard
           title="Longest Audit"
           value={metrics.slowestDurationFormatted}
           subtext={metrics.slowestStore}
-          icon={<Hourglass />}
+          icon={<Hourglass size={18} />}
         />
-        <KpiCard2
+        <KpiCard
           title="In Progress"
           value={metrics.inProgressCount}
           subtext="Audits missing end time"
-          icon={<Hourglass />}
+          icon={<Hourglass size={18} />}
         />
       </div>
 
@@ -708,7 +708,5 @@ export default function CycleCountSectionV2() {
     </div>
   );
 }
-
-
 
 

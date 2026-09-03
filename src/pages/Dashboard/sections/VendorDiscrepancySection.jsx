@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
+import './VendorDiscrepancySection.css';
 import { useVendorDiscrepancy } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import KpiCard from '../../../components/charts/KpiCard';
+import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import ComposedChart from '../../../components/charts/ComposedChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
@@ -114,30 +115,30 @@ export default function VendorDiscrepancySection() {
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        <KpiCard
+        <KpiCard2
           title="Total Expected Qty"
           value={totals?.ACTUAL_QTY || '0'}
-          icon={<Icons.Truck size={20} />}
+          icon={<Icons.Truck />}
         />
-        <KpiCard
+        <KpiCard2
           title="Total Actual Qty"
           value={totals?.SCANNED_QTY || '0'}
           badgeVariant="success"
-          icon={<Icons.PackageCheck size={20} />}
+          icon={<Icons.PackageCheck />}
         />
-        <KpiCard
+        <KpiCard2
           title="Current Discrepancy"
           value={totals?.DIFF_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
-          icon={<Icons.AlertTriangle size={20} />}
+          icon={<Icons.AlertTriangle />}
         />
-        <KpiCard
+        <KpiCard2
           title="Discrepancy Rate"
           value={discrepancyPercent}
           subtext="Overall % of missing items"
           badgeVariant="warning"
-          icon={<Icons.Percent size={20} />}
+          icon={<Icons.Percent />}
         />
       </div>
 
@@ -292,4 +293,8 @@ export default function VendorDiscrepancySection() {
     </section>
   );
 }
+
+
+
+
 
