@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { USE_GLOBAL_MOCK_DATA } from '../../../config/constants';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
@@ -142,10 +143,8 @@ export default function LiveStockSection() {
   // === STATE MANAGEMENT ===
   // Global Data & Context
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
-  // const data = mockStores; // USE MOCK DATA OVERRIDE
-  // const totals = mockTotals;
-  const data = realData;
-  const totals = realTotals;
+  const data = USE_GLOBAL_MOCK_DATA ? mockStores : realData;
+  const totals = USE_GLOBAL_MOCK_DATA ? mockTotals : realTotals;
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().split('T')[0];
 

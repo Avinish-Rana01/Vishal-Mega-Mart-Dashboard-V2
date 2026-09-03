@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { USE_GLOBAL_MOCK_DATA } from '../../../config/constants';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -393,8 +394,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
-  // const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
-  const data = realData;
+  const data = USE_GLOBAL_MOCK_DATA ? mockCycleCountData : realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);

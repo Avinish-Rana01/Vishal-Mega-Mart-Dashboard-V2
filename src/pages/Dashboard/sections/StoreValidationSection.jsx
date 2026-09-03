@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { USE_GLOBAL_MOCK_DATA } from '../../../config/constants';
 import './StoreValidationSection.css';
 import { useStoreDashboard } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
@@ -233,10 +234,8 @@ const VIEW_OPTIONS = [
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function StoreValidationSection() {
   const { data: realData, totals: realTotals, isLoading, error } = useStoreDashboard();
-  // const data = mockStores;
-  // const totals = mockTotals;
-  const data = realData;
-  const totals = realTotals;
+  const data = USE_GLOBAL_MOCK_DATA ? mockStores : realData;
+  const totals = USE_GLOBAL_MOCK_DATA ? mockTotals : realTotals;
 
   const [chartView, setChartView] = useState('grouped');
   const [searchFilter, setSearchFilter] = useState('');

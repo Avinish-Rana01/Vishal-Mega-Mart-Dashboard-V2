@@ -13,7 +13,7 @@ import {
   getWarehouseEncoding,
   getDcValidation
 } from '../services/stockService';
-import { API_DEFAULTS, STORE_MAPPING } from '../config/constants';
+import { API_DEFAULTS, STORE_MAPPING, USE_GLOBAL_MOCK_DATA } from '../config/constants';
 
 /**
  * Generic hook for dashboard table endpoints.
@@ -148,11 +148,15 @@ const vendorTotals = (summary) => ({
   DIFF_TILL_DATE: summary.differenceQtyTillDate?.toLocaleString('en-IN') || 0
 });
 
-// const mockGetVendorDiscrepancy = async (searchQuery, pageIndex, pageSize, signal) => {
-//   return mockVendorDiscrepancy;
-// };
+const mockGetVendorDiscrepancy = async (searchQuery, pageIndex, pageSize, signal) => {
+  return mockVendorDiscrepancy;
+};
 
-export const useVendorDiscrepancy = () => useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals);
+export const useVendorDiscrepancy = () => useDashboardFetch(
+  USE_GLOBAL_MOCK_DATA ? mockGetVendorDiscrepancy : getVendorDiscrepancy, 
+  vendorFilter, 
+  vendorTotals
+);
 
 // ==========================================
 // 4. Store Dashboard
@@ -199,11 +203,15 @@ const saleDashboardTotals = (summary) => {
 };
 
 // Temporarily mock getSaleDashboard for 20 stores due to empty backend data
-// const mockGetSaleDashboard = async (signal) => {
-//   return generateMockSaleDashboard(20);
-// };
+const mockGetSaleDashboard = async (signal) => {
+  return generateMockSaleDashboard(20);
+};
 
-export const useSaleDashboard = () => useDashboardFetch(getSaleDashboard, saleDashboardFilter, saleDashboardTotals);
+export const useSaleDashboard = () => useDashboardFetch(
+  USE_GLOBAL_MOCK_DATA ? mockGetSaleDashboard : getSaleDashboard, 
+  saleDashboardFilter, 
+  saleDashboardTotals
+);
 
 // ==========================================
 // 6. Void Dashboard
@@ -222,11 +230,15 @@ const voidDashboardTotals = (summary) => ({
 
 import { generateMockVoidDashboard } from '../utils/mockVoidDashboard';
 
-// const mockGetVoidDashboard = async (signal) => {
-//   return generateMockVoidDashboard(20);
-// };
+const mockGetVoidDashboard = async (signal) => {
+  return generateMockVoidDashboard(20);
+};
 
-export const useVoidDashboard = () => useDashboardFetch(getVoidDashboard, voidDashboardFilter, voidDashboardTotals);
+export const useVoidDashboard = () => useDashboardFetch(
+  USE_GLOBAL_MOCK_DATA ? mockGetVoidDashboard : getVoidDashboard, 
+  voidDashboardFilter, 
+  voidDashboardTotals
+);
 
 // ==========================================
 // 7. Return Dashboard
@@ -245,11 +257,15 @@ const returnDashboardTotals = (summary) => ({
 
 import { generateMockReturnDashboard } from '../utils/mockReturnDashboard';
 
-// const mockGetReturnDashboard = async (signal) => {
-//   return generateMockReturnDashboard();
-// };
+const mockGetReturnDashboard = async (signal) => {
+  return generateMockReturnDashboard();
+};
 
-export const useReturnDashboard = () => useDashboardFetch(getReturnDashboard, returnDashboardFilter, returnDashboardTotals);
+export const useReturnDashboard = () => useDashboardFetch(
+  USE_GLOBAL_MOCK_DATA ? mockGetReturnDashboard : getReturnDashboard, 
+  returnDashboardFilter, 
+  returnDashboardTotals
+);
 
 // ==========================================
 // 8. DC Validation
@@ -267,11 +283,15 @@ const dcValidationTotals = (summary) => ({
 
 import { generateMockDcValidation } from '../utils/mockDcValidation';
 
-// const mockGetDcValidation = async (searchQuery, pageIndex, pageSize, signal) => {
-//   return generateMockDcValidation(20);
-// };
+const mockGetDcValidation = async (searchQuery, pageIndex, pageSize, signal) => {
+  return generateMockDcValidation(20);
+};
 
-export const useDcValidation = () => useDashboardFetch(getDcValidation, dcValidationFilter, dcValidationTotals);
+export const useDcValidation = () => useDashboardFetch(
+  USE_GLOBAL_MOCK_DATA ? mockGetDcValidation : getDcValidation, 
+  dcValidationFilter, 
+  dcValidationTotals
+);
 
 // ==========================================
 // 9. Tag Management Charts (NOT REFACTORED)
@@ -290,12 +310,17 @@ export const useTagCharts = () => {
     const fetchTagCharts = async () => {
       setIsLoading(true);
       try {
-        const [locData, cycData] = await Promise.all([
-          getTagLocation(controller.signal),
-          getTagCycleCount(controller.signal)
-        ]);
-        // const locData = mockTagLocation;
-        // const cycData = mockTagCycleCount;
+        let locData, cycData;
+        
+        if (USE_GLOBAL_MOCK_DATA) {
+          locData = mockTagLocation;
+          cycData = mockTagCycleCount;
+        } else {
+          [locData, cycData] = await Promise.all([
+            getTagLocation(controller.signal),
+            getTagCycleCount(controller.signal)
+          ]);
+        }
 
         if (controller.signal.aborted) return;
 
@@ -377,10 +402,9 @@ export const useWarehouseEncoding = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const USE_MOCK_DATA = false;
         let response = {};
 
-        if (USE_MOCK_DATA) {
+        if (USE_GLOBAL_MOCK_DATA) {
           await new Promise(resolve => setTimeout(resolve, 600)); // Simulate delay
           if (controller.signal.aborted) return;
           
