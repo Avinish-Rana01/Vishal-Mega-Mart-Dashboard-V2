@@ -1,44 +1,45 @@
-import React, { useMemo, useState } from 'react';
-import './ReturnDashboardSectionV2.css';
-import { useReturnDashboard } from '../../hooks/useDashboardData';
-import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
-import CurvedCard from '../../components/common/CurvedCard';
-import KpiCard2 from '../../components/charts/KpiCard2';
-import GroupedBarChart from '../../components/charts/GroupedBarChart';
-import SemiDonutChart from '../../components/charts/SemiDonutChart';
-import StoreRankList from '../../components/charts/StoreRankList';
-import ChartToolbar from '../../components/common/ChartToolbar';
-import CustomDropdown from '../../components/common/CustomDropdown';
-import DashboardShimmer from '../../components/common/DashboardShimmer';
-import { GlobalEmptyState } from '../../components/common/ChartEmptyState';
-import { useIsInViewport } from '../../hooks/useIsInViewport';
+import React, { useMemo } from 'react';
+import './VoidDashboardSectionV2.css';
+import { RefreshCw } from 'lucide-react';
+import { useVoidDashboard } from '../../../hooks/useDashboardData';
+
+import KpiCard2 from '../../../components/charts/KpiCard2';
+import GroupedBarChart from '../../../components/charts/GroupedBarChart';
+import SemiDonutChart from '../../../components/charts/SemiDonutChart';
+import StoreRankList from '../../../components/charts/StoreRankList';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
-import '../../components/charts/DashboardSection.css';
-import '../Dashboard/sections/CycleCountSection.css';
+import '../../../components/charts/DashboardSection.css';
 
 // SVG Icons
 const Icons = {
-  CornerUpLeft: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>,
+  Trash: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
   Barcode: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5v14M8 5v14M12 5v14M17 5v14M21 5v14"></path></svg>,
   Alert: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
   Percent: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>,
 };
 
 const VIEW_OPTIONS = [
-  { value: 'grouped', label: 'Return vs Encoded' },
-  { value: 'pending', label: 'Highest Pending Returns' },
+  { value: 'grouped', label: 'Void vs Encoded' },
+  { value: 'pending', label: 'Highest Pending Voids' },
   { value: 'encoding', label: 'Highest Encoding Rates' },
 ];
 
 const SORT_OPTIONS = [
-  { value: 'RETURN_DESC', label: 'Highest Returns' },
+  { value: 'VOID_DESC', label: 'Highest Voids' },
   { value: 'ENCODE_DESC', label: 'Highest Encoded' },
   { value: 'PENDING_DESC', label: 'Highest Pending' },
   { value: 'RATE_DESC', label: 'Highest Rate' },
   { value: 'STORE_ASC', label: 'Store (A-Z)' },
 ];
 
-const ReturnVsEncodedTooltip = ({ active, payload }) => {
+const VoidVsEncodedTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -49,10 +50,10 @@ const ReturnVsEncodedTooltip = ({ active, payload }) => {
             <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
           )}
         </div>
-        <div style={{ fontSize: '13px', color: '#c026d3', marginBottom: '4px' }}>Return Qty : <span style={{ fontWeight: 600 }}>{data.Return}</span></div>
+        <div style={{ fontSize: '13px', color: '#d97706', marginBottom: '4px' }}>Void Qty : <span style={{ fontWeight: 600 }}>{data.Void}</span></div>
         <div style={{ fontSize: '13px', color: '#eab308', marginBottom: '8px' }}>Encoded Qty : <span style={{ fontWeight: 600 }}>{data.Encoded}</span></div>
         <div style={{ height: '1px', background: '#f1f5f9', margin: '4px 0 8px 0' }}></div>
-        <div style={{ fontSize: '13px', color: '#ec4899' }}>Pending Returns : <span style={{ fontWeight: 600 }}>{data.Difference}</span></div>
+        <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Voids : <span style={{ fontWeight: 600 }}>{data.Difference}</span></div>
       </div>
     );
   }
@@ -81,13 +82,13 @@ const MemoizedPendingChart = React.memo(({ data }) => {
                         <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
                       )}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#ec4899' }}>Pending Returns: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
+                    <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Voids: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
                   </div>
                 );
               }
               return null;
             }} />
-              <Bar dataKey="pending" fill="#ec4899" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} />
+              <Bar dataKey="pending" fill="#ef4444" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -128,48 +129,55 @@ const MemoizedEncodingChart = React.memo(({ data }) => {
               <LabelList dataKey="rate" position="right" formatter={(val) => `${val.toFixed(1)}%`} style={{ fontSize: '11px', fontWeight: 600, fill: '#10b981' }} />
             </Bar>
           </BarChart>
-          </ResponsiveContainer>
+        </ResponsiveContainer>
         </div>
       )}
     </div>
   );
 });
 
-export default function ReturnDashboardSectionV2() {
-  const { data, totals, isLoading, error, refresh } = useReturnDashboard();
+export default function VoidDashboardSectionV2() {
+  const { data, totals, isLoading, error, refresh } = useVoidDashboard();
   const [chartView, setChartView] = React.useState('grouped');
-  const [sortBy, setSortBy] = React.useState('RETURN_DESC');
+  const [sortBy, setSortBy] = React.useState('VOID_DESC');
+
+  // Smart defaults for sorting when switching views
+  React.useEffect(() => {
+    if (chartView === 'grouped') setSortBy('VOID_DESC');
+    if (chartView === 'pending') setSortBy('PENDING_DESC');
+    if (chartView === 'encoding') setSortBy('RATE_DESC');
+  }, [chartView]);
 
   // Derived Metrics for Charts & Lists
-  const { barData, rankList, encodePercent, totalReturnRaw, encodeRaw, pendingChartData, encodingChartData } = useMemo(() => {
-    if (!data || !totals) return { barData: [], rankList: [], encodePercent: 0, totalReturnRaw: 0, encodeRaw: 0, pendingChartData: [], encodingChartData: [] };
+  const { barData, rankList, encodePercent, totalVoidRaw, encodeRaw, pendingChartData, encodingChartData } = useMemo(() => {
+    if (!data || !totals) return { barData: [], rankList: [], encodePercent: 0, totalVoidRaw: 0, encodeRaw: 0, pendingChartData: [], encodingChartData: [] };
 
     const sortFn = (a, b) => {
-      if (sortBy === 'STORE_ASC') return (a.STORE_NAME || '').localeCompare(b.STORE_NAME || '');
+      if (sortBy === 'STORE_ASC') return (a.STORE || '').localeCompare(b.STORE || '');
       if (sortBy === 'ENCODE_DESC') return Number(b.ENCODE_QTY || 0) - Number(a.ENCODE_QTY || 0);
       if (sortBy === 'PENDING_DESC') return Number(b.DIFFERENCE_QTY || 0) - Number(a.DIFFERENCE_QTY || 0);
       if (sortBy === 'RATE_DESC') {
-         const rateA = Number(a.RETURN_QTY || 0) > 0 ? (Number(a.ENCODE_QTY || 0)/Number(a.RETURN_QTY || 0)) : 0;
-         const rateB = Number(b.RETURN_QTY || 0) > 0 ? (Number(b.ENCODE_QTY || 0)/Number(b.RETURN_QTY || 0)) : 0;
+         const rateA = Number(a.VOID_QTY || 0) > 0 ? (Number(a.ENCODE_QTY || 0)/Number(a.VOID_QTY || 0)) : 0;
+         const rateB = Number(b.VOID_QTY || 0) > 0 ? (Number(b.ENCODE_QTY || 0)/Number(b.VOID_QTY || 0)) : 0;
          return rateB - rateA;
       }
-      return Number(b.RETURN_QTY || 0) - Number(a.RETURN_QTY || 0); // default RETURN_DESC
+      return Number(b.VOID_QTY || 0) - Number(a.VOID_QTY || 0); // default VOID_DESC
     };
 
     // 1. Bar Chart Data (Sorted dynamically)
     const sortedData = [...data].sort(sortFn);
     const barData = sortedData.map(row => ({
-      name: row.Store_Code || row.STORE_CODE, // Return API uses Store_Code
+      name: row.STORE,
       fullName: row.STORE_NAME,
-      Return: Number(row.RETURN_QTY || 0),
+      Void: Number(row.VOID_QTY || 0),
       Encoded: Number(row.ENCODE_QTY || 0),
       Difference: Number(row.DIFFERENCE_QTY || 0)
     }));
 
     // 2. Global Breakdown for SemiDonut
-    const totalReturnRaw = Number((totals.RETURN_QTY || '0').replace(/,/g, ''));
+    const totalVoidRaw = Number((totals.VOID_QTY || '0').replace(/,/g, ''));
     const encodeRaw = Number((totals.ENCODE_QTY || '0').replace(/,/g, ''));
-    const encodePercent = totalReturnRaw > 0 ? ((encodeRaw / totalReturnRaw) * 100) : 0;
+    const encodePercent = totalVoidRaw > 0 ? ((encodeRaw / totalVoidRaw) * 100) : 0;
 
     // 3. Rank List (Stores with Highest Pending/Difference) - Always Top 3 pending
     const rankList = [...data]
@@ -177,30 +185,30 @@ export default function ReturnDashboardSectionV2() {
       .sort((a, b) => Number(b.DIFFERENCE_QTY || 0) - Number(a.DIFFERENCE_QTY || 0))
       .slice(0, 3);
 
-    // 4. Pending Returns Chart Data (Horizontal)
+    // 4. Pending Voids Chart Data (Horizontal)
     const pendingChartData = [...data]
       .filter(row => Number(row.DIFFERENCE_QTY || 0) > 0)
       .sort(sortFn)
-      .map(row => ({ name: row.Store_Code || row.STORE_CODE, fullName: row.STORE_NAME, pending: Number(row.DIFFERENCE_QTY || 0) }));
+      .map(row => ({ name: row.STORE, fullName: row.STORE_NAME, pending: Number(row.DIFFERENCE_QTY || 0) }));
 
     // 5. Encoding Rates Chart Data (Horizontal)
     const encodingChartData = [...data]
       .sort(sortFn)
       .map(row => {
-        const retQ = Number(row.RETURN_QTY || 0);
+        const voidQ = Number(row.VOID_QTY || 0);
         const encQ = Number(row.ENCODE_QTY || 0);
-        const rate = retQ > 0 ? (encQ / retQ) * 100 : 0;
-        return { name: row.Store_Code || row.STORE_CODE, fullName: row.STORE_NAME, rate: rate };
+        const rate = voidQ > 0 ? (encQ / voidQ) * 100 : 0;
+        return { name: row.STORE, fullName: row.STORE_NAME, rate: rate };
       });
 
-    return { barData, rankList, encodePercent, totalReturnRaw, encodeRaw, pendingChartData, encodingChartData };
+    return { barData, rankList, encodePercent, totalVoidRaw, encodeRaw, pendingChartData, encodingChartData };
   }, [data, totals, sortBy]);
 
   const handleStoreClick = (storeData) => {
-    console.log('Navigate to store return report:', storeData.Store_Code || storeData.name);
+    console.log('Navigate to store void report:', storeData.STORE || storeData.name);
   };
 
-  if (isLoading) return <DashboardShimmer title="Return Dashboard" />;
+  if (isLoading) return <DashboardShimmer title="Void Dashboard" />;
 
   if (error) {
     return <div className="ds-error">{error}</div>;
@@ -210,36 +218,28 @@ export default function ReturnDashboardSectionV2() {
     return (
       <section className="ds-section">
         <GlobalEmptyState
-          title="No Return Data Available"
-          subtitle="There are currently no return transactions for the selected period."
+          title="No Void Data Available"
+          subtitle="There are currently no void transactions for the selected period."
         />
       </section>
     );
   }
 
 
-
   return (
     <section className="ds-section">
       <SectionHeader 
-        title="Return Dashboard" 
-        // subtitle="Track customer returns vs successfully encoded items." 
-        rightContent={<DateBadge />} 
+        title="Void Dashboard"
+        // subtitle="Track voided transactions vs successfully encoded items."
+        rightContent={<DateBadge />}
       />
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
-        {/* <CurvedCard
-          title="Total Return Qty"
-          value={totals?.RETURN_QTY || '0'}
-          waveColor={['#a21caf', '#f6afffff']} // Fuchsia gradient
-          icon={<Icons.CornerUpLeft />}
-        /> */}
-         <KpiCard2
-          title="Total Return Qty"
-          value={totals?.RETURN_QTY || '0'}
-          badgeVariant="success"
-          icon={<Icons.Barcode />}
+        <KpiCard2
+          title="Total Void Qty"
+          value={totals?.VOID_QTY || '0'}
+          icon={<Icons.Trash />}
         />
         <KpiCard2
           title="Encoded Qty"
@@ -248,17 +248,16 @@ export default function ReturnDashboardSectionV2() {
           icon={<Icons.Barcode />}
         />
         <KpiCard2
-          title="Pending Returns"
+          title="Pending Voids"
           value={totals?.DIFFERENCE_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
           icon={<Icons.Alert />}
         />
         <KpiCard2
-          title="Encoding Rate"
+          title="Encode Rate"
           value={`${encodePercent.toFixed(1)}%`}
-          badge={encodePercent >= 90 ? "Excellent" : encodePercent >= 70 ? "Good" : "Low"}
-          badgeVariant={encodePercent >= 90 ? "success" : encodePercent >= 70 ? "warning" : "danger"}
+          badgeVariant="info"
           icon={<Icons.Percent />}
         />
       </div>
@@ -294,19 +293,19 @@ export default function ReturnDashboardSectionV2() {
               {chartView === 'grouped' && (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f0abfc' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#fcd34d' }} />
                     <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encoded Qty</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#c026d3' }} />
-                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Return Qty</span>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#d97706' }} />
+                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Void Qty</span>
                   </div>
                 </>
               )}
               {chartView === 'pending' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ec4899' }} />
-                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Pending Returns</span>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ef4444' }} />
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Pending Voids</span>
                 </div>
               )}
               {chartView === 'encoding' && (
@@ -324,12 +323,12 @@ export default function ReturnDashboardSectionV2() {
                     <GroupedBarChart
                       data={barData}
                       bars={[
-                        { dataKey: 'Return', color: '#c026d3', label: 'Return Qty' },
-                        { dataKey: 'Encoded', color: '#f0abfc', label: 'Encoded Qty' }
+                        { dataKey: 'Void', color: '#d97706', label: 'Void Qty' },
+                        { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
                       ]}
                       height="100%"
                       hideLegend={true}
-                      customTooltip={<ReturnVsEncodedTooltip />}
+                      customTooltip={<VoidVsEncodedTooltip />}
                     />
                   </div>
                 </div>
@@ -345,15 +344,15 @@ export default function ReturnDashboardSectionV2() {
       <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
         {/* Left: Store Rank List */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Returns</h3>
+          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Voids</h3>
           <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
             <StoreRankList
               items={rankList}
               labelKey="STORE_NAME"
-              sublabelKey="Store_Code"
+              sublabelKey="STORE"
               valueKey="DIFFERENCE_QTY"
-              diffKey="RETURN_QTY"
-              diffLabel="Total Returns:"
+              diffKey="VOID_QTY"
+              diffLabel="Total Voids:"
               statusFn={() => 'danger'}
               formatValue={(val) => `${val} Pending`}
             />
@@ -366,14 +365,20 @@ export default function ReturnDashboardSectionV2() {
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SemiDonutChart
               value={encodeRaw}
-              maxValue={totalReturnRaw}
+              maxValue={totalVoidRaw}
               centerLabel="Encoded"
-              primaryColor="#c026d3"
+              primaryColor="#d97706"
             />
           </div>
         </div>
       </div>
+
     </section>
   );
 }
+
+
+
+
+
 

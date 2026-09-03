@@ -1,24 +1,24 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLiveStock } from '../../hooks/useDashboardData';
+import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
-import DashboardShimmer from '../../components/common/DashboardShimmer';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { RefreshCw, Store, Database, LineChart, Target } from 'lucide-react';
-import ChartPaginator from '../../components/common/ChartPaginator';
-import KpiCard2 from '../../components/charts/KpiCard2';
-import ActionAlertBar from '../../components/common/ActionAlertBar';
-import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
-import { SearchEmptyState } from '../../components/common/ChartEmptyState';
-import ChartToolbar from '../../components/common/ChartToolbar';
-import ChartSearchInput from '../../components/common/ChartSearchInput';
-import { generateMockData } from '../../utils/mockLiveStock';
-import { AccuracyTooltip, StoreBarTooltip } from '../../components/charts/LiveStockTooltips';
-import CustomDropdown from '../../components/common/CustomDropdown';
-import '../../components/charts/DashboardSection.css';
-import '../Dashboard/sections/common.css';
-import '../Dashboard/sections/LiveStockSection.css';
-import { useIsInViewport } from '../../hooks/useIsInViewport';
-import './DashboardV2.css'
+import ChartPaginator from '../../../components/common/ChartPaginator';
+import KpiCard2 from '../../../components/charts/KpiCard2';
+import ActionAlertBar from '../../../components/common/ActionAlertBar';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
+import { generateMockData } from '../../../utils/mockLiveStock';
+import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import '../../../components/charts/DashboardSection.css';
+import './commonV2.css';
+import './LiveStockSectionV2.css';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
+import '../DashboardV2.css'
 
 // Custom RFID Icon
 const RfidIcon = ({ size = 24, strokeWidth = 2, color = "currentColor", ...props }) => (
@@ -594,3 +594,5 @@ export default function LiveStockSectionV2() {
     </div>
   );
 }
+
+

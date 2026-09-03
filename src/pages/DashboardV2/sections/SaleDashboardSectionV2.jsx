@@ -1,20 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import './SaleDashboardSectionV2.css';
 import { useNavigate } from 'react-router-dom';
-import { useSaleDashboard } from '../../hooks/useDashboardData';
-import KpiCard2 from '../../components/charts/KpiCard2';
-import GroupedBarChart from '../../components/charts/GroupedBarChart';
+import { useSaleDashboard } from '../../../hooks/useDashboardData';
+import KpiCard2 from '../../../components/charts/KpiCard2';
+import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import { motion } from 'framer-motion';
-import DashboardDataGrid from '../../components/charts/DashboardDataGrid';
-import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
-import DashboardShimmer from '../../components/common/DashboardShimmer';
-import ChartToolbar from '../../components/common/ChartToolbar';
-import ChartSearchInput from '../../components/common/ChartSearchInput';
-import CustomDropdown from '../../components/common/CustomDropdown';
-import { SearchEmptyState, GlobalEmptyState } from '../../components/common/ChartEmptyState';
-import '../../components/charts/DashboardSection.css';
-import '../Dashboard/sections/common.css';
-import '../Dashboard/sections/CycleCountSection.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
+import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import '../../../components/charts/DashboardSection.css';
+import './commonV2.css';
+import './CycleCountSharedV2.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
 
 // SVG Icons
 const Icons = {
@@ -319,4 +319,9 @@ export default function SaleDashboardSectionV2() {
     </div>
   );
 }
+
+
+
+
+
 

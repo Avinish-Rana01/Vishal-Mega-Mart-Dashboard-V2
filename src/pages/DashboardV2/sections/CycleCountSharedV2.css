@@ -1,0 +1,459 @@
+/* ==============================================
+   CycleCountSection.css
+   Scoped styles for the Cycle Count dashboard section.
+   Naming: cc-* (mirrors ls-* convention from LiveStock)
+   ============================================== */
+
+/* ---- Root Container ---- */
+.cc-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #334155;
+}
+
+/* ---- KPI Grid ---- */
+.cc-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(var(--kpi-cols, 5), 1fr);
+  gap: 5px;
+}
+
+/* ---- Chart Card ---- */
+.cc-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 10px 10px 8px 10px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: visible;
+  border: solid 1px #e2e8f0;
+}
+
+/* ==========================================================================
+   CYCLE COUNT SPLIT CHART LAYOUT
+   ========================================================================== */
+.cc-split-layout {
+  display: grid;
+  grid-template-columns: 57% 43%;
+  gap: 5px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .cc-split-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+
+/* ---- Chart Scroll Container (50+ store scalability) ---- */
+.cc-chart-scroll {
+  width: 100%;
+  flex: 1;
+  min-height: 294px;
+  max-height: 294px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+
+
+.cc-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: #334155;
+}
+
+/* ---- Data Grid ---- */
+.cc-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f9f9fb;
+  border-radius: 20px 20px 0 0;
+}
+
+.cc-grid-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-transform: uppercase;
+}
+
+.cc-grid-count {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+
+/* Action Buttons */
+.cc-action-btn {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cc-action-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.cc-export-btn {
+  color: #1d4ed8;
+  font-weight: 600;
+  gap: 8px;
+  padding: 6px 16px;
+}
+
+/* ---- Empty / Error States ---- */
+.cc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: #94a3b8;
+  text-align: center;
+  gap: 8px;
+}
+
+.cc-empty svg {
+  opacity: 0.3;
+}
+
+.cc-empty p {
+  font-size: 14px;
+  margin: 0;
+  color: #94a3b8;
+}
+
+/* ---- Custom Row Tooltip ---- */
+.cc-row-tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.cc-row-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  transform: translateY(10px);
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+  z-index: 1000;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.cc-row-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+.cc-row-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 19px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: #e2e8f0 transparent transparent transparent;
+  z-index: -1;
+}
+
+.cc-data-grid-tr:hover .cc-row-tooltip,
+.cc-row-tooltip-wrapper:hover .cc-row-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-8px);
+}
+
+
+.cc-error {
+  padding: 20px;
+  background: #fee2e2;
+  border-radius: 12px;
+  color: #b91c1c;
+  font-size: 14px;
+  border: 1px solid #fca5a5;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .cc-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .cc-kpi-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cc-search-container {
+    width: 100%;
+  }
+
+  .cc-search-input {
+    width: 100%;
+  }
+
+  .cc-card .vmm-toolbar-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .cc-card .vmm-toolbar-controls {
+    display: contents;
+  }
+
+  .cc-card .vmm-search-container {
+    order: 3;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .cc-card .vmm-toolbar-title {
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  .cc-card .vmm-toolbar-controls > div:first-child {
+    flex: none !important;
+    width: auto !important;
+    max-width: 60% !important;
+  }
+
+  .cc-card .vmm-toolbar-title > div {
+    max-width: 100%;
+  }
+
+  .cc-card .ls-filter-select {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}
+
+/* Native Table Scrollbar — must override global hiding from index.css */
+.cc-native-table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: auto !important;
+  /* Override global * { -ms-overflow-style: none } */
+  scrollbar-width: thin !important;
+  /* Override global * { scrollbar-width: none } */
+  scrollbar-color: #94a3b8 #f1f5f9;
+  /* Firefox thumb & track colors */
+  min-width: 0;
+  /* margin: 0 8px; */
+  border-radius: 8px;
+}
+
+/* Override global ::-webkit-scrollbar { display: none } */
+.cc-native-table-scroll::-webkit-scrollbar {
+  display: block !important;
+  height: 10px;
+  background-color: #f1f5f9;
+}
+
+.cc-native-table-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.cc-native-table-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 8px;
+  border: 2px solid #f1f5f9;
+}
+
+.cc-native-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* NATIVE DATA GRID CLASSES */
+.cc-data-grid-card {
+  padding: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.cc-data-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 10px;
+}
+
+.cc-data-grid-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.cc-data-grid-inner-wrapper {
+  min-width: 700px;
+}
+
+.cc-data-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cc-data-grid-thead {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.cc-data-grid-th {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.cc-data-grid-empty-cell {
+  text-align: center;
+  padding: 30px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.cc-data-grid-tr {
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cc-data-grid-tr:hover {
+  background: #f8fafc;
+}
+
+.cc-data-grid-td {
+  padding: 6px 1px;
+  font-size: 12px;
+  color: #0f172a;
+  /* border-bottom: 1px solid #f1f5f9; */
+  white-space: nowrap;
+  text-align: center;
+}
+
+.cc-data-grid-td-bold {
+  font-weight: 600;
+  color: #334155;
+}
+
+.cc-data-grid-ref-link {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.cc-data-grid-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cc-data-grid-status-normal {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.cc-data-grid-status-high {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.cc-native-table-scroll {
+  max-height: 204px;
+  overflow-y: auto;
+}
+
+.cc-native-table-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cc-native-table-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.cc-native-table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

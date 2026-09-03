@@ -1,23 +1,23 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
-import KpiCard2 from '../../components/charts/KpiCard2';
-import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
-import DashboardShimmer from '../../components/common/DashboardShimmer';
-import DashboardDataGrid from '../../components/charts/DashboardDataGrid';
-import CycleCountModal from '../../components/modals/CycleCountModal';
-import BaseDataTable from '../../components/common/BaseDataTable';
-import CustomDropdown from '../../components/common/CustomDropdown';
-import { SearchEmptyState, GlobalEmptyState } from '../../components/common/ChartEmptyState';
-import ChartToolbar from '../../components/common/ChartToolbar';
-import ChartSearchInput from '../../components/common/ChartSearchInput';
-import { useCycleCount } from '../../hooks/useDashboardData';
-import { useCycleCountMetrics } from '../../hooks/useCycleCountMetrics';
-import { useIsInViewport } from '../../hooks/useIsInViewport';
+import KpiCard2 from '../../../components/charts/KpiCard2';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
+import CycleCountModal from '../../../components/modals/CycleCountModal';
+import BaseDataTable from '../../../components/common/BaseDataTable';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
+import { useCycleCount } from '../../../hooks/useDashboardData';
+import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateMockCycleCount } from '../../utils/mockCycleCount';
-import '../../components/charts/DashboardSection.css';
-import '../Dashboard/sections/common.css';
+import { generateMockCycleCount } from '../../../utils/mockCycleCount';
+import '../../../components/charts/DashboardSection.css';
+import './commonV2.css';
 import './CycleCountSectionV2.css';
 
 // Generate mock data once (same pattern as LiveStock)
@@ -531,31 +531,31 @@ export default function CycleCountSectionV2() {
           title="Stores Reported"
           value={metrics.storesReported}
           subtext="In current view"
-          icon={<ClipboardList size={18} />}
+          icon={<ClipboardList />}
         />
         <KpiCard2
           title="Counted Today"
           value={metrics.todayCount}
           subtext="Audits completed today"
-          icon={<Calendar size={18} />}
+          icon={<Calendar />}
         />
         <KpiCard2
           title="Avg Duration"
           value={metrics.avgDurationFormatted}
           subtext="Across reported stores"
-          icon={<Clock size={18} />}
+          icon={<Clock />}
         />
         <KpiCard2
           title="Longest Audit"
           value={metrics.slowestDurationFormatted}
           subtext={metrics.slowestStore}
-          icon={<Hourglass size={18} />}
+          icon={<Hourglass />}
         />
         <KpiCard2
           title="In Progress"
           value={metrics.inProgressCount}
           subtext="Audits missing end time"
-          icon={<Hourglass size={18} />}
+          icon={<Hourglass />}
         />
       </div>
 
@@ -708,4 +708,7 @@ export default function CycleCountSectionV2() {
     </div>
   );
 }
+
+
+
 

@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import './VendorDiscrepancySectionV2.css';
-import { useVendorDiscrepancy } from '../../hooks/useDashboardData';
-import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
-import KpiCard2 from '../../components/charts/KpiCard2';
-import GroupedBarChart from '../../components/charts/GroupedBarChart';
-import ComposedChart from '../../components/charts/ComposedChart';
-import SemiDonutChart from '../../components/charts/SemiDonutChart';
-import ChartToolbar from '../../components/common/ChartToolbar';
-import CustomDropdown from '../../components/common/CustomDropdown';
-import '../../components/charts/DashboardSection.css';
-import WorkInProgress from '../../components/common/WorkInProgress';
+import { useVendorDiscrepancy } from '../../../hooks/useDashboardData';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import KpiCard2 from '../../../components/charts/KpiCard2';
+import GroupedBarChart from '../../../components/charts/GroupedBarChart';
+import ComposedChart from '../../../components/charts/ComposedChart';
+import SemiDonutChart from '../../../components/charts/SemiDonutChart';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import '../../../components/charts/DashboardSection.css';
+import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
 
 export default function VendorDiscrepancySectionV2() {
@@ -118,27 +118,27 @@ export default function VendorDiscrepancySectionV2() {
         <KpiCard2
           title="Total Expected Qty"
           value={totals?.ACTUAL_QTY || '0'}
-          icon={<Icons.Truck size={20} />}
+          icon={<Icons.Truck />}
         />
         <KpiCard2
           title="Total Actual Qty"
           value={totals?.SCANNED_QTY || '0'}
           badgeVariant="success"
-          icon={<Icons.PackageCheck size={20} />}
+          icon={<Icons.PackageCheck />}
         />
         <KpiCard2
           title="Current Discrepancy"
           value={totals?.DIFF_QTY || '0'}
           badge="Action Needed"
           badgeVariant="danger"
-          icon={<Icons.AlertTriangle size={20} />}
+          icon={<Icons.AlertTriangle />}
         />
         <KpiCard2
           title="Discrepancy Rate"
           value={discrepancyPercent}
           subtext="Overall % of missing items"
           badgeVariant="warning"
-          icon={<Icons.Percent size={20} />}
+          icon={<Icons.Percent />}
         />
       </div>
 
@@ -293,4 +293,7 @@ export default function VendorDiscrepancySectionV2() {
     </section>
   );
 }
+
+
+
 

@@ -1,0 +1,655 @@
+/* LiveStockSection.css - Blue Theme Masonry Layout */
+
+.ls-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #334155;
+}
+
+.ls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ls-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.ls-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ls-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.ls-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.ls-btn-primary {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+}
+
+.ls-btn-primary:hover {
+  background-color: #1e3a8a;
+}
+
+.ls-btn-secondary {
+  background-color: white;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.ls-btn-secondary:hover {
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+/* Grid Layout */
+.ls-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  min-width: 0;
+}
+
+/* Cards */
+.ls-card {
+  /* background: white; */
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2px 10px 8px 10px;
+  /* box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: solid 1px #e2e8f0;
+}
+
+.ls-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #475569;
+  margin: 0 0 12px 0;
+}
+
+.ls-card-active .ls-card-title {
+  color: #eff6ff;
+}
+
+.ls-card-value {
+  font-size: clamp(14px, 1.8vw, 28px);
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #0f172a;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ls-card-active .ls-card-value {
+  color: white;
+}
+
+.ls-card-icon {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.ls-card-active .ls-card-icon {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+}
+
+/* Subtext with badge */
+.ls-card-subtext {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: auto;
+}
+
+.ls-card-subtext>span:last-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.ls-card-active .ls-card-subtext {
+  color: #bfdbfe;
+}
+
+.ls-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #166534;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ls-card-active .ls-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Section specific styling */
+.ls-span-2 {
+  grid-column: span 2;
+}
+
+.ls-span-1 {
+  grid-column: span 1;
+}
+
+/* Bottom row: full-width two-column split below the bar chart */
+.ls-row-bottom {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.ls-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 20px 0;
+}
+
+/* Donut Chart Layout */
+.ls-donut-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 60px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px 0 10px;
+}
+
+.ls-donut-wrapper {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  flex-shrink: 0;
+}
+
+/* List Items */
+.ls-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.ls-list-item:hover {
+  background-color: #dfdfdf;
+  border-radius: 9px;
+
+}
+
+.ls-list-item:last-child {
+  border-bottom: none;
+}
+
+.ls-item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ls-item-content {
+  flex: 1;
+  min-width: 0;
+  /* Fix flexbox truncation */
+}
+
+.ls-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ls-item-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ls-item-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Donut Legend & Chart */
+.ls-donut-container {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  height: 100%;
+}
+
+.ls-donut-wrapper {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
+/* Recharts Customization */
+.recharts-bar-rectangle {
+  rx: 20;
+  /* Fully rounded caps */
+  ry: 20;
+}
+
+@media (max-width: 1024px) {
+  .ls-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .ls-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Make the 5th odd card stretch full width */
+  .ls-grid > div:nth-child(5) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .ls-span-2 {
+    grid-column: span 1;
+  }
+}
+
+/* Responsive Toolbar Layout */
+.ls-toolbar-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.ls-toolbar-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ls-toolbar-secondary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 9;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ls-toolbar-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .ls-toolbar-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ls-toolbar-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ls-toolbar-secondary {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .ls-toolbar-controls-left {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ls-toolbar-controls-left > div:first-child,
+  .ls-search-wrapper {
+    width: calc(50% - 6px) !important;
+    flex: none !important;
+  }
+
+  .ls-filter-container {
+    width: 100%;
+    justify-content: space-between;
+    height: 35px;
+  }
+
+  /* Donut Responsive */
+  .ls-donut-container {
+    flex-direction: column;
+    gap: 30px !important;
+  }
+
+  .ls-donut-wrapper {
+    margin: 0 auto;
+    width: min(220px, 100vw - 60px) !important;
+    height: auto !important;
+    aspect-ratio: 1;
+  }
+}
+
+
+
+/* Futuristic Filter Controls */
+.ls-filter-container {
+  display: flex;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(203, 213, 225, 0.5);
+  border-radius: 999px;
+  padding:  0 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  height: 35px;
+}
+
+.ls-filter-container:focus-within {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+}
+
+.ls-filter-label {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  background: rgba(241, 245, 249, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.ls-filter-select {
+  padding: 4px 20px 4px 8px;
+  border-radius: 999px;
+  border: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 12px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3b82f6;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ls-filter-select:hover {
+  background-color: rgba(241, 245, 249, 0.8);
+}
+
+.ls-filter-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0 4px;
+}
+
+.ls-filter-input {
+  width: 55px;
+  padding: 4px 18px 4px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(241, 245, 249, 0.4);
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.ls-filter-input:focus {
+  /* width: 90px; */
+  background: #fff;
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ls-filter-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ls-filter-percent {
+  position: absolute;
+  right: 10px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.ls-filter-btn {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ls-filter-btn:not(:disabled) {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.ls-filter-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.ls-filter-btn:disabled {
+  background: #cbd5e1;
+  color: #f8fafc;
+  cursor: not-allowed;
+}
+
+/* Hide the native up/down arrows in number inputs */
+.ls-filter-input::-webkit-outer-spin-button,
+.ls-filter-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ls-filter-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Custom Animated Dropdown */
+.ls-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 130px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 9999;
+  animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ls-dropdown-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.ls-dropdown-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.ls-dropdown-item.active {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+@media (max-width: 767px) {
+  .ls-coverage-legend {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .ls-coverage-item {
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .ls-coverage-label-row {
+    font-size: 13px !important;
+    gap: 4px !important;
+  }
+
+  .ls-coverage-name {
+    font-size: 13px !important;
+    gap: 6px !important;
+  }
+
+  .ls-coverage-values {
+    gap: 6px !important;
+  }
+
+  .ls-coverage-values span:last-child {
+    font-size: 11px !important;
+    min-width: 36px !important;
+  }
+}
+

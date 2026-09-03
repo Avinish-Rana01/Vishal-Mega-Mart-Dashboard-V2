@@ -1,22 +1,22 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './StoreValidationSectionV2.css';
-import { useStoreDashboard } from '../../hooks/useDashboardData';
-import { useIsInViewport } from '../../hooks/useIsInViewport';
-import KpiCard2 from '../../components/charts/KpiCard2';
-import SectionHeader, { DateBadge } from '../../components/common/SectionHeader';
-import DashboardShimmer from '../../components/common/DashboardShimmer';
-import DashboardDataGrid from '../../components/charts/DashboardDataGrid';
-import CustomDropdown from '../../components/common/CustomDropdown';
-import { SearchEmptyState, GlobalEmptyState } from '../../components/common/ChartEmptyState';
-import ChartToolbar from '../../components/common/ChartToolbar';
-import ChartSearchInput from '../../components/common/ChartSearchInput';
-import ChartLegend from '../../components/common/ChartLegend';
+import { useStoreDashboard } from '../../../hooks/useDashboardData';
+import { useIsInViewport } from '../../../hooks/useIsInViewport';
+import KpiCard2 from '../../../components/charts/KpiCard2';
+import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
+import CustomDropdown from '../../../components/common/CustomDropdown';
+import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
+import ChartToolbar from '../../../components/common/ChartToolbar';
+import ChartSearchInput from '../../../components/common/ChartSearchInput';
+import ChartLegend from '../../../components/common/ChartLegend';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-import '../../components/charts/DashboardSection.css';
+import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
-import { generateMockStoreValidation } from '../../utils/mockStoreValidation';
-import '../Dashboard/sections/common.css';
-import '../Dashboard/sections/CycleCountSection.css';
+import { generateMockStoreValidation } from '../../../utils/mockStoreValidation';
+import './commonV2.css';
+import './CycleCountSharedV2.css';
 
 const { mockStores, mockTotals } = generateMockStoreValidation(20);
 
@@ -549,4 +549,6 @@ export default function StoreValidationSectionV2() {
     </section>
   );
 }
+
+
 

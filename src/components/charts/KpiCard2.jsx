@@ -57,13 +57,17 @@ export default function KpiCard2({ title, value, subtext, badge, badgeVariant = 
           position: 'absolute',
           right: '16px',
           top: '50%',
-          transform: 'translateY(-50%)',
+          transform: 'translateY(-50%) scale(1.833)',
+          transformOrigin: 'right center',
           color: cardColor.border, 
           opacity: 0.35, 
           zIndex: 0,
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
-          {React.isValidElement(icon) ? React.cloneElement(icon, { size: 44, strokeWidth: 2 }) : icon}
+          {icon}
         </div>
       )}
     </div>
