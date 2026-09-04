@@ -10,7 +10,6 @@ import SectionHeader, { DateBadge } from '../../../components/common/SectionHead
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import ChartSearchInput from '../../../components/common/ChartSearchInput';
-import { generateMockData } from '../../../utils/mockLiveStock';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import '../../../components/charts/DashboardSection.css';
@@ -25,8 +24,6 @@ const ArrowUpRight = () => (
     <polyline points="7 7 17 7 17 17"></polyline>
   </svg>
 );
-
-const { mockStores, mockTotals } = generateMockData();
 
 const operatorOptions = [
   { value: '<', label: 'Less (<)' },
@@ -116,10 +113,8 @@ export default function LiveStockSection() {
   // === STATE MANAGEMENT ===
   // Global Data & Context
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
-  const data = mockStores; // USE MOCK DATA OVERRIDE
-  const totals = mockTotals;
-  // const data = realData;
-  // const totals = realTotals;
+  const data = realData;
+  const totals = realTotals;
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().split('T')[0];
 

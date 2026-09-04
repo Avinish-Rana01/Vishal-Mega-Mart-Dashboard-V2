@@ -272,11 +272,6 @@
 .livestock-report-table-wrapper {
   flex: 1;
   margin: 0;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0,0,0,0.02);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }

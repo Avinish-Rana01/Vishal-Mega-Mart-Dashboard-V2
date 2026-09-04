@@ -1,0 +1,350 @@
+.login-page-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden; /* Main container prevents page scroll */
+  background: #ffffff;
+}
+
+/* LEFT PANEL */
+.login-left-panel {
+  flex: 0 0 40%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+  z-index: 20; /* Keep it above the right panel so text overlaps */
+  background-image: url('/assets/images/Sign_in.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Blue overlay over the image */
+.login-left-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #2564eb90;
+  opacity: 0.85; /* Allows the image to show through in blue tones */
+  z-index: 0;
+}
+
+/* The vertical SIGN IN text */
+.login-vertical-text-container {
+  position: absolute;
+  top: 50%;
+  left: 100%; /* Exactly at the boundary of the left panel */
+  transform: translate(-50%, -50%) rotate(-90deg);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.login-vertical-text {
+  font-size: 160px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 4px;
+  white-space: nowrap;
+  margin: 0;
+  /* For unrotated text, the split is horizontal. 
+     Top half (which will face left after -90deg rotation) is White.
+     Bottom half (which will face right after rotation) is Blue. */
+  background: linear-gradient(to bottom, #ffffff 50%, #2563eb 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* At small screens, hide left panel */
+@media (max-width: 992px) {
+  .login-left-panel {
+    display: none;
+  }
+}
+
+/* RIGHT PANEL */
+.login-right-panel {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  position: relative;
+  overflow-y: auto; /* Allow scrolling within the panel if viewport is too short */
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 440px;
+  text-align: left;
+}
+
+/* Form Titles */
+.login-title-header {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px; /* Reduced from 40px to make room for subtitle */
+  text-align: center;
+}
+
+.login-subtitle {
+  color: #64748b;
+  font-size: 18px;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 32px;
+}
+
+.login-title-header span {
+  color: #2563eb;
+}
+
+/* Form Inputs */
+.login-form-group {
+  margin-bottom: 24px;
+}
+
+.login-label {
+  display: none;
+}
+
+.login-input-wrapper {
+  position: relative;
+  background-color: #e2e8f0; /* Gray/greenish background like the image */
+  border-radius: 4px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.login-input-wrapper:focus-within {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+}
+
+.login-input-wrapper-label {
+  font-size: 11px;
+  color: #475569;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.login-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  padding: 4px 0;
+}
+
+.login-input::placeholder {
+  color: #94a3b8;
+}
+
+.input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  cursor: pointer;
+}
+
+/* Login Action Row (Forgot Pass + Sign In Btn) */
+.login-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.login-link {
+  color: #64748b;
+  font-size: 14px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.login-link:hover {
+  color: #2563eb;
+}
+
+.login-btn {
+  background-color: #2563eb; /* User wants blue instead of yellow */
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.login-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.login-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-btn:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Separator */
+.login-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 32px 0;
+}
+
+.login-separator::before,
+.login-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.login-separator::before {
+  margin-right: 16px;
+}
+
+.login-separator::after {
+  margin-left: 16px;
+}
+
+/* Social Buttons */
+.social-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border: none;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.social-btn:hover {
+  background-color: #cbd5e1;
+}
+
+.social-icon-google {
+  color: #ea4335;
+}
+
+.social-icon-facebook {
+  color: #1877f2;
+}
+
+/* Footer / Create Account */
+.login-footer-text {
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Footer Section */
+.login-footer-container {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 14px; /* Increased from 12px */
+  color: #64748b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-footer-logo {
+  height: 40px; /* Increased from 20px */
+  width: auto;
+  object-fit: contain;
+}
+
+.login-footer-link {
+  color: #f59e0b; /* Yellow/Orange to match the image link color */
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 14px;
+  padding: 0;
+}
+
+.login-footer-link:hover {
+  color: #d97706;
+}
+
+.login-error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 8px;
+  display: block;
+  text-align: left;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+@media (max-width: 768px) {
+  .login-footer-container {
+    font-size: 12px;
+    padding: 0 16px;
+    gap: 6px;
+  }
+  .login-footer-logo {
+    height: 24px;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-right-panel {
+    padding: 24px 16px;
+  }
+  .login-title-header {
+    font-size: 28px;
+    /* margin-bo  ttom: 24px; */
+  }
+  .login-footer-container {
+    flex-direction: column;
+    bottom: 16px;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .login-footer-logo {
+    height: 29px;
+  }
+}

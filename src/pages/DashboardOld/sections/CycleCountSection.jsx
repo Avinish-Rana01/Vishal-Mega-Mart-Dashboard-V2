@@ -15,13 +15,9 @@ import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './CycleCountSection.css';
-
-// Generate mock data once (same pattern as LiveStock)
-const mockCycleCountData = generateMockCycleCount(20);
 
 const VIEW_OPTIONS = [
   { value: 'store', label: 'Audit Duration by Store' },
@@ -393,8 +389,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
-  const data = mockCycleCountData; // USE MOCK DATA OVERRIDE
-  // const data = realData;
+  const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);

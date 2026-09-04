@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { USE_GLOBAL_MOCK_DATA } from '../../../config/constants';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -16,13 +15,9 @@ import { useCycleCountMetrics } from '../../../hooks/useCycleCountMetrics';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateMockCycleCount } from '../../../utils/mockCycleCount';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './CycleCountSection.css';
-
-// Generate mock data once (same pattern as LiveStock)
-const mockCycleCountData = generateMockCycleCount(20);
 
 const VIEW_OPTIONS = [
   { value: 'store', label: 'Audit Duration by Store' },
@@ -394,7 +389,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 // ---- Main Component ----
 export default function CycleCountSection() {
   const { data: realData, isLoading, error, refresh } = useCycleCount();
-  const data = USE_GLOBAL_MOCK_DATA ? mockCycleCountData : realData;
+  const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -667,7 +662,7 @@ export default function CycleCountSection() {
             transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
             key={row.REF_NO || row.STORE_CODE}
             className="cc-data-grid-tr"
-            /* onClick={() => handleRowClick(row)} */
+            onClick={() => handleRowClick(row)}
           >
             <td className="cc-data-grid-td cc-data-grid-td-bold">
               <div className="cc-row-tooltip-wrapper">

@@ -13,11 +13,8 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
-import { generateMockStoreValidation } from '../../../utils/mockStoreValidation';
 import './common.css';
 import './CycleCountSection.css';
-
-const { mockStores, mockTotals } = generateMockStoreValidation(20);
 
 
 
@@ -231,10 +228,9 @@ const VIEW_OPTIONS = [
 
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function StoreValidationSection() {
-  // eslint-disable-next-line no-unused-vars
-  const { data: _realData, totals: _realTotals, isLoading, error } = useStoreDashboard();
-  const data = mockStores;
-  const totals = mockTotals;
+  const { data: realData, totals: realTotals, isLoading, error } = useStoreDashboard();
+  const data = realData;
+  const totals = realTotals;
 
   const [chartView, setChartView] = useState('grouped');
   const [searchFilter, setSearchFilter] = useState('');

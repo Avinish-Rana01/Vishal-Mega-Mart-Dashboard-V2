@@ -1,15 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
-import { loginUser } from '../../services/authService';
+import { loginUser, requestPasswordReset, changePassword } from '../../services/authService';
+import { Eye, EyeOff, ShieldCheck, ArrowLeft, Key } from 'lucide-react';
+import './LoginPage.css';
+
 
 export default function LoginPage() {
+  const [view, setView] = useState('login'); // 'login', 'forgot', 'change'
+  
+  // Login State
   const [username, setUsername] = useState('Admin');
   const [password, setPassword] = useState('');
+  
+  // Forgot Password State
+  const [forgotUsername, setForgotUsername] = useState('');
+  
+  // Change Password State
+  const [changeUsername, setChangeUsername] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  
+  // Shared State
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({ username: '', password: '', form: '' });
+  const [errors, setErrors] = useState({});
+  const [successMsg, setSuccessMsg] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,163 +35,293 @@ export default function LoginPage() {
 
   const from = location.state?.from?.pathname || '/dashboard';
 
-  // Redirect if they are already logged in
-  React.useEffect(() => {
+  useEffect(() => {
     if (isLoggedIn) {
       navigate('/dashboard', { replace: true });
     }
   }, [isLoggedIn, navigate]);
 
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { username: '', password: '', form: '' };
-
-    if (!username.trim()) {
-      newErrors.username = 'Please Enter User Name';
-      valid = false;
-    }
-    if (!password) {
-      newErrors.password = 'Password is required';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
   const handleFocus = (field) => {
     setErrors((prev) => ({ ...prev, [field]: '' }));
+    setSuccessMsg('');
   };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!username.trim()) {
+      setErrors({ username: 'Please enter your email or username' });
+      return;
+    }
+    if (!password) {
+      setErrors({ password: 'Password is required' });
+      return;
+    }
 
     setIsLoading(true);
-    setErrors((prev) => ({ ...prev, form: '' }));
-
+    setErrors({});
+    
     try {
       const response = await loginUser(username, password);
       login(response);
       navigate(from, { replace: true });
     } catch (err) {
       console.error('Login failed', err);
-      setErrors((prev) => ({ ...prev, form: 'Invalid username or password. Please try again.' }));
+      setErrors({ form: 'Invalid username or password. Please try again.' });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleForgotSubmit = async (e) => {
+    e.preventDefault();
+    if (!forgotUsername.trim()) {
+      setErrors({ forgotUsername: 'Please Enter User Name or Email' });
+      return;
+    }
+    setIsLoading(true);
+    setErrors({});
+    try {
+      await requestPasswordReset(forgotUsername);
+      setSuccessMsg('A password reset link has been sent.');
+      setTimeout(() => setView('login'), 3000);
+    } catch (err) {
+      setErrors({ form: 'Failed to request password reset.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangePassSubmit = async (e) => {
+    e.preventDefault();
+    if (!changeUsername.trim() || !oldPassword || !newPassword) {
+      setErrors({ form: 'All fields are required.' });
+      return;
+    }
+    setIsLoading(true);
+    setErrors({});
+    try {
+      await changePassword(changeUsername, oldPassword, newPassword);
+      setSuccessMsg('Password changed successfully.');
+      setTimeout(() => setView('login'), 3000);
+    } catch (err) {
+      setErrors({ form: 'Failed to change password.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formVariants = {
+    hidden: { opacity: 0, x: -20, scale: 0.95 },
+    visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+    exit: { opacity: 0, x: 20, scale: 0.95, transition: { duration: 0.3, ease: "easeIn" } }
+  };
+
   return (
-    <div className="limiter">
-      <div className="container-login100">
-        <div className="wrap-login100">
-          {/* Sign In Form */}
-          <form onSubmit={handleLoginSubmit} className="login100-form validate-form" noValidate>
-            <center>
-              <img
-                src="/assets/images/vishal_mega_mart.png"
-                className="logo"
-                alt="Logo"
-              />
-            </center>
-
-            <div className="login100-form-title p-b-15">
-              {APP_INFO.TITLE}
-            </div>
-
-            <div className="hr-sect p-b-20">
-              SIGN IN
-            </div>
-
-            {/* Username Input */}
-            <div
-              className={`wrap-input100 validate-input ${errors.username ? 'alert-validate' : ''}`}
-              data-validate={errors.username || "Please Enter User Name"}
-            >
-              <input
-                id="txtUsername"
-                type="text"
-                className={`input100 ${username.trim() !== '' ? 'has-val' : ''}`}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                onFocus={() => handleFocus('username')}
-                autoFocus
-              />
-              <span className="focus-input100"></span>
-              <span className="label-input100">User Name</span>
-            </div>
-
-            {/* Password Input */}
-            <div
-              className={`wrap-input100 validate-input ${errors.password ? 'alert-validate' : ''}`}
-              data-validate={errors.password || "Password is required"}
-            >
-              <input
-                id="txtPassword"
-                type={showPassword ? 'text' : 'password'}
-                className={`input100 ${password.trim() !== '' ? 'has-val' : ''}`}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onFocus={() => handleFocus('password')}
-              />
-              <span className="focus-input100"></span>
-              <span className="label-input100">Password</span>
-            </div>
-
-            {/* Checkbox */}
-            <div className="flex-sb-m w-full p-t-3 p-b-20">
-              <div className="contact100-form-checkbox">
-                <input
-                  className="input-checkbox100"
-                  id="ckb1"
-                  type="checkbox"
-                  name="remember-me"
-                  checked={showPassword}
-                  onChange={(e) => setShowPassword(e.target.checked)}
-                />
-                <label className="label-checkbox100" htmlFor="ckb1">
-                  Show Password
-                </label>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            {errors.form && (
-              <div className="p-b-15 text-center" style={{ color: '#dc2626', fontSize: '13px', fontWeight: '500' }}>
-                {errors.form}
-              </div>
-            )}
-            <div className="container-login100-form-btn">
-              <button
-                type="submit"
-                id="btnLogin"
-                className="login100-form-btn"
-                disabled={isLoading}
-              >
-                {isLoading ? 'SIGNING IN...' : 'SIGN IN'}
-              </button>
-            </div>
-
-            {/* Footer */}
-            <div className="text-center p-t-15 p-b-10">
-              <div className="txt2">
-                Copyright &copy; {APP_INFO.DEFAULT_YEAR} | V {APP_INFO.VERSION} | {APP_INFO.COMPANY} | Designed & Developed by <br />
-                <div className="footer-dev">
-                  <img
-                    src="/assets/images/vyapti_logo.png"
-                    title={APP_INFO.COMPANY}
-                    alt="Vyapti Logo"
-                    className="vyapti-logo-img"
-                  />
-                </div>
-              </div>
-            </div>
-          </form>
-
-          {/* Left/Right Background Image Banner */}
-          <div className="login100-more"></div>
+    <div className="login-page-container">
+      {/* Left Panel */}
+      <div className="login-left-panel">
+        <div className="login-vertical-text-container">
+          <div className="login-vertical-text">SIGN IN</div>
         </div>
+      </div>
+
+      {/* Right Panel */}
+      <div className="login-right-panel">
+        <div className="login-form-container">
+          
+          {/* Static Logo Above Animated Forms */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <img 
+              src="/assets/images/vishal_mega_mart.png" 
+              alt="Vishal Mega Mart Logo" 
+              style={{ maxWidth: '360px', height: 'auto' }} 
+            />
+          </div>
+
+          <AnimatePresence mode="wait">
+            {view === 'login' && (
+              <motion.div key="login" variants={formVariants} initial="hidden" animate="visible" exit="exit">
+                <div className="login-title-header">Sign <span>in</span></div>
+                <p className="login-subtitle" style={{ marginBottom: '24px', color: '#666' }}>Welcome back! Please enter your details.</p>
+                
+                <form onSubmit={handleLoginSubmit}>
+                  <div className="login-form-group">
+                    <div className="login-input-wrapper">
+                      <span className="login-input-wrapper-label">User Name</span>
+                      <input
+                        type="text"
+                        className="login-input"
+                        placeholder="Enter your email address"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        onFocus={() => handleFocus('username')}
+                      />
+                    </div>
+                    {errors.username && <span className="login-error-text">{errors.username}</span>}
+                  </div>
+
+                  <div className="login-form-group">
+                    <div className="login-input-wrapper">
+                      <span className="login-input-wrapper-label">Password</span>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="login-input"
+                        placeholder="***************"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onFocus={() => handleFocus('password')}
+                      />
+                      {showPassword ? (
+                         <EyeOff size={16} className="input-icon" onClick={() => setShowPassword(false)} />
+                      ) : (
+                         <Eye size={16} className="input-icon" onClick={() => setShowPassword(true)} />
+                      )}
+                    </div>
+                    {errors.password && <span className="login-error-text">{errors.password}</span>}
+                  </div>
+
+                  {errors.form && <div className="login-error-text" style={{ marginBottom: '16px' }}>{errors.form}</div>}
+                  
+                  <div className="login-action-row">
+                    <button type="button" className="login-link" onClick={() => setView('forgot')}>
+                      Forgot your password?
+                    </button>
+                    <button type="submit" className="login-btn" disabled={isLoading}>
+                      {isLoading ? 'Signing in...' : 'Sign in'}
+                    </button>
+                  </div>
+                  
+                  {/* <div className="login-footer-text" style={{ marginTop: '24px', fontSize: '11px' }}>
+                    <button type="button" className="login-link" style={{ fontSize: '11px' }} onClick={() => setView('change')}>
+                      Need to change your password?
+                    </button>
+                  </div> */}
+                </form>
+              </motion.div>
+            )}
+
+            {view === 'forgot' && (
+              <motion.div key="forgot" variants={formVariants} initial="hidden" animate="visible" exit="exit">
+                <div className="login-title-header">Reset <span>Password</span></div>
+                
+                <form onSubmit={handleForgotSubmit}>
+                  <div className="login-form-group">
+                    <div className="login-input-wrapper">
+                      <span className="login-input-wrapper-label">Email / User Name</span>
+                      <input
+                        type="text"
+                        className="login-input"
+                        placeholder="Enter your email address"
+                        value={forgotUsername}
+                        onChange={(e) => setForgotUsername(e.target.value)}
+                        onFocus={() => handleFocus('forgotUsername')}
+                      />
+                      <ShieldCheck size={16} className="input-icon" />
+                    </div>
+                    {errors.forgotUsername && <span className="login-error-text">{errors.forgotUsername}</span>}
+                  </div>
+
+                  {errors.form && <div className="login-error-text" style={{ marginBottom: '16px' }}>{errors.form}</div>}
+                  {successMsg && <div style={{ color: '#16a34a', fontSize: '13px', marginBottom: '16px' }}>{successMsg}</div>}
+                  
+                  <div className="login-action-row" style={{ justifyContent: 'flex-end' }}>
+                    <button type="submit" className="login-btn" disabled={isLoading}>
+                      {isLoading ? 'Sending...' : 'Send Reset Link'}
+                    </button>
+                  </div>
+
+                  <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                    <button type="button" className="login-link" style={{ display: 'inline-flex', alignItems: 'center' }} onClick={() => setView('login')}>
+                      <ArrowLeft size={14} style={{ marginRight: '6px' }} /> Back to Sign In
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+
+            {view === 'change' && (
+              <motion.div key="change" variants={formVariants} initial="hidden" animate="visible" exit="exit">
+                <div className="login-title-header">Change <span>Password</span></div>
+                
+                <form onSubmit={handleChangePassSubmit}>
+                  <div className="login-form-group">
+                    <div className="login-input-wrapper">
+                      <span className="login-input-wrapper-label">Email / User Name</span>
+                      <input
+                        type="text"
+                        className="login-input"
+                        placeholder="Enter your username"
+                        value={changeUsername}
+                        onChange={(e) => setChangeUsername(e.target.value)}
+                        onFocus={() => handleFocus('changeUsername')}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="login-form-group">
+                    <div className="login-input-wrapper">
+                      <span className="login-input-wrapper-label">Old Password</span>
+                      <input
+                        type="password"
+                        className="login-input"
+                        placeholder="Enter old password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        onFocus={() => handleFocus('oldPassword')}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="login-form-group">
+                    <div className="login-input-wrapper">
+                      <span className="login-input-wrapper-label">New Password</span>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="login-input"
+                        placeholder="Enter new password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        onFocus={() => handleFocus('newPassword')}
+                      />
+                      <Key size={16} className="input-icon" style={{ right: '36px' }} />
+                      {showPassword ? (
+                         <EyeOff size={16} className="input-icon" onClick={() => setShowPassword(false)} />
+                      ) : (
+                         <Eye size={16} className="input-icon" onClick={() => setShowPassword(true)} />
+                      )}
+                    </div>
+                  </div>
+
+                  {errors.form && <div className="login-error-text" style={{ marginBottom: '16px' }}>{errors.form}</div>}
+                  {successMsg && <div style={{ color: '#16a34a', fontSize: '13px', marginBottom: '16px' }}>{successMsg}</div>}
+                  
+                  <div className="login-action-row" style={{ justifyContent: 'flex-end' }}>
+                    <button type="submit" className="login-btn" disabled={isLoading}>
+                      {isLoading ? 'Updating...' : 'Update Password'}
+                    </button>
+                  </div>
+
+                  <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                    <button type="button" className="login-link" style={{ display: 'inline-flex', alignItems: 'center' }} onClick={() => setView('login')}>
+                      <ArrowLeft size={14} style={{ marginRight: '6px' }} /> Back to Sign In
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        
+        {/* Footer */}
+        <div className="login-footer-container">
+          <span>Copyright &copy; {APP_INFO.DEFAULT_YEAR} | V {APP_INFO.VERSION} | {APP_INFO.COMPANY} | Designed & Developed by</span>
+          <img 
+            src="/assets/images/vyapti_logo.png" 
+            alt="Vyapti Logo" 
+            className="login-footer-logo"
+          />
+        </div>
+
       </div>
     </div>
   );

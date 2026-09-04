@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { USE_GLOBAL_MOCK_DATA } from '../../../config/constants';
 import './StoreValidationSection.css';
 import { useStoreDashboard } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
@@ -15,11 +14,8 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
-import { generateMockStoreValidation } from '../../../utils/mockStoreValidation';
 import './common.css';
 import './CycleCountShared.css';
-
-const { mockStores, mockTotals } = generateMockStoreValidation(20);
 
 
 
@@ -234,8 +230,8 @@ const VIEW_OPTIONS = [
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function StoreValidationSection() {
   const { data: realData, totals: realTotals, isLoading, error } = useStoreDashboard();
-  const data = USE_GLOBAL_MOCK_DATA ? mockStores : realData;
-  const totals = USE_GLOBAL_MOCK_DATA ? mockTotals : realTotals;
+  const data = realData;
+  const totals = realTotals;
 
   const [chartView, setChartView] = useState('grouped');
   const [searchFilter, setSearchFilter] = useState('');

@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: 5174,
+      port: 5999,
       proxy: {
         // Proxy ASP.NET WebMethod & Web API requests to IIS Express
         '/Dashboard.aspx': {

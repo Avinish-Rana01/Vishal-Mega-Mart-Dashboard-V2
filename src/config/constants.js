@@ -18,8 +18,6 @@ export const API_DEFAULTS = {
   SORT_DIRECTION: 'asc'
 };
 
-export const USE_GLOBAL_MOCK_DATA = true;
-
 export const STORE_MAPPING = {
   "HD02": "PITAMPURA",
   "HD24": "NAJAFGARH-2",

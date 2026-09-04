@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { USE_GLOBAL_MOCK_DATA } from '../../../config/constants';
 import { useLiveStock } from '../../../hooks/useDashboardData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
@@ -12,7 +11,6 @@ import SectionHeader, { DateBadge } from '../../../components/common/SectionHead
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import ChartSearchInput from '../../../components/common/ChartSearchInput';
-import { generateMockData } from '../../../utils/mockLiveStock';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import '../../../components/charts/DashboardSection.css';
@@ -52,8 +50,6 @@ const ClipboardChartIcon = ({ size = 44, color = "#3b82f6" }) => (
     <circle cx="15" cy="7.5" r="1.5" fill={color} stroke="none"></circle>
   </svg>
 );
-
-const { mockStores, mockTotals } = generateMockData();
 
 const operatorOptions = [
   { value: '<', label: 'Less (<)' },
@@ -97,8 +93,8 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => {
             />
 
             {/* Stacked bars: RFID on left, Difference on right */}
-            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
-            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" isAnimationActive={true} animationDuration={800} />
+            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -143,8 +139,8 @@ export default function LiveStockSection() {
   // === STATE MANAGEMENT ===
   // Global Data & Context
   const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
-  const data = USE_GLOBAL_MOCK_DATA ? mockStores : realData;
-  const totals = USE_GLOBAL_MOCK_DATA ? mockTotals : realTotals;
+  const data = realData;
+  const totals = realTotals;
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -256,7 +252,8 @@ export default function LiveStockSection() {
         PERCENTAGE: percentage,
         RFID: rfid,
         SAP_STOCK: sap,
-        Difference: difference
+        Difference: difference,
+        DATE: row.DATE
       };
     });
   }, [filteredData]);
@@ -298,8 +295,10 @@ export default function LiveStockSection() {
    */
   const handleBarClick = React.useCallback((dataProps) => {
     const storeCode = dataProps?.name || dataProps?.payload?.name;
+    const payloadDate = dataProps?.DATE || dataProps?.payload?.DATE || todayStr;
+    
     if (storeCode) {
-      navigate('/reports/live-stock', { state: { store: storeCode, date: todayStr } });
+      navigate('/reports/live-stock', { state: { store: storeCode, date: payloadDate } });
     }
   }, [navigate, todayStr]);
 
