@@ -1,0 +1,118 @@
+/* UnderDevelopmentPage.css */
+
+.dev-page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Background animated gradient */
+.dev-background-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, #1e3a8a 0%, #0f172a 70%);
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* Transparent wrapper instead of a card */
+.dev-content-card {
+  padding: 3rem 4rem;
+  z-index: 10;
+  max-width: 600px;
+  width: 100%;
+}
+
+.dev-icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.dev-icon-wrapper {
+  background: rgba(59, 130, 246, 0.2);
+  padding: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.dev-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dev-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #94a3b8;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+}
+
+/* Progress / loading bar style */
+.dev-progress-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.dev-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  border-radius: 10px;
+}
+
+.dev-footer {
+  position: absolute;
+  bottom: 2rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.dev-footer svg {
+  color: #94a3b8;
+}
+
+.dev-footer span {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+/* Animated particles effect */
+.dev-particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 2;
+}
