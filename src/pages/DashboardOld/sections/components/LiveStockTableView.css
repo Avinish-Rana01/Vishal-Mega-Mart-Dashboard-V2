@@ -250,7 +250,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.report-selected-info-bar {
+/* .report-selected-info-bar {
   display: flex;
   gap: 30px;
   padding: 8px 15px;
@@ -261,7 +261,7 @@
   font-weight: 700;
   color: #1e293b;
   border: 1px solid #cbd5e1;
-}
+} */
 
 .livestock-table-view {
   display: flex;

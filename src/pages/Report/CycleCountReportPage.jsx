@@ -11,9 +11,10 @@ export default function CycleCountReportPage() {
   const location = useLocation();
   const { storeCode: initialStore, date: initialDate } = location.state || {};
 
+  const defaultDate = initialDate || '2026-07-21';
   const [selectedStore, setSelectedStore] = useState(initialStore || '');
-  const [fromDate, setFromDate] = useState(initialDate || new Date().toISOString().split('T')[0]);
-  const [toDate, setToDate] = useState(initialDate || new Date().toISOString().split('T')[0]);
+  const [fromDate, setFromDate] = useState(defaultDate);
+  const [toDate, setToDate] = useState(defaultDate);
   const [storeOptions, setStoreOptions] = useState([]);
   
   const [reportData, setReportData] = useState([]);
@@ -24,6 +25,7 @@ export default function CycleCountReportPage() {
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalRecords, setTotalRecords] = useState(0);
+  const [searchTrigger, setSearchTrigger] = useState(0);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,15 +37,14 @@ export default function CycleCountReportPage() {
     const fetchStores = async () => {
       try {
         const data = await getBindStores(fromDate, toDate, controller.signal);
-        // BindStoreResponse has a Stores array
-        setStoreOptions(data?.stores || data?.Stores || []);
+        setStoreOptions(Array.isArray(data) ? data : (data?.stores || data?.Stores || []));
       } catch (err) {
         if (err.name !== 'AbortError') console.error("Failed to fetch stores", err);
       }
     };
     fetchStores();
     return () => controller.abort();
-  }, [fromDate, toDate]);
+  }, []);
 
   // Fetch Report Data
   const fetchReportData = async (signal) => {
@@ -73,12 +74,13 @@ export default function CycleCountReportPage() {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [pageIndex, pageSize, searchTerm, selectedStore]); // fetch when store or pagination changes
+  }, [pageIndex, pageSize, searchTerm, selectedStore, searchTrigger]);
 
   const handleSearch = () => {
-    setPageIndex(1);
-    const controller = new AbortController();
-    fetchReportData(controller.signal);
+    if (pageIndex !== 1) {
+      setPageIndex(1);
+    }
+    setSearchTrigger(prev => prev + 1);
   };
 
   const handleClear = () => {

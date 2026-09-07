@@ -8,7 +8,7 @@ export const linkRenderer = (val) => <span className="vmm-link-num">{val}</span>
 
 export const dateRenderer = (val) => {
   if (!val) return '';
-  return typeof val === 'string' ? val.split(' ')[0] : val;
+  return typeof val === 'string' ? val.split('T')[0].split(' ')[0] : val;
 };
 
 export const storeRenderer = (val, row) => {

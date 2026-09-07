@@ -58,7 +58,7 @@ export default function DetailsModal({
 
           {/* Data Table */}
           {tableColumns && tableColumns.length > 0 && (
-            <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ backgroundColor: 'white', borderRadius: '12px',  flex: 1, display: 'flex', flexDirection: 'column' }}>
               <ReportDataTableCard 
                 columns={tableColumns}
                 data={tableData}
