@@ -333,7 +333,12 @@ export default function StoreValidationSection() {
 
   return (
     <section className="cc-container">
-      <SectionHeader title="Store Validation" rightContent={<DateBadge />} />
+      <SectionHeader 
+        title="Store Validation" 
+        subtitle="Overview of store GRN validation process"
+        icon={<Icons.CheckCircle size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
       <div className="cc-kpi-row">

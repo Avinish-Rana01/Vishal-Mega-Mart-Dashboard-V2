@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tags } from 'lucide-react';
 import './TagManagementSection.css';
 import { useTagCharts } from '../../../hooks/useDashboardData';
 import KpiCard2 from '../../../components/charts/KpiCard2';
@@ -30,7 +31,12 @@ export default function TagManagementSection() {
   if (isLoading) {
     return (
       <section className="ds-section">
-        <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
+        <SectionHeader 
+          title="TAG MANAGEMENT" 
+          subtitle="Overview of tag issuance and inventory across locations"
+          icon={<Tags size={44} color="#3b82f6" strokeWidth={2.2} />}
+          rightContent={<DateBadge />} 
+        />
         <div className="ds-kpi-row">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="ds-skeleton-box" style={{ height: '80px', borderRadius: '12px' }}>
@@ -62,7 +68,12 @@ export default function TagManagementSection() {
 
   return (
     <section className="ds-section">
-      <SectionHeader title="TAG MANAGEMENT" rightContent={<DateBadge />} />
+      <SectionHeader 
+        title="TAG MANAGEMENT" 
+        subtitle="Overview of tag issuance and inventory across locations"
+        icon={<Tags size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">

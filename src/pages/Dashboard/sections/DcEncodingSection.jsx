@@ -133,7 +133,12 @@ export default function DcEncodingSection() {
 
   return (
     <div className="vmm-section-container ds-section">
-      <SectionHeader title="DC Encoding" rightContent={<DateBadge />} />
+      <SectionHeader 
+        title="DC Encoding" 
+        subtitle="Overview of hourly tag encoding in the Distribution Center"
+        icon={<Icons.Barcode size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
       <div className="ds-kpi-row">
         <KpiCard2 title="Tags Encoded" value={totalEncoded.toLocaleString('en-IN')} icon={<Icons.Tag />} />

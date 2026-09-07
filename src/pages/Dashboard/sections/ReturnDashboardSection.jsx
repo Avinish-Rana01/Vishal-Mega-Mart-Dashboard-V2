@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 import './ReturnDashboardSection.css';
 import { useReturnDashboard } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -223,7 +224,8 @@ export default function ReturnDashboardSection() {
     <section className="ds-section">
       <SectionHeader 
         title="Return Dashboard" 
-        // subtitle="Track customer returns vs successfully encoded items." 
+        subtitle="Overview of customer return transactions"
+        icon={<RotateCcw size={44} color="#3b82f6" strokeWidth={2.2} />}
         rightContent={<DateBadge />} 
       />
 

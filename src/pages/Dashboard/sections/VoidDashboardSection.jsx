@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import './VoidDashboardSection.css';
-import { RefreshCw } from 'lucide-react';
+import { Ban } from 'lucide-react';
 import { useVoidDashboard } from '../../../hooks/useDashboardData';
 
 import KpiCard2 from '../../../components/charts/KpiCard2';
@@ -230,7 +230,8 @@ export default function VoidDashboardSection() {
     <section className="ds-section">
       <SectionHeader 
         title="Void Dashboard"
-        // subtitle="Track voided transactions vs successfully encoded items."
+        subtitle="Overview of voided transactions across stores"
+        icon={<Ban size={44} color="#3b82f6" strokeWidth={2.2} />}
         rightContent={<DateBadge />}
       />
 

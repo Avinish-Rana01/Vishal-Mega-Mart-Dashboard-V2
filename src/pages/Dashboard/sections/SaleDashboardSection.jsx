@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import './SaleDashboardSection.css';
 import { useNavigate } from 'react-router-dom';
 import { useSaleDashboard } from '../../../hooks/useDashboardData';
@@ -137,7 +138,12 @@ export default function SaleDashboardSection() {
   if (!data || data.length === 0) {
     return (
       <div className="cc-container">
-        <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
+        <SectionHeader 
+          title="Sale Operations" 
+          subtitle="Overview of store sales performance"
+          icon={<ShoppingCart size={44} color="#3b82f6" strokeWidth={2.2} />}
+          rightContent={<DateBadge />} 
+        />
         <GlobalEmptyState
           title="No Sales Data Available"
           subtitle="There is currently no sales data for today."
@@ -150,7 +156,12 @@ export default function SaleDashboardSection() {
 
   return (
     <div className="cc-container">
-      <SectionHeader title="Sale Operations" rightContent={<DateBadge />} />
+      <SectionHeader 
+        title="Sale Operations" 
+        subtitle="Overview of store sales performance"
+        icon={<ShoppingCart size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row">

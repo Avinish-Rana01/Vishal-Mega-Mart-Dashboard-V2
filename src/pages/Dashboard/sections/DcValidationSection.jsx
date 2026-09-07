@@ -105,7 +105,12 @@ export default function DcValidationSection() {
 
   return (
     <div className="cc-container">
-      <SectionHeader title="DC Validation" rightContent={<DateBadge />} />
+      <SectionHeader 
+        title="DC Validation" 
+        subtitle="Overview of Distribution Center validation progress"
+        icon={<Icons.Building size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>

@@ -68,7 +68,12 @@ export default function VendorDiscrepancySection() {
   if (isLoading) {
     return (
       <section className="ds-section">
-        <SectionHeader title="VENDOR DISCREPANCY" rightContent={<DateBadge />} />
+        <SectionHeader 
+        title="VENDOR DISCREPANCY" 
+        subtitle="Discrepancies between expected and scanned vendor deliveries"
+        icon={<Icons.Truck size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
         {/* 1. KPI Skeleton Row */}
         <div className="ds-kpi-row">
@@ -111,7 +116,12 @@ export default function VendorDiscrepancySection() {
 
   return (
     <section className="ds-section">
-      <SectionHeader title="VENDOR DISCREPANCY" rightContent={<DateBadge />} />
+      <SectionHeader 
+        title="VENDOR DISCREPANCY" 
+        subtitle="Discrepancies between expected and scanned vendor deliveries"
+        icon={<Icons.Truck size={44} color="#3b82f6" strokeWidth={2.2} />}
+        rightContent={<DateBadge />} 
+      />
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">

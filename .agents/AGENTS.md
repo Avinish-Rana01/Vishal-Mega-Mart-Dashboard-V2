@@ -76,3 +76,17 @@ When rendering responsive charts (especially with Recharts) inside flex containe
 2. **Scroll Containers**: Any scrollable wrapper inside the flex container MUST use `flex: 1; min-height: 0` (or `min-width: 0` for rows). 
 3. **Avoid height: 100% alone**: Never rely solely on `height: 100%` for a chart wrapper inside a flex item, as it will often collapse. Always use `flex: 1; min-height: 0`.
 4. **Recharts ResponsiveContainer**: Ensure the `ResponsiveContainer` is wrapped in a rigidly constrained `flex: 1; min-height: 0` container. If the chart needs to scroll, apply `overflow: auto` to that specific wrapper.
+
+## Frontend Deployment Pre-requisite
+When the user asks to ""/deploy"" the frontend codebase or push changes to production, you MUST ALWAYS uncomment the 
+eturn <UnderDevelopmentPage />; line within the ""DEPLOYMENT TOGGLE"" block in src/pages/Login/LoginPage.jsx before pushing the code. This ensures that the ""Under Development"" splash screen is active in production instead of the broken login page.
+
+# Custom Slash Commands
+
+## /deploy
+When the user types /deploy or asks to deploy the frontend codebase:
+1. Open src/pages/Login/LoginPage.jsx.
+2. Find the 'DEPLOYMENT TOGGLE' block (around line 122).
+3. Uncomment the line `return <UnderDevelopmentPage />;`.
+4. Stage and commit the changes if instructed to push.
+5. Provide a summary of the action taken.

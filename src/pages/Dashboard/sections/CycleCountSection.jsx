@@ -498,6 +498,8 @@ export default function CycleCountSection() {
       <div className="cc-container">
         <SectionHeader
           title="Cycle Count"
+          subtitle="Real-time progress and duration of store cycle counts"
+          icon={<ClipboardList size={44} color="#3b82f6" strokeWidth={2.2} />}
           rightContent={<DateBadge />}
         />
         <div className="cc-card">
@@ -517,6 +519,8 @@ export default function CycleCountSection() {
       {/* HEADER — same structure as LiveStock */}
       <SectionHeader
         title="Cycle Count"
+        subtitle="Real-time progress and duration of store cycle counts"
+        icon={<ClipboardList size={44} color="#3b82f6" strokeWidth={2.2} />}
         rightContent={<DateBadge />}
       />
 
