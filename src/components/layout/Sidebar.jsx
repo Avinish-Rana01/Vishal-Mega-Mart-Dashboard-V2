@@ -45,11 +45,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   Dashboard V2
                 </NavLink>
               </li>
-              {/* <li>
+              <li>
                 <NavLink to="/dashboard-old" end className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
                   Legacy Dashboard
                 </NavLink>
-              </li> */}
+              </li>
             </ul>
           </div>
         </div>

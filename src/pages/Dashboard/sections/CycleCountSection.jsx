@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -61,7 +62,7 @@ function DurationTooltip({ active, payload }) {
 }
 
 // ---- Memoized Chart Component ----
-const MemoizedChart = React.memo(({ chartData, chartHeight }) => {
+const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
   return (
     <div ref={ref} style={{ width: '100%', minHeight: chartHeight }}>
@@ -88,7 +89,7 @@ const MemoizedChart = React.memo(({ chartData, chartHeight }) => {
               content={<DurationTooltip />}
               cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
             />
-            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff" isAnimationActive={true}>
+            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff" isAnimationActive={true} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
               <LabelList
                 dataKey="rawDuration"
                 position="right"
@@ -171,7 +172,7 @@ function CycleInfoTooltip({ active, payload }) {
 }
 
 // ---- Left Chart: System vs Scanned ----
-const CycleCountStockChart = React.memo(({ chartData, chartHeight }) => {
+const CycleCountStockChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
       <BarChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 5 }}>
@@ -186,10 +187,10 @@ const CycleCountStockChart = React.memo(({ chartData, chartHeight }) => {
           width={50}
         />
         <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
-        <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false}>
+        <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
           <LabelList dataKey="SYSTEM_STOCK" position="right" fill="#3b82f6" fontSize={11} fontWeight={600} />
         </Bar>
-        <Bar dataKey="SCANNED_QTY" barSize={12} fill="#10b981" radius={[4, 4, 4, 4]} isAnimationActive={false}>
+        <Bar dataKey="SCANNED_QTY" barSize={12} fill="#10b981" radius={[4, 4, 4, 4]} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
           <LabelList dataKey="SCANNED_QTY" position="right" fill="#10b981" fontSize={11} fontWeight={600} />
         </Bar>
       </BarChart>
@@ -251,7 +252,7 @@ const CustomVarianceLabel = (props) => {
 };
 
 // ---- Right Chart: Stock Variance (Recharts Stacked Implementation) ----
-const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
+const CycleCountVarianceChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
   const maxShort = Math.max(0, ...chartData.map(d => Math.abs(Number(d.SHORT_QTY || 0))));
   const maxExcess = Math.max(0, ...chartData.map(d => Number(d.EXCESS_QTY || 0)));
 
@@ -303,11 +304,11 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
               <XAxis type="number" hide domain={[0, 100]} />
               <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
               <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
-              <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#f97316" radius={4} isAnimationActive={false}>
+              <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#f97316" radius={4} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
                 <LabelList dataKey="SHORT_VAL" content={<CustomVarianceLabel fill="#f97316" />} />
               </Bar>
               <Bar dataKey="SPACER_FG" stackId="a" fill="transparent" isAnimationActive={false} />
-              <Bar dataKey="EXCESS_BAR" stackId="a" barSize={14} fill="#10b981" radius={4} isAnimationActive={false}>
+              <Bar dataKey="EXCESS_BAR" stackId="a" barSize={14} fill="#10b981" radius={4} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
                 <LabelList dataKey="EXCESS_VAL" content={<CustomVarianceLabel fill="#10b981" />} />
               </Bar>
             </BarChart>
@@ -322,7 +323,7 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight }) => {
 });
 
 // ---- Split Layout Wrapper (Now a Tabbed Carousel) ----
-const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab }) => {
+const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab, onBarClick }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
@@ -350,7 +351,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
                   </span>
                 </div>
               </div>
-              <CycleCountStockChart chartData={chartData} chartHeight={chartHeight} />
+              <CycleCountStockChart chartData={chartData} chartHeight={chartHeight} onBarClick={onBarClick} />
             </motion.div>
           ) : (
             <motion.div
@@ -377,7 +378,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
                   </span>
                 </div>
               </div>
-              <CycleCountVarianceChart chartData={chartData} chartHeight={chartHeight} />
+              <CycleCountVarianceChart chartData={chartData} chartHeight={chartHeight} onBarClick={onBarClick} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -388,6 +389,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 
 // ---- Main Component ----
 export default function CycleCountSection() {
+  const navigate = useNavigate();
   const { data: realData, isLoading, error, refresh } = useCycleCount();
   const data = realData;
   const metrics = useCycleCountMetrics(data);
@@ -618,12 +620,12 @@ export default function CycleCountSection() {
                 onClearSearch={() => setSearchFilter('')}
               />
             ) : (
-              <MemoizedChart chartData={chartData} chartHeight={chartHeight} />
+              <MemoizedChart chartData={chartData} chartHeight={chartHeight} onBarClick={handleRowClick} />
             )
           ) : chartView === 'distribution' ? (
             <MemoizedDistributionChart distributionData={distributionData} />
           ) : (
-            <MemoizedCycleSplitCharts chartData={chartData} chartHeight={chartHeight} activeTab={infoTab} />
+            <MemoizedCycleSplitCharts chartData={chartData} chartHeight={chartHeight} activeTab={infoTab} onBarClick={handleRowClick} />
           )}
         </div>
       </div>
@@ -666,10 +668,13 @@ export default function CycleCountSection() {
             transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
             key={row.REF_NO || row.STORE_CODE}
             className="cc-data-grid-tr"
-            onClick={() => handleRowClick(row)}
           >
             <td className="cc-data-grid-td cc-data-grid-td-bold">
-              <div className="cc-row-tooltip-wrapper">
+              <div 
+                className="cc-row-tooltip-wrapper"
+                style={{ cursor: 'pointer', color: '#2563eb' }}
+                onClick={() => navigate('/reports/cycle-count', { state: { storeCode: row.STORE_CODE, date: row.DATE } })}
+              >
                 {row.STORE_CODE || '—'}
                 {row.STORE_NAME && (
                   <div className="cc-row-tooltip">
@@ -683,7 +688,15 @@ export default function CycleCountSection() {
                 row.CYCLE_COUNT_TYPE === 'MC' ? 'MC Level' :
                   (row.CYCLE_COUNT_TYPE || '—')}
             </td>
-            <td className="cc-data-grid-td"><span className="cc-data-grid-ref-link">{row.REF_NO || '—'}</span></td>
+            <td className="cc-data-grid-td">
+              <span 
+                className="cc-data-grid-ref-link"
+                style={{ cursor: 'pointer', color: '#2563eb', textDecoration: 'underline' }}
+                onClick={() => handleRowClick(row)}
+              >
+                {row.REF_NO || '—'}
+              </span>
+            </td>
             <td className="cc-data-grid-td">{row.formattedDate || '—'}</td>
             <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
             <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>

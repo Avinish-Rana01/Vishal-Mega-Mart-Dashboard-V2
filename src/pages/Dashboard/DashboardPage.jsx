@@ -24,7 +24,7 @@ export default function DashboardPage() {
         <div className="vmm-dashboard-stack">
           <CycleCountSection />
         </div>
-        {/* <div className="vmm-dashboard-stack">
+        <div className="vmm-dashboard-stack">
           <StoreValidationSection />
         </div>
         <div className="vmm-dashboard-stack">
@@ -47,7 +47,7 @@ export default function DashboardPage() {
         </div>
         <div className="vmm-dashboard-stack">
           <VendorDiscrepancySection />
-        </div> */}
+        </div>
       </div>
     </AppLayout>
   );
