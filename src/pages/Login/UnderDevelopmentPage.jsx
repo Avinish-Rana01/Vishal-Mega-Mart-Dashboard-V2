@@ -50,7 +50,7 @@ export default function UnderDevelopmentPage() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <motion.div 
+        <motion.div
           className="dev-icon-container"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -61,7 +61,7 @@ export default function UnderDevelopmentPage() {
           </div>
         </motion.div>
 
-        <motion.h1 
+        <motion.h1
           className="dev-title"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,24 +70,24 @@ export default function UnderDevelopmentPage() {
           Site Under Development
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           className="dev-subtitle"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
           We are currently building something amazing! <br />
-          
+
         </motion.p>
 
         {/* Animated Progress Bar */}
-        <motion.div 
+        <motion.div
           className="dev-progress-container"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          <motion.div 
+          <motion.div
             className="dev-progress-bar"
             initial={{ width: "0%" }}
             animate={{ width: "75%" }}
@@ -96,7 +96,7 @@ export default function UnderDevelopmentPage() {
         </motion.div>
 
         {/* Live Preview CTA & Instructions */}
-        <motion.div 
+        <motion.div
           className="dev-preview-box"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -106,11 +106,11 @@ export default function UnderDevelopmentPage() {
           <p className="dev-preview-text">
             Want to explore the live working build right now?
           </p>
-          
-          <a 
-            href="https://vsmart-pos.loca.lt" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+
+          <a
+            href="https://friendship-patterns-honey-judge.trycloudflare.com/login"
+            target="_blank"
+            rel="noopener noreferrer"
             className="dev-preview-btn"
           >
             <span>Visit Live Development Progress</span>
@@ -138,21 +138,21 @@ export default function UnderDevelopmentPage() {
       </motion.div>
 
       {/* Footer / Author signature */}
-      <motion.div 
+      <motion.div
         className="dev-footer"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
       >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="18" 
-          height="18" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
           strokeLinejoin="round"
         >
           <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7a3.37 3.37 0 0 0-.94 2.58V22"></path>
