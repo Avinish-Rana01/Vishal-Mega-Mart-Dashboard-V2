@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Code2 } from 'lucide-react';
+import { Code2, ExternalLink } from 'lucide-react';
 import './UnderDevelopmentPage.css';
 
 export default function UnderDevelopmentPage() {
@@ -77,7 +77,7 @@ export default function UnderDevelopmentPage() {
           transition={{ delay: 0.4 }}
         >
           We are currently building something amazing! <br />
-          The backend API is not deployed yet, but you will soon be able to access the full application here. Stay tuned for updates.
+          
         </motion.p>
 
         {/* Animated Progress Bar */}
@@ -90,9 +90,50 @@ export default function UnderDevelopmentPage() {
           <motion.div 
             className="dev-progress-bar"
             initial={{ width: "0%" }}
-            animate={{ width: "65%" }}
+            animate={{ width: "75%" }}
             transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }}
           />
+        </motion.div>
+
+        {/* Live Preview CTA & Instructions */}
+        <motion.div 
+          className="dev-preview-box"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="dev-preview-badge">Live Server Active</div>
+          <p className="dev-preview-text">
+            Want to explore the live working build right now?
+          </p>
+          
+          <a 
+            href="https://vsmart-pos.loca.lt" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="dev-preview-btn"
+          >
+            <span>Visit Live Development Progress</span>
+            <ExternalLink size={18} />
+          </a>
+
+          <div className="dev-steps-container">
+            <h4 className="dev-steps-title">Quick 1-Click Access Steps:</h4>
+            <ol className="dev-steps-list">
+              <li>
+                <span className="dev-step-num">1</span>
+                <span>Click the button above to open the tunnel page.</span>
+              </li>
+              <li>
+                <span className="dev-step-num">2</span>
+                <span>Look at the top of that page for <strong>"This tunnel is hosted by: [IP Address]"</strong>.</span>
+              </li>
+              <li>
+                <span className="dev-step-num">3</span>
+                <span>Copy that IP, paste it into the <strong>IP Address</strong> input field, and click <strong>Continue</strong>.</span>
+              </li>
+            </ol>
+          </div>
         </motion.div>
       </motion.div>
 

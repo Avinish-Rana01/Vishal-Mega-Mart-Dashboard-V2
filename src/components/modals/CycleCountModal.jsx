@@ -187,18 +187,26 @@ export default function CycleCountModal({ modalData, onClose }) {
     { label: 'STORE', value: formatValue(storeCode), valueColor: '#004cff' },
     { label: 'CYCLE COUNT TYPE', value: formatValue(getVal(modalData, 'CYCLE_COUNT_TYPE') || 'ARTICLE LEVEL'), valueColor: '#004cff' },
     { label: 'DATE', value: formatValue(fromDate) },
-    { label: 'CYCLE COUNT TIME', value: formatValue(getVal(modalData, 'Time_Taken')) }
+    { label: 'CYCLE COUNT TIME', value: formatValue(getVal(modalData, 'Time_Taken') || getVal(modalData, 'rawDuration')) }
   ];
 
   const safeNum = (val) => (val !== undefined && val !== null ? val : 0).toLocaleString('en-IN');
 
+  const numArticles = summaryData?.recordCount ?? summaryData?.RecordCount ?? summaryData?.totalCount ?? summaryData?.TotalCount ?? 0;
+  const sysStock = summaryData?.actualQty ?? summaryData?.ActualQty ?? 0;
+  const scanQty = summaryData?.scannedQty ?? summaryData?.ScannedQty ?? 0;
+  const excess = summaryData?.excessQty ?? summaryData?.ExcessQty ?? 0;
+  const rawDiff = summaryData?.diffQty ?? summaryData?.DiffQty ?? 0;
+  const short = summaryData?.shortQty ?? summaryData?.ShortQty ?? (rawDiff < 0 ? Math.abs(rawDiff) : 0);
+  const netDiff = scanQty - sysStock;
+
   const summaryCards = [
-    { title: "NO OF ARTICLES", value: summaryData ? safeNum(summaryData.totalCount || summaryData.TotalCount) : "0", waveColor: ['#fecaca', '#f87171'], icon: <Shirt size={20} /> },
-    { title: "SYSTEM STOCK", value: summaryData ? safeNum(summaryData.actualQty || summaryData.ActualQty) : "0", waveColor: ['#fbcfe8', '#f472b6'], icon: <Layers size={20} /> },
-    { title: "SCANNED QTY", value: summaryData ? safeNum(summaryData.scannedQty || summaryData.ScannedQty) : "0", waveColor: ['#bbf7d0', '#4ade80'], icon: <ScanLine size={20} /> },
-    { title: "NET DIFFERENCE", value: summaryData ? safeNum(summaryData.diffQty || summaryData.DiffQty) : "0", waveColor: ['#fecaca', '#f87171'], icon: <TrendingDown size={20} /> },
-    { title: "SHORT QTY", value: summaryData ? safeNum(summaryData.shortQty || summaryData.ShortQty) : "0", waveColor: ['#d9f99d', '#a3e635'], icon: <ArrowDownSquare size={20} /> },
-    { title: "EXCESS QTY", value: summaryData ? safeNum(summaryData.excessQty || summaryData.ExcessQty) : "0", waveColor: ['#bfdbfe', '#60a5fa'], icon: <TrendingUp size={20} /> }
+    { title: "NO OF ARTICLES", value: safeNum(numArticles), waveColor: ['#fecaca', '#f87171'], icon: <Shirt size={20} /> },
+    { title: "SYSTEM STOCK", value: safeNum(sysStock), waveColor: ['#fbcfe8', '#f472b6'], icon: <Layers size={20} /> },
+    { title: "SCANNED QTY", value: safeNum(scanQty), waveColor: ['#bbf7d0', '#4ade80'], icon: <ScanLine size={20} /> },
+    { title: "NET DIFFERENCE", value: safeNum(netDiff), waveColor: ['#fecaca', '#f87171'], icon: <TrendingDown size={20} /> },
+    { title: "SHORT QTY", value: safeNum(short), waveColor: ['#d9f99d', '#a3e635'], icon: <ArrowDownSquare size={20} /> },
+    { title: "EXCESS QTY", value: safeNum(excess), waveColor: ['#bfdbfe', '#60a5fa'], icon: <TrendingUp size={20} /> }
   ];
 
   return (
