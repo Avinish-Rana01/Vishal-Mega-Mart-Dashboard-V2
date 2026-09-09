@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReportDataTableCard from "../common/ReportDataTableCard";
 import SearchableDropdown from "../common/SearchableDropdown";
+import CustomDatePicker from "../common/CustomDatePicker";
 import CurvedCard from "../common/CurvedCard";
 import { getReportStores, searchReportArticles, getReportLiveStock } from "../../services/stockService";
 import './LiveStockTableView.css'; // We'll copy LiveStockReport.css styles here
@@ -166,13 +167,11 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
           </div>
           <div className="search-field">
             <label>Stock Date</label>
-            <div className="input-group">
-              <input 
-                type="date" 
-                value={selectedDate} 
-                onChange={(e) => setSelectedDate(e.target.value)} 
-              />
-            </div>
+            <CustomDatePicker
+              value={selectedDate}
+              onChange={(val) => setSelectedDate(val)}
+              placeholder="Select Stock Date"
+            />
           </div>
           <div className="search-field">
             <label>Article No</label>

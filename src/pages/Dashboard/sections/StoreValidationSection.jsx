@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './StoreValidationSection.css';
 import { useStoreDashboard } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
@@ -52,8 +53,8 @@ function ValidationTooltip({ active, payload }) {
 }
 
 // ─── Side Badge Columns ───────────────────────────────────────────────────────
-const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true }) => (
-  <div style={{ width: '70px', height: chartHeight, display: 'flex', flexDirection: 'column', pointerEvents: 'none', flexShrink: 0, paddingTop: '20px', paddingBottom: '35px' }}>
+const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true, onCellClick }) => (
+  <div style={{ width: '70px', height: chartHeight, display: 'flex', flexDirection: 'column', flexShrink: 0, paddingTop: '20px', paddingBottom: '35px' }}>
     {chartData.map((d, i) => {
       const wrong = Number(d.HU_WRONG_QTY || 0);
       const pending = Number(d.STORE_PENDING_QTY || 0);
@@ -63,7 +64,12 @@ const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true }) => (
       return (
         <div key={d.STORE || i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '4px' }}>
           {hasError ? (
-            <div style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fee2e2', color: '#dc2626', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+            <div 
+              className="sv-clickable-badge"
+              onClick={(e) => onCellClick && onCellClick(d, '0', e)}
+              title="Click to view Wrong HUs in GRC Report (Status: 0)"
+              style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fee2e2', color: '#dc2626', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}
+            >
               {wrong}
             </div>
           ) : (
@@ -72,7 +78,12 @@ const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true }) => (
             </div>
           )}
           {showPending && hasPending && (
-            <div style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fef3c7', color: '#d97706', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+            <div 
+              className="sv-clickable-badge"
+              onClick={(e) => onCellClick && onCellClick(d, '3', e)}
+              title="Click to view Pending HUs in GRC Report (Status: 3)"
+              style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fef3c7', color: '#d97706', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}
+            >
               {pending}
             </div>
           )}
@@ -103,7 +114,7 @@ const CustomGapLabel = (props) => {
 };
 
 // ─── 1. Grouped Bar Chart (Received vs Validated) ─────────────────────────────
-const MemoizedValidationChart = React.memo(({ chartData }) => {
+const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
   const ROW_HEIGHT = 16;
   const GROUP_GAP = 16;
   const chartHeight = Math.max(220, chartData.length * (ROW_HEIGHT * 2 + GROUP_GAP) + 40);
@@ -119,10 +130,32 @@ const MemoizedValidationChart = React.memo(({ chartData }) => {
               <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
               <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
               <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
-              <Bar dataKey="HU_RECEIVED_QTY" name="Received HU" barSize={ROW_HEIGHT} fill={COLOR_RECEIVED} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+              <Bar 
+                dataKey="HU_RECEIVED_QTY" 
+                name="Received HU" 
+                barSize={ROW_HEIGHT} 
+                fill={COLOR_RECEIVED} 
+                radius={[4,4,4,4]} 
+                isAnimationActive={true} 
+                animationDuration={500} 
+                animationEasing="ease-out"
+                cursor="pointer"
+                onClick={(entry) => onCellClick && onCellClick(entry, '4')}
+              >
                 <LabelList dataKey="HU_RECEIVED_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_RECEIVED }} />
               </Bar>
-              <Bar dataKey="HU_VALIDATED_QTY" name="Validated HU" barSize={ROW_HEIGHT} fill={COLOR_VALIDATED} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+              <Bar 
+                dataKey="HU_VALIDATED_QTY" 
+                name="Validated HU" 
+                barSize={ROW_HEIGHT} 
+                fill={COLOR_VALIDATED} 
+                radius={[4,4,4,4]} 
+                isAnimationActive={true} 
+                animationDuration={500} 
+                animationEasing="ease-out"
+                cursor="pointer"
+                onClick={(entry) => onCellClick && onCellClick(entry, '1')}
+              >
                 <LabelList dataKey="HU_VALIDATED_QTY" content={<CustomGapLabel data={chartData} />} />
               </Bar>
             </BarChart>
@@ -134,7 +167,7 @@ const MemoizedValidationChart = React.memo(({ chartData }) => {
 });
 
 // ─── 2. Progress Bar Chart (HHT Validated + Pending) ──────────────────────────
-const MemoizedProgressChart = React.memo(({ chartData }) => {
+const MemoizedProgressChart = React.memo(({ chartData, onCellClick }) => {
   const ROW_HEIGHT = 20;
   const GROUP_GAP = 16;
   const chartHeight = Math.max(220, chartData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
@@ -151,16 +184,40 @@ const MemoizedProgressChart = React.memo(({ chartData }) => {
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
                 <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
                 <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
-                <Bar dataKey="HHT_VALIDATE_QTY" stackId="a" name="HHT Validated" barSize={ROW_HEIGHT} fill={COLOR_HHT} radius={[4,0,0,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                <Bar 
+                  dataKey="HHT_VALIDATE_QTY" 
+                  stackId="a" 
+                  name="HHT Validated" 
+                  barSize={ROW_HEIGHT} 
+                  fill={COLOR_HHT} 
+                  radius={[4,0,0,4]} 
+                  isAnimationActive={true} 
+                  animationDuration={500} 
+                  animationEasing="ease-out"
+                  cursor="pointer"
+                  onClick={(entry) => onCellClick && onCellClick(entry, '2')}
+                >
                   <LabelList dataKey="HHT_VALIDATE_QTY" position="insideLeft" style={{ fontSize: '11px', fontWeight: 600, fill: '#fff' }} formatter={(val) => val > 0 ? val : ''} />
                 </Bar>
-                <Bar dataKey="STORE_PENDING_QTY" stackId="a" name="Pending" barSize={ROW_HEIGHT} fill={COLOR_PENDING} radius={[0,4,4,0]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+                <Bar 
+                  dataKey="STORE_PENDING_QTY" 
+                  stackId="a" 
+                  name="Pending" 
+                  barSize={ROW_HEIGHT} 
+                  fill={COLOR_PENDING} 
+                  radius={[0,4,4,0]} 
+                  isAnimationActive={true} 
+                  animationDuration={500} 
+                  animationEasing="ease-out"
+                  cursor="pointer"
+                  onClick={(entry) => onCellClick && onCellClick(entry, '3')}
+                >
                   <LabelList dataKey="STORE_PENDING_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: '#d97706' }} formatter={(val) => val > 0 ? val : ''} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <WrongHUBadgeColumn chartData={chartData} chartHeight={chartHeight} showPending={false} />
+          <WrongHUBadgeColumn chartData={chartData} chartHeight={chartHeight} showPending={false} onCellClick={onCellClick} />
         </>
       )}
     </div>
@@ -168,7 +225,7 @@ const MemoizedProgressChart = React.memo(({ chartData }) => {
 });
 
 // ─── 3. Wrong HU Distribution Chart ───────────────────────────────────────────
-const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearch }) => {
+const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearch, onCellClick }) => {
   const ROW_HEIGHT = 20;
   const GROUP_GAP = 16;
   const filteredData = chartData.filter(d => Number(d.HU_WRONG_QTY || 0) > 0);
@@ -207,7 +264,18 @@ const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearc
               <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
               <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
               <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(254,226,226,0.6)' }} />
-              <Bar dataKey="HU_WRONG_QTY" name="Wrong HU" barSize={ROW_HEIGHT} fill={COLOR_WRONG} radius={[4,4,4,4]} isAnimationActive={true} animationDuration={500} animationEasing="ease-out">
+              <Bar 
+                dataKey="HU_WRONG_QTY" 
+                name="Wrong HU" 
+                barSize={ROW_HEIGHT} 
+                fill={COLOR_WRONG} 
+                radius={[4,4,4,4]} 
+                isAnimationActive={true} 
+                animationDuration={500} 
+                animationEasing="ease-out"
+                cursor="pointer"
+                onClick={(entry) => onCellClick && onCellClick(entry, '0')}
+              >
                 <LabelList dataKey="HU_WRONG_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_WRONG }} />
               </Bar>
             </BarChart>
@@ -229,14 +297,48 @@ const VIEW_OPTIONS = [
 
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function StoreValidationSection() {
+  const navigate = useNavigate();
   const { data: realData, totals: realTotals, isLoading, error } = useStoreDashboard();
   const data = realData;
   const totals = realTotals;
+
 
   const [chartView, setChartView] = useState('grouped');
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('PENDING_DESC');
   const [tableSort, setTableSort] = useState('PENDING_DESC');
+
+  const handleStoreClick = useCallback((storeCode, rowDate) => {
+    if (!storeCode) return;
+    navigate('/reports/store-grc', {
+      state: {
+        store: storeCode,
+        rowDate: rowDate || undefined,
+      }
+    });
+  }, [navigate]);
+
+  const handleCellClick = useCallback((row, status) => {
+    const storeCode = row?.STORE || row?.Store_Code || row?.STORE_CODE;
+    if (!storeCode) return;
+
+    let dateOnly = '';
+    if (row?.DATE) {
+      dateOnly = String(row.DATE).split(' ')[0];
+    } else {
+      const now = new Date();
+      dateOnly = now.toISOString().split('T')[0];
+    }
+
+    navigate('/reports/grc', {
+      state: {
+        store: storeCode,
+        fromDate: dateOnly,
+        toDate: dateOnly,
+        grcStatus: String(status)
+      }
+    });
+  }, [navigate]);
 
   const tableSortOptions = useMemo(() => [
     { value: 'PENDING_DESC', label: 'Highest Pending' },
@@ -359,60 +461,44 @@ export default function StoreValidationSection() {
         <KpiCard2
           title="HHT Validated"
           value={totals?.HHT_VALIDATE_QTY || '0'}
-          badge="Scanned"
-          badgeVariant="info"
+          badge="Verified"
+          badgeVariant="purple"
           icon={<Icons.Smartphone />}
         />
         <KpiCard2
-          title="Encoded Qty"
-          value={totals?.ENCODED_QTY || '0'}
-          badge="Tags"
-          badgeVariant="neutral"
-          icon={<Icons.Tag />}
+          title="Store Pending"
+          value={totals?.STORE_PENDING_QTY || '0'}
+          badge="Action Required"
+          badgeVariant="warning"
+          icon={<Icons.Clock />}
         />
         <KpiCard2
-          title="Wrong / Error HU"
+          title="Wrong HU"
           value={totals?.HU_WRONG_QTY || '0'}
+          badge="Discrepancy"
           badgeVariant="danger"
           icon={<Icons.AlertTriangle />}
         />
       </div>
 
       {/* ── Main Chart Card ──────────────────────────────────────────────── */}
-      <div className="cc-card">
+      <div className="cc-card" style={{ overflow: 'hidden' }}>
 
         <ChartToolbar
-          leftContent={
-            <CustomDropdown
-              options={VIEW_OPTIONS}
-              value={chartView}
-              onChange={(val) => {
-                setChartView(val);
-                if (val === 'grouped' && sortBy === 'WRONG_DESC') {
-                  setSortBy('PENDING_DESC');
-                }
-              }}
-              buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-              menuStyle={{ left: 0, right: 'auto', minWidth: '260px', textTransform: 'none', letterSpacing: 'normal' }}
-            />
-          }
-          rightContent={
-            <>
-              <CustomDropdown
-                options={sortOptions}
-                value={sortBy}
-                onChange={setSortBy}
-                prefix="Sort:"
-                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-                menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
-              />
-              <ChartSearchInput
-                value={searchFilter}
-                onChange={setSearchFilter}
-                onClear={() => setSearchFilter('')}
-              />
-            </>
-          }
+          tabOptions={VIEW_OPTIONS}
+          activeTab={chartView}
+          onTabChange={(view) => {
+            setChartView(view);
+            const valid = sortOptions.some(o => o.value === sortBy);
+            if (!valid) setSortBy(sortOptions[0].value);
+          }}
+          searchQuery={searchFilter}
+          onSearchChange={setSearchFilter}
+          searchPlaceholder="Search store..."
+          sortOptions={sortOptions}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          totalCount={chartData.length}
         />
 
         {/* ── Legend Strip (Dynamic based on View) ────────────────── */}
@@ -426,7 +512,6 @@ export default function StoreValidationSection() {
           <ChartLegend items={[
             { color: COLOR_HHT, label: 'HHT Validated' },
             { color: COLOR_PENDING, label: 'Pending' },
-            { color: '#fee2e2', label: 'Wrong HU', borderColor: '#ef4444' },
           ]} />
         )}
         {chartView === 'wrong_hu' && (
@@ -450,9 +535,9 @@ export default function StoreValidationSection() {
             />
           ) : (
             <>
-              {chartView === 'grouped' && <MemoizedValidationChart chartData={chartData} />}
-              {chartView === 'progress' && <MemoizedProgressChart chartData={chartData} />}
-              {chartView === 'wrong_hu' && <MemoizedWrongHUChart chartData={chartData} searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />}
+              {chartView === 'grouped' && <MemoizedValidationChart chartData={chartData} onCellClick={handleCellClick} />}
+              {chartView === 'progress' && <MemoizedProgressChart chartData={chartData} onCellClick={handleCellClick} />}
+              {chartView === 'wrong_hu' && <MemoizedWrongHUChart chartData={chartData} searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} onCellClick={handleCellClick} />}
             </>
           )}
         </div>
@@ -503,7 +588,11 @@ export default function StoreValidationSection() {
           return (
             <tr key={row.STORE || idx} className="cc-data-grid-tr">
               <td className="cc-data-grid-td cc-data-grid-td-bold">
-                <div className="cc-row-tooltip-wrapper">
+                <div 
+                  className="cc-row-tooltip-wrapper sv-clickable-store"
+                  onClick={() => handleStoreClick(row.STORE, row.DATE)}
+                  title="Click to view Store GRC Report"
+                >
                   {row.STORE || '—'}
                   {row.STORE_NAME && (
                     <div className="cc-row-tooltip">
@@ -516,17 +605,43 @@ export default function StoreValidationSection() {
                 {row.DATE ? row.DATE.split(' ')[0] : '—'}
               </td>
               <td className="cc-data-grid-td">
-                <span style={{ color: COLOR_RECEIVED, fontWeight: 700 }}>{received.toLocaleString('en-IN')}</span>
+                <span 
+                  className="sv-clickable-cell"
+                  style={{ color: COLOR_RECEIVED, fontWeight: 700 }}
+                  onClick={() => handleCellClick(row, '4')}
+                  title="Click to view Received HUs in GRC Report (Status: 4)"
+                >
+                  {received.toLocaleString('en-IN')}
+                </span>
               </td>
               <td className="cc-data-grid-td">
-                <span style={{ color: validatedColor, fontWeight: 700 }}>{validated.toLocaleString('en-IN')}</span>
+                <span 
+                  className="sv-clickable-cell"
+                  style={{ color: validatedColor, fontWeight: 700 }}
+                  onClick={() => handleCellClick(row, '1')}
+                  title="Click to view Validated HUs in GRC Report (Status: 1)"
+                >
+                  {validated.toLocaleString('en-IN')}
+                </span>
               </td>
               <td className="cc-data-grid-td">
-                <span style={{ color: hhtColor, fontWeight: 700 }}>{hhtValidated.toLocaleString('en-IN')}</span>
+                <span 
+                  className="sv-clickable-cell"
+                  style={{ color: hhtColor, fontWeight: 700 }}
+                  onClick={() => handleCellClick(row, '2')}
+                  title="Click to view HHT Validated in GRC Report (Status: 2)"
+                >
+                  {hhtValidated.toLocaleString('en-IN')}
+                </span>
               </td>
               <td className="cc-data-grid-td">
                 {pending > 0 ? (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>
+                  <span 
+                    className="sv-clickable-badge"
+                    onClick={() => handleCellClick(row, '3')}
+                    title="Click to view Pending HUs in GRC Report (Status: 3)"
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}
+                  >
                     {pending.toLocaleString('en-IN')}
                   </span>
                 ) : (
@@ -535,7 +650,12 @@ export default function StoreValidationSection() {
               </td>
               <td className="cc-data-grid-td">
                 {wrong > 0 ? (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fee2e2', color: '#dc2626', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>
+                  <span 
+                    className="sv-clickable-badge"
+                    onClick={() => handleCellClick(row, '0')}
+                    title="Click to view Wrong HUs in GRC Report (Status: 0)"
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fee2e2', color: '#dc2626', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}
+                  >
                     ✕ {wrong.toLocaleString('en-IN')}
                   </span>
                 ) : (

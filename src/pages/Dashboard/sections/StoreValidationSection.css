@@ -1,0 +1,45 @@
+/* ==============================================
+   StoreValidationSection.css
+   Interactive styling for clickable table cells and chart badges
+   ============================================== */
+
+.sv-clickable-cell {
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.15s ease-in-out;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.sv-clickable-cell:hover {
+  text-decoration: underline;
+  transform: translateY(-1px);
+  filter: brightness(1.15);
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+.sv-clickable-store {
+  cursor: pointer;
+  color: #1d4ed8;
+  font-weight: 700;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sv-clickable-store:hover {
+  color: #1e3a8a;
+  text-decoration: underline;
+}
+
+.sv-clickable-badge {
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.sv-clickable-badge:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  filter: brightness(0.96);
+}

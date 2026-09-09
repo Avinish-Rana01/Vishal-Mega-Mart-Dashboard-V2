@@ -172,9 +172,9 @@ export default function GrcReportPage() {
   // Helper text mapping for the purple card
   const getGrcStatusText = () => {
     switch (grcStatus) {
-      case '0': return 'HHT GRC QTY';
-      case '1': return 'HU RECEIVED QTY';
-      case '2': return 'HHT GRC QTY';
+      case '0': return 'WRONG HU QTY';
+      case '1': return 'WH VALIDATED QTY';
+      case '2': return 'STORE VALIDATED QTY';
       case '3': return 'STORE PENDING GRC QTY';
       case '4': return 'HU RECEIVED QTY';
       default: return 'HU RECEIVED QTY';

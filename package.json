@@ -14,9 +14,11 @@
   "dependencies": {
     "axios": "^1.19.0",
     "datatables.net-dt": "^3.0.0",
+    "date-fns": "^4.4.0",
     "framer-motion": "^13.1.0",
     "lucide-react": "^1.25.0",
     "react": "^19.2.7",
+    "react-datepicker": "^9.1.0",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
     "recharts": "^3.10.0"
