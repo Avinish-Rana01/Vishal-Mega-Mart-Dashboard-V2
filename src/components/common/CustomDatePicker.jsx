@@ -1,7 +1,8 @@
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useRef, useMemo } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import CustomDropdown from './CustomDropdown';
 import './CustomDatePicker.css';
 
 const MONTH_SHORT = [
@@ -103,10 +104,27 @@ export default function CustomDatePicker({
 
   // Generate a reasonable range of years (e.g. 2018 to currentYear + 3)
   const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let y = 2018; y <= currentYear + 3; y++) {
-    years.push(y);
-  }
+  const years = useMemo(() => {
+    const list = [];
+    for (let y = 2018; y <= currentYear + 3; y++) {
+      list.push(y);
+    }
+    return list;
+  }, [currentYear]);
+
+  const monthOptions = useMemo(() => {
+    return MONTH_SHORT.map((month, idx) => ({
+      value: idx,
+      label: month,
+    }));
+  }, []);
+
+  const yearOptions = useMemo(() => {
+    return years.map((year) => ({
+      value: year,
+      label: String(year),
+    }));
+  }, [years]);
 
   return (
     <div className={`vmm-datepicker-wrapper ${className}`}>
@@ -150,31 +168,47 @@ export default function CustomDatePicker({
             </button>
 
             <div className="vmm-dp-selects-group">
-              <select
-                className="vmm-dp-month-select"
+              <CustomDropdown
+                options={monthOptions}
                 value={date.getMonth()}
-                onChange={({ target: { value } }) =>
-                  changeMonth(Number(value))
-                }
-              >
-                {MONTH_SHORT.map((month, idx) => (
-                  <option key={month} value={idx}>
-                    {month}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => changeMonth(Number(val))}
+                width="72px"
+                buttonStyle={{
+                  height: '28px',
+                  padding: '2px 18px 2px 8px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  borderRadius: '6px',
+                  border: '1px solid #cbd5e1',
+                  backgroundPosition: 'right 6px center',
+                }}
+                menuStyle={{
+                  minWidth: '85px',
+                  maxHeight: '170px',
+                  zIndex: 99999,
+                }}
+              />
 
-              <select
-                className="vmm-dp-year-select"
+              <CustomDropdown
+                options={yearOptions}
                 value={date.getFullYear()}
-                onChange={({ target: { value } }) => changeYear(Number(value))}
-              >
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => changeYear(Number(val))}
+                width="74px"
+                buttonStyle={{
+                  height: '28px',
+                  padding: '2px 18px 2px 8px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  borderRadius: '6px',
+                  border: '1px solid #cbd5e1',
+                  backgroundPosition: 'right 6px center',
+                }}
+                menuStyle={{
+                  minWidth: '85px',
+                  maxHeight: '170px',
+                  zIndex: 99999,
+                }}
+              />
             </div>
 
             <button

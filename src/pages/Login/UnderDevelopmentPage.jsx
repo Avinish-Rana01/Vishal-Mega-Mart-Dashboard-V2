@@ -108,7 +108,7 @@ export default function UnderDevelopmentPage() {
           </p>
 
           <a
-            href="https://friendship-patterns-honey-judge.trycloudflare.com/login"
+            href="https://pour-rough-bryan-examining.trycloudflare.com"
             target="_blank"
             rel="noopener noreferrer"
             className="dev-preview-btn"

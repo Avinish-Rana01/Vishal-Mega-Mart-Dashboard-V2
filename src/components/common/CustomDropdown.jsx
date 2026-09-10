@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import './CustomDropdown.css';
 
 /**
  * A reusable custom dropdown component.
@@ -13,6 +14,22 @@ import React, { useState } from 'react';
  */
 export default function CustomDropdown({ options, value, onChange, prefix, buttonStyle, menuStyle, width }) {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   // Find the selected option's label to display in the button
   const selectedOption = options.find(opt => opt.value === value);
@@ -20,16 +37,12 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
 
   return (
     <div 
+      ref={containerRef}
+      className="custom-dropdown-container"
       style={{ position: 'relative', width: width ? width : 'auto' }}
-      tabIndex={0}
-      onBlur={(e) => {
-        // Close dropdown when focus leaves the component
-        if (!e.currentTarget.contains(e.relatedTarget)) {
-          setIsOpen(false);
-        }
-      }}
     >
       <button 
+        type="button"
         className="ls-filter-select"
         style={{ paddingRight: '24px', width: '100%', textAlign: 'left', ...buttonStyle }}
         onClick={() => setIsOpen(!isOpen)}
@@ -39,7 +52,10 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
       </button>
 
       {isOpen && (
-        <div className="ls-dropdown-menu" style={{ ...menuStyle, minWidth: '100%', maxHeight: '180px', overflowY: 'auto' }}>
+        <div 
+          className="ls-dropdown-menu" 
+          style={{ ...menuStyle, minWidth: '100%', maxHeight: '180px', overflowY: 'auto' }}
+        >
           {options.map((opt) => (
             <div 
               key={opt.value}
