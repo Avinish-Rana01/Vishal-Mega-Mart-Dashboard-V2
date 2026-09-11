@@ -66,7 +66,7 @@ const sortOptions = [
 // ---------------------------
 
 // ---- Memoized Charts ----
-const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => {
+const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlightedStore }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
   const height = Math.max(barChartData.length * 28, 240);
   return (
@@ -93,7 +93,14 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick }) => {
             />
 
             {/* Stacked bars: RFID on left, Difference on right */}
-            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800}>
+              {barChartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-rfid-${index}`} 
+                  className={highlightedStore && highlightedStore === entry.name ? 'bar-updated-pulse' : ''}
+                />
+              ))}
+            </Bar>
             <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
           </BarChart>
         </ResponsiveContainer>
@@ -138,7 +145,15 @@ const MemoizedPieChart = React.memo(({ accuracyPieData }) => {
 export default function LiveStockSection() {
   // === STATE MANAGEMENT ===
   // Global Data & Context
-  const { data: realData, totals: realTotals, isLoading, error, refresh } = useLiveStock();
+  const { 
+    data: realData, 
+    totals: realTotals, 
+    isLoading, 
+    error, 
+    refresh,
+    highlightedStore,
+    connectionStatus
+  } = useLiveStock();
   const data = realData;
   const totals = realTotals;
   const navigate = useNavigate();
@@ -341,7 +356,15 @@ export default function LiveStockSection() {
         title="Live Stock"
         subtitle="Overview of stock status across all stores"
         icon={<ClipboardChartIcon />}
-        rightContent={<DateBadge />}
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot"></span>
+              <span>{connectionStatus === 'connected' ? 'Live Sync (2s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}</span>
+            </div>
+            <DateBadge />
+          </div>
+        }
       />
 
       <div className="ls-grid2">
@@ -522,7 +545,7 @@ export default function LiveStockSection() {
                 onClearSearch={() => { setSearchStore(''); setFilterVal(''); setAppliedFilter({ field: 'ALL', op: '<', val: '' }); }}
               />
             ) : (
-              <MemoizedLiveStockChart barChartData={barChartData} onBarClick={handleBarClick} />
+              <MemoizedLiveStockChart barChartData={barChartData} onBarClick={handleBarClick} highlightedStore={highlightedStore} />
             )}
           </div>
         </div>

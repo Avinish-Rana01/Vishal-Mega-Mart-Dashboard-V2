@@ -13,6 +13,7 @@ import {
   getDcValidation
 } from '../services/stockService';
 import { API_DEFAULTS, STORE_MAPPING } from '../config/constants';
+import { liveStockSocket } from '../services/liveStockSocket';
 
 /**
  * Generic hook for dashboard table endpoints.
@@ -99,7 +100,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_
 };
 
 // ==========================================
-// 1. Live Stock
+// 1. Live Stock (Enhanced with Real-Time Delta Reducer & SignalR)
 // ==========================================
 const liveStockFilter = (row, term) => 
   (row.STORE_CODE && row.STORE_CODE.toLowerCase().includes(term)) ||
@@ -113,7 +114,117 @@ const liveStockTotals = (summary) => ({
   DIFFERENCE: summary.diffQty?.toLocaleString('en-IN') || 0
 });
 
-export const useLiveStock = () => useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals);
+export const useLiveStock = () => {
+  const baseFetch = useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals);
+  const [data, setData] = useState([]);
+  const [totals, setTotals] = useState(null);
+  const [highlightedStore, setHighlightedStore] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
+
+  // Sync initial and refreshed baseline data from HTTP API
+  useEffect(() => {
+    if (baseFetch.data && baseFetch.data.length > 0) {
+      setData(baseFetch.data);
+    }
+  }, [baseFetch.data]);
+
+  useEffect(() => {
+    if (baseFetch.totals) {
+      setTotals(baseFetch.totals);
+    }
+  }, [baseFetch.totals]);
+
+  // Connect to SignalR LiveStockHub and apply in-place micro-delta patches
+  useEffect(() => {
+    let highlightTimer = null;
+
+    liveStockSocket.connect();
+
+    const unsubStatus = liveStockSocket.onStatusChange((status) => {
+      setConnectionStatus(status);
+    });
+
+    const unsubPatch = liveStockSocket.onPatch((patch) => {
+      if (!patch || !patch.storeCode) return;
+
+      // 1. In-place row update using immutable .map()
+      setData((prev) => {
+        let storeFound = false;
+        const updated = prev.map((row) => {
+          if (row.STORE_CODE === patch.storeCode) {
+            storeFound = true;
+            return {
+              ...row,
+              RFID_STOCK: patch.newRfidStock !== undefined ? patch.newRfidStock : row.RFID_STOCK,
+              SAP_STOCK: patch.newSapStock !== undefined ? patch.newSapStock : row.SAP_STOCK,
+              DIFFERENCE: patch.newDifference !== undefined ? patch.newDifference : row.DIFFERENCE,
+              PERCENTAGE: patch.newPercentage !== undefined ? String(patch.newPercentage) : row.PERCENTAGE,
+              _lastUpdated: Date.now()
+            };
+          }
+          return row;
+        });
+
+        // If newly scanned store is not in current view, prepend it smoothly
+        if (!storeFound && patch.storeCode) {
+          return [
+            {
+              RowNumber: 1,
+              STORE_CODE: patch.storeCode,
+              STORE_NAME: patch.storeName || STORE_MAPPING[patch.storeCode] || patch.storeCode,
+              SAP_STOCK: patch.newSapStock || 0,
+              RFID_STOCK: patch.newRfidStock || 0,
+              DIFFERENCE: patch.newDifference || 0,
+              PERCENTAGE: String(patch.newPercentage || 0),
+              DATE: new Date().toISOString().split('T')[0],
+              _lastUpdated: Date.now()
+            },
+            ...updated
+          ];
+        }
+
+        return updated;
+      });
+
+      // 2. In-place global KPI counter updates
+      if (patch.summaryDelta) {
+        setTotals((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            RFID_STOCK: patch.summaryDelta.newTotalRfid !== undefined 
+              ? patch.summaryDelta.newTotalRfid.toLocaleString('en-IN') 
+              : prev.RFID_STOCK,
+            DIFFERENCE: patch.summaryDelta.newTotalDiff !== undefined 
+              ? patch.summaryDelta.newTotalDiff.toLocaleString('en-IN') 
+              : prev.DIFFERENCE
+          };
+        });
+      }
+
+      // 3. Highlight updated store with 1.2s emerald glow
+      setHighlightedStore(patch.storeCode);
+      if (highlightTimer) clearTimeout(highlightTimer);
+      highlightTimer = setTimeout(() => {
+        setHighlightedStore(null);
+      }, 1200);
+    });
+
+    return () => {
+      unsubStatus();
+      unsubPatch();
+      if (highlightTimer) clearTimeout(highlightTimer);
+    };
+  }, []);
+
+  return {
+    ...baseFetch,
+    data,
+    totals: totals || baseFetch.totals,
+    highlightedStore,
+    connectionStatus
+  };
+};
 
 // ==========================================
 // 2. Cycle Count
