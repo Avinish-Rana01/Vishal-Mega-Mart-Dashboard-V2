@@ -60,7 +60,16 @@ class DashboardSocketService {
           skipNegotiation: false,
           transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
         })
-        .withAutomaticReconnect([2000, 5000, 10000, 30000])
+        .withAutomaticReconnect({
+          nextRetryDelayInMilliseconds: retryContext => {
+            // Jittered backoff: Stagger reconnects across 500 concurrent users so they do not hammer the server simultaneously
+            if (retryContext.previousRetryCount >= 10) return null;
+            const delays = [2000, 4000, 8000, 15000, 30000];
+            const baseDelay = delays[Math.min(retryContext.previousRetryCount, delays.length - 1)];
+            const jitter = Math.floor(Math.random() * 1500); // 0-1500ms random jitter
+            return baseDelay + jitter;
+          }
+        })
         .configureLogging(signalR.LogLevel.Warning)
         .build();
 
