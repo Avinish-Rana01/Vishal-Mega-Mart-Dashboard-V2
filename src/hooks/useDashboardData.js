@@ -77,6 +77,9 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_
           if (total !== undefined && total > 0) {
             setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
           }
+        } else {
+          setTotals(null);
+          setTotalPages(1);
         }
       } catch (err) {
         if (err.name === 'AbortError' || err.name === 'CanceledError') return;
@@ -134,23 +137,21 @@ export const useLiveStock = () => {
 
   // Sync initial and refreshed baseline data from HTTP API
   useEffect(() => {
-    if (baseFetch.data && baseFetch.data.length > 0) {
+    if (baseFetch.data) {
       setData(baseFetch.data);
     }
   }, [baseFetch.data]);
 
   useEffect(() => {
-    if (baseFetch.totals) {
-      setTotals(baseFetch.totals);
-    }
+    setTotals(baseFetch.totals);
   }, [baseFetch.totals]);
 
-  // Connect to SignalR only after data has been populated by the API
+  // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (data && data.length > 0 && connectionStatus === 'disconnected') {
+    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [data, connectionStatus]);
+  }, [baseFetch.isLoading, connectionStatus]);
 
   // Connect to SignalR LiveStockHub and apply in-place micro-delta patches
   useEffect(() => {
@@ -265,19 +266,19 @@ export const useCycleCount = () => {
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
   useEffect(() => {
-    if (baseFetch.data && baseFetch.data.length > 0) setData(baseFetch.data);
+    if (baseFetch.data) setData(baseFetch.data);
   }, [baseFetch.data]);
 
   useEffect(() => {
-    if (baseFetch.totals) setTotals(baseFetch.totals);
+    setTotals(baseFetch.totals);
   }, [baseFetch.totals]);
 
-  // Connect to SignalR only after data has been populated by the API
+  // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (data && data.length > 0 && connectionStatus === 'disconnected') {
+    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [data, connectionStatus]);
+  }, [baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
     let highlightTimer = null;
@@ -354,19 +355,19 @@ export const useVendorDiscrepancy = () => {
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
   useEffect(() => {
-    if (baseFetch.data && baseFetch.data.length > 0) setData(baseFetch.data);
+    if (baseFetch.data) setData(baseFetch.data);
   }, [baseFetch.data]);
 
   useEffect(() => {
-    if (baseFetch.totals) setTotals(baseFetch.totals);
+    setTotals(baseFetch.totals);
   }, [baseFetch.totals]);
 
-  // Connect to SignalR only after data has been populated by the API
+  // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (data && data.length > 0 && connectionStatus === 'disconnected') {
+    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [data, connectionStatus]);
+  }, [baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
     let highlightTimer = null;
@@ -446,19 +447,19 @@ export const useStoreDashboard = () => {
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
   useEffect(() => {
-    if (baseFetch.data && baseFetch.data.length > 0) setData(baseFetch.data);
+    if (baseFetch.data) setData(baseFetch.data);
   }, [baseFetch.data]);
 
   useEffect(() => {
-    if (baseFetch.totals) setTotals(baseFetch.totals);
+    setTotals(baseFetch.totals);
   }, [baseFetch.totals]);
 
-  // Connect to SignalR only after data has been populated by the API
+  // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (data && data.length > 0 && connectionStatus === 'disconnected') {
+    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [data, connectionStatus]);
+  }, [baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
     let highlightTimer = null;
@@ -686,12 +687,12 @@ export const useTagCharts = () => {
 
   const refresh = useCallback(() => setTrigger(t => t + 1), []);
 
-  // Connect to SignalR only after data has been populated by the API
+  // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (locationData && locationData.length > 0 && connectionStatus === 'disconnected') {
+    if (!isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [locationData, connectionStatus]);
+  }, [isLoading, connectionStatus]);
 
   // Real-time SignalR subscription for Tag Management deltas
   useEffect(() => {
@@ -836,12 +837,12 @@ export const useWarehouseEncoding = () => {
 
   const refresh = useCallback(() => setTrigger(t => t + 1), []);
 
-  // Connect to SignalR only after data has been populated by the API
+  // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (data && data.length > 0 && connectionStatus === 'disconnected') {
+    if (!isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [data, connectionStatus]);
+  }, [isLoading, connectionStatus]);
 
   // Real-time SignalR subscription for DC Encoding deltas
   useEffect(() => {

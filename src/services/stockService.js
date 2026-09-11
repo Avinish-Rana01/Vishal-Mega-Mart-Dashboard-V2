@@ -8,13 +8,41 @@ const getHeaders = () => ({
   'Accept': 'application/json'
 });
 
+// Helper to dynamically get the active user ID from current authenticated session
+export const getActiveUserId = () => {
+  try {
+    const raw = sessionStorage.getItem('vmm_user');
+    if (raw) {
+      const user = JSON.parse(raw);
+      // Direct match for all common casings (notably userID from login response)
+      const direct = user.userID ?? user.userId ?? user.UserID ?? user.User_Id ?? user.USER_ID ?? user.user_id ?? user.id ?? user.Id;
+      if (direct !== undefined && direct !== null && String(direct).trim() !== '') {
+        return direct;
+      }
+      // Case-insensitive key scan fallback
+      for (const key of Object.keys(user)) {
+        const lower = key.toLowerCase();
+        if (lower === 'userid' || lower === 'user_id') {
+          const val = user[key];
+          if (val !== undefined && val !== null && String(val).trim() !== '') {
+            return val;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // fallback if parse fails
+  }
+  return API_DEFAULTS.USER_ID;
+};
+
 // ==============================================================
 // Dashboard APIs
 // ==============================================================
 
 export const getLiveStock = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/live-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/live-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -23,7 +51,7 @@ export const getLiveStock = async (searchQuery = '', pageIndex = API_DEFAULTS.PA
 
 export const getCycleCount = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=STORE%20CODE&sortDirection=ASC&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=STORE%20CODE&sortDirection=ASC&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -32,7 +60,7 @@ export const getCycleCount = async (searchQuery = '', pageIndex = API_DEFAULTS.P
 
 export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=DIFF_TILL_DATE&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=DIFF_TILL_DATE&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -57,7 +85,7 @@ export const getTagCycleCount = async (signal) => {
 
 export const getStoreDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/store-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/store-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -66,7 +94,7 @@ export const getStoreDashboard = async (searchQuery = '', pageIndex = API_DEFAUL
 
 export const getSaleDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/sale-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/sale-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -75,7 +103,7 @@ export const getSaleDashboard = async (searchQuery = '', pageIndex = API_DEFAULT
 
 export const getVoidDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/void-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/void-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -84,7 +112,7 @@ export const getVoidDashboard = async (searchQuery = '', pageIndex = API_DEFAULT
 
 export const getReturnDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -104,7 +132,7 @@ export const getWarehouseEncoding = async (fromDate, toDate, signal) => {
 
 export const getDcValidation = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
   const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/dc-validate-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/dc-validate-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -116,7 +144,7 @@ export const getDcValidation = async (searchQuery = '', pageIndex = API_DEFAULTS
 // ==============================================================
 
 export const getReportStores = async (signal) => {
-  const response = await axios.get(`${API_BASE}/api/report/stores?userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/report/stores?userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });
@@ -175,7 +203,7 @@ export const getStoreGrcReport = async (storeCode, fromDate, toDate, pageIndex =
 };
 
 export const getBindStores = async (fromDate, toDate, signal) => {
-  const response = await axios.get(`${API_BASE}/api/report/stores?userId=${API_DEFAULTS.USER_ID}`, {
+  const response = await axios.get(`${API_BASE}/api/report/stores?userId=${getActiveUserId()}`, {
     headers: getHeaders(),
     signal
   });

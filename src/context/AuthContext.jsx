@@ -1,4 +1,5 @@
-import  { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { liveStockSocket } from '../services/liveStockSocket';
 
 const AuthContext = createContext();
 
@@ -16,10 +17,17 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const logout = () => {
+    try {
+      liveStockSocket.disconnect();
+    } catch (e) {
+      // ignore
+    }
     setLoggedInUser(null);
+    setUserId(null);
     setIsLoggedIn(false);
     sessionStorage.removeItem('vmm_user');
     sessionStorage.removeItem('vmm_login_time');
@@ -43,6 +51,8 @@ export const AuthProvider = ({ children }) => {
         try {
           const parsed = JSON.parse(storedUser);
           setLoggedInUser(parsed.userName || parsed.username || parsed.name || 'User');
+          const uid = parsed.userID ?? parsed.userId ?? parsed.UserID ?? parsed.User_Id ?? parsed.USER_ID ?? parsed.user_id ?? parsed.id ?? parsed.Id;
+          if (uid) setUserId(uid);
         } catch (e) {
           setLoggedInUser(storedUser);
         }
@@ -75,7 +85,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     const username = userData?.userName || userData?.username || (typeof userData === 'string' ? userData : 'Admin');
+    const uid = userData?.userID ?? userData?.userId ?? userData?.UserID ?? userData?.User_Id ?? userData?.USER_ID ?? userData?.user_id ?? userData?.id ?? userData?.Id;
     setLoggedInUser(username);
+    if (uid) setUserId(uid);
     setIsLoggedIn(true);
     sessionStorage.setItem('vmm_user', typeof userData === 'string' ? userData : JSON.stringify(userData));
     sessionStorage.setItem('vmm_login_time', Date.now().toString());
@@ -89,6 +101,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isLoggedIn,
     loggedInUser,
+    userId,
     login,
     logout
   };

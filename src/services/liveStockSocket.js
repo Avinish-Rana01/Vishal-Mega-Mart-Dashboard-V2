@@ -22,6 +22,12 @@ class DashboardSocketService {
     this.statusListeners = new Set();
     this.isConnected = false;
     this.isConnecting = false;
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        this.disconnect();
+      });
+    }
   }
 
   getHubUrl() {
@@ -158,37 +164,49 @@ class DashboardSocketService {
   // Live Stock listeners
   onPatch(callback) {
     this.patchListeners.add(callback);
-    return () => this.patchListeners.delete(callback);
+    return () => {
+      this.patchListeners.delete(callback);
+    };
   }
 
   // Cycle Count listeners
   onCycleCountPatch(callback) {
     this.cyclePatchListeners.add(callback);
-    return () => this.cyclePatchListeners.delete(callback);
+    return () => {
+      this.cyclePatchListeners.delete(callback);
+    };
   }
 
   // Store Validation listeners
   onStoreValidationPatch(callback) {
     this.storeValidationPatchListeners.add(callback);
-    return () => this.storeValidationPatchListeners.delete(callback);
+    return () => {
+      this.storeValidationPatchListeners.delete(callback);
+    };
   }
 
   // DC Encoding listeners
   onDcEncodingPatch(callback) {
     this.dcEncodingPatchListeners.add(callback);
-    return () => this.dcEncodingPatchListeners.delete(callback);
+    return () => {
+      this.dcEncodingPatchListeners.delete(callback);
+    };
   }
 
   // Tag Management listeners
   onTagManagementPatch(callback) {
     this.tagManagementPatchListeners.add(callback);
-    return () => this.tagManagementPatchListeners.delete(callback);
+    return () => {
+      this.tagManagementPatchListeners.delete(callback);
+    };
   }
 
   // Vendor Discrepancy listeners
   onVendorDiscrepancyPatch(callback) {
     this.vendorDiscrepancyPatchListeners.add(callback);
-    return () => this.vendorDiscrepancyPatchListeners.delete(callback);
+    return () => {
+      this.vendorDiscrepancyPatchListeners.delete(callback);
+    };
   }
 
   onStatusChange(callback) {
