@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Search, ClipboardList, Calendar, Clock, Hourglass, Filter, Download } from 'lucide-react';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -390,7 +391,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
 // ---- Main Component ----
 export default function CycleCountSection() {
   const navigate = useNavigate();
-  const { data: realData, isLoading, error, refresh } = useCycleCount();
+  const { data: realData, isLoading, isRefreshing, error, refresh, highlightedRow, connectionStatus } = useCycleCount();
   const data = realData;
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -523,20 +524,28 @@ export default function CycleCountSection() {
         title="Cycle Count"
         subtitle="Real-time progress and duration of store cycle counts"
         icon={<ClipboardList size={44} color="#3b82f6" strokeWidth={2.2} />}
-        rightContent={<DateBadge />}
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot"></span>
+              {connectionStatus === 'connected' ? 'Live Sync (4s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            </div>
+            <DateBadge />
+          </div>
+        }
       />
 
       {/* KPI ROW — 4 cards */}
       <div className="cc-kpi-row">
         <KpiCard2
           title="Stores Reported"
-          value={metrics.storesReported}
+          value={<LiveTickerValue value={metrics.storesReported || 0} />}
           subtext="In current view"
           icon={<ClipboardList />}
         />
         <KpiCard2
           title="Counted Today"
-          value={metrics.todayCount}
+          value={<LiveTickerValue value={metrics.todayCount || 0} />}
           subtext="Audits completed today"
           icon={<Calendar />}
         />
@@ -554,7 +563,7 @@ export default function CycleCountSection() {
         />
         <KpiCard2
           title="In Progress"
-          value={metrics.inProgressCount}
+          value={<LiveTickerValue value={metrics.inProgressCount || 0} />}
           subtext="Audits missing end time"
           icon={<Hourglass />}
         />

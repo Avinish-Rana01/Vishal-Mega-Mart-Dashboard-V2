@@ -1,12 +1,24 @@
 import * as signalR from '@microsoft/signalr';
 
 /**
- * Service to manage SignalR connection for Live Stock updates
+ * Service to manage SignalR connection for Real-Time Dashboard Updates:
+ * - Live Stock
+ * - Cycle Count
+ * - Store Validation
+ * - DC Encoding
+ * - Tag Management
+ * - Vendor Discrepancy
  */
-class LiveStockSocketService {
+class DashboardSocketService {
   constructor() {
     this.connection = null;
-    this.patchListeners = new Set();
+    this.patchListeners = new Set(); // Live Stock
+    this.cyclePatchListeners = new Set();
+    this.storeValidationPatchListeners = new Set();
+    this.dcEncodingPatchListeners = new Set();
+    this.tagManagementPatchListeners = new Set();
+    this.vendorDiscrepancyPatchListeners = new Set();
+
     this.statusListeners = new Set();
     this.isConnected = false;
     this.isConnecting = false;
@@ -15,11 +27,27 @@ class LiveStockSocketService {
   getHubUrl() {
     let baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
     baseUrl = baseUrl.replace(/\/+$/, '');
-    return `${baseUrl}/hubs/livestock`;
+    return `${baseUrl}/hubs/dashboard`;
   }
 
   async connect() {
-    if (this.connection && (this.isConnected || this.isConnecting)) {
+    if (this.connection) {
+      if (
+        this.connection.state === signalR.HubConnectionState.Connected ||
+        this.connection.state === signalR.HubConnectionState.Connecting ||
+        this.connection.state === signalR.HubConnectionState.Reconnecting
+      ) {
+        return;
+      }
+      try {
+        await this.connection.stop();
+      } catch (e) {
+        // ignore
+      }
+      this.connection = null;
+    }
+
+    if (this.isConnecting) {
       return;
     }
 
@@ -32,18 +60,38 @@ class LiveStockSocketService {
           skipNegotiation: false,
           transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
         })
-        .withAutomaticReconnect([0, 2000, 5000, 10000])
+        .withAutomaticReconnect([2000, 5000, 10000, 30000])
         .configureLogging(signalR.LogLevel.Warning)
         .build();
 
+      // 1. Live Stock
       this.connection.on('ReceiveLiveStockPatch', (patch) => {
-        this.patchListeners.forEach(cb => {
-          try {
-            cb(patch);
-          } catch (err) {
-            console.error('[LiveStockSocket] Error in patch listener:', err);
-          }
-        });
+        this.dispatch(this.patchListeners, patch, 'LiveStock');
+      });
+
+      // 2. Cycle Count
+      this.connection.on('ReceiveCycleCountPatch', (patch) => {
+        this.dispatch(this.cyclePatchListeners, patch, 'CycleCount');
+      });
+
+      // 3. Store Validation
+      this.connection.on('ReceiveStoreValidationPatch', (patch) => {
+        this.dispatch(this.storeValidationPatchListeners, patch, 'StoreValidation');
+      });
+
+      // 4. DC Encoding
+      this.connection.on('ReceiveDcEncodingPatch', (patch) => {
+        this.dispatch(this.dcEncodingPatchListeners, patch, 'DcEncoding');
+      });
+
+      // 5. Tag Management
+      this.connection.on('ReceiveTagManagementPatch', (patch) => {
+        this.dispatch(this.tagManagementPatchListeners, patch, 'TagManagement');
+      });
+
+      // 6. Vendor Discrepancy
+      this.connection.on('ReceiveVendorDiscrepancyPatch', (patch) => {
+        this.dispatch(this.vendorDiscrepancyPatchListeners, patch, 'VendorDiscrepancy');
       });
 
       this.connection.onreconnecting(() => {
@@ -67,11 +115,21 @@ class LiveStockSocketService {
       this.isConnecting = false;
       this.notifyStatus('connected');
     } catch (err) {
-      console.warn('[LiveStockSocket] Initial connection failed, falling back:', err.message);
+      console.warn('[DashboardSocket] Initial connection failed, falling back:', err.message);
       this.isConnected = false;
       this.isConnecting = false;
       this.notifyStatus('disconnected');
     }
+  }
+
+  dispatch(listenerSet, patch, channelName) {
+    listenerSet.forEach(cb => {
+      try {
+        cb(patch);
+      } catch (err) {
+        console.error(`[DashboardSocket] Error in ${channelName} listener:`, err);
+      }
+    });
   }
 
   disconnect() {
@@ -88,9 +146,40 @@ class LiveStockSocketService {
     }
   }
 
+  // Live Stock listeners
   onPatch(callback) {
     this.patchListeners.add(callback);
     return () => this.patchListeners.delete(callback);
+  }
+
+  // Cycle Count listeners
+  onCycleCountPatch(callback) {
+    this.cyclePatchListeners.add(callback);
+    return () => this.cyclePatchListeners.delete(callback);
+  }
+
+  // Store Validation listeners
+  onStoreValidationPatch(callback) {
+    this.storeValidationPatchListeners.add(callback);
+    return () => this.storeValidationPatchListeners.delete(callback);
+  }
+
+  // DC Encoding listeners
+  onDcEncodingPatch(callback) {
+    this.dcEncodingPatchListeners.add(callback);
+    return () => this.dcEncodingPatchListeners.delete(callback);
+  }
+
+  // Tag Management listeners
+  onTagManagementPatch(callback) {
+    this.tagManagementPatchListeners.add(callback);
+    return () => this.tagManagementPatchListeners.delete(callback);
+  }
+
+  // Vendor Discrepancy listeners
+  onVendorDiscrepancyPatch(callback) {
+    this.vendorDiscrepancyPatchListeners.add(callback);
+    return () => this.vendorDiscrepancyPatchListeners.delete(callback);
   }
 
   onStatusChange(callback) {
@@ -104,10 +193,11 @@ class LiveStockSocketService {
       try {
         cb(status);
       } catch (err) {
-        console.error('[LiveStockSocket] Error in status listener:', err);
+        console.error('[DashboardSocket] Error in status listener:', err);
       }
     });
   }
 }
 
-export const liveStockSocket = new LiveStockSocketService();
+export const liveStockSocket = new DashboardSocketService();
+export const dashboardSocket = liveStockSocket;

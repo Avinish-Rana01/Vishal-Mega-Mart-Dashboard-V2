@@ -4,6 +4,7 @@ import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import DonutChart from '../../../components/charts/DonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
@@ -17,7 +18,7 @@ import * as Icons from 'lucide-react';
 const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f472b6', '#2dd4bf', '#fb923c', '#818cf8', '#a3e635', '#22d3ee', '#facc15'];
 
 export default function DcEncodingSection() {
-  const { chartData: apiData, isLoading, error } = useWarehouseEncoding();
+  const { chartData: apiData, isLoading, isRefreshing, error, highlightedBlock, connectionStatus } = useWarehouseEncoding();
   const [chartRef, chartVisible] = useIsInViewport({ threshold: 0.1 });
 
   const { totalEncoded, peakHour, peakCount, avgPerHour, rankList, chartData, donutData } = useMemo(() => {
@@ -137,14 +138,22 @@ export default function DcEncodingSection() {
         title="DC Encoding" 
         subtitle="Overview of hourly tag encoding in the Distribution Center"
         icon={<Icons.Barcode size={44} color="#3b82f6" strokeWidth={2.2} />}
-        rightContent={<DateBadge />} 
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot"></span>
+              {connectionStatus === 'connected' ? 'Live Sync (6s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            </div>
+            <DateBadge />
+          </div>
+        } 
       />
 
       <div className="ds-kpi-row">
-        <KpiCard2 title="Tags Encoded" value={totalEncoded.toLocaleString('en-IN')} icon={<Icons.Tag />} />
+        <KpiCard2 title="Tags Encoded" value={<LiveTickerValue value={totalEncoded || 0} />} icon={<Icons.Tag />} />
         <KpiCard2 title="Peak Encoding Hour" value={peakHour} icon={<Icons.Clock />} />
         <KpiCard2 title="Peak Hour Volume" value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'} icon={<Icons.Activity />} />
-        <KpiCard2 title="Average Encoding / Hour" value={Number(avgPerHour).toLocaleString('en-IN')} icon={<Icons.TrendingUp />} />
+        <KpiCard2 title="Average Encoding / Hour" value={<LiveTickerValue value={Number(avgPerHour) || 0} />} icon={<Icons.TrendingUp />} />
       </div>
 
       {/* 2. Charts Row */}

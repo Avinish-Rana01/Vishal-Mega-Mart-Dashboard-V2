@@ -3,6 +3,7 @@ import './VendorDiscrepancySection.css';
 import { useVendorDiscrepancy } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import ComposedChart from '../../../components/charts/ComposedChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
@@ -13,7 +14,7 @@ import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
 
 export default function VendorDiscrepancySection() {
-  const { data, totals, isLoading, error } = useVendorDiscrepancy();
+  const { data, totals, isLoading, isRefreshing, error, highlightedVendor, connectionStatus } = useVendorDiscrepancy();
   const [chartView, setChartView] = useState('volume');
   const [sortBy, setSortBy] = useState('EXPECTED_DESC');
 
@@ -120,32 +121,40 @@ export default function VendorDiscrepancySection() {
         title="VENDOR DISCREPANCY" 
         subtitle="Discrepancies between expected and scanned vendor deliveries"
         icon={<Icons.Truck size={44} color="#3b82f6" strokeWidth={2.2} />}
-        rightContent={<DateBadge />} 
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot"></span>
+              {connectionStatus === 'connected' ? 'Live Sync (14s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            </div>
+            <DateBadge />
+          </div>
+        } 
       />
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
         <KpiCard2
           title="Total Expected Qty"
-          value={totals?.ACTUAL_QTY || '0'}
+          value={<LiveTickerValue value={totals?.ACTUAL_QTY || 0} />}
           icon={<Icons.Truck />}
         />
         <KpiCard2
           title="Total Actual Qty"
-          value={totals?.SCANNED_QTY || '0'}
+          value={<LiveTickerValue value={totals?.SCANNED_QTY || 0} />}
           badgeVariant="success"
           icon={<Icons.PackageCheck />}
         />
         <KpiCard2
           title="Current Discrepancy"
-          value={totals?.DIFF_QTY || '0'}
+          value={<LiveTickerValue value={totals?.DIFF_QTY || 0} />}
           badge="Action Needed"
           badgeVariant="danger"
           icon={<Icons.AlertTriangle />}
         />
         <KpiCard2
           title="Discrepancy Rate"
-          value={discrepancyPercent}
+          value={<LiveTickerValue value={discrepancyPercent} suffix="%" />}
           subtext="Overall % of missing items"
           badgeVariant="warning"
           icon={<Icons.Percent />}

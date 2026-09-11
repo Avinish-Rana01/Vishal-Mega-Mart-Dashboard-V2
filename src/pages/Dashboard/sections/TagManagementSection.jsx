@@ -3,6 +3,7 @@ import { Tags } from 'lucide-react';
 import './TagManagementSection.css';
 import { useTagCharts } from '../../../hooks/useDashboardData';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
@@ -25,7 +26,9 @@ export default function TagManagementSection() {
     cycleData,
     cycleTotal,
     avgRecycle,
-    isLoading
+    isLoading,
+    isRefreshing,
+    connectionStatus
   } = useTagCharts();
 
   if (isLoading) {
@@ -72,33 +75,41 @@ export default function TagManagementSection() {
         title="TAG MANAGEMENT" 
         subtitle="Overview of tag issuance and inventory across locations"
         icon={<Tags size={44} color="#3b82f6" strokeWidth={2.2} />}
-        rightContent={<DateBadge />} 
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot"></span>
+              {connectionStatus === 'connected' ? 'Live Sync (6s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            </div>
+            <DateBadge />
+          </div>
+        } 
       />
 
       {/* 1. KPI Row */}
       <div className="ds-kpi-row">
         <KpiCard2
           title="Total Tags"
-          value={locationTotal.toLocaleString('en-IN')}
+          value={<LiveTickerValue value={locationTotal || 0} />}
           icon={<Icons.Tag />}
         />
         <KpiCard2
           title="Store Inventory"
-          value={storeInv.toLocaleString('en-IN')}
+          value={<LiveTickerValue value={storeInv || 0} />}
           badge={`${((storeInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="success"
           icon={<Icons.Store />}
         />
         <KpiCard2
           title="Warehouse Inventory"
-          value={whInv.toLocaleString('en-IN')}
+          value={<LiveTickerValue value={whInv || 0} />}
           badge={`${((whInv / (locationTotal || 1)) * 100).toFixed(1)}%`}
           badgeVariant="info"
           icon={<Icons.Warehouse />}
         />
         <KpiCard2
           title="Average Recycle Count"
-          value={`${Number(avgRecycle || 0).toFixed(2)}`}
+          value={<LiveTickerValue value={Number(avgRecycle || 0).toFixed(2)} />}
           subtext="across all active tags"
           badgeVariant="warning"
           icon={<Icons.Refresh />}

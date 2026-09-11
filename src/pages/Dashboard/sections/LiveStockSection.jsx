@@ -150,6 +150,7 @@ export default function LiveStockSection() {
     data: realData, 
     totals: realTotals, 
     isLoading, 
+    isRefreshing,
     error, 
     refresh,
     highlightedStore,

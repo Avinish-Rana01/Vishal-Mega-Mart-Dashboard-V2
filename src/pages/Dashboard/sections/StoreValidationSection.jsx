@@ -4,6 +4,7 @@ import './StoreValidationSection.css';
 import { useStoreDashboard } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -298,7 +299,7 @@ const VIEW_OPTIONS = [
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function StoreValidationSection() {
   const navigate = useNavigate();
-  const { data: realData, totals: realTotals, isLoading, error } = useStoreDashboard();
+  const { data: realData, totals: realTotals, isLoading, isRefreshing, error, highlightedStore, connectionStatus } = useStoreDashboard();
   const data = realData;
   const totals = realTotals;
 
@@ -439,42 +440,50 @@ export default function StoreValidationSection() {
         title="Store Validation" 
         subtitle="Overview of store GRN validation process"
         icon={<Icons.CheckCircle size={44} color="#3b82f6" strokeWidth={2.2} />}
-        rightContent={<DateBadge />} 
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot"></span>
+              {connectionStatus === 'connected' ? 'Live Sync (12s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            </div>
+            <DateBadge />
+          </div>
+        } 
       />
 
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
       <div className="cc-kpi-row">
         <KpiCard2
           title="HU Received"
-          value={totals?.HU_RECEIVED_QTY || '0'}
+          value={<LiveTickerValue value={totals?.HU_RECEIVED_QTY || 0} />}
           badge="Expected"
           badgeVariant="default"
           icon={<Icons.Box />}
         />
         <KpiCard2
           title="HU Validated"
-          value={totals?.HU_VALIDATED_QTY || '0'}
+          value={<LiveTickerValue value={totals?.HU_VALIDATED_QTY || 0} />}
           badge="Processed"
           badgeVariant="success"
           icon={<Icons.CheckCircle />}
         />
         <KpiCard2
           title="HHT Validated"
-          value={totals?.HHT_VALIDATE_QTY || '0'}
+          value={<LiveTickerValue value={totals?.HHT_VALIDATE_QTY || 0} />}
           badge="Verified"
           badgeVariant="purple"
           icon={<Icons.Smartphone />}
         />
         <KpiCard2
           title="Store Pending"
-          value={totals?.STORE_PENDING_QTY || '0'}
+          value={<LiveTickerValue value={totals?.STORE_PENDING_QTY || 0} />}
           badge="Action Required"
           badgeVariant="warning"
           icon={<Icons.Clock />}
         />
         <KpiCard2
           title="Wrong HU"
-          value={totals?.HU_WRONG_QTY || '0'}
+          value={<LiveTickerValue value={totals?.HU_WRONG_QTY || 0} />}
           badge="Discrepancy"
           badgeVariant="danger"
           icon={<Icons.AlertTriangle />}
