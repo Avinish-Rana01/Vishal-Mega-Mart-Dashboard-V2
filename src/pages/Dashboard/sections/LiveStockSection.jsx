@@ -6,6 +6,7 @@ import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { RefreshCw, Store, Database, LineChart, Target } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import ActionAlertBar from '../../../components/common/ActionAlertBar';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
@@ -372,7 +373,7 @@ export default function LiveStockSection() {
         {/* ROW 1: 5 KPI Cards */}
         <KpiCard2
           title="Total Stores"
-          value={data ? data.length : '0'}
+          value={<LiveTickerValue value={data ? data.length : 0} />}
           subtext="Active stores"
           badge="Network"
           badgeVariant="info"
@@ -381,7 +382,7 @@ export default function LiveStockSection() {
 
         <KpiCard2
           title="Total SAP Stock"
-          value={totals?.SAP_STOCK || '0'}
+          value={<LiveTickerValue value={totals?.SAP_STOCK || 0} />}
           subtext="Total expected volume"
           badge="System Data"
           badgeVariant="default"
@@ -390,7 +391,7 @@ export default function LiveStockSection() {
 
         <KpiCard2
           title="Total RFID Scanned"
-          value={totals?.RFID_STOCK || '0'}
+          value={<LiveTickerValue value={totals?.RFID_STOCK || 0} />}
           subtext="Actual scanned items"
           badge="Physical"
           badgeVariant="default"
@@ -399,7 +400,7 @@ export default function LiveStockSection() {
 
         <KpiCard2
           title="Global Variance"
-          value={totals?.DIFFERENCE || '0'}
+          value={<LiveTickerValue value={totals?.DIFFERENCE || 0} />}
           subtext="Items missing"
           badge="Gap"
           badgeVariant="warning"
@@ -409,7 +410,7 @@ export default function LiveStockSection() {
         {/* Overall Accuracy */}
         <KpiCard2
           title="Overall Accuracy"
-          value={`${accuracyPercent}%`}
+          value={<LiveTickerValue value={accuracyPercent} suffix="%" />}
           subtext="Current global accuracy"
           badge="Live"
           badgeVariant="info"

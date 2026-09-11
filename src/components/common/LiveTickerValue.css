@@ -1,0 +1,32 @@
+.live-ticker-container {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.live-ticker-digit-slot {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  height: 1.18em;
+  min-width: 0.58em;
+  vertical-align: baseline;
+}
+
+.live-ticker-digit {
+  display: inline-block;
+  line-height: 1;
+  text-align: center;
+}
+
+.live-ticker-static {
+  display: inline-block;
+  line-height: 1;
+  margin: 0 0.04em;
+  user-select: none;
+}
