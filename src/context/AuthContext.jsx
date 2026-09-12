@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [allowedSections, setAllowedSections] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const logout = () => {
@@ -28,6 +30,8 @@ export const AuthProvider = ({ children }) => {
     }
     setLoggedInUser(null);
     setUserId(null);
+    setUserRole(null);
+    setAllowedSections([]);
     setIsLoggedIn(false);
     sessionStorage.removeItem('vmm_user');
     sessionStorage.removeItem('vmm_login_time');
@@ -53,6 +57,10 @@ export const AuthProvider = ({ children }) => {
           setLoggedInUser(parsed.userName || parsed.username || parsed.name || 'User');
           const uid = parsed.userID ?? parsed.userId ?? parsed.UserID ?? parsed.User_Id ?? parsed.USER_ID ?? parsed.user_id ?? parsed.id ?? parsed.Id;
           if (uid) setUserId(uid);
+          const role = parsed.userType ?? parsed.UserType ?? parsed.role ?? parsed.Role ?? null;
+          if (role) setUserRole(role);
+          const sections = parsed.allowedSections ?? parsed.AllowedSections ?? [];
+          setAllowedSections(Array.isArray(sections) ? sections : []);
         } catch (e) {
           setLoggedInUser(storedUser);
         }
@@ -86,11 +94,34 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     const username = userData?.userName || userData?.username || (typeof userData === 'string' ? userData : 'Admin');
     const uid = userData?.userID ?? userData?.userId ?? userData?.UserID ?? userData?.User_Id ?? userData?.USER_ID ?? userData?.user_id ?? userData?.id ?? userData?.Id;
+    const role = userData?.userType ?? userData?.UserType ?? userData?.role ?? userData?.Role ?? null;
+    const sections = userData?.allowedSections ?? userData?.AllowedSections ?? [];
+
     setLoggedInUser(username);
     if (uid) setUserId(uid);
+    if (role) setUserRole(role);
+    setAllowedSections(Array.isArray(sections) ? sections : []);
+
     setIsLoggedIn(true);
     sessionStorage.setItem('vmm_user', typeof userData === 'string' ? userData : JSON.stringify(userData));
     sessionStorage.setItem('vmm_login_time', Date.now().toString());
+  };
+
+  const hasSection = (sectionKey) => {
+    if (!sectionKey) return false;
+    // Super Admin has access to all sections
+    if (userRole === 'Super Admin') return true;
+    if (Array.isArray(allowedSections) && allowedSections.length > 0) {
+      return allowedSections.includes(sectionKey);
+    }
+    // Fallback based on userRole if allowedSections array is not yet present
+    if (userRole === 'Store Admin') {
+      return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return'].includes(sectionKey);
+    }
+    if (userRole === 'Warehouse Admin') {
+      return ['dc_validation', 'dc_encoding', 'tag_management', 'vendor_discrepancy'].includes(sectionKey);
+    }
+    return false;
   };
 
   if (loading) {
@@ -102,6 +133,10 @@ export const AuthProvider = ({ children }) => {
     isLoggedIn,
     loggedInUser,
     userId,
+    userRole,
+    userType: userRole,
+    allowedSections,
+    hasSection,
     login,
     logout
   };
