@@ -13,7 +13,7 @@ export const APP_INFO = {
 export const API_DEFAULTS = {
   PAGE_INDEX: 1,
   PAGE_SIZE: 100,
-  USER_ID: '26', // Hardcoded for now, to be replaced by auth context in Phase 3
+  // USER_ID: '26', 
   SORT_COLUMN: 'STORE',
   SORT_DIRECTION: 'asc'
 };

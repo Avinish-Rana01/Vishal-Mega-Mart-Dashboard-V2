@@ -8,33 +8,33 @@ const getHeaders = () => ({
   'Accept': 'application/json'
 });
 
-// Helper to dynamically get the active user ID from current authenticated session
-export const getActiveUserId = () => {
-  try {
-    const raw = sessionStorage.getItem('vmm_user');
-    if (raw) {
-      const user = JSON.parse(raw);
-      // Direct match for all common casings (notably userID from login response)
-      const direct = user.userID ?? user.userId ?? user.UserID ?? user.User_Id ?? user.USER_ID ?? user.user_id ?? user.id ?? user.Id;
-      if (direct !== undefined && direct !== null && String(direct).trim() !== '') {
-        return direct;
-      }
-      // Case-insensitive key scan fallback
-      for (const key of Object.keys(user)) {
-        const lower = key.toLowerCase();
-        if (lower === 'userid' || lower === 'user_id') {
-          const val = user[key];
-          if (val !== undefined && val !== null && String(val).trim() !== '') {
-            return val;
+  // Helper to dynamically get the active user ID from current authenticated session
+  export const getActiveUserId = () => {
+    try {
+      const raw = sessionStorage.getItem('vmm_user');
+      if (raw) {
+        const user = JSON.parse(raw);
+        // Direct match for all common casings (notably userID from login response)
+        const direct = user.userID ?? user.userId ?? user.UserID ?? user.User_Id ?? user.USER_ID ?? user.user_id ?? user.id ?? user.Id;
+        if (direct !== undefined && direct !== null && String(direct).trim() !== '') {
+          return direct;
+        }
+        // Case-insensitive key scan fallback
+        for (const key of Object.keys(user)) {
+          const lower = key.toLowerCase();
+          if (lower === 'userid' || lower === 'user_id') {
+            const val = user[key];
+            if (val !== undefined && val !== null && String(val).trim() !== '') {
+              return val;
+            }
           }
         }
       }
+    } catch (e) {
+      // fallback if parse fails
     }
-  } catch (e) {
-    // fallback if parse fails
-  }
-  return API_DEFAULTS.USER_ID;
-};
+    return API_DEFAULTS.USER_ID;
+  };
 
 // ==============================================================
 // Dashboard APIs

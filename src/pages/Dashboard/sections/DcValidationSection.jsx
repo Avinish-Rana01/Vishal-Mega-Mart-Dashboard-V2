@@ -114,7 +114,7 @@ export default function DcValidationSection() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
               <span className="live-sync-dot" />
-              {connectionStatus === 'connected' ? 'Live Sync (14s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+              {connectionStatus === 'connected' ? 'Live Sync (1s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
             </div>
             <DateBadge />
           </div>
