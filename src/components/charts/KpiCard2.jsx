@@ -43,7 +43,7 @@ export default function KpiCard2({ title, value, subtext, badge, badgeVariant = 
       overflow: 'hidden'
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', zIndex: 1, position: 'relative', width: 'calc(100% - 50px)' }}>
-        <h3 style={{ fontSize: '11.5px', fontWeight: '700', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <h3 style={{ fontSize: '14.5px', fontWeight: '700', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {title}
         </h3>
         

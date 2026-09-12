@@ -37,20 +37,24 @@ export default function GroupedBarChart({
   xAxisTickFormatter
 }) {
   if (!data || data.length === 0) {
-    return (
-      <div style={{
-        height,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#94a3b8',
-        fontSize: '14px',
-        background: '#f8fafc',
-        borderRadius: '12px',
-      }}>
-        {emptyText}
-      </div>
-    );
+    if (!emptyText) {
+      // Allow rendering the empty chart grid/axes with nothing on it
+    } else {
+      return (
+        <div style={{
+          height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#94a3b8',
+          fontSize: '14px',
+          background: '#f8fafc',
+          borderRadius: '12px',
+        }}>
+          {emptyText}
+        </div>
+      );
+    }
   }
 
   const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
@@ -66,7 +70,7 @@ export default function GroupedBarChart({
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={margin ? { ...margin, bottom: isMobile ? Math.max(margin.bottom || 0, 50) : margin.bottom } : { top: 30, right: 0, left: -20, bottom: isMobile ? 50 : 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
+          <BarChart data={data || []} margin={margin ? { ...margin, bottom: isMobile ? Math.max(margin.bottom || 0, 50) : margin.bottom } : { top: 30, right: 0, left: -20, bottom: isMobile ? 50 : 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
             <defs>
               <pattern id="gchart-stripe" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                 <rect width="10" height="10" fill="#f8fafc" />

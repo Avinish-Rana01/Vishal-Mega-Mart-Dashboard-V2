@@ -38,6 +38,7 @@ export default function StoreRankList({
   const displayItems = items.slice(0, maxItems);
 
   if (displayItems.length === 0) {
+    if (!emptyText) return null;
     return (
       <div style={{ textAlign: 'center', color: '#94a3b8', padding: '40px 0', fontSize: '14px' }}>
         {emptyText}

@@ -588,7 +588,7 @@ export const useReturnDashboard = () => useDashboardFetch(
 );
 
 // ==========================================
-// 8. DC Validation
+// 8. DC Validation (Enhanced with Real-Time SignalR)
 // ==========================================
 const dcValidationFilter = (row, term) => 
   (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term)) ||
@@ -601,11 +601,82 @@ const dcValidationTotals = (summary) => ({
   PROCESSED_ARTICLE_QTY: summary.articleQty || 0
 });
 
-export const useDcValidation = () => useDashboardFetch(
-  getDcValidation, 
-  dcValidationFilter, 
-  dcValidationTotals
-);
+export const useDcValidation = () => {
+  const baseFetch = useDashboardFetch(
+    getDcValidation, 
+    dcValidationFilter, 
+    dcValidationTotals
+  );
+
+  const [data, setData] = useState([]);
+  const [totals, setTotals] = useState(null);
+  const [highlightedPlant, setHighlightedPlant] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
+
+  useEffect(() => {
+    if (baseFetch.data) setData(baseFetch.data);
+  }, [baseFetch.data]);
+
+  useEffect(() => {
+    setTotals(baseFetch.totals);
+  }, [baseFetch.totals]);
+
+  // Connect to SignalR as soon as initial API request completes
+  useEffect(() => {
+    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
+      liveStockSocket.connect();
+    }
+  }, [baseFetch.isLoading, connectionStatus]);
+
+  useEffect(() => {
+    let highlightTimer = null;
+
+    const unsubStatus = liveStockSocket.onStatusChange((status) => {
+      setConnectionStatus(status);
+    });
+
+    const unsub = liveStockSocket.onDcValidationPatch((patch) => {
+      if (!patch || !patch.recivingPlant) return;
+
+      setData((prev) => {
+        return prev.map((row) => {
+          if (row.Reciving_Plant === patch.recivingPlant) {
+            return {
+              ...row,
+              PROCESSED_HU: patch.newProcessedHu !== undefined ? patch.newProcessedHu : row.PROCESSED_HU,
+              UNPROCESSED_HU: patch.newUnprocessedHu !== undefined ? patch.newUnprocessedHu : row.UNPROCESSED_HU,
+              PROCESSED_ARTICLE_QTY: patch.newProcessedArticleQty !== undefined ? patch.newProcessedArticleQty : row.PROCESSED_ARTICLE_QTY,
+              _lastUpdated: Date.now()
+            };
+          }
+          return row;
+        });
+      });
+
+      if (patch.summaryDelta) {
+        setTotals((prev) => prev ? {
+          ...prev,
+          recordCount: patch.summaryDelta.recordCount ?? prev.recordCount,
+          PROCESSED_HU: patch.summaryDelta.totalProcessedHu ?? prev.PROCESSED_HU,
+          UNPROCESSED_HU: patch.summaryDelta.totalUnprocessedHu ?? prev.UNPROCESSED_HU,
+          PROCESSED_ARTICLE_QTY: patch.summaryDelta.totalProcessedArticleQty ?? prev.PROCESSED_ARTICLE_QTY
+        } : prev);
+      }
+
+      setHighlightedPlant(patch.recivingPlant);
+      if (highlightTimer) clearTimeout(highlightTimer);
+      highlightTimer = setTimeout(() => setHighlightedPlant(null), 1500);
+    });
+
+    return () => {
+      unsubStatus();
+      unsub();
+      if (highlightTimer) clearTimeout(highlightTimer);
+    };
+  }, []);
+
+  return { ...baseFetch, data, totals: totals || baseFetch.totals, highlightedPlant, connectionStatus };
+};
 
 // ==========================================
 // 9. Tag Management Charts (Enhanced with Real-Time SignalR)

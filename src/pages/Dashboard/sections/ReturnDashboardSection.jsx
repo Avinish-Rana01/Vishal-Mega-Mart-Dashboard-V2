@@ -11,7 +11,6 @@ import StoreRankList from '../../../components/charts/StoreRankList';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
-import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
@@ -207,19 +206,6 @@ export default function ReturnDashboardSection() {
     return <div className="ds-error">{error}</div>;
   }
 
-  if (!data || data.length === 0) {
-    return (
-      <section className="ds-section">
-        <GlobalEmptyState
-          title="No Return Data Available"
-          subtitle="There are currently no return transactions for the selected period."
-        />
-      </section>
-    );
-  }
-
-
-
   return (
     <section className="ds-section">
       <SectionHeader 
@@ -322,7 +308,7 @@ export default function ReturnDashboardSection() {
             {chartView === 'grouped' && (
               <div style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
-                  <div style={{ minWidth: `max(100%, ${barData.length * 70}px)`, height: '100%' }}>
+                  <div style={{ minWidth: '100%', height: '100%' }}>
                     <GroupedBarChart
                       data={barData}
                       bars={[
@@ -331,6 +317,7 @@ export default function ReturnDashboardSection() {
                       ]}
                       height="100%"
                       hideLegend={true}
+                      emptyText=""
                       customTooltip={<ReturnVsEncodedTooltip />}
                     />
                   </div>
@@ -358,6 +345,7 @@ export default function ReturnDashboardSection() {
               diffLabel="Total Returns:"
               statusFn={() => 'danger'}
               formatValue={(val) => `${val} Pending`}
+              emptyText=""
             />
           </div>
         </div>

@@ -8,7 +8,6 @@ import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import { GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
@@ -214,18 +213,6 @@ export default function VoidDashboardSection() {
     return <div className="ds-error">{error}</div>;
   }
 
-  if (!data || data.length === 0) {
-    return (
-      <section className="ds-section">
-        <GlobalEmptyState
-          title="No Void Data Available"
-          subtitle="There are currently no void transactions for the selected period."
-        />
-      </section>
-    );
-  }
-
-
   return (
     <section className="ds-section">
       <SectionHeader 
@@ -320,7 +307,7 @@ export default function VoidDashboardSection() {
             {chartView === 'grouped' && (
               <div style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
-                  <div style={{ minWidth: `max(100%, ${barData.length * 70}px)`, height: '100%' }}>
+                  <div style={{ minWidth: '100%', height: '100%' }}>
                     <GroupedBarChart
                       data={barData}
                       bars={[
@@ -329,6 +316,7 @@ export default function VoidDashboardSection() {
                       ]}
                       height="100%"
                       hideLegend={true}
+                      emptyText=""
                       customTooltip={<VoidVsEncodedTooltip />}
                     />
                   </div>
@@ -356,6 +344,7 @@ export default function VoidDashboardSection() {
               diffLabel="Total Voids:"
               statusFn={() => 'danger'}
               formatValue={(val) => `${val} Pending`}
+              emptyText=""
             />
           </div>
         </div>

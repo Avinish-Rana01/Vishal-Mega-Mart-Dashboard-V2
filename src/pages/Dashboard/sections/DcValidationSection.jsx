@@ -11,6 +11,7 @@ import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import ChartLegend from '../../../components/common/ChartLegend';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import '../../../components/charts/DashboardSection.css';
 import './CycleCountShared.css';
 import * as Icons from 'lucide-react';
@@ -19,7 +20,7 @@ const COLOR_PROCESSED = '#06b6d4'; // Cyan
 const COLOR_UNPROCESSED = '#64748b'; // Gray
 
 export default function DcValidationSection() {
-  const { data, totals, isLoading, error } = useDcValidation();
+  const { data, totals, isLoading, error, highlightedPlant, connectionStatus } = useDcValidation();
 
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('UNPROCESSED_DESC');
@@ -109,34 +110,42 @@ export default function DcValidationSection() {
         title="DC Validation" 
         subtitle="Overview of Distribution Center validation progress"
         icon={<Icons.Building size={44} color="#3b82f6" strokeWidth={2.2} />}
-        rightContent={<DateBadge />} 
+        rightContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
+              <span className="live-sync-dot" />
+              {connectionStatus === 'connected' ? 'Live Sync (14s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            </div>
+            <DateBadge />
+          </div>
+        } 
       />
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard2
           title="Processed HUs"
-          value={processedTotal.toLocaleString('en-IN')}
+          value={<LiveTickerValue value={processedTotal} />}
           badgeVariant="success"
           icon={<Icons.CheckSquare />}
         />
         <KpiCard2
           title="Unprocessed HUs"
-          value={unprocessedTotal.toLocaleString('en-IN')}
+          value={<LiveTickerValue value={unprocessedTotal} />}
           badge="Backlog"
           badgeVariant="warning"
           icon={<Icons.Package />}
         />
         <KpiCard2
           title="Validated Articles"
-          value={Number(totals?.PROCESSED_ARTICLE_QTY || 0).toLocaleString('en-IN')}
+          value={<LiveTickerValue value={Number(totals?.PROCESSED_ARTICLE_QTY || 0)} />}
           subtext="Total items inside processed HUs"
           badgeVariant="info"
           icon={<Icons.Layers />}
         />
         <KpiCard2
           title="Processing Rate"
-          value={`${processingRate}%`}
+          value={<LiveTickerValue value={processingRate} suffix="%" />}
           badgeVariant={processingRate >= 95 ? "success" : processingRate >= 80 ? "warning" : "danger"}
           icon={<Icons.CheckSquare />}
         />
@@ -245,9 +254,10 @@ export default function DcValidationSection() {
           const processed = Number(row.PROCESSED_HU || 0);
           const unprocessed = Number(row.UNPROCESSED_HU || 0);
           const articles = Number(row.PROCESSED_ARTICLE_QTY || 0);
+          const isRowHighlighted = highlightedPlant && (highlightedPlant === row.Reciving_Plant || highlightedPlant === row.STORE_NAME);
 
           return (
-            <tr key={row.Reciving_Plant || idx} className="cc-data-grid-tr">
+            <tr key={row.Reciving_Plant || idx} className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}>
               <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ width: '100px' }}>
                 <div className="cc-row-tooltip-wrapper">
                   {row.Reciving_Plant || '—'}

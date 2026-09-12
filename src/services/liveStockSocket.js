@@ -18,6 +18,7 @@ class DashboardSocketService {
     this.dcEncodingPatchListeners = new Set();
     this.tagManagementPatchListeners = new Set();
     this.vendorDiscrepancyPatchListeners = new Set();
+    this.dcValidationPatchListeners = new Set();
 
     this.statusListeners = new Set();
     this.isConnected = false;
@@ -107,6 +108,11 @@ class DashboardSocketService {
       // 6. Vendor Discrepancy
       this.connection.on('ReceiveVendorDiscrepancyPatch', (patch) => {
         this.dispatch(this.vendorDiscrepancyPatchListeners, patch, 'VendorDiscrepancy');
+      });
+
+      // 7. DC Validation
+      this.connection.on('ReceiveDcValidationPatch', (patch) => {
+        this.dispatch(this.dcValidationPatchListeners, patch, 'DcValidation');
       });
 
       this.connection.onreconnecting(() => {
@@ -206,6 +212,14 @@ class DashboardSocketService {
     this.vendorDiscrepancyPatchListeners.add(callback);
     return () => {
       this.vendorDiscrepancyPatchListeners.delete(callback);
+    };
+  }
+
+  // DC Validation listeners
+  onDcValidationPatch(callback) {
+    this.dcValidationPatchListeners.add(callback);
+    return () => {
+      this.dcValidationPatchListeners.delete(callback);
     };
   }
 
