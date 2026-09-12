@@ -491,23 +491,40 @@ export default function StoreValidationSection() {
       </div>
 
       {/* ── Main Chart Card ──────────────────────────────────────────────── */}
-      <div className="cc-card" style={{ overflow: 'hidden' }}>
+      <div className="cc-card">
 
         <ChartToolbar
-          tabOptions={VIEW_OPTIONS}
-          activeTab={chartView}
-          onTabChange={(view) => {
-            setChartView(view);
-            const valid = sortOptions.some(o => o.value === sortBy);
-            if (!valid) setSortBy(sortOptions[0].value);
-          }}
-          searchQuery={searchFilter}
-          onSearchChange={setSearchFilter}
-          searchPlaceholder="Search store..."
-          sortOptions={sortOptions}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          totalCount={chartData.length}
+          leftContent={
+            <CustomDropdown
+              options={VIEW_OPTIONS}
+              value={chartView}
+              onChange={(val) => {
+                setChartView(val);
+                const valid = sortOptions.some(o => o.value === sortBy);
+                if (!valid) setSortBy(sortOptions[0].value);
+              }}
+              buttonStyle={{ backgroundColor: 'transparent', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e3a8a\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundPosition: 'right 4px center', border: 'none', paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: '18px', fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+              menuStyle={{ left: 0, right: 'auto', minWidth: '260px', textTransform: 'none', letterSpacing: 'normal' }}
+            />
+          }
+          rightContent={
+            <>
+              <CustomDropdown
+                options={sortOptions}
+                value={sortBy}
+                onChange={setSortBy}
+                prefix="Sort:"
+                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
+                menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+              />
+              <ChartSearchInput
+                value={searchFilter}
+                onChange={setSearchFilter}
+                onClear={() => setSearchFilter('')}
+                placeholder="Search store..."
+              />
+            </>
+          }
         />
 
         {/* ── Legend Strip (Dynamic based on View) ────────────────── */}
