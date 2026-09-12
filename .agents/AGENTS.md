@@ -90,3 +90,27 @@ When the user types /deploy or asks to deploy the frontend codebase:
 3. Uncomment the line `return <UnderDevelopmentPage />;`.
 4. Stage and commit the changes if instructed to push.
 5. Provide a summary of the action taken.
+
+## /update-docs
+When the user types `/update-docs` or asks to update/refresh the documentation:
+1. **Scan the entire codebase** for any new technologies, libraries, components, hooks, services, CSS patterns, or architectural changes that are NOT yet documented in the `md/` folder.
+2. **Update ALL relevant markdown files** inside `md/` to reflect the current state of the project. The 7 files to review and update are:
+   - `md/01_PROBLEMS_AND_SOLUTIONS.md` — Add any new bugs encountered, approaches tried, and solutions applied.
+   - `md/02_CHALLENGES_AND_FAQ.md` — Add Q&A entries for any new technology choices, trade-offs, or architectural decisions.
+   - `md/03_WEBSOCKETS_AND_SIGNALR_GUIDE.md` — Update if any new SignalR channels, hubs, or real-time features were added.
+   - `md/04_FRONTEND_COMPONENTS_AND_SYNTAX.md` — Add any new reusable components, design system tokens, or CSS rules.
+   - `md/05_REACT_HOOKS_MASTERCLASS.md` — Add any new custom hooks or new usage patterns of existing hooks.
+   - `md/06_PROJECT_FILE_MAP.md` — Update the file tree if any new files, folders, pages, or services were created.
+   - `md/07_CSS_ANIMATIONS_AND_MICROINTERACTIONS.md` — Add any new animations, transitions, or micro-interaction patterns.
+   - `md/README.md` — Update the master index table if any new doc files were added, and update the architecture diagram if the system topology changed.
+3. **Preserve existing content** — do NOT delete or overwrite existing documented problems/solutions. Only ADD new entries or UPDATE outdated information.
+4. **Use Mermaid flowcharts** for any new architectural explanations or data flow diagrams.
+5. **Write for beginners** — all syntax examples should include line-by-line comments so a basic HTML/CSS developer can understand them.
+6. **Report a summary** — after updating, list which files were modified and what was added.
+
+## /update-docs or /sync-docs
+When the user types /update-docs, /sync-docs, or instructs to "update docs with [new tech]":
+1. Inspect all `.md` files in the `md/` directory (`md/01_PROBLEMS_AND_SOLUTIONS.md`, `md/02_CHALLENGES_AND_FAQ.md`, `md/03_WEBSOCKETS_AND_SIGNALR_GUIDE.md`, `md/04_FRONTEND_COMPONENTS_AND_SYNTAX.md`, `md/README.md`, etc.).
+2. Update all component architecture, hook examples, state management patterns, and Mermaid diagrams to reflect the newly introduced technology.
+3. Keep frontend documentation perfectly synchronized with the backend contracts in `VS_mart_Backend/md/`.
+
