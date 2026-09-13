@@ -11,6 +11,7 @@ This document provides a developer guide to the **UI Design System**, core compo
 4. [Deep Dive: The Two-Slot ChartToolbar Pattern](#4-deep-dive-the-two-slot-charttoolbar-pattern)
 5. [The Indian Number System Standard (`en-IN`)](#5-the-indian-number-system-standard-en-in)
 6. [CSS Design Tokens, Color Palettes & Responsive Flex Rules](#6-css-design-tokens-color-palettes--responsive-flex-rules)
+7. [UI Creation & Consistency Playbook (Old UI → New UI Protocol)](#7-ui-creation--consistency-playbook-old-ui--new-ui-protocol)
 
 ---
 
@@ -254,3 +255,20 @@ When rendering responsive charts (especially with Recharts) inside flex containe
 2. **Scroll Containers:** Any scrollable wrapper inside the flex container MUST use `flex: 1 1 auto; min-height: 0; min-width: 0`.
 3. **Avoid `height: 100%` alone:** Never rely solely on `height: 100%` for a chart wrapper inside a flex item, as it will evaluate to 0px.
 4. **Recharts ResponsiveContainer:** Ensure `ResponsiveContainer` is wrapped in a rigidly constrained `flex: 1; min-height: 0` container.
+
+---
+
+## 7. UI Creation & Consistency Playbook (Old UI → New UI Protocol)
+
+For complete end-to-end guidance on creating new screens, refer to the dedicated handbook:
+👉 [**`08_UI_CREATION_AND_CONSISTENCY_PLAYBOOK.md`**](./08_UI_CREATION_AND_CONSISTENCY_PLAYBOOK.md)
+
+### Key Takeaways for New Screen Development:
+1. **Never Build From Scratch:** Perform a dual-source audit:
+   - **Legacy Audit:** Check inputs, grid columns, and SQL OUTPUT totals in `SP_NEW_REPORT` or `SP_NEW_DASHBOARD`.
+   - **V2 System Audit:** Replicate canonical files ([`GrcReportPage.jsx`](../src/pages/Report/GrcReportPage.jsx) for reports, [`LiveStockSection.jsx`](../src/pages/Dashboard/sections/LiveStockSection.jsx) for dashboard tabs).
+2. **Strict Layout Invariants:**
+   - **Report Pages:** Header Toolbar (`CustomDatePicker`, `SearchableDropdown`) ➔ KPI Badges ➔ `ReportDataTableCard` / `BaseDataTable`.
+   - **Dashboard Sections:** 3-Row Pattern (`SectionHeader` ➔ `CurvedCard`/`KpiCard` ➔ `GroupedBarChart`/`SemiDonutChart` ➔ `StoreRankList`). No tables in dashboard tabs.
+3. **Use the `/new-ui` Command:**
+   - Type `/new-ui [ScreenName]` to trigger the plan-first scaffolding workflow.

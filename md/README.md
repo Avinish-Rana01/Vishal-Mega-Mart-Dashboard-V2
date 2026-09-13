@@ -15,6 +15,7 @@ Welcome to the central documentation hub for **POS Web Application React V2**. T
 | [**`05_REACT_HOOKS_MASTERCLASS.md`**](./05_REACT_HOOKS_MASTERCLASS.md) | **React Hooks Masterclass** | Every React hook used in the project (`useState`, `useEffect`, `useCallback`, `useMemo`, `useRef`, custom hooks) explained with **actual production code examples** from the VMM codebase. | Beginners, Frontend Developers |
 | [**`06_PROJECT_FILE_MAP.md`**](./06_PROJECT_FILE_MAP.md) | **Complete Project File Map** | Every single file and folder in the entire project explained — frontend components, backend services, hooks, context, pages, and CSS. | New Developers, Onboarding |
 | [**`07_CSS_ANIMATIONS_AND_MICROINTERACTIONS.md`**](./07_CSS_ANIMATIONS_AND_MICROINTERACTIONS.md) | **CSS Animations & Micro-Interactions** | How shimmer loaders, live number tickers, row highlight flashes, connection status pills, dropdown transitions, and chart entry animations work, with full CSS `@keyframes` code. | Frontend Developers, UI Designers |
+| [**`08_UI_CREATION_AND_CONSISTENCY_PLAYBOOK.md`**](./08_UI_CREATION_AND_CONSISTENCY_PLAYBOOK.md) | **UI Creation & Design Consistency Playbook** | The canonical "Old UI → New UI" standard, dual-source audit workflows, Report vs Dashboard archetypes, templates with line-by-line comments, and `/new-ui` reference. | Frontend Engineers, Agents |
 
 ---
 

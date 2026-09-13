@@ -53,6 +53,39 @@ ALL visual sections in the V2 Dashboard MUST use these reusable components from 
 - **Long names**: All list item titles MUST use `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;` with `title={fullName}` on the element.
 - **Loading state**: Use shimmer skeleton boxes shaped like the section content, NOT a spinner icon.
 
+## UI Creation & Consistency Rules (Old UI → New UI Protocol)
+Whenever you are tasked with creating, refactoring, or extending ANY User Interface (UI) screen, page, or modal in this project, you MUST strictly adhere to the following 5-phase protocol:
+
+1. **Never Build From Scratch (Mandatory Dual-Source Audit)**:
+   - **Audit Source 1 — Legacy / Original Data Contract**: First inspect the legacy ASPX web forms or tabular app (`POS_Web_Application React`) or backend stored procedures (`SP_NEW_REPORT`, `SP_NEW_DASHBOARD`). Identify all required input filters (date ranges, store/vendor dropdowns), data table columns, numeric formats, and summary metrics returned via SQL `OUTPUT` parameters.
+   - **Audit Source 2 — Canonical V2 Design System**: Inspect the corresponding canonical V2 implementation:
+     - **For Report Pages**: Inspect `src/pages/Report/GrcReportPage.jsx` and `GrcReport.css`.
+     - **For Dashboard Analytics Tabs**: Inspect `src/pages/Dashboard/sections/LiveStockSection.jsx` and `DashboardSection.css`.
+
+2. **Strict Layout Archetypes**:
+   - **Report Page Archetype**:
+     - **Row 1 (Header & Filter Toolbar)**: Page title, `CustomDatePicker`, `SearchableDropdown` / `CustomDropdown`, search, clear, and export actions.
+     - **Row 2 (KPI Summary Row)**: Quick metric badges displaying totals (e.g., Total Invoices, Total Qty, Discrepancy Amount).
+     - **Row 3 (Data Table)**: Wrapped in `ReportDataTableCard` or `BaseDataTable` with sticky headers, search filtering, column sorting, pagination, and Indian number formatting (`.toLocaleString('en-IN')`).
+   - **Dashboard Section Archetype**:
+     - Follow the strict **3-Row Pattern**: KPI Row (`ds-kpi-row`) using `CurvedCard` and `KpiCard` → Charts Row (`ds-charts-row`) using `GroupedBarChart`, `SemiDonutChart`, `DonutChart`, `TimelineChart` → List Row using `StoreRankList`.
+     - Data tables (`ReportDataTableCard` or `BaseDataTable`) are **strictly prohibited** in dashboard sections.
+
+3. **Mandatory Component Reuse**:
+   - Always reuse existing components from `src/components/common/` and `src/components/charts/`.
+   - **NEVER** re-invent a date picker — use `CustomDatePicker`.
+   - **NEVER** build standard select dropdowns — use `SearchableDropdown` or `CustomDropdown`.
+   - **NEVER** use inline Recharts elements directly in page files — wrap charts in the designated reusable chart components.
+   - **NEVER** use generic spinning loader icons — use `DashboardShimmer` styled to match the layout shape.
+
+4. **Strict Flexbox Chart Constraints**:
+   - Every responsive chart container must use `display: flex; flex-direction: column`.
+   - Any scrolling element must have `flex: 1; min-height: 0; overflow: auto;` to prevent Recharts 0px height collapse or infinite expansion.
+
+5. **Plan-First Scaffolding Gate**:
+   - Never write code for a new UI immediately. First produce an implementation plan with an audit comparison table (Legacy UI vs. V2 Design Components) and obtain explicit user approval before writing JSX or CSS files.
+
+
 
 # Project Knowledge & Architecture Context (For New Developers & Agents)
 
@@ -78,23 +111,25 @@ When rendering responsive charts (especially with Recharts) inside flex containe
 4. **Recharts ResponsiveContainer**: Ensure the `ResponsiveContainer` is wrapped in a rigidly constrained `flex: 1; min-height: 0` container. If the chart needs to scroll, apply `overflow: auto` to that specific wrapper.
 
 ## Frontend Deployment Pre-requisite
-When the user asks to ""/deploy"" the frontend codebase or push changes to production, you MUST ALWAYS uncomment the 
-eturn <UnderDevelopmentPage />; line within the ""DEPLOYMENT TOGGLE"" block in src/pages/Login/LoginPage.jsx before pushing the code. This ensures that the ""Under Development"" splash screen is active in production instead of the broken login page.
+When the user asks to "/deploy" the frontend codebase or push changes to production, you MUST ALWAYS uncomment the 
+`return <UnderDevelopmentPage />;` line within the "DEPLOYMENT TOGGLE" block in `src/pages/Login/LoginPage.jsx` before pushing the code. This ensures that the "Under Development" splash screen is active in production instead of the broken login page.
+
+
 
 # Custom Slash Commands
 
 ## /deploy
 When the user types /deploy or asks to deploy the frontend codebase:
-1. Open src/pages/Login/LoginPage.jsx.
+1. Open `src/pages/Login/LoginPage.jsx`.
 2. Find the 'DEPLOYMENT TOGGLE' block (around line 122).
 3. Uncomment the line `return <UnderDevelopmentPage />;`.
 4. Stage and commit the changes if instructed to push.
 5. Provide a summary of the action taken.
 
-## /update-docs
-When the user types `/update-docs` or asks to update/refresh the documentation:
+## /update-docs or /sync-docs
+When the user types `/update-docs`, `/sync-docs`, or asks to update/refresh the documentation:
 1. **Scan the entire codebase** for any new technologies, libraries, components, hooks, services, CSS patterns, or architectural changes that are NOT yet documented in the `md/` folder.
-2. **Update ALL relevant markdown files** inside `md/` to reflect the current state of the project. The 7 files to review and update are:
+2. **Update ALL relevant markdown files** inside `md/` to reflect the current state of the project. The 8 files to review and update are:
    - `md/01_PROBLEMS_AND_SOLUTIONS.md` — Add any new bugs encountered, approaches tried, and solutions applied.
    - `md/02_CHALLENGES_AND_FAQ.md` — Add Q&A entries for any new technology choices, trade-offs, or architectural decisions.
    - `md/03_WEBSOCKETS_AND_SIGNALR_GUIDE.md` — Update if any new SignalR channels, hubs, or real-time features were added.
@@ -102,15 +137,29 @@ When the user types `/update-docs` or asks to update/refresh the documentation:
    - `md/05_REACT_HOOKS_MASTERCLASS.md` — Add any new custom hooks or new usage patterns of existing hooks.
    - `md/06_PROJECT_FILE_MAP.md` — Update the file tree if any new files, folders, pages, or services were created.
    - `md/07_CSS_ANIMATIONS_AND_MICROINTERACTIONS.md` — Add any new animations, transitions, or micro-interaction patterns.
-   - `md/README.md` — Update the master index table if any new doc files were added, and update the architecture diagram if the system topology changed.
+   - `md/08_UI_CREATION_AND_CONSISTENCY_PLAYBOOK.md` — Update canonical templates, archetype patterns, and component catalog.
+   - `md/README.md` — Update the master index table and architecture diagram if changed.
 3. **Preserve existing content** — do NOT delete or overwrite existing documented problems/solutions. Only ADD new entries or UPDATE outdated information.
 4. **Use Mermaid flowcharts** for any new architectural explanations or data flow diagrams.
 5. **Write for beginners** — all syntax examples should include line-by-line comments so a basic HTML/CSS developer can understand them.
 6. **Report a summary** — after updating, list which files were modified and what was added.
 
-## /update-docs or /sync-docs
-When the user types /update-docs, /sync-docs, or instructs to "update docs with [new tech]":
-1. Inspect all `.md` files in the `md/` directory (`md/01_PROBLEMS_AND_SOLUTIONS.md`, `md/02_CHALLENGES_AND_FAQ.md`, `md/03_WEBSOCKETS_AND_SIGNALR_GUIDE.md`, `md/04_FRONTEND_COMPONENTS_AND_SYNTAX.md`, `md/README.md`, etc.).
-2. Update all component architecture, hook examples, state management patterns, and Mermaid diagrams to reflect the newly introduced technology.
-3. Keep frontend documentation perfectly synchronized with the backend contracts in `VS_mart_Backend/md/`.
-
+## /new-ui
+When the user types `/new-ui [ScreenName]` or asks to create a new user interface:
+1. **Discovery & Archetype Classification**:
+   - Determine whether the screen is a **Report Page** (tabular data, date range filter, store dropdown, export) or a **Dashboard Section** (management analytics, 3-row pattern, KPI cards, Recharts).
+2. **Dual-Source Audit**:
+   - **Audit Source 1 (Legacy / Source)**: Locate corresponding legacy ASPX forms, Tabular app code, or backend stored procedures (`SP_NEW_REPORT` / `SP_NEW_DASHBOARD`). List all required input filters, table columns, data formats, and SQL OUTPUT totals.
+   - **Audit Source 2 (V2 Design System)**: Compare against canonical V2 reference files (`src/pages/Report/GrcReportPage.jsx` for reports, `src/pages/Dashboard/sections/LiveStockSection.jsx` for dashboard tabs).
+3. **Strict Plan-First Gate**:
+   - Create an `implementation_plan.md` artifact containing:
+     - Audit Comparison Table (Legacy Filters/Columns ➔ V2 Reusable Components).
+     - Component Tree & Hook mapping (`stockService.js`, `useDashboardData.js`).
+     - Scoped CSS plan reusing `DashboardSection.css` or scoped styling tokens.
+     - Routes to update in `src/App.jsx` and navigation items.
+   - **STOP** and await explicit user review and approval before generating any code.
+4. **Scaffold & Wire (Post-Approval Only)**:
+   - Generate the component JSX and CSS adhering 100% to design system rules and Indian number formatting (`.toLocaleString('en-IN')`).
+   - Wire API service calls or hooks with shimmer loading skeletons and `ErrorBoundary`.
+   - Add route in `App.jsx` and link in Navigation / Tab bar.
+   - Verify layout responsiveness and flexbox constraints.
