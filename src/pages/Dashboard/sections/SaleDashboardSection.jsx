@@ -273,7 +273,7 @@ export default function SaleDashboardSection() {
       </div>
 
       {/* 2. Charts Row (Full Width Stacked Bar) */}
-      {/* <div className="cc-card">
+      <div className="cc-card">
         <ChartToolbar
           leftContent={
             <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -336,7 +336,7 @@ export default function SaleDashboardSection() {
             )}
           </div>
         </div>
-      </div> */}
+      </div>
 
       {/* 3. NATIVE TABLE / DATA GRID */}
       <DashboardDataGrid

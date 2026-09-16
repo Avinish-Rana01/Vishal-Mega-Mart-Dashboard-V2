@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
+import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import { getReportStores, searchGrcHuNumbers, getGrcDetails } from '../../services/stockService';
+import GrcDetailsModal from '../../components/modals/GrcDetailsModal';
 import './GrcReport.css';
 
 export default function GrcReportPage() {
@@ -27,6 +29,7 @@ export default function GrcReportPage() {
   const [fromDate, setFromDate] = useState(initialFromDate);
   const [toDate, setToDate] = useState(initialToDate);
   const [grcStatus, setGrcStatus] = useState(initialGrcStatus);
+  const [selectedModalRow, setSelectedModalRow] = useState(null);
   const [storeOptions, setStoreOptions] = useState([]);
 
   const [cardGradients, setCardGradients] = useState([
@@ -150,8 +153,14 @@ export default function GrcReportPage() {
     return () => controller.abort();
   }, [selectedStore, fromDate, toDate, pageIndex, pageSize, selectedHu, grcStatus]);
 
-  const actionRenderer = (val) => (
-    <button className="vmm-btn-view-details" onClick={() => console.log('Open Modal', val)}>
+  const actionRenderer = (val, row) => (
+    <button 
+      className="vmm-btn-view-details" 
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedModalRow(row);
+      }}
+    >
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
         <circle cx="12" cy="12" r="3"></circle>
@@ -211,23 +220,19 @@ export default function GrcReportPage() {
               </div>
               <div className="search-field">
                 <label>From Date</label>
-                <div className="input-group">
-                  <input 
-                    type="date" 
-                    value={fromDate} 
-                    onChange={(e) => setFromDate(e.target.value)} 
-                  />
-                </div>
+                <CustomDatePicker
+                  value={fromDate}
+                  onChange={(val) => setFromDate(val)}
+                  placeholder="From Date"
+                />
               </div>
               <div className="search-field">
                 <label>To Date</label>
-                <div className="input-group">
-                  <input 
-                    type="date" 
-                    value={toDate} 
-                    onChange={(e) => setToDate(e.target.value)} 
-                  />
-                </div>
+                <CustomDatePicker
+                  value={toDate}
+                  onChange={(val) => setToDate(val)}
+                  placeholder="To Date"
+                />
               </div>
               <div className="search-field">
                 <label>HU Number</label>
@@ -316,6 +321,14 @@ export default function GrcReportPage() {
               totalRecords={totalRecords}
             />
           </div>
+
+          {/* Details Modal */}
+          {selectedModalRow && (
+            <GrcDetailsModal 
+              modalData={selectedModalRow} 
+              onClose={() => setSelectedModalRow(null)} 
+            />
+          )}
     </AppLayout>
   );
 }

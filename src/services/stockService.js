@@ -349,3 +349,31 @@ export const searchSaleEans = async ({ columnName = 'TOTAL_DPOS_SALE', store = '
   return response.data;
 };
 
+export const getGrcModalDetails = async ({
+  huNo = '',
+  article = '',
+  scanTime = '',
+  storeCode = '',
+  grcStatus = '',
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = ''
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (huNo) params.append('huNo', huNo);
+  if (article) params.append('article', article);
+  if (scanTime) params.append('scanTime', scanTime);
+  if (storeCode) params.append('storeCode', storeCode);
+  if (grcStatus) params.append('grcStatus', grcStatus);
+  params.append('pageIndex', pageIndex);
+  params.append('pageSize', pageSize);
+  if (searchTerm) params.append('searchTerm', searchTerm);
+
+  const response = await axios.get(`${API_BASE}/api/grc-report/modal-details?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+

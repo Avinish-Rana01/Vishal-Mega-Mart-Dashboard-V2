@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
+import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import { getReportStores, getStoreGrcReport } from '../../services/stockService';
 import './StoreGrcReport.css'; // We will create this or use LiveStockReport.css
@@ -207,29 +208,25 @@ export default function StoreGrcReportPage() {
               </div>
               <div className="search-field">
                 <label>From Date *</label>
-                <div className="input-group">
-                  <input 
-                    type="date" 
-                    value={fromDate} 
-                    onChange={(e) => {
-                      setFromDate(e.target.value);
-                      setPageIndex(1);
-                    }} 
-                  />
-                </div>
+                <CustomDatePicker
+                  value={fromDate}
+                  onChange={(dateStr) => {
+                    setFromDate(dateStr);
+                    setPageIndex(1);
+                  }}
+                  placeholder="From Date"
+                />
               </div>
               <div className="search-field">
                 <label>To Date *</label>
-                <div className="input-group">
-                  <input 
-                    type="date" 
-                    value={toDate} 
-                    onChange={(e) => {
-                      setToDate(e.target.value);
-                      setPageIndex(1);
-                    }} 
-                  />
-                </div>
+                <CustomDatePicker
+                  value={toDate}
+                  onChange={(dateStr) => {
+                    setToDate(dateStr);
+                    setPageIndex(1);
+                  }}
+                  placeholder="To Date"
+                />
               </div>
             </div>
           </div>

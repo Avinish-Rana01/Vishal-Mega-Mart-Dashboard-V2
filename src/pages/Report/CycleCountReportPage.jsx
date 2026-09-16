@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
+import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CycleCountModal from '../../components/modals/CycleCountModal';
 import { getCycleCountReport, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
@@ -156,24 +157,20 @@ export default function CycleCountReportPage() {
 
               <div className="search-field">
                 <label>From Date</label>
-                <div className="input-group">
-                  <input 
-                    type="date" 
-                    value={fromDate} 
-                    onChange={(e) => setFromDate(e.target.value)}
-                  />
-                </div>
+                <CustomDatePicker 
+                  value={fromDate} 
+                  onChange={(val) => setFromDate(val)}
+                  placeholder="From Date"
+                />
               </div>
 
               <div className="search-field">
                 <label>To Date</label>
-                <div className="input-group">
-                  <input 
-                    type="date" 
-                    value={toDate} 
-                    onChange={(e) => setToDate(e.target.value)}
-                  />
-                </div>
+                <CustomDatePicker 
+                  value={toDate} 
+                  onChange={(val) => setToDate(val)}
+                  placeholder="To Date"
+                />
               </div>
 
               <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>

@@ -8,7 +8,7 @@ import GrcReportPage from './pages/Report/GrcReportPage';
 import StoreGrcReportPage from './pages/Report/StoreGrcReportPage';
 import CycleCountReportPage from './pages/Report/CycleCountReportPage';
 import StoreSaleReportPage from './pages/Report/StoreSaleReportPage';
-import SalesReportPage from './pages/Report/SalesReportPage';
+import TotalDposSalePage from './pages/Report/TotalDposSalePage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -91,7 +91,16 @@ export default function App() {
               path="/reports/sale" 
               element={
                 <ProtectedRoute>
-                  <SalesReportPage />
+                  <TotalDposSalePage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/total-dpos-sale" 
+              element={
+                <ProtectedRoute>
+                  <TotalDposSalePage />
                 </ProtectedRoute>
               } 
             />

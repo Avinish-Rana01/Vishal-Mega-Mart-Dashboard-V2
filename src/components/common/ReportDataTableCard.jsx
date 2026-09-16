@@ -119,7 +119,6 @@ export default function ReportDataTableCard({
                         onClick={() => {
                           if (onPageSizeChange) {
                             onPageSizeChange(option);
-                            if (onPageChange) onPageChange(1); // Reset to page 1 on size change
                           }
                           setIsDropdownOpen(false);
                         }}

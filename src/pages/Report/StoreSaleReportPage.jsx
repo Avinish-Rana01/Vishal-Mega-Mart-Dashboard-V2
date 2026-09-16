@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, RotateCcw, Tag, Package, FileText, FileSpreadsheet } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
+import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import { getReportStores, getStoreSaleReport } from '../../services/stockService';
 import './StoreSaleReport.css';
@@ -87,8 +88,16 @@ export default function StoreSaleReportPage() {
     return () => controller.abort();
   }, []);
 
+  const fetchControllerRef = useRef(null);
+
   // 2. Fetch Store Sale Report Data
-  const fetchReport = useCallback(async (pIndex = pageIndex, pSize = pageSize) => {
+  const fetchReport = useCallback(async (pIndex, pSize) => {
+    if (fetchControllerRef.current) {
+      fetchControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    fetchControllerRef.current = controller;
+
     setIsLoading(true);
     setError(null);
     try {
@@ -98,7 +107,9 @@ export default function StoreSaleReportPage() {
         toDate,
         pageIndex: pIndex,
         pageSize: pSize
-      });
+      }, controller.signal);
+
+      if (controller.signal.aborted) return;
 
       if (result) {
         setTableData(result.items || []);
@@ -111,25 +122,34 @@ export default function StoreSaleReportPage() {
         setReportSummary(null);
       }
     } catch (err) {
-      if (err.name !== 'AbortError' && err.name !== 'CanceledError') {
-        console.error("Failed to fetch store sale report", err);
-        setError("Failed to load store sale data. Please check your connection.");
-      }
+      if (err.name === 'AbortError' || err.name === 'CanceledError') return;
+      console.error("Failed to fetch store sale report", err);
+      setError("Failed to load store sale data. Please check your connection.");
       setTableData([]);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [selectedStore, fromDate, toDate, pageIndex, pageSize]);
+  }, [selectedStore, fromDate, toDate]);
 
   // Initial and reactive fetch
   useEffect(() => {
     fetchReport(pageIndex, pageSize);
+    return () => {
+      if (fetchControllerRef.current) {
+        fetchControllerRef.current.abort();
+      }
+    };
   }, [fetchReport, pageIndex, pageSize]);
 
   // Handle Search button
   const handleSearch = () => {
-    setPageIndex(1);
-    fetchReport(1, pageSize);
+    if (pageIndex === 1) {
+      fetchReport(1, pageSize);
+    } else {
+      setPageIndex(1);
+    }
   };
 
   // Handle Clear / Reset
@@ -142,8 +162,11 @@ export default function StoreSaleReportPage() {
 
     setFromDate(fDate);
     setToDate(tDate);
-    setPageIndex(1);
-    fetchReport(1, pageSize);
+    if (pageIndex === 1) {
+      fetchReport(1, pageSize);
+    } else {
+      setPageIndex(1);
+    }
   };
 
   // Get Store Display Name for info banner
@@ -258,34 +281,30 @@ export default function StoreSaleReportPage() {
             </div>
 
             <div className="search-field">
-              <label>From Date *</label>
-              <div className="input-group">
-                <input 
-                  type="date" 
-                  value={fromDate} 
-                  onChange={(e) => {
-                    setFromDate(e.target.value);
-                    setPageIndex(1);
-                  }} 
-                />
-              </div>
+              <label>From Date</label>
+              <CustomDatePicker
+                value={fromDate}
+                onChange={(dateStr) => {
+                  setFromDate(dateStr);
+                  setPageIndex(1);
+                }}
+                placeholder="From Date"
+              />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <div className="input-group">
-                <input 
-                  type="date" 
-                  value={toDate} 
-                  onChange={(e) => {
-                    setToDate(e.target.value);
-                    setPageIndex(1);
-                  }} 
-                />
-              </div>
+              <CustomDatePicker
+                value={toDate}
+                onChange={(dateStr) => {
+                  setToDate(dateStr);
+                  setPageIndex(1);
+                }}
+                placeholder="To Date"
+              />
             </div>
 
-            <div className="search-field store-sale-search-actions">
+            <div className="store-sale-search-actions">
               <button 
                 type="button" 
                 className="store-sale-btn-search"
@@ -356,14 +375,10 @@ export default function StoreSaleReportPage() {
             pageIndex={pageIndex}
             pageSize={pageSize}
             exportFileName={`Store_Sale_Report_${selectedStore}_${fromDate}_to_${toDate}.csv`}
-            onPageChange={(newPg) => {
-              setPageIndex(newPg);
-              fetchReport(newPg, pageSize);
-            }}
+            onPageChange={(newPg) => setPageIndex(newPg)}
             onPageSizeChange={(newSize) => {
               setPageSize(newSize);
               setPageIndex(1);
-              fetchReport(1, newSize);
             }}
           />
         </div>
