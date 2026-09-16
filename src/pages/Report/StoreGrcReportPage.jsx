@@ -332,7 +332,7 @@ export default function StoreGrcReportPage() {
               onPageChange={setPageIndex}
               pageSize={pageSize}
               onPageSizeChange={setPageSize}
-              totalRecords={reportSummary?.totalRecords || 0}
+              totalRecords={totalRecords}
             />
           </div>
         </main>

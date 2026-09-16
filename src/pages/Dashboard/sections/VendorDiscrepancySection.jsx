@@ -154,7 +154,7 @@ export default function VendorDiscrepancySection() {
         />
         <KpiCard2
           title="Discrepancy Rate"
-          value={<LiveTickerValue value={discrepancyPercent} suffix="%" />}
+          value={<LiveTickerValue value={discrepancyPercent} />}
           subtext="Overall % of missing items"
           badgeVariant="warning"
           icon={<Icons.Percent />}
