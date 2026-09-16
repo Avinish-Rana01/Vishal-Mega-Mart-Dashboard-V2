@@ -7,6 +7,8 @@ import LiveStockReportPage from './pages/Report/LiveStockReportPage';
 import GrcReportPage from './pages/Report/GrcReportPage';
 import StoreGrcReportPage from './pages/Report/StoreGrcReportPage';
 import CycleCountReportPage from './pages/Report/CycleCountReportPage';
+import StoreSaleReportPage from './pages/Report/StoreSaleReportPage';
+import SalesReportPage from './pages/Report/SalesReportPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -74,6 +76,29 @@ export default function App() {
                   <CycleCountReportPage />
                 </ProtectedRoute>
               } 
+            />
+
+            <Route 
+              path="/reports/store-sale" 
+              element={
+                <ProtectedRoute>
+                  <StoreSaleReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/sale" 
+              element={
+                <ProtectedRoute>
+                  <SalesReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/sales" 
+              element={<Navigate to="/reports/sale" replace />} 
             />
 
             <Route 

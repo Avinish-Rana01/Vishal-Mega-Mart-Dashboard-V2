@@ -8,11 +8,16 @@ import { useIsInViewport } from './useIsInViewport';
  * @param {string|number} endValue - The target value (e.g. "1,29,759", "92%", or 1234)
  * @param {number} duration - Animation duration in ms
  */
-export function useCountUp(endValue, duration = 2000) {
+export function useCountUp(endValue, duration = 2000, enabled = true) {
   const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
-  const [currentValue, setCurrentValue] = useState('0');
+  const [currentValue, setCurrentValue] = useState(() => String(endValue ?? '0'));
 
   useEffect(() => {
+    if (!enabled) {
+      setCurrentValue(String(endValue ?? ''));
+      return;
+    }
+
     // Wait until the element is actually on screen before counting
     if (!hasBeenVisible || endValue === undefined || endValue === null) {
       return;
@@ -91,10 +96,11 @@ export function useCountUp(endValue, duration = 2000) {
     animationFrameId = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [endValue, hasBeenVisible, duration]);
+  }, [endValue, hasBeenVisible, duration, enabled]);
 
   // Before being visible, show '0' with the same format if possible
   const getInitialValue = () => {
+    if (!enabled) return endValue !== undefined && endValue !== null ? String(endValue) : '';
     if (hasBeenVisible) return currentValue;
     
     if (endValue === undefined || endValue === null) return '0';

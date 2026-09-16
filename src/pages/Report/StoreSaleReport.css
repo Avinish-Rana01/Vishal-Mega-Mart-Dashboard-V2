@@ -1,0 +1,80 @@
+/* Store Sale Report Scoped Styles */
+@import './LiveStockReport.css';
+
+.store-sale-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px;
+  margin: 0 15px 18px 15px;
+}
+
+@media (max-width: 1024px) {
+  .store-sale-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-sale-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Custom Clickable Link in Table */
+.store-sale-link {
+  color: #16a34a;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.store-sale-link:hover {
+  color: #15803d;
+}
+
+.store-sale-search-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.store-sale-btn-search {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.store-sale-btn-search:hover {
+  background: #0369a1;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+}
+
+.store-sale-btn-clear {
+  background: #94a3b8;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.store-sale-btn-clear:hover {
+  background: #64748b;
+}

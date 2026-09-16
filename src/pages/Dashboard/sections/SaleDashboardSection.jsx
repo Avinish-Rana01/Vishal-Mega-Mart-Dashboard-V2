@@ -72,6 +72,59 @@ export default function SaleDashboardSection() {
   const [sortBy, setSortBy] = useState('DPOS_DESC');
   const [tableSort, setTableSort] = useState('DPOS_DESC');
 
+  const handleCellClick = (row, colName) => {
+    const storeCode = row?.STORE || row?.Store_Code || row?.STORE_CODE;
+    if (!storeCode) return;
+
+    let dateOnly = '';
+    if (row?.DATE) {
+      dateOnly = String(row.DATE).split(' ')[0].split('T')[0];
+    } else {
+      const now = new Date();
+      dateOnly = now.toISOString().split('T')[0];
+    }
+
+    if (colName === 'STORE') {
+      const [y, m, d] = dateOnly.split('-').map(Number);
+      const pastWeek = new Date(y, m - 1, d);
+      pastWeek.setDate(pastWeek.getDate() - 7);
+      const fDate = `${pastWeek.getFullYear()}-${String(pastWeek.getMonth() + 1).padStart(2, '0')}-${String(pastWeek.getDate()).padStart(2, '0')}`;
+
+      navigate('/reports/store-sale', {
+        state: {
+          store: storeCode,
+          fromDate: fDate,
+          toDate: dateOnly
+        }
+      });
+      return;
+    } else {
+      navigate('/reports/sale', {
+        state: {
+          store: storeCode,
+          fromDate: dateOnly,
+          toDate: dateOnly,
+          columnName: colName
+        }
+      });
+    }
+  };
+
+  const handleKpiClick = (colName) => {
+    const defaultDate = tableData[0]?.DATE 
+      ? String(tableData[0].DATE).split(' ')[0].split('T')[0] 
+      : new Date().toISOString().split('T')[0];
+    const defaultStore = tableData[0]?.STORE || 'HD44';
+    navigate('/reports/sale', {
+      state: {
+        store: defaultStore,
+        fromDate: defaultDate,
+        toDate: defaultDate,
+        columnName: colName
+      }
+    });
+  };
+
   // Derived Metrics for Charts & Lists
   const { barData, tableData } = useMemo(() => {
     if (!data || !totals) return { barData: [], tableData: [] };
@@ -165,40 +218,62 @@ export default function SaleDashboardSection() {
 
       {/* 1. KPI Row */}
       <div className="cc-kpi-row">
-        <KpiCard2
-          title="Total DPOS Sale"
-          value={totals?.TOTAL_DPOS_SALE || '0'}
-          badgeVariant="default"
-          icon={<Icons.Cart />}
-        />
-        <KpiCard2
-          title="Total RFID Checkout"
-          value={totals?.TOTAL_RFID_CHECKOUT || '0'}
-          badgeVariant="info"
-          icon={<Icons.Tag />}
-        />
-        <KpiCard2
-          title="Taffeta Sales"
-          value={totals?.TOTAL_TAFFETA_SALE || '0'}
-          badgeVariant="success"
-          icon={<Icons.Star />}
-        />
-        <KpiCard2
-          title="Manual Sales"
-          value={totals?.TOTAL_MANUAL_SALE || '0'}
-          badgeVariant="warning"
-          icon={<Icons.Manual />}
-        />
-        <KpiCard2
-          title="RFID Sales Share"
-          value={totals?.RFID_SALES_SHARE || '0%'}
-          badgeVariant="default"
-          icon={<Icons.Tag />}
-        />
+        <div 
+          onClick={() => handleKpiClick('TOTAL_DPOS_SALE')} 
+          style={{ flex: 1, cursor: 'pointer', display: 'flex' }}
+          title="Click to view Total POS Sale Report"
+        >
+          <KpiCard2
+            title="Total DPOS Sale"
+            value={totals?.TOTAL_DPOS_SALE || '0'}
+            badgeVariant="default"
+            icon={<Icons.Cart />}
+          />
+        </div>
+        <div 
+          onClick={() => handleKpiClick('TOTAL_RFID_CHECKOUT')} 
+          style={{ flex: 1, cursor: 'pointer', display: 'flex' }}
+          title="Click to view RFID Checkout Report"
+        >
+          <KpiCard2
+            title="Total RFID Checkout"
+            value={totals?.TOTAL_RFID_CHECKOUT || '0'}
+            badgeVariant="info"
+            icon={<Icons.Tag />}
+          />
+        </div>
+        <div style={{ flex: 1, display: 'flex' }}>
+          <KpiCard2
+            title="Taffeta Sales"
+            value={totals?.TOTAL_TAFFETA_SALE || '0'}
+            badgeVariant="success"
+            icon={<Icons.Star />}
+          />
+        </div>
+        <div 
+          onClick={() => handleKpiClick('TOTAL_MANUAL_SALE')} 
+          style={{ flex: 1, cursor: 'pointer', display: 'flex' }}
+          title="Click to view Manual Sales Report"
+        >
+          <KpiCard2
+            title="Manual Sales"
+            value={totals?.TOTAL_MANUAL_SALE || '0'}
+            badgeVariant="warning"
+            icon={<Icons.Manual />}
+          />
+        </div>
+        <div style={{ flex: 1, display: 'flex' }}>
+          <KpiCard2
+            title="RFID Sales Share"
+            value={totals?.RFID_SALES_SHARE || '0%'}
+            badgeVariant="default"
+            icon={<Icons.Tag />}
+          />
+        </div>
       </div>
 
       {/* 2. Charts Row (Full Width Stacked Bar) */}
-      <div className="cc-card">
+      {/* <div className="cc-card">
         <ChartToolbar
           leftContent={
             <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -261,7 +336,7 @@ export default function SaleDashboardSection() {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* 3. NATIVE TABLE / DATA GRID */}
       <DashboardDataGrid
@@ -306,8 +381,15 @@ export default function SaleDashboardSection() {
             className="cc-data-grid-tr"
           >
             <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ padding: '8px' }}>
-              <div className="cc-row-tooltip-wrapper">
-                {row.STORE || '—'}
+              <div 
+                className="cc-row-tooltip-wrapper"
+                onClick={() => handleCellClick(row, 'STORE')}
+                title="Click to view daily store sales report"
+                style={{ cursor: 'pointer', color: '#1d4ed8' }}
+              >
+                <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                  {row.STORE || '—'}
+                </span>
                 {row.STORE_NAME && (
                   <div className="cc-row-tooltip">
                     {row.STORE_NAME}
@@ -316,12 +398,41 @@ export default function SaleDashboardSection() {
               </div>
             </td>
             <td className="cc-data-grid-td" style={{ padding: '8px', fontSize: '12px', color: '#64748b' }}>
-              {row.DATE ? row.DATE.split(' ')[0] : '—'}
+              {row.DATE ? String(row.DATE).split(' ')[0].split('T')[0] : '—'}
             </td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_DPOS_SALE || '0'}</td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_RFID_CHECKOUT || '0'}</td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_TAFFETA_SALE || '0'}</td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>{row.TOTAL_MANUAL_SALE || '0'}</td>
+            <td 
+              className="cc-data-grid-td" 
+              style={{ padding: '8px', cursor: 'pointer', color: '#1d4ed8', fontWeight: 600 }}
+              onClick={() => handleCellClick(row, 'TOTAL_DPOS_SALE')}
+              title="Click to view POS Sale details"
+            >
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                {Number(row.TOTAL_DPOS_SALE || 0).toLocaleString('en-IN')}
+              </span>
+            </td>
+            <td 
+              className="cc-data-grid-td" 
+              style={{ padding: '8px', cursor: 'pointer', color: '#1d4ed8', fontWeight: 600 }}
+              onClick={() => handleCellClick(row, 'TOTAL_RFID_CHECKOUT')}
+              title="Click to view RFID Checkout details"
+            >
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                {Number(row.TOTAL_RFID_CHECKOUT || 0).toLocaleString('en-IN')}
+              </span>
+            </td>
+            <td className="cc-data-grid-td" style={{ padding: '8px' }}>
+              {Number(row.TOTAL_TAFFETA_SALE || 0).toLocaleString('en-IN')}
+            </td>
+            <td 
+              className="cc-data-grid-td" 
+              style={{ padding: '8px', cursor: 'pointer', color: '#1d4ed8', fontWeight: 600 }}
+              onClick={() => handleCellClick(row, 'TOTAL_MANUAL_SALE')}
+              title="Click to view Manual Sale details"
+            >
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                {Number(row.TOTAL_MANUAL_SALE || 0).toLocaleString('en-IN')}
+              </span>
+            </td>
           </motion.tr>
         )}
       />

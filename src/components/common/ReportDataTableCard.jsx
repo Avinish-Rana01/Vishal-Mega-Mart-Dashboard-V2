@@ -14,7 +14,8 @@ export default function ReportDataTableCard({
   onPageChange = null,
   pageSize = 10,
   onPageSizeChange = null,
-  totalRecords = 0
+  totalRecords = 0,
+  exportFileName = "Report.csv"
 }) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -52,7 +53,7 @@ export default function ReportDataTableCard({
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", "LiveStock_Report.csv");
+    link.setAttribute("download", exportFileName || "Report.csv");
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();

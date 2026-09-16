@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { useCountUp } from '../../hooks/useCountUp';
 
-export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2777'], icon, progress, progressText }) {
+export default function CurvedCard({ title, value, waveColor = ['#f472b6', '#db2777'], icon, progress, progressText, animate = true }) {
   // Ensure we have an array for gradient, fallback to same color if string passed
   const colors = Array.isArray(waveColor) ? waveColor : [waveColor, waveColor];
   // We need a unique ID for the SVG gradient so they don't clash on the page
   const gradientId = `wave-grad-${title.replace(/[^a-zA-Z0-9]/g, '')}`;
 
-  const { ref, animatedValue } = useCountUp(value, 1000);
+  const { ref, animatedValue } = useCountUp(value, 1000, animate);
 
   // Generate a smooth random wave path on mount using summed sine waves
   const wavePath = useMemo(() => {

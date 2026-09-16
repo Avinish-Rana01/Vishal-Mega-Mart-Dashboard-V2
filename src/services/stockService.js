@@ -230,3 +230,122 @@ export const getCycleCountDetails = async (pageIndex = API_DEFAULTS.PAGE_INDEX, 
   });
   return response.data;
 };
+
+export const getStoreSaleReport = async ({
+  storeCode = '',
+  fromDate = '',
+  toDate = '',
+  searchTerm = '',
+  pageIndex = API_DEFAULTS.PAGE_INDEX,
+  pageSize = API_DEFAULTS.PAGE_SIZE,
+  sortColumn = 'DATE',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams({
+    userId: String(getActiveUserId()),
+    searchTerm: searchTerm || '',
+    storeCode: storeCode || '',
+    fromDate: fromDate || '',
+    toDate: toDate || '',
+    pageIndex: String(pageIndex || 1),
+    pageSize: String(pageSize || 10),
+    sortColumn: sortColumn || 'DATE',
+    sortDirection: sortDirection || 'desc'
+  });
+
+  const response = await axios.get(`${API_BASE}/api/stock/store-sale-report?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getSaleData = async ({
+  columnName = 'TOTAL_DPOS_SALE',
+  storeName = '',
+  store = '',
+  storeCode = '',
+  fromDate = '',
+  toDate = '',
+  pos = '',
+  articleNo = '',
+  ean = '',
+  pageIndex = API_DEFAULTS.PAGE_INDEX,
+  pageSize = API_DEFAULTS.PAGE_SIZE,
+  searchTerm = '',
+  sortColumn = 'ITEM_CD',
+  sortDirection = 'asc'
+} = {}, signal) => {
+  const effectiveStore = storeCode || store || storeName || '';
+  const params = new URLSearchParams({
+    columnName: columnName || 'TOTAL_DPOS_SALE',
+    storeName: effectiveStore,
+    store: effectiveStore,
+    storeCode: effectiveStore,
+    fromDate: fromDate || '',
+    toDate: toDate || '',
+    pos: pos || '',
+    articleNo: articleNo || '',
+    ean: ean || '',
+    pageIndex: String(pageIndex || 1),
+    pageSize: String(pageSize || 10),
+    searchTerm: searchTerm || '',
+    sortColumn: sortColumn || 'ITEM_CD',
+    sortDirection: sortDirection || 'asc',
+    userId: String(getActiveUserId())
+  });
+
+  const response = await axios.get(`${API_BASE}/api/stock/sale-data?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getSalePosCounters = async ({ columnName = 'TOTAL_DPOS_SALE', store = '', fromDate = '', toDate = '' } = {}, signal) => {
+  const params = new URLSearchParams({
+    columnName: columnName || 'TOTAL_DPOS_SALE',
+    store: store || '',
+    fromDate: fromDate || '',
+    toDate: toDate || ''
+  });
+  const response = await axios.get(`${API_BASE}/api/stock/sale/pos-counters?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const searchSaleArticles = async ({ columnName = 'TOTAL_DPOS_SALE', store = '', pos = '', fromDate = '', toDate = '', searchTerm = '' } = {}, signal) => {
+  const params = new URLSearchParams({
+    columnName: columnName || 'TOTAL_DPOS_SALE',
+    store: store || '',
+    pos: pos || '',
+    fromDate: fromDate || '',
+    toDate: toDate || '',
+    searchTerm: searchTerm || ''
+  });
+  const response = await axios.get(`${API_BASE}/api/stock/sale/articles?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const searchSaleEans = async ({ columnName = 'TOTAL_DPOS_SALE', store = '', pos = '', fromDate = '', toDate = '', material = '', searchTerm = '' } = {}, signal) => {
+  const params = new URLSearchParams({
+    columnName: columnName || 'TOTAL_DPOS_SALE',
+    store: store || '',
+    pos: pos || '',
+    fromDate: fromDate || '',
+    toDate: toDate || '',
+    material: material || '',
+    searchTerm: searchTerm || ''
+  });
+  const response = await axios.get(`${API_BASE}/api/stock/sale/eans?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
