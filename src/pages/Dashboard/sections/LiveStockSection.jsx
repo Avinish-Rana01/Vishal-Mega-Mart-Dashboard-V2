@@ -362,7 +362,7 @@ export default function LiveStockSection() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
               <span className="live-sync-dot"></span>
-              <span>{connectionStatus === 'connected' ? 'Live Sync (2s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}</span>
+              <span>{connectionStatus === 'connected' ? 'Live' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}</span>
             </div>
             <DateBadge />
           </div>

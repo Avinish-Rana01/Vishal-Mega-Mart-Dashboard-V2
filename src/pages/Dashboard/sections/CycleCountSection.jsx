@@ -528,7 +528,7 @@ export default function CycleCountSection() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>
               <span className="live-sync-dot"></span>
-              {connectionStatus === 'connected' ? 'Live Sync (4s)' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+              {connectionStatus === 'connected' ? 'Live' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
             </div>
             <DateBadge />
           </div>
