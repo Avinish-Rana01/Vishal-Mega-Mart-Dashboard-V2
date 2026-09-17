@@ -1,12 +1,9 @@
-import React, { useEffect, useRef, useMemo } from 'react';
-import DataTableLib from 'datatables.net-dt';
-
-// Safely extract the DataTable constructor
-const DataTable = DataTableLib.default || DataTableLib || window.DataTable;
+import React, { useState, useMemo } from 'react';
 
 /**
- * Pure jQuery DataTables React Component
- * This handles ONLY the table itself, preventing React Fiber mismatches.
+ * Pure React Data Table Component
+ * Completely flicker-free: No jQuery DataTables DOM destruction or remounting.
+ * Preserves the table structure in the DOM and reconciles row cells in-place.
  */
 export default function BaseDataTable({
   columns = [],
@@ -18,96 +15,51 @@ export default function BaseDataTable({
   striped = true,
   enablePagination = false,
   pageSize = 10,
-  domConfig = '<"top">rt<"bottom"ip><"clear">',
   searching = false,
   lengthChange = false,
   containerClassName = "vmm-table-container",
   tableClassName = "vmm-table",
   ordering = true
 }) {
-  const tableRef = useRef(null);
-  const dataTableInstance = useRef(null);
+  const [sortCol, setSortCol] = useState(null);
+  const [sortDir, setSortDir] = useState(null); // 'asc' | 'desc' | null
 
-  // 1. Force a complete React remount of the table when data changes.
-  const tableKey = useMemo(() => Math.random().toString(36), [data, isLoading, enablePagination, pageSize, domConfig, searching, lengthChange, ordering]);
+  // Show shimmer skeleton ONLY on initial load when there is NO data yet to fill
+  const showSkeleton = isLoading && (!data || data.length === 0);
 
-  // 2. Safe jQuery DataTables Initialization
-  useEffect(() => {
-    if (isLoading || !tableRef.current || data.length === 0) return;
-
-    if (dataTableInstance.current) {
-      dataTableInstance.current.destroy();
-      dataTableInstance.current = null;
+  const handleSort = (colKey) => {
+    if (!ordering) return;
+    if (sortCol !== colKey) {
+      setSortCol(colKey);
+      setSortDir('asc');
+    } else if (sortDir === 'asc') {
+      setSortDir('desc');
+    } else {
+      setSortCol(null);
+      setSortDir(null);
     }
+  };
 
-    try {
-      // Mount DataTables over the React-rendered DOM
-      dataTableInstance.current = new DataTable(tableRef.current, {
-        paging: enablePagination,
-        pageLength: pageSize,
-        searching: searching,
-        ordering: ordering,
-        info: enablePagination,
-        lengthChange: lengthChange,
-        destroy: true,
-        dom: domConfig,
-        language: {
-          paginate: {
-            previous: 'Previous',
-            next: 'Next'
-          }
-        },
-        drawCallback: function(settings) {
-          const api = this.api();
-          const pageInfo = api.page.info();
-          const container = api.table().container();
-          
-          if (container) {
-            const bottomEl = container.querySelector('.bottom');
-            if (bottomEl) {
-              bottomEl.style.display = pageInfo.pages <= 1 ? 'none' : 'flex';
-            }
-          }
-        }
-      });
-    } catch (err) {
-      console.error("DataTables Initialization Error:", err);
-    }
-
-    return () => {
-      if (dataTableInstance.current) {
-        try {
-          dataTableInstance.current.destroy();
-        } catch (e) {
-          // Ignore destruction errors on unmount
-        }
-        dataTableInstance.current = null;
+  const sortedData = useMemo(() => {
+    if (!ordering || !sortCol || !sortDir) return data;
+    return [...data].sort((a, b) => {
+      const aVal = a[sortCol];
+      const bVal = b[sortCol];
+      if (aVal === bVal) return 0;
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
       }
-    };
-  }, [tableKey]);
-
-  // 3. DOM Event Delegation Workaround
-  useEffect(() => {
-    const tableEl = tableRef.current;
-    if (!tableEl || !onRowClick) return;
-
-    const handleTableClick = (e) => {
-      const tr = e.target.closest('tr');
-      if (tr && tr.hasAttribute('data-row-index')) {
-        const idx = parseInt(tr.getAttribute('data-row-index'), 10);
-        if (data[idx]) {
-          onRowClick(data[idx]);
-        }
-      }
-    };
-
-    tableEl.addEventListener('click', handleTableClick);
-    return () => tableEl.removeEventListener('click', handleTableClick);
-  }, [tableKey, onRowClick, data]);
+      return sortDir === 'asc'
+        ? String(aVal).localeCompare(String(bVal), undefined, { numeric: true })
+        : String(bVal).localeCompare(String(aVal), undefined, { numeric: true });
+    });
+  }, [data, ordering, sortCol, sortDir]);
 
   return (
     <div className={containerClassName}>
-      {isLoading ? (
+      {showSkeleton ? (
         <div className="dt-container">
           <table className={`${tableClassName} dataTable vmm-skeleton-table ${striped ? 'vmm-table-striped' : ''}`}>
             <thead>
@@ -115,7 +67,6 @@ export default function BaseDataTable({
                 {columns.map((col) => (
                   <th key={col.key} className="dt-orderable-asc dt-orderable-desc">
                     <span className="dt-column-title">{col.label}</span>
-                    <span className="dt-column-order"></span>
                   </th>
                 ))}
               </tr>
@@ -146,36 +97,50 @@ export default function BaseDataTable({
           </table>
         </div>
       ) : (
-        <div key={tableKey}>
-          <table ref={tableRef} className={`${tableClassName} ${striped ? 'vmm-table-striped' : ''}`}>
+        <div className="dt-container">
+          <table className={`${tableClassName} dataTable ${striped ? 'vmm-table-striped' : ''}`}>
             <thead>
               <tr>
-                {columns.map((col) => (
-                  <th key={col.key}>{col.label}</th>
-                ))}
+                {columns.map((col) => {
+                  const isSorted = sortCol === col.key;
+                  const sortClass = isSorted 
+                    ? (sortDir === 'asc' ? 'dt-ordering-asc' : 'dt-ordering-desc') 
+                    : '';
+                  return (
+                    <th 
+                      key={col.key} 
+                      className={`dt-orderable-asc dt-orderable-desc ${ordering ? 'sortable' : ''} ${sortClass}`}
+                      onClick={() => handleSort(col.key)}
+                    >
+                      <span className="dt-column-title">{col.label}</span>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
-              {data.length === 0 ? (
+              {sortedData.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
                     No matching records found
                   </td>
                 </tr>
               ) : (
-                data.map((row, rowIdx) => (
-                  <tr 
-                    key={rowIdx} 
-                    data-row-index={rowIdx} 
-                    style={{ cursor: onRowClick ? 'pointer' : 'default' }}
-                  >
-                    {columns.map((col) => (
-                      <td key={col.key}>
-                        {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                sortedData.map((row, rowIdx) => {
+                  return (
+                    <tr 
+                      key={rowIdx}
+                      onClick={() => onRowClick && onRowClick(row)}
+                      style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                    >
+                      {columns.map((col) => (
+                        <td key={col.key}>
+                          {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
               )}
             </tbody>
             {totals && (

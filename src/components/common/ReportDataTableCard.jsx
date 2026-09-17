@@ -209,7 +209,7 @@ export default function ReportDataTableCard({
           <div className="ls-pagination-controls">
             <button 
               className="ls-page-btn" 
-              onClick={() => onPageChange && onPageChange(pageIndex - 1)}
+              onClick={() => !isLoading && onPageChange && onPageChange(pageIndex - 1)}
               disabled={pageIndex <= 1}
             >
               Previous
@@ -217,7 +217,12 @@ export default function ReportDataTableCard({
             
             {pageNumbers[0] > 1 && (
               <>
-                <button className="ls-page-btn" onClick={() => onPageChange && onPageChange(1)}>1</button>
+                <button 
+                  className="ls-page-btn" 
+                  onClick={() => !isLoading && onPageChange && onPageChange(1)}
+                >
+                  1
+                </button>
                 {pageNumbers[0] > 2 && <span className="ls-page-ellipsis">...</span>}
               </>
             )}
@@ -226,7 +231,7 @@ export default function ReportDataTableCard({
               <button 
                 key={pg} 
                 className={`ls-page-btn ${pageIndex === pg ? 'active' : ''}`}
-                onClick={() => onPageChange && onPageChange(pg)}
+                onClick={() => !isLoading && onPageChange && onPageChange(pg)}
               >
                 {pg}
               </button>
@@ -235,13 +240,18 @@ export default function ReportDataTableCard({
             {pageNumbers[pageNumbers.length - 1] < totalPages && (
               <>
                 {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && <span className="ls-page-ellipsis">...</span>}
-                <button className="ls-page-btn" onClick={() => onPageChange && onPageChange(totalPages)}>{totalPages}</button>
+                <button 
+                  className="ls-page-btn" 
+                  onClick={() => !isLoading && onPageChange && onPageChange(totalPages)}
+                >
+                  {totalPages}
+                </button>
               </>
             )}
             
             <button 
               className="ls-page-btn" 
-              onClick={() => onPageChange && onPageChange(pageIndex + 1)}
+              onClick={() => !isLoading && onPageChange && onPageChange(pageIndex + 1)}
               disabled={pageIndex >= totalPages}
             >
               Next
