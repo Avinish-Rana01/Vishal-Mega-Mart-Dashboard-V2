@@ -18,7 +18,8 @@ import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './LiveStockSection.css';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
-import '../Dashboard.css'
+import '../Dashboard.css';
+import { saveDashboardReturnPoint, useSessionState } from '../../../utils/dashboardNavigationMemory';
 
 // Custom RFID Icon
 const RfidIcon = ({ size = 24, strokeWidth = 2, color = "currentColor", ...props }) => (
@@ -162,7 +163,7 @@ export default function LiveStockSection() {
   const todayStr = new Date().toISOString().split('T')[0];
 
   // Filtering & Search State
-  const [searchStore, setSearchStore] = React.useState(''); // Text input for searching by store code/name
+  const [searchStore, setSearchStore] = useSessionState('ls_search_store', ''); // Text input for searching by store code/name
   const [filterField, setFilterField] = React.useState('ALL'); // Which metric to filter by
   const [filterOp, setFilterOp] = React.useState('<'); // Mathematical operator for filtering (<, >, =)
   const [filterVal, setFilterVal] = React.useState(''); // The numerical threshold for the filter
@@ -170,7 +171,7 @@ export default function LiveStockSection() {
   const [filterError, setFilterError] = React.useState(''); // Validation error messages for filter input
 
   // Sorting State
-  const [sortBy, setSortBy] = React.useState('CODE_ASC'); // Active sorting metric (e.g., Variance, Accuracy)
+  const [sortBy, setSortBy] = useSessionState('ls_sort_by', 'CODE_ASC'); // Active sorting metric (e.g., Variance, Accuracy)
 
   /**
    * Validates and applies the user's custom filter criteria.
@@ -315,6 +316,7 @@ export default function LiveStockSection() {
     const payloadDate = dataProps?.DATE || dataProps?.payload?.DATE || todayStr;
     
     if (storeCode) {
+      saveDashboardReturnPoint('live_stock');
       navigate('/reports/live-stock', { state: { store: storeCode, date: payloadDate } });
     }
   }, [navigate, todayStr]);

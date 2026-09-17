@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
 import './CycleCountSection.css';
+import { saveDashboardReturnPoint, useSessionState } from '../../../utils/dashboardNavigationMemory';
 
 const VIEW_OPTIONS = [
   { value: 'store', label: 'Audit Duration by Store' },
@@ -396,11 +397,11 @@ export default function CycleCountSection() {
   const metrics = useCycleCountMetrics(data);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
-  const [searchFilter, setSearchFilter] = useState('');
-  const [sortBy, setSortBy] = useState('DURATION_DESC');
-  const [tableSort, setTableSort] = useState('latest');
-  const [chartView, setChartView] = useState('store');
-  const [infoTab, setInfoTab] = useState('system');
+  const [searchFilter, setSearchFilter] = useSessionState('cc_search_filter', '');
+  const [sortBy, setSortBy] = useSessionState('cc_sort_by', 'DURATION_DESC');
+  const [tableSort, setTableSort] = useSessionState('cc_table_sort', 'latest');
+  const [chartView, setChartView] = useSessionState('cc_chart_view', 'store');
+  const [infoTab, setInfoTab] = useSessionState('cc_info_tab', 'system');
 
   // Single source of filtered data for both chart and table
   const filteredData = useMemo(() => {
@@ -682,7 +683,10 @@ export default function CycleCountSection() {
               <div 
                 className="cc-row-tooltip-wrapper"
                 style={{ cursor: 'pointer', color: '#2563eb' }}
-                onClick={() => navigate('/reports/cycle-count', { state: { storeCode: row.STORE_CODE, date: row.DATE } })}
+                onClick={() => {
+                  saveDashboardReturnPoint('cycle_count');
+                  navigate('/reports/cycle-count', { state: { storeCode: row.STORE_CODE, date: row.DATE } });
+                }}
               >
                 {row.STORE_CODE || '—'}
                 {row.STORE_NAME && (

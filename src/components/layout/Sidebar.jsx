@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Store, Tags, Settings } from 'lucide-react';
+import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
 import './Sidebar.css';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
@@ -15,10 +16,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
   }, [isOpen]);
 
+  const handleDashboardClick = () => {
+    clearDashboardReturnPoint();
+    setIsTooltipOpen(false);
+    const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <aside className={`vmm-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="vmm-sidebar-logo" title="Vishal Mega Mart">
-        <Link to="/dashboard">
+        <Link to="/dashboard" onClick={handleDashboardClick}>
           <img src="/assets/images/vishal_mega_mart_icon.png" alt="VMM Icon" />
         </Link>
       </div>
@@ -41,7 +51,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             <h4 className="vmm-nav-tooltip-title">Home</h4>
             <ul>
               <li>
-                <NavLink to="/dashboard" className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={() => setIsTooltipOpen(false)}>
+                <NavLink to="/dashboard" className={({ isActive }) => `vmm-nav-tooltip-link ${isActive ? 'active' : ''}`} onClick={handleDashboardClick}>
                   Dashboard V2
                 </NavLink>
               </li>

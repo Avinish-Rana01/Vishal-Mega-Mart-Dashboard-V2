@@ -18,6 +18,7 @@ import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
 import './common.css';
 import './CycleCountShared.css';
+import { saveDashboardReturnPoint, useSessionState } from '../../../utils/dashboardNavigationMemory';
 
 
 
@@ -304,13 +305,14 @@ export default function StoreValidationSection() {
   const totals = realTotals;
 
 
-  const [chartView, setChartView] = useState('grouped');
-  const [searchFilter, setSearchFilter] = useState('');
-  const [sortBy, setSortBy] = useState('PENDING_DESC');
-  const [tableSort, setTableSort] = useState('PENDING_DESC');
+  const [chartView, setChartView] = useSessionState('sv_chart_view', 'grouped');
+  const [searchFilter, setSearchFilter] = useSessionState('sv_search_filter', '');
+  const [sortBy, setSortBy] = useSessionState('sv_sort_by', 'PENDING_DESC');
+  const [tableSort, setTableSort] = useSessionState('sv_table_sort', 'PENDING_DESC');
 
   const handleStoreClick = useCallback((storeCode, rowDate) => {
     if (!storeCode) return;
+    saveDashboardReturnPoint('store_validation');
     navigate('/reports/store-grc', {
       state: {
         store: storeCode,
@@ -331,6 +333,7 @@ export default function StoreValidationSection() {
       dateOnly = now.toISOString().split('T')[0];
     }
 
+    saveDashboardReturnPoint('store_validation');
     navigate('/reports/grc', {
       state: {
         store: storeCode,
