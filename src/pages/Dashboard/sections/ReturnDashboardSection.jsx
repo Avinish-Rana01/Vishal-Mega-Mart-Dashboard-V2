@@ -81,13 +81,13 @@ const MemoizedPendingChart = React.memo(({ data }) => {
                         <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
                       )}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#ec4899' }}>Pending Returns: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
+                    <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Returns: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
                   </div>
                 );
               }
               return null;
             }} />
-              <Bar dataKey="pending" fill="#ec4899" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} />
+              <Bar dataKey="pending" fill="#ef4444" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} />
             </BarChart>
           </ResponsiveContainer>
         </div>

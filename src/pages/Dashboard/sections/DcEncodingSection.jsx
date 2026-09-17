@@ -15,7 +15,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
 
-const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f472b6', '#2dd4bf', '#fb923c', '#818cf8', '#a3e635', '#22d3ee', '#facc15'];
 
 export default function DcEncodingSection() {
   const { chartData: apiData, isLoading, isRefreshing, error, highlightedBlock, connectionStatus } = useWarehouseEncoding();
@@ -104,10 +103,7 @@ export default function DcEncodingSection() {
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
               formatter={(value) => value.toLocaleString('en-IN')}
             />
-            <Bar dataKey="Encoded" name="Tags Encoded" radius={12} barSize={24} isAnimationActive={true}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-              ))}
+            <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={24} isAnimationActive={true}>
               <LabelList
                 dataKey="Encoded"
                 position="top"

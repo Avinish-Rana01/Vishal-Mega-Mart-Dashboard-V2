@@ -23,6 +23,8 @@ class DashboardSocketService {
     this.statusListeners = new Set();
     this.isConnected = false;
     this.isConnecting = false;
+    this.lastConnectAttemptTime = 0;
+    this.reconnectCooldownMs = 5000;
 
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', () => {
@@ -38,6 +40,16 @@ class DashboardSocketService {
   }
 
   async connect() {
+    if (this.isConnecting) {
+      return;
+    }
+
+    const now = Date.now();
+    if (now - this.lastConnectAttemptTime < this.reconnectCooldownMs) {
+      return;
+    }
+    this.lastConnectAttemptTime = now;
+
     if (this.connection) {
       if (
         this.connection.state === signalR.HubConnectionState.Connected ||
@@ -52,10 +64,6 @@ class DashboardSocketService {
         // ignore
       }
       this.connection = null;
-    }
-
-    if (this.isConnecting) {
-      return;
     }
 
     this.isConnecting = true;

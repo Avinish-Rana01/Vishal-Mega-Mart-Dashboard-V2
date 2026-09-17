@@ -23,11 +23,11 @@ import { saveDashboardReturnPoint, useSessionState } from '../../../utils/dashbo
 
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
-const COLOR_RECEIVED  = '#3b82f6'; // blue
-const COLOR_VALIDATED = '#ff8800ff'; // orange (from cycle count)
+const COLOR_RECEIVED  = '#3b82f6'; // blue (Normal/Baseline)
+const COLOR_VALIDATED = '#10b981'; // green (Completed/Positive)
 const COLOR_HHT       = '#6366f1'; // indigo
-const COLOR_PENDING   = '#fcd34d'; // amber/yellow gap
-const COLOR_WRONG     = '#ef4444'; // red
+const COLOR_PENDING   = '#f59e0b'; // amber (Pending/In-progress)
+const COLOR_WRONG     = '#ef4444'; // red (Error)
 
 // ─── Tooltips ────────────────────────────────────────────────────────────────
 function ValidationTooltip({ active, payload }) {

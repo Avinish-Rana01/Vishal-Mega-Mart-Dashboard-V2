@@ -16,8 +16,8 @@ import '../../../components/charts/DashboardSection.css';
 import './CycleCountShared.css';
 import * as Icons from 'lucide-react';
 
-const COLOR_PROCESSED = '#06b6d4'; // Cyan
-const COLOR_UNPROCESSED = '#64748b'; // Gray
+const COLOR_PROCESSED = '#10b981'; // Green (Completed)
+const COLOR_UNPROCESSED = '#f59e0b'; // Amber (Pending/Unprocessed)
 
 export default function DcValidationSection() {
   const { data, totals, isLoading, error, highlightedPlant, connectionStatus } = useDcValidation();

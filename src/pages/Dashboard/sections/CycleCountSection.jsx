@@ -91,7 +91,7 @@ const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
               content={<DurationTooltip />}
               cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
             />
-            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#ff8800ff" isAnimationActive={true} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
+            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#3b82f6" isAnimationActive={true} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
               <LabelList
                 dataKey="rawDuration"
                 position="right"
@@ -166,7 +166,7 @@ function CycleInfoTooltip({ active, payload }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '4px 12px', fontSize: '11px', color: '#475569' }}>
         <span style={{ color: '#64748b' }}>Articles</span>       <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.NO_OF_ARTICLES || 0}</span>
         <span style={{ color: '#64748b' }}>Difference</span>     <span style={{ fontWeight: 700, color: netColor }}>{netDiff > 0 ? '+' : ''}{netDiff}</span>
-        <span style={{ color: '#64748b' }}>Short Qty</span>      <span style={{ fontWeight: 700, color: '#f97316' }}>{Math.abs(d.SHORT_QTY || 0)}</span>
+        <span style={{ color: '#64748b' }}>Short Qty</span>      <span style={{ fontWeight: 700, color: '#ef4444' }}>{Math.abs(d.SHORT_QTY || 0)}</span>
         <span style={{ color: '#64748b' }}>Excess Qty</span>     <span style={{ fontWeight: 700, color: '#10b981' }}>{d.EXCESS_QTY || 0}</span>
       </div>
     </div>
@@ -306,8 +306,8 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight, onBarClick
               <XAxis type="number" hide domain={[0, 100]} />
               <YAxis dataKey="STORE_CODE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={60} />
               <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
-              <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#f97316" radius={4} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
-                <LabelList dataKey="SHORT_VAL" content={<CustomVarianceLabel fill="#f97316" />} />
+              <Bar dataKey="SHORT_BAR" stackId="a" barSize={14} fill="#ef4444" radius={4} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
+                <LabelList dataKey="SHORT_VAL" content={<CustomVarianceLabel fill="#ef4444" />} />
               </Bar>
               <Bar dataKey="SPACER_FG" stackId="a" fill="transparent" isAnimationActive={false} />
               <Bar dataKey="EXCESS_BAR" stackId="a" barSize={14} fill="#10b981" radius={4} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
@@ -367,7 +367,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginBottom: '4px', paddingRight: '16px', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
                 <div style={{ display: 'flex', gap: '16px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#f97316', display: 'inline-block' }}></span>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block' }}></span>
                     Short Qty
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

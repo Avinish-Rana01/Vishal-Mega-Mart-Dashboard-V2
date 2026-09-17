@@ -217,23 +217,23 @@ export default function VendorDiscrepancySection() {
             {chartView === 'volume' ? (
               <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: '#64748b' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#94a3b8' }}></span>
+                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#3b82f6' }}></span>
                   Expected Qty
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0d9488' }}></span>
+                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
                   Actual Qty
                 </div>
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: '#64748b' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0d9488' }}></span>
-                  Discrepancy %
+                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ef4444' }}></span>
+                  Discrepancy Qty
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#94a3b8' }}></span>
-                  Discrepancy Qty
+                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#f59e0b' }}></span>
+                  Discrepancy %
                 </div>
               </div>
             )}
@@ -246,8 +246,8 @@ export default function VendorDiscrepancySection() {
                 <GroupedBarChart
                   data={barData}
                   bars={[
-                    { dataKey: 'Expected', color: '#94a3b8', label: 'Expected Qty' },
-                    { dataKey: 'Scanned', color: '#0d9488', label: 'Actual Qty' }
+                    { dataKey: 'Expected', color: '#3b82f6', label: 'Expected Qty' },
+                    { dataKey: 'Scanned', color: '#10b981', label: 'Actual Qty' }
                   ]}
                   height={220}
                   hideLegend={true}
@@ -281,10 +281,10 @@ export default function VendorDiscrepancySection() {
                 <ComposedChart
                   data={composedData}
                   bars={[
-                    { dataKey: 'DIFF_QTY', color: '#94a3b8', label: 'Discrepancy Qty', yAxisId: 'left' }
+                    { dataKey: 'DIFF_QTY', color: '#ef4444', label: 'Discrepancy Qty', yAxisId: 'left' }
                   ]}
                   lines={[
-                    { dataKey: 'DIFF_PER', color: '#0d9488', label: 'Discrepancy %', yAxisId: 'right' }
+                    { dataKey: 'DIFF_PER', color: '#f59e0b', label: 'Discrepancy %', yAxisId: 'right' }
                   ]}
                   height={220}
                   hideLegend={true}
