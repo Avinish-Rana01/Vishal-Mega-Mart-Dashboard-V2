@@ -135,7 +135,11 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
   };
 
   const columns = [
-    { key: 'srNo', label: 'Sr.No' },
+    { 
+      key: 'srNo', 
+      label: 'Sr.No', 
+      render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
+    },
     { key: 'stockDate', label: 'Stock Date' },
     { key: 'articleNo', label: 'Article No', render: linkRenderer },
     { key: 'sapStock', label: 'SAP Stock', render: numRenderer },
@@ -268,7 +272,10 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
           pageIndex={pageIndex}
           onPageChange={setPageIndex}
           pageSize={pageSize}
-          onPageSizeChange={setPageSize}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPageIndex(1);
+          }}
           totalRecords={reportSummary?.totalRecords || articleData.length}
         />
       </div>

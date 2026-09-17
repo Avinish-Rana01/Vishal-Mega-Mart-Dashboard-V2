@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import BaseDataTable from './BaseDataTable';
 import './LiveStockDataTable.css';
 
@@ -15,21 +15,43 @@ export default function ReportDataTableCard({
   pageSize = 10,
   onPageSizeChange = null,
   totalRecords = 0,
-  exportFileName = "Report.csv"
+  exportFileName = "Report.csv",
+  onSearch = null,
+  searchPlaceholder = "Search Records",
+  searchValue = undefined
 }) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [internalSearch, setInternalSearch] = useState(searchValue || '');
 
-  // 1. Filter Data Internally (like the original LiveStockDataTable did)
+  // Keep internalSearch in sync if controlled searchValue changes
+  useEffect(() => {
+    if (searchValue !== undefined) {
+      setInternalSearch(searchValue);
+    }
+  }, [searchValue]);
+
+  // Debounce server-side search callback if provided
+  useEffect(() => {
+    if (!onSearch) return;
+    const handler = setTimeout(() => {
+      onSearch(internalSearch);
+      if (onPageChange && internalSearch.trim()) {
+        onPageChange(1);
+      }
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [internalSearch, onSearch]);
+
+  // Filter Data Internally only if onSearch is NOT provided (client-side fallback)
   const filteredData = useMemo(() => {
-    if (!searchTerm.trim()) return data;
-    const term = searchTerm.toLowerCase();
+    if (onSearch || !internalSearch.trim()) return data;
+    const term = internalSearch.toLowerCase();
     return data.filter((row) => {
       return columns.some((col) => {
         const val = row[col.key];
         return val !== undefined && val !== null && String(val).toLowerCase().includes(term);
       });
     });
-  }, [data, searchTerm, columns]);
+  }, [data, internalSearch, columns, onSearch]);
 
   // Handle Export to CSV
   const handleExportCSV = () => {
@@ -63,7 +85,16 @@ export default function ReportDataTableCard({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pageSizeOptions = [10, 25, 50, 100];
 
-  const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+  const effectiveTotal = onSearch ? totalRecords : (internalSearch.trim() ? filteredData.length : totalRecords);
+  const totalPages = Math.max(1, Math.ceil(effectiveTotal / pageSize));
+
+  // Clamp pageIndex if out of bounds (e.g. after filter reduces count or pageSize increases)
+  useEffect(() => {
+    if (effectiveTotal > 0 && pageIndex > totalPages && onPageChange) {
+      onPageChange(totalPages);
+    }
+  }, [effectiveTotal, pageIndex, totalPages, onPageChange]);
+
   const getPageNumbers = () => {
     const pages = [];
     const maxVisible = 5;
@@ -80,6 +111,10 @@ export default function ReportDataTableCard({
     return pages;
   };
   const pageNumbers = getPageNumbers();
+
+  const isDataEmpty = onSearch ? data.length === 0 : filteredData.length === 0;
+  const startEntry = effectiveTotal === 0 || isDataEmpty ? 0 : Math.min((pageIndex - 1) * pageSize + 1, effectiveTotal);
+  const endEntry = effectiveTotal === 0 || isDataEmpty ? 0 : Math.min(pageIndex * pageSize, effectiveTotal);
 
   return (
     <div className="ls-table-wrapper">
@@ -120,6 +155,9 @@ export default function ReportDataTableCard({
                           if (onPageSizeChange) {
                             onPageSizeChange(option);
                           }
+                          if (onPageChange) {
+                            onPageChange(1);
+                          }
                           setIsDropdownOpen(false);
                         }}
                       >
@@ -138,9 +176,9 @@ export default function ReportDataTableCard({
             <span>Search:</span>
             <input 
               type="text" 
-              placeholder="Search Records" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={searchPlaceholder} 
+              value={internalSearch}
+              onChange={(e) => setInternalSearch(e.target.value)}
             />
           </div>
         </div>
@@ -164,7 +202,7 @@ export default function ReportDataTableCard({
       
       <div className="ls-toolbar-bottom">
         <div className="ls-pagination-info">
-          Showing {totalRecords === 0 ? 0 : (pageIndex - 1) * pageSize + 1} to {Math.min(pageIndex * pageSize, totalRecords)} of {totalRecords.toLocaleString('en-IN')} entries
+          Showing {startEntry} to {endEntry} of {effectiveTotal.toLocaleString('en-IN')} entries
         </div>
         
         {totalPages > 1 && (
@@ -172,7 +210,7 @@ export default function ReportDataTableCard({
             <button 
               className="ls-page-btn" 
               onClick={() => onPageChange && onPageChange(pageIndex - 1)}
-              disabled={pageIndex === 1}
+              disabled={pageIndex <= 1}
             >
               Previous
             </button>
@@ -204,7 +242,7 @@ export default function ReportDataTableCard({
             <button 
               className="ls-page-btn" 
               onClick={() => onPageChange && onPageChange(pageIndex + 1)}
-              disabled={pageIndex === totalPages}
+              disabled={pageIndex >= totalPages}
             >
               Next
             </button>

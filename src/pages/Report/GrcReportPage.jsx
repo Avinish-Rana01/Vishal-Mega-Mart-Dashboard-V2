@@ -170,7 +170,11 @@ export default function GrcReportPage() {
   );
 
   const columns = [
-    { key: 'srNo', label: 'SR.NO' },
+    { 
+      key: 'srNo', 
+      label: 'SR.NO', 
+      render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
+    },
     { key: 'storeCode', label: 'STORE CODE' },
     { key: 'huNumber', label: 'HU NUMBER' },
     { key: 'status', label: 'STATUS' },
@@ -317,7 +321,10 @@ export default function GrcReportPage() {
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
               pageSize={pageSize}
-              onPageSizeChange={setPageSize}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPageIndex(1);
+              }}
               totalRecords={totalRecords}
             />
           </div>

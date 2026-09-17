@@ -170,7 +170,11 @@ export default function StoreGrcReportPage() {
   const numRenderer = (val) => <span className="vmm-link-num">{typeof val === 'number' ? val.toLocaleString('en-IN') : val}</span>;
 
   const columns = [
-    { key: 'srNo', label: 'SR.NO' },
+    { 
+      key: 'srNo', 
+      label: 'SR.NO', 
+      render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
+    },
     { key: 'date', label: 'DATE' },
     { key: 'huReceivedQty', label: 'HU RECEIVED QTY', render: numRenderer },
     { key: 'whValidatedQty', label: 'WH VALIDATED QTY', render: numRenderer },
@@ -331,7 +335,10 @@ export default function StoreGrcReportPage() {
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
               pageSize={pageSize}
-              onPageSizeChange={setPageSize}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPageIndex(1);
+              }}
               totalRecords={totalRecords}
             />
           </div>

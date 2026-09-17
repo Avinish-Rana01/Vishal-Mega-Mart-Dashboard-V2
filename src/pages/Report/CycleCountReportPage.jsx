@@ -197,7 +197,10 @@ export default function CycleCountReportPage() {
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
               pageSize={pageSize}
-              onPageSizeChange={setPageSize}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPageIndex(1);
+              }}
               totalRecords={totalRecords}
               onSearch={setSearchTerm}
               searchPlaceholder="Search Records"

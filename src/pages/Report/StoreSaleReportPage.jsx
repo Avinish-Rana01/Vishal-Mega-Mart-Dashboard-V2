@@ -192,7 +192,12 @@ export default function StoreSaleReportPage() {
 
   // Columns definition for ReportDataTableCard
   const tableColumns = useMemo(() => [
-    { key: 'RowNumber', label: 'SR.NO', sortable: true },
+    { 
+      key: 'RowNumber', 
+      label: 'SR.NO', 
+      sortable: true,
+      render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1)
+    },
     { 
       key: 'DATE', 
       label: 'DATE', 
@@ -247,7 +252,7 @@ export default function StoreSaleReportPage() {
         </span>
       )
     }
-  ], [selectedStore, fromDate]);
+  ], [selectedStore, fromDate, pageIndex, pageSize]);
 
   return (
     <AppLayout 
