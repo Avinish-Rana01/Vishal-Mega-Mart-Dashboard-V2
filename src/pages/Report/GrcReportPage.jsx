@@ -83,6 +83,8 @@ export default function GrcReportPage() {
 
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sortColumn, setSortColumn] = useState('GRC_DATE');
+  const [sortDirection, setSortDirection] = useState('asc');
 
   // HU Autocomplete State
   const [huSearchTerm, setHuSearchTerm] = useState('');
@@ -118,7 +120,7 @@ export default function GrcReportPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getGrcDetails(pageIndex, pageSize, grcStatus, selectedStore, selectedHu, fromDate, toDate, controller.signal);
+        const result = await getGrcDetails(pageIndex, pageSize, grcStatus, selectedStore, selectedHu, fromDate, toDate, sortColumn, sortDirection, controller.signal);
         
         if (controller.signal.aborted) return;
         
@@ -151,7 +153,7 @@ export default function GrcReportPage() {
     };
     fetchReport();
     return () => controller.abort();
-  }, [selectedStore, fromDate, toDate, pageIndex, pageSize, selectedHu, grcStatus]);
+  }, [selectedStore, fromDate, toDate, pageIndex, pageSize, selectedHu, grcStatus, sortColumn, sortDirection]);
 
   const actionRenderer = (val, row) => (
     <button 
@@ -325,6 +327,13 @@ export default function GrcReportPage() {
                 setPageSize(newSize);
                 setPageIndex(1);
               }}
+              onSortChange={(col, dir) => {
+                setSortColumn(col);
+                setSortDirection(dir);
+                setPageIndex(1);
+              }}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
               totalRecords={totalRecords}
             />
           </div>

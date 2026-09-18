@@ -419,7 +419,7 @@ export default function LiveStockSection() {
           badgeVariant="info"
           icon={<Target />}
         />
-
+      {/* we will work on this in future for every section 
       <div style={{ gridColumn: '1 / -1' }}>
         <ActionAlertBar 
           below80Count={5}
@@ -428,7 +428,7 @@ export default function LiveStockSection() {
           above95Count={7}
           // onViewAll={() => console.log('View All Alerts clicked')}
         />
-      </div>
+      </div> */}
 
       {/* ROW 2 & 3 Flex Container */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', gridColumn: '1 / -1', width: '100%' }}>

@@ -17,7 +17,10 @@
 }
 
 .custom-select-trigger span {
-  font-size: 13px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .custom-select-trigger span.has-value {
@@ -89,7 +92,7 @@
   outline: none !important;
   box-shadow: none !important;
   appearance: none !important;
-  font-size: 13px !important;
+  font-size: 11px !important;
   box-sizing: border-box !important;
   color: #334155 !important;
   background-color: #ffffff !important;

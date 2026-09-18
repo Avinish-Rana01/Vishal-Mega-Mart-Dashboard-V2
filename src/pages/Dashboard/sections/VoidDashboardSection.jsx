@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import './VoidDashboardSection.css';
 import { Ban } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useVoidDashboard } from '../../../hooks/useDashboardData';
 
 import KpiCard2 from '../../../components/charts/KpiCard2';
@@ -59,7 +60,27 @@ const VoidVsEncodedTooltip = ({ active, payload }) => {
   return null;
 };
 
-const MemoizedPendingChart = React.memo(({ data }) => {
+const CustomYAxisTick = ({ x, y, payload, onClick }) => {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={4}
+        textAnchor="end"
+        fill="#2563eb"
+        fontSize={13}
+        fontWeight="bold"
+        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+        onClick={() => onClick(payload.value)}
+      >
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
+const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
   const height = Math.max(data.length * 35, 300);
   return (
@@ -69,7 +90,7 @@ const MemoizedPendingChart = React.memo(({ data }) => {
           <ResponsiveContainer width="100%" height={height}>
           <BarChart layout="vertical" data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="name" width={60} axisLine={false} tickLine={false} tick={<CustomYAxisTick onClick={onAxisClick} />} />
             <RechartsTooltip cursor={{ fill: '#f1f5f9' }} content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 const data = payload[0].payload;
@@ -87,7 +108,7 @@ const MemoizedPendingChart = React.memo(({ data }) => {
               }
               return null;
             }} />
-              <Bar dataKey="pending" fill="#ef4444" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} />
+              <Bar dataKey="pending" fill="#ef4444" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -96,7 +117,7 @@ const MemoizedPendingChart = React.memo(({ data }) => {
   );
 });
 
-const MemoizedEncodingChart = React.memo(({ data }) => {
+const MemoizedEncodingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
   const height = Math.max(data.length * 35, 300);
   return (
@@ -106,7 +127,7 @@ const MemoizedEncodingChart = React.memo(({ data }) => {
           <ResponsiveContainer width="100%" height={height}>
           <BarChart layout="vertical" data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={(val) => `${val}%`} axisLine={false} tickLine={false} />
-            <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="name" width={60} axisLine={false} tickLine={false} tick={<CustomYAxisTick onClick={onAxisClick} />} />
             <RechartsTooltip cursor={{ fill: '#f1f5f9' }} content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 const data = payload[0].payload;
@@ -124,7 +145,7 @@ const MemoizedEncodingChart = React.memo(({ data }) => {
               }
               return null;
             }} />
-            <Bar dataKey="rate" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800}>
+            <Bar dataKey="rate" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
               <LabelList dataKey="rate" position="right" formatter={(val) => `${val.toFixed(1)}%`} style={{ fontSize: '11px', fontWeight: 600, fill: '#10b981' }} />
             </Bar>
           </BarChart>
@@ -139,6 +160,7 @@ export default function VoidDashboardSection() {
   const { data, totals, isLoading, error, refresh } = useVoidDashboard();
   const [chartView, setChartView] = React.useState('grouped');
   const [sortBy, setSortBy] = React.useState('VOID_DESC');
+  const navigate = useNavigate();
 
   // Smart defaults for sorting when switching views
   React.useEffect(() => {
@@ -203,8 +225,16 @@ export default function VoidDashboardSection() {
     return { barData, rankList, encodePercent, totalVoidRaw, encodeRaw, pendingChartData, encodingChartData };
   }, [data, totals, sortBy]);
 
-  const handleStoreClick = (storeData) => {
-    console.log('Navigate to store void report:', storeData.STORE || storeData.name);
+  const handleStoreClick = (storeCode) => {
+    navigate('/reports/void-details', {
+      state: { storeCode: storeCode || '' }
+    });
+  };
+
+  const handleBarClick = (payload) => {
+    navigate('/reports/void-reconciliation', {
+      state: { storeCode: payload?.name || payload?.STORE || '' }
+    });
   };
 
   if (isLoading) return <DashboardShimmer title="Void Dashboard" />;
@@ -318,13 +348,16 @@ export default function VoidDashboardSection() {
                       hideLegend={true}
                       emptyText=""
                       customTooltip={<VoidVsEncodedTooltip />}
+                      onBarClick={handleBarClick}
+                      onAxisClick={handleStoreClick}
+                      xAxisFontSize={13}
                     />
                   </div>
                 </div>
               </div>
             )}
-            {chartView === 'pending' && <MemoizedPendingChart data={pendingChartData} />}
-            {chartView === 'encoding' && <MemoizedEncodingChart data={encodingChartData} />}
+            {chartView === 'pending' && <MemoizedPendingChart data={pendingChartData} onBarClick={handleBarClick} onAxisClick={handleStoreClick} />}
+            {chartView === 'encoding' && <MemoizedEncodingChart data={encodingChartData} onBarClick={handleBarClick} onAxisClick={handleStoreClick} />}
           </div>
         </div>
       </div>
@@ -345,6 +378,7 @@ export default function VoidDashboardSection() {
               statusFn={() => 'danger'}
               formatValue={(val) => `${val} Pending`}
               emptyText=""
+              onItemClick={(row) => handleStoreClick(row.STORE)}
             />
           </div>
         </div>

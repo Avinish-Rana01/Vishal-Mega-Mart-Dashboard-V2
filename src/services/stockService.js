@@ -110,6 +110,46 @@ export const getVoidDashboard = async (searchQuery = '', pageIndex = 1, pageSize
   return response.data;
 };
 
+export const getVoidDetails = async (storeName = '', fromDate = '', toDate = '', pageIndex = 1, pageSize = 100, sortColumn = 'DATE', sortDirection = 'asc', signal) => {
+  const store = encodeURIComponent(storeName || '');
+  const response = await axios.get(`${API_BASE}/api/stock/GetVoidDetails?storeName=${store}&fromDate=${fromDate}&toDate=${toDate}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getVoidReconciliationData = async (storeName = '', fromDate = '', toDate = '', pos = '', ean = '', pageIndex = 1, pageSize = 100, sortColumn = 'DATE', sortDirection = 'asc', signal) => {
+  const store = encodeURIComponent(storeName || '');
+  const p = encodeURIComponent(pos || '');
+  const e = encodeURIComponent(ean || '');
+  const response = await axios.get(`${API_BASE}/api/stock/GetVoidReconciliationData?storeName=${store}&fromDate=${fromDate}&toDate=${toDate}&pos=${p}&ean=${e}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getVoidPosCounters = async (store = '', fromDate = '', toDate = '', signal) => {
+  const storeEnc = encodeURIComponent(store || '');
+  const response = await axios.get(`${API_BASE}/api/stock/void/pos-counters?store=${storeEnc}&fromDate=${fromDate}&toDate=${toDate}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getVoidSearchEAN = async (store = '', fromDate = '', toDate = '', searchTerm = '', pos = '', signal) => {
+  const storeEnc = encodeURIComponent(store || '');
+  const searchEnc = encodeURIComponent(searchTerm || '');
+  const posEnc = encodeURIComponent(pos || '');
+  const response = await axios.get(`${API_BASE}/api/stock/void-SearchEAN?store=${storeEnc}&fromDate=${fromDate}&toDate=${toDate}&searchTerm=${searchEnc}&pos=${posEnc}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
 export const getReturnDashboard = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
@@ -161,10 +201,10 @@ export const searchReportArticles = async (searchTerm, storeCode, fromDate, toDa
   return response.data;
 };
 
-export const getReportLiveStock = async (storeCode, stockDate, articleNo, pageIndex, pageSize, signal) => {
+export const getReportLiveStock = async (storeCode, stockDate, articleNo, pageIndex, pageSize, sortColumn = 'STOCK_DATE', sortDirection = 'asc', signal) => {
   const store = encodeURIComponent(storeCode || '');
   const date = encodeURIComponent(stockDate || '');
-  let url = `${API_BASE}/api/report/live-stock?pageIndex=${pageIndex}&pageSize=${pageSize}&storeName=${store}&stockDate=${date}&sortColumn=STOCK_DATE&sortDirection=asc`;
+  let url = `${API_BASE}/api/report/live-stock?pageIndex=${pageIndex}&pageSize=${pageSize}&storeName=${store}&stockDate=${date}&sortColumn=${sortColumn || 'STOCK_DATE'}&sortDirection=${sortDirection || 'asc'}`;
   
   if (articleNo) {
     url += `&articleNo=${encodeURIComponent(articleNo)}`;
@@ -184,8 +224,8 @@ export const searchGrcHuNumbers = async (searchTerm, grcStatus = '1', storeCode 
   return response.data;
 };
 
-export const getGrcDetails = async (pageIndex, pageSize, grcStatus = '1', storeName = '', huNo = '', fromDate = '', toDate = '', signal) => {
-  let url = `${API_BASE}/api/grc-report/details?pageIndex=${pageIndex}&pageSize=${pageSize}&grcStatus=${grcStatus}&storeName=${encodeURIComponent(storeName)}&fromDate=${fromDate}&toDate=${toDate}`;
+export const getGrcDetails = async (pageIndex, pageSize, grcStatus = '1', storeName = '', huNo = '', fromDate = '', toDate = '', sortColumn = 'GRC_DATE', sortDirection = 'asc', signal) => {
+  let url = `${API_BASE}/api/grc-report/details?pageIndex=${pageIndex}&pageSize=${pageSize}&grcStatus=${grcStatus}&storeName=${encodeURIComponent(storeName)}&fromDate=${fromDate}&toDate=${toDate}&sortColumn=${sortColumn || 'GRC_DATE'}&sortDirection=${sortDirection || 'asc'}`;
   if (huNo) {
     url += `&huNo=${encodeURIComponent(huNo)}`;
   }
@@ -193,9 +233,9 @@ export const getGrcDetails = async (pageIndex, pageSize, grcStatus = '1', storeN
   return response.data;
 };
 
-export const getStoreGrcReport = async (storeCode, fromDate, toDate, pageIndex = 1, pageSize = 100, signal) => {
+export const getStoreGrcReport = async (storeCode, fromDate, toDate, pageIndex = 1, pageSize = 100, sortColumn = 'DATE', sortDirection = 'DESC', signal) => {
   const store = encodeURIComponent(storeCode || '');
-  const response = await axios.get(`${API_BASE}/api/stock/store-grc-report?storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&pageIndex=${pageIndex}&pageSize=${pageSize}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/store-grc-report?storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn || 'DATE'}&sortDirection=${sortDirection || 'DESC'}`, {
     headers: getHeaders(),
     signal
   });
@@ -210,10 +250,10 @@ export const getBindStores = async (fromDate, toDate, signal) => {
   return response.data;
 };
 
-export const getCycleCountReport = async (pageIndex = 1, pageSize = 100, searchTerm = '', storeCode = '', fromDate = '', toDate = '', signal) => {
+export const getCycleCountReport = async (pageIndex = 1, pageSize = 100, searchTerm = '', storeCode = '', fromDate = '', toDate = '', sortColumn = 'DATE', sortDirection = 'DESC', signal) => {
   const term = encodeURIComponent(searchTerm || '');
   const store = encodeURIComponent(storeCode || '');
-  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-report?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&sortColumn=DATE&sortDirection=DESC`, {
+  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-report?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&sortColumn=${sortColumn || 'DATE'}&sortDirection=${sortDirection || 'DESC'}`, {
     headers: getHeaders(),
     signal
   });

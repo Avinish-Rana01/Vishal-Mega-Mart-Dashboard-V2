@@ -18,7 +18,10 @@ export default function ReportDataTableCard({
   exportFileName = "Report.csv",
   onSearch = null,
   searchPlaceholder = "Search Records",
-  searchValue = undefined
+  searchValue = undefined,
+  onSortChange = null,
+  sortColumn = null,
+  sortDirection = null
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
 
@@ -198,6 +201,9 @@ export default function ReportDataTableCard({
         domConfig='<"top">rt<"clear">'
         containerClassName="vmm-table-container"
         tableClassName="vmm-table"
+        onSortChange={onSortChange}
+        externalSortCol={sortColumn}
+        externalSortDir={sortDirection}
       />
       
       <div className="ls-toolbar-bottom">

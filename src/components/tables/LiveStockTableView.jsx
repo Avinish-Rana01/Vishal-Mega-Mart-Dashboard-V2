@@ -52,6 +52,8 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
 
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sortColumn, setSortColumn] = useState('STOCK_DATE');
+  const [sortDirection, setSortDirection] = useState('asc');
 
   // Article Autocomplete State
   const [articleSearchTerm, setArticleSearchTerm] = useState('');
@@ -86,7 +88,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getReportLiveStock(selectedStore, selectedDate, selectedArticle, pageIndex, pageSize, controller.signal);
+        const result = await getReportLiveStock(selectedStore, selectedDate, selectedArticle, pageIndex, pageSize, sortColumn, sortDirection, controller.signal);
         
         if (controller.signal.aborted) return;
         
@@ -121,7 +123,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
     };
     fetchReport();
     return () => controller.abort();
-  }, [selectedStore, selectedDate, pageIndex, pageSize, selectedArticle]);
+  }, [selectedStore, selectedDate, pageIndex, pageSize, selectedArticle, sortColumn, sortDirection]);
 
   const numRenderer = (val) => <span className="vmm-link-num">{typeof val === 'number' ? val.toLocaleString('en-IN') : val}</span>;
   const linkRenderer = (val) => <span className="vmm-link-num">{val}</span>;
@@ -277,6 +279,13 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
             setPageIndex(1);
           }}
           totalRecords={reportSummary?.totalRecords || articleData.length}
+          onSortChange={(col, dir) => {
+            setSortColumn(col);
+            setSortDirection(dir);
+            setPageIndex(1);
+          }}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
         />
       </div>
     </div>

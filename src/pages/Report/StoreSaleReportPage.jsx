@@ -54,6 +54,8 @@ export default function StoreSaleReportPage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [sortColumn, setSortColumn] = useState('DATE');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   // Card Gradient Wave Colors (Matching Reference Image)
   const cardGradients = useMemo(() => [
@@ -106,7 +108,9 @@ export default function StoreSaleReportPage() {
         fromDate,
         toDate,
         pageIndex: pIndex,
-        pageSize: pSize
+        pageSize: pSize,
+        sortColumn,
+        sortDirection
       }, controller.signal);
 
       if (controller.signal.aborted) return;
@@ -131,7 +135,7 @@ export default function StoreSaleReportPage() {
         setIsLoading(false);
       }
     }
-  }, [selectedStore, fromDate, toDate]);
+  }, [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
 
   // Initial and reactive fetch
   useEffect(() => {
@@ -154,14 +158,11 @@ export default function StoreSaleReportPage() {
 
   // Handle Clear / Reset
   const handleClear = () => {
-    const today = new Date();
-    const tDate = formatDate(today);
-    const lastWeek = new Date(today);
-    lastWeek.setDate(lastWeek.getDate() - 7);
-    const fDate = formatDate(lastWeek);
-
-    setFromDate(fDate);
-    setToDate(tDate);
+    setSelectedStore(initialStore);
+    setFromDate(defaultFromDate);
+    setToDate(defaultToDate);
+    setSortColumn('DATE');
+    setSortDirection('desc');
     if (pageIndex === 1) {
       fetchReport(1, pageSize);
     } else {
@@ -385,6 +386,13 @@ export default function StoreSaleReportPage() {
               setPageSize(newSize);
               setPageIndex(1);
             }}
+            onSortChange={(col, dir) => {
+              setSortColumn(col);
+              setSortDirection(dir);
+              setPageIndex(1);
+            }}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
           />
         </div>
 

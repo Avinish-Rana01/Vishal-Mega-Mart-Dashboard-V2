@@ -570,8 +570,10 @@ export default function CycleCountSection() {
         />
       </div>
 
-      {/* DURATION BAR CHART */}
-      <div className="cc-card">
+      {/* SPLIT LAYOUT FOR CHART AND TABLE */}
+      <div className="cc-split-layout">
+        {/* DURATION BAR CHART */}
+        <div className="cc-card">
 
         <ChartToolbar
           leftContent={
@@ -722,6 +724,7 @@ export default function CycleCountSection() {
           </motion.tr>
         )}
       />
+      </div>
 
       {/* Modal */}
       {isModalOpen && (

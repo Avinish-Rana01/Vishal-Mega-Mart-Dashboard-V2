@@ -151,8 +151,10 @@ export default function DcValidationSection() {
         />
       </div>
 
-      {/* 2. Charts Row */}
-      <div className="cc-card">
+      {/* SPLIT LAYOUT FOR CHART AND TABLE */}
+      <div className="cc-split-layout">
+        {/* 2. Charts Row */}
+        <div className="cc-card">
         <ChartToolbar
           leftContent={
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -287,6 +289,7 @@ export default function DcValidationSection() {
           );
         }}
       />
+      </div>
     </div>
   );
 }

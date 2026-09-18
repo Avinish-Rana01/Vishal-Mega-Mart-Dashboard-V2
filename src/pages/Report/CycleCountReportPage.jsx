@@ -27,6 +27,8 @@ export default function CycleCountReportPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [totalRecords, setTotalRecords] = useState(0);
   const [searchTrigger, setSearchTrigger] = useState(0);
+  const [sortColumn, setSortColumn] = useState('DATE');
+  const [sortDirection, setSortDirection] = useState('DESC');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,7 +60,7 @@ export default function CycleCountReportPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await getCycleCountReport(pageIndex, pageSize, searchTerm, selectedStore, fromDate, toDate, signal);
+      const result = await getCycleCountReport(pageIndex, pageSize, searchTerm, selectedStore, fromDate, toDate, sortColumn, sortDirection, signal);
       setReportData(result?.items || result?.Items || []);
       setTotalRecords(result?.summary?.recordCount || result?.Summary?.RecordCount || 0);
     } catch (err) {
@@ -75,7 +77,7 @@ export default function CycleCountReportPage() {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [pageIndex, pageSize, searchTerm, selectedStore, searchTrigger]);
+  }, [pageIndex, pageSize, searchTerm, selectedStore, searchTrigger, sortColumn, sortDirection]);
 
   const handleSearch = () => {
     if (pageIndex !== 1) {
@@ -90,6 +92,9 @@ export default function CycleCountReportPage() {
     setToDate('');
     setReportData([]);
     setTotalRecords(0);
+    setSortColumn('DATE');
+    setSortDirection('DESC');
+    setPageIndex(1);
   };
 
   const handleRefClick = (row) => {
@@ -201,6 +206,13 @@ export default function CycleCountReportPage() {
                 setPageSize(newSize);
                 setPageIndex(1);
               }}
+              onSortChange={(col, dir) => {
+                setSortColumn(col);
+                setSortDirection(dir);
+                setPageIndex(1);
+              }}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
               totalRecords={totalRecords}
               onSearch={setSearchTerm}
               searchPlaceholder="Search Records"

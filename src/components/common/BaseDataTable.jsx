@@ -19,28 +19,52 @@ export default function BaseDataTable({
   lengthChange = false,
   containerClassName = "vmm-table-container",
   tableClassName = "vmm-table",
-  ordering = true
+  ordering = true,
+  onSortChange = null,
+  externalSortCol = null,
+  externalSortDir = null
 }) {
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState(null); // 'asc' | 'desc' | null
+
+  // Use external sort state if server-side sorting is enabled
+  const activeSortCol = onSortChange ? externalSortCol : sortCol;
+  const activeSortDir = onSortChange ? externalSortDir : sortDir;
 
   // Show shimmer skeleton ONLY on initial load when there is NO data yet to fill
   const showSkeleton = isLoading && (!data || data.length === 0);
 
   const handleSort = (colKey) => {
     if (!ordering) return;
-    if (sortCol !== colKey) {
-      setSortCol(colKey);
-      setSortDir('asc');
-    } else if (sortDir === 'asc') {
-      setSortDir('desc');
+    
+    if (onSortChange) {
+      // Server-side sorting: delegate to parent
+      let newDir;
+      if (activeSortCol !== colKey) {
+        newDir = 'asc';
+      } else if (activeSortDir === 'asc') {
+        newDir = 'desc';
+      } else {
+        newDir = null;
+      }
+      onSortChange(newDir ? colKey : null, newDir);
     } else {
-      setSortCol(null);
-      setSortDir(null);
+      // Client-side sorting
+      if (sortCol !== colKey) {
+        setSortCol(colKey);
+        setSortDir('asc');
+      } else if (sortDir === 'asc') {
+        setSortDir('desc');
+      } else {
+        setSortCol(null);
+        setSortDir(null);
+      }
     }
   };
 
   const sortedData = useMemo(() => {
+    // Skip client-side sorting when server-side sorting is active
+    if (onSortChange) return data;
     if (!ordering || !sortCol || !sortDir) return data;
     return [...data].sort((a, b) => {
       const aVal = a[sortCol];
@@ -55,7 +79,7 @@ export default function BaseDataTable({
         ? String(aVal).localeCompare(String(bVal), undefined, { numeric: true })
         : String(bVal).localeCompare(String(aVal), undefined, { numeric: true });
     });
-  }, [data, ordering, sortCol, sortDir]);
+  }, [data, ordering, sortCol, sortDir, onSortChange]);
 
   return (
     <div className={containerClassName}>
@@ -102,9 +126,9 @@ export default function BaseDataTable({
             <thead>
               <tr>
                 {columns.map((col) => {
-                  const isSorted = sortCol === col.key;
+                  const isSorted = activeSortCol === col.key;
                   const sortClass = isSorted 
-                    ? (sortDir === 'asc' ? 'dt-ordering-asc' : 'dt-ordering-desc') 
+                    ? (activeSortDir === 'asc' ? 'dt-ordering-asc' : 'dt-ordering-desc') 
                     : '';
                   return (
                     <th 

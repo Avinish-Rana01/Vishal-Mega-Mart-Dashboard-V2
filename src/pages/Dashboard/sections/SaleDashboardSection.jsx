@@ -272,8 +272,10 @@ export default function SaleDashboardSection() {
         </div>
       </div>
 
-      {/* 2. Charts Row (Full Width Stacked Bar) */}
-      <div className="cc-card">
+      {/* SPLIT LAYOUT FOR CHART AND TABLE */}
+      <div className="cc-split-layout">
+        {/* 2. Charts Row (Stacked Bar) */}
+        <div className="cc-card">
         <ChartToolbar
           leftContent={
             <h3 className="cc-data-grid-title" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -436,6 +438,7 @@ export default function SaleDashboardSection() {
           </motion.tr>
         )}
       />
+      </div>
 
 
     </div>

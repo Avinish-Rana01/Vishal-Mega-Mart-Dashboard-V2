@@ -34,7 +34,9 @@ export default function GroupedBarChart({
   hideLegend = false,
   showValues = false,
   margin,
-  xAxisTickFormatter
+  xAxisTickFormatter,
+  onAxisClick,
+  xAxisFontSize = 11
 }) {
   if (!data || data.length === 0) {
     if (!emptyText) {
@@ -84,11 +86,33 @@ export default function GroupedBarChart({
 
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 11, fill: '#94a3b8', angle: isMobile ? -45 : 0, textAnchor: isMobile ? 'end' : 'middle', dy: isMobile ? 10 : 0 }}
+              tick={
+                onAxisClick 
+                ? (props) => {
+                    const { x, y, payload } = props;
+                    return (
+                      <g transform={`translate(${x},${y})`}>
+                        <text
+                          x={0} y={0} dy={16}
+                          textAnchor={isMobile ? 'end' : 'middle'}
+                          fill="#2563eb"
+                          fontSize={xAxisFontSize}
+                          fontWeight="bold"
+                          style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => onAxisClick(payload.value)}
+                          transform={isMobile ? 'rotate(-45)' : ''}
+                        >
+                          {xAxisTickFormatter ? xAxisTickFormatter(payload.value) : (payload.value && payload.value.length > 10 ? payload.value.substring(0, 10) + '…' : payload.value)}
+                        </text>
+                      </g>
+                    );
+                  }
+                : { fontSize: xAxisFontSize, fill: '#94a3b8', angle: isMobile ? -45 : 0, textAnchor: isMobile ? 'end' : 'middle', dy: isMobile ? 10 : 0 }
+              }
               axisLine={false}
               tickLine={false}
               interval={0}
-              tickFormatter={xAxisTickFormatter || ((val) => val && val.length > 10 ? val.substring(0, 10) + '…' : val)}
+              onClick={onAxisClick ? undefined : undefined}
             />
             <YAxis
               tick={{ fontSize: 11, fill: '#94a3b8' }}

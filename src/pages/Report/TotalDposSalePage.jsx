@@ -64,6 +64,8 @@ export default function TotalDposSalePage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [sortColumn, setSortColumn] = useState('ITEM_CD');
+  const [sortDirection, setSortDirection] = useState('asc');
 
   // Gradient presets for CurvedCard
   const [cardGradients, setCardGradients] = useState([
@@ -224,7 +226,9 @@ export default function TotalDposSalePage() {
         articleNo: selectedArticle,
         ean: selectedEan,
         pageIndex: pIndex,
-        pageSize: pSize
+        pageSize: pSize,
+        sortColumn,
+        sortDirection
       }, controller.signal);
 
       if (controller.signal.aborted) return;
@@ -252,7 +256,7 @@ export default function TotalDposSalePage() {
         setIsLoading(false);
       }
     }
-  }, [columnName, selectedStore, fromDate, toDate, selectedPos, selectedArticle, selectedEan]);
+  }, [columnName, selectedStore, fromDate, toDate, selectedPos, selectedArticle, selectedEan, sortColumn, sortDirection]);
 
   // Single source of truth for pagination and initial fetch
   useEffect(() => {
@@ -264,11 +268,12 @@ export default function TotalDposSalePage() {
     };
   }, [fetchData, pageIndex, pageSize]);
 
-  // Reset Filters
   const handleResetFilters = () => {
     setSelectedPos('');
     setSelectedArticle('');
     setSelectedEan('');
+    setSortColumn('ITEM_CD');
+    setSortDirection('asc');
     if (pageIndex === 1) {
       fetchData(1, pageSize);
     } else {
@@ -603,6 +608,13 @@ export default function TotalDposSalePage() {
               setPageSize(newSize);
               setPageIndex(1);
             }}
+            onSortChange={(col, dir) => {
+              setSortColumn(col);
+              setSortDirection(dir);
+              setPageIndex(1);
+            }}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
           />
         </div>
 

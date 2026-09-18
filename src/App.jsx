@@ -9,6 +9,8 @@ import StoreGrcReportPage from './pages/Report/StoreGrcReportPage';
 import CycleCountReportPage from './pages/Report/CycleCountReportPage';
 import StoreSaleReportPage from './pages/Report/StoreSaleReportPage';
 import TotalDposSalePage from './pages/Report/TotalDposSalePage';
+import VoidDetailsReportPage from './pages/Report/VoidDetailsReportPage';
+import VoidReconciliationReportPage from './pages/Report/VoidReconciliationReportPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -92,6 +94,24 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <TotalDposSalePage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/void-details" 
+              element={
+                <ProtectedRoute>
+                  <VoidDetailsReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/void-reconciliation" 
+              element={
+                <ProtectedRoute>
+                  <VoidReconciliationReportPage />
                 </ProtectedRoute>
               } 
             />

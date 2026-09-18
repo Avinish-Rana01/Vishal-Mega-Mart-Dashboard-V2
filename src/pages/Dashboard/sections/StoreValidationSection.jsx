@@ -493,8 +493,10 @@ export default function StoreValidationSection() {
         />
       </div>
 
-      {/* ── Main Chart Card ──────────────────────────────────────────────── */}
-      <div className="cc-card">
+      {/* SPLIT LAYOUT FOR CHART AND TABLE */}
+      <div className="cc-split-layout">
+        {/* ── Main Chart Card ──────────────────────────────────────────────── */}
+        <div className="cc-card">
 
         <ChartToolbar
           leftContent={
@@ -695,6 +697,7 @@ export default function StoreValidationSection() {
           );
         }}
       />
+      </div>
 
     </section>
   );
