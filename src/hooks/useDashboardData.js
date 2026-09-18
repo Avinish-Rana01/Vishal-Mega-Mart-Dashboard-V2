@@ -12,14 +12,13 @@ import {
   getWarehouseEncoding,
   getDcValidation
 } from '../services/stockService';
-import { API_DEFAULTS } from '../config/constants';
 import { liveStockSocket } from '../services/liveStockSocket';
 
 /**
  * Generic hook for dashboard table endpoints.
  * Handles state management, debouncing, and API fetching with AbortController.
  */
-const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_DEFAULTS.PAGE_SIZE) => {
+const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100) => {
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

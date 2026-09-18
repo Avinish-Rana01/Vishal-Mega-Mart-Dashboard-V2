@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_DEFAULTS } from '../config/constants';
+
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -40,7 +40,7 @@ const getHeaders = () => ({
 // Dashboard APIs
 // ==============================================================
 
-export const getLiveStock = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getLiveStock = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/live-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -49,7 +49,7 @@ export const getLiveStock = async (searchQuery = '', pageIndex = API_DEFAULTS.PA
   return response.data;
 };
 
-export const getCycleCount = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getCycleCount = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/cycle-count-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=STORE%20CODE&sortDirection=ASC&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -58,7 +58,7 @@ export const getCycleCount = async (searchQuery = '', pageIndex = API_DEFAULTS.P
   return response.data;
 };
 
-export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=DIFF_TILL_DATE&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -83,7 +83,7 @@ export const getTagCycleCount = async (signal) => {
   return response.data;
 };
 
-export const getStoreDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getStoreDashboard = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/store-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -92,7 +92,7 @@ export const getStoreDashboard = async (searchQuery = '', pageIndex = API_DEFAUL
   return response.data;
 };
 
-export const getSaleDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getSaleDashboard = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/sale-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -101,7 +101,7 @@ export const getSaleDashboard = async (searchQuery = '', pageIndex = API_DEFAULT
   return response.data;
 };
 
-export const getVoidDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getVoidDashboard = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/void-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -110,7 +110,7 @@ export const getVoidDashboard = async (searchQuery = '', pageIndex = API_DEFAULT
   return response.data;
 };
 
-export const getReturnDashboard = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getReturnDashboard = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -130,7 +130,7 @@ export const getWarehouseEncoding = async (fromDate, toDate, signal) => {
   return response.data;
 };
 
-export const getDcValidation = async (searchQuery = '', pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getDcValidation = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/dc-validate-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
@@ -193,7 +193,7 @@ export const getGrcDetails = async (pageIndex, pageSize, grcStatus = '1', storeN
   return response.data;
 };
 
-export const getStoreGrcReport = async (storeCode, fromDate, toDate, pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, signal) => {
+export const getStoreGrcReport = async (storeCode, fromDate, toDate, pageIndex = 1, pageSize = 100, signal) => {
   const store = encodeURIComponent(storeCode || '');
   const response = await axios.get(`${API_BASE}/api/stock/store-grc-report?storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&pageIndex=${pageIndex}&pageSize=${pageSize}`, {
     headers: getHeaders(),
@@ -210,7 +210,7 @@ export const getBindStores = async (fromDate, toDate, signal) => {
   return response.data;
 };
 
-export const getCycleCountReport = async (pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, searchTerm = '', storeCode = '', fromDate = '', toDate = '', signal) => {
+export const getCycleCountReport = async (pageIndex = 1, pageSize = 100, searchTerm = '', storeCode = '', fromDate = '', toDate = '', signal) => {
   const term = encodeURIComponent(searchTerm || '');
   const store = encodeURIComponent(storeCode || '');
   const response = await axios.get(`${API_BASE}/api/stock/cycle-count-report?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&sortColumn=DATE&sortDirection=DESC`, {
@@ -220,7 +220,7 @@ export const getCycleCountReport = async (pageIndex = API_DEFAULTS.PAGE_INDEX, p
   return response.data;
 };
 
-export const getCycleCountDetails = async (pageIndex = API_DEFAULTS.PAGE_INDEX, pageSize = API_DEFAULTS.PAGE_SIZE, searchTerm = '', storeCode = '', fromDate = '', toDate = '', refNo = '', signal) => {
+export const getCycleCountDetails = async (pageIndex = 1, pageSize = 100, searchTerm = '', storeCode = '', fromDate = '', toDate = '', refNo = '', signal) => {
   const term = encodeURIComponent(searchTerm || '');
   const store = encodeURIComponent(storeCode || '');
   const ref = encodeURIComponent(refNo || '');
@@ -236,8 +236,8 @@ export const getStoreSaleReport = async ({
   fromDate = '',
   toDate = '',
   searchTerm = '',
-  pageIndex = API_DEFAULTS.PAGE_INDEX,
-  pageSize = API_DEFAULTS.PAGE_SIZE,
+  pageIndex = 1,
+  pageSize = 100,
   sortColumn = 'DATE',
   sortDirection = 'desc'
 } = {}, signal) => {
@@ -270,8 +270,8 @@ export const getSaleData = async ({
   pos = '',
   articleNo = '',
   ean = '',
-  pageIndex = API_DEFAULTS.PAGE_INDEX,
-  pageSize = API_DEFAULTS.PAGE_SIZE,
+  pageIndex = 1,
+  pageSize = 100,
   searchTerm = '',
   sortColumn = 'ITEM_CD',
   sortDirection = 'asc'

@@ -4,16 +4,10 @@
 
 export const APP_INFO = {
   TITLE: 'VISHAL MEGA MART',
-  VERSION: '3.4',
+  VERSION: '4.0.0.1',
   COMPANY: 'Markss Infotech Ltd',
   DEVELOPER: 'TeCMi Vyapti',
   DEFAULT_YEAR: new Date().getFullYear()
 };
 
-export const API_DEFAULTS = {
-  PAGE_INDEX: 1,
-  PAGE_SIZE: 100,
-  // USER_ID: '26', 
-  SORT_COLUMN: 'STORE',
-  SORT_DIRECTION: 'asc'
-};
+
