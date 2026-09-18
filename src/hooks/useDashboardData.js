@@ -12,7 +12,7 @@ import {
   getWarehouseEncoding,
   getDcValidation
 } from '../services/stockService';
-import { API_DEFAULTS, STORE_MAPPING } from '../config/constants';
+import { API_DEFAULTS } from '../config/constants';
 import { liveStockSocket } from '../services/liveStockSocket';
 
 /**
@@ -55,14 +55,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = API_
           items = items.filter(row => filterFn(row, term));
         }
 
-        // Apply CEO Store Name Mapping globally to all dashboard data
-        items = items.map(row => {
-          const code = row.STORE_CODE || row.STORE || row.Store_Code;
-          if (code && STORE_MAPPING[code]) {
-            return { ...row, STORE_NAME: STORE_MAPPING[code] };
-          }
-          return row;
-        });
+
 
         setData(items);
         if (items.length > 0) {
@@ -188,7 +181,7 @@ export const useLiveStock = () => {
             {
               RowNumber: 1,
               STORE_CODE: patch.storeCode,
-              STORE_NAME: patch.storeName || STORE_MAPPING[patch.storeCode] || patch.storeCode,
+              STORE_NAME: patch.storeName || patch.storeCode,
               SAP_STOCK: patch.newSapStock || 0,
               RFID_STOCK: patch.newRfidStock || 0,
               DIFFERENCE: patch.newDifference || 0,
