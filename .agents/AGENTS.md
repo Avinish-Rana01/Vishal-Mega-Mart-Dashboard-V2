@@ -36,6 +36,13 @@ ALL visual sections in the V2 Dashboard MUST use these reusable components from 
 - **NEVER** use `DataTableCard` or `BaseDataTable` inside any dashboard section. Tables are for Report pages ONLY.
 - Import shared layout CSS: `import '../../components/charts/DashboardSection.css';`
 
+## Table & Report Rules
+- Tables belong on **Report Pages only** (or modal popups), never inside overview dashboard sections.
+- All report pages MUST use `ReportDataTableCard` (which wraps `BaseDataTable`).
+- **Sorting UI is 100% built-in**: Click handling, toggling `asc` ↔ `desc`, and arrow icons are already implemented in `BaseDataTable`.
+- **Server-Side Sorting**: When creating a report page, pass `sortColumn`, `sortDirection`, and `onSortChange` to `<ReportDataTableCard>` and forward them to the API fetch function.
+- Refer to `.agents/rules/table-sorting-standard.md` for complete guidelines and syntax.
+
 ## Styling Rules
 - Color palette: Primary `#1d4ed8`, Hover `#1e3a8a`, Light `#eff6ff`, Text `#0f172a`, Muted `#64748b`, Border `#f1f5f9`.
 - All layout structure MUST use CSS class names from `DashboardSection.css` (`.ds-section`, `.ds-card`, `.ds-kpi-row`, `.ds-charts-row`, etc.).

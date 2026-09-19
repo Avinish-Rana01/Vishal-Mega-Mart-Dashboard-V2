@@ -11,6 +11,8 @@ import StoreSaleReportPage from './pages/Report/StoreSaleReportPage';
 import TotalDposSalePage from './pages/Report/TotalDposSalePage';
 import VoidDetailsReportPage from './pages/Report/VoidDetailsReportPage';
 import VoidReconciliationReportPage from './pages/Report/VoidReconciliationReportPage';
+import ReturnDetailsReportPage from './pages/Report/ReturnDetailsReportPage';
+import ReturnReconciliationReportPage from './pages/Report/ReturnReconciliationReportPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -112,6 +114,24 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <VoidReconciliationReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/return-details" 
+              element={
+                <ProtectedRoute>
+                  <ReturnDetailsReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/return-reconciliation" 
+              element={
+                <ProtectedRoute>
+                  <ReturnReconciliationReportPage />
                 </ProtectedRoute>
               } 
             />

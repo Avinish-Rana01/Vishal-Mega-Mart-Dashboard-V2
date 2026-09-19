@@ -1,6 +1,6 @@
 import React from 'react';
 import ReconciliationReportView from '../../components/common/ReconciliationReportView';
 
-export default function VoidReconciliationReportPage() {
-  return <ReconciliationReportView type="void" />;
+export default function ReturnReconciliationReportPage() {
+  return <ReconciliationReportView type="return" />;
 }

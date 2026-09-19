@@ -130,6 +130,39 @@ export const getVoidReconciliationData = async (storeName = '', fromDate = '', t
   return response.data;
 };
 
+export const getVoidReconciliationDataModel = async ({
+  storeCode = '',
+  billDate = '',
+  pos = '',
+  ean = '',
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = '',
+  sortColumn = 'VOID_DATE',
+  sortDirection = 'ASC',
+  signal
+} = {}) => {
+  const params = new URLSearchParams();
+  if (storeCode) params.append('StoreCode', storeCode);
+  if (billDate) params.append('BillDate', billDate);
+  if (pos) params.append('Pos', pos);
+  if (ean) params.append('Ean', ean);
+  if (pageIndex) params.append('PageIndex', pageIndex);
+  if (pageSize) params.append('PageSize', pageSize);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(
+    `${API_BASE}/api/Stock/GetVoidReconciliationDataModel?${params.toString()}`,
+    {
+      headers: getHeaders(),
+      signal
+    }
+  );
+  return response.data;
+};
+
 export const getVoidPosCounters = async (store = '', fromDate = '', toDate = '', signal) => {
   const storeEnc = encodeURIComponent(store || '');
   const response = await axios.get(`${API_BASE}/api/stock/void/pos-counters?store=${storeEnc}&fromDate=${fromDate}&toDate=${toDate}`, {
@@ -153,6 +186,79 @@ export const getVoidSearchEAN = async (store = '', fromDate = '', toDate = '', s
 export const getReturnDashboard = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/return-dashboard?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=Store&sortDirection=asc&userId=${getActiveUserId()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getReturnDetails = async (storeName = '', fromDate = '', toDate = '', pageIndex = 1, pageSize = 100, sortColumn = 'DATE', sortDirection = 'asc', signal) => {
+  const store = encodeURIComponent(storeName || '');
+  const response = await axios.get(`${API_BASE}/api/stock/dashboard/return-details?storeName=${store}&fromDate=${fromDate}&toDate=${toDate}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getReturnReconciliationData = async (storeName = '', fromDate = '', toDate = '', pos = '', ean = '', pageIndex = 1, pageSize = 100, sortColumn = 'BILL_DATE', sortDirection = 'asc', signal) => {
+  const store = encodeURIComponent(storeName || '');
+  const p = encodeURIComponent(pos || '');
+  const e = encodeURIComponent(ean || '');
+  const response = await axios.get(`${API_BASE}/api/stock/void/return-reconciliation?storeName=${store}&fromDate=${fromDate}&toDate=${toDate}&pos=${p}&ean=${e}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getReturnReconciliationDataModel = async ({
+  storeCode = '',
+  billDate = '',
+  pos = '',
+  ean = '',
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = '',
+  sortColumn = 'BILL_DATE',
+  sortDirection = 'ASC',
+  signal
+} = {}) => {
+  const params = new URLSearchParams();
+  if (storeCode) params.append('StoreCode', storeCode);
+  if (billDate) params.append('BillDate', billDate);
+  if (pos) params.append('Pos', pos);
+  if (ean) params.append('Ean', ean);
+  if (pageIndex) params.append('PageIndex', pageIndex);
+  if (pageSize) params.append('PageSize', pageSize);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(
+    `${API_BASE}/api/Stock/GetReturnReconciliationDataModel?${params.toString()}`,
+    {
+      headers: getHeaders(),
+      signal
+    }
+  );
+  return response.data;
+};
+
+export const getReturnPosCounters = async (store = '', fromDate = '', toDate = '', signal) => {
+  const storeEnc = encodeURIComponent(store || '');
+  const response = await axios.get(`${API_BASE}/api/stock/return/pos-counters?store=${storeEnc}&fromDate=${fromDate}&toDate=${toDate}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getReturnSearchEAN = async (store = '', fromDate = '', toDate = '', searchTerm = '', pos = '', signal) => {
+  const storeEnc = encodeURIComponent(store || '');
+  const searchEnc = encodeURIComponent(searchTerm || '');
+  const posEnc = encodeURIComponent(pos || '');
+  const response = await axios.get(`${API_BASE}/api/stock/return-SearchEAN?store=${storeEnc}&fromDate=${fromDate}&toDate=${toDate}&searchTerm=${searchEnc}&pos=${posEnc}`, {
     headers: getHeaders(),
     signal
   });

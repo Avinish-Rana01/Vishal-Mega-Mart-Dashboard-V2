@@ -15,6 +15,13 @@ export default function DetailsModal({
   onPageChange,
   pageSize = 10,
   onPageSizeChange,
+  onSearch,
+  searchPlaceholder = "Search Records",
+  searchValue,
+  onSortChange,
+  sortColumn,
+  sortDirection,
+  exportFileName = "Details.csv"
 }) {
 
   return (
@@ -68,6 +75,13 @@ export default function DetailsModal({
                 pageSize={pageSize}
                 onPageSizeChange={onPageSizeChange}
                 totalRecords={totalRecords || tableData.length}
+                onSearch={onSearch}
+                searchPlaceholder={searchPlaceholder}
+                searchValue={searchValue}
+                onSortChange={onSortChange}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+                exportFileName={exportFileName}
               />
             </div>
           )}

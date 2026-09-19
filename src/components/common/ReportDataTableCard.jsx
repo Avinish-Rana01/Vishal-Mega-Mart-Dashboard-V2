@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import BaseDataTable from './BaseDataTable';
 import './LiveStockDataTable.css';
 
@@ -24,25 +24,46 @@ export default function ReportDataTableCard({
   sortDirection = null
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
+  const onSearchRef = useRef(onSearch);
+  onSearchRef.current = onSearch;
+
+  const onPageChangeRef = useRef(onPageChange);
+  onPageChangeRef.current = onPageChange;
+
+  const prevSearchRef = useRef(searchValue || '');
+  const isMountedRef = useRef(false);
 
   // Keep internalSearch in sync if controlled searchValue changes
   useEffect(() => {
     if (searchValue !== undefined) {
       setInternalSearch(searchValue);
+      prevSearchRef.current = searchValue;
     }
   }, [searchValue]);
 
-  // Debounce server-side search callback if provided
+  // Debounce server-side search callback if provided (only when search text actually changes)
   useEffect(() => {
-    if (!onSearch) return;
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
+
+    if (prevSearchRef.current === internalSearch) {
+      return;
+    }
+    prevSearchRef.current = internalSearch;
+
+    if (!onSearchRef.current) return;
+
     const handler = setTimeout(() => {
-      onSearch(internalSearch);
-      if (onPageChange && internalSearch.trim()) {
-        onPageChange(1);
+      onSearchRef.current?.(internalSearch);
+      if (onPageChangeRef.current) {
+        onPageChangeRef.current(1);
       }
     }, 350);
+
     return () => clearTimeout(handler);
-  }, [internalSearch, onSearch]);
+  }, [internalSearch]);
 
   // Filter Data Internally only if onSearch is NOT provided (client-side fallback)
   const filteredData = useMemo(() => {
