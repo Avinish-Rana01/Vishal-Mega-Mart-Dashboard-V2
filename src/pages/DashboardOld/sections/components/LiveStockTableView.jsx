@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ReportDataTableCard from '../../../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../../../components/common/SearchableDropdown';
 import CurvedCard from '../../../../components/common/CurvedCard';
@@ -52,20 +52,42 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Article Options derived from current table data
+  const tableArticleOptions = useMemo(() => {
+    if (!articleData || articleData.length === 0) return [];
+    const seen = new Set();
+    const list = [];
+    for (const row of articleData) {
+      const art = row.articleNo || row.ARTICLE || row.Article;
+      if (art && !seen.has(String(art))) {
+        seen.add(String(art));
+        list.push({ id: String(art), value: String(art), text: String(art) });
+      }
+    }
+    return list;
+  }, [articleData]);
+
   // Article Autocomplete State
   const [articleSearchTerm, setArticleSearchTerm] = useState('');
   const [articleOptions, setArticleOptions] = useState([]);
   const [isArticleSearching, setIsArticleSearching] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState('');
 
-  // Fetch Article Options based on search term
+  // Sync Article options: use table data by default; only call search API when user actively types a search query
   useEffect(() => {
+    const trimmed = articleSearchTerm.trim();
+    if (!trimmed) {
+      setArticleOptions(tableArticleOptions);
+      setIsArticleSearching(false);
+      return;
+    }
+
     const controller = new AbortController();
     const delayDebounceFn = setTimeout(async () => {
       setIsArticleSearching(true);
       try {
-        const data = await searchReportArticles(articleSearchTerm, selectedStore, selectedDate, selectedDate, controller.signal);
-        setArticleOptions(data);
+        const data = await searchReportArticles(trimmed, selectedStore, selectedDate, selectedDate, controller.signal);
+        setArticleOptions(Array.isArray(data) ? data : []);
       } catch (err) {
         if (err.name !== 'AbortError') console.error("Failed to fetch articles", err);
       } finally {
@@ -77,7 +99,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       clearTimeout(delayDebounceFn);
       controller.abort();
     };
-  }, [articleSearchTerm, selectedStore, selectedDate]);
+  }, [articleSearchTerm, selectedStore, selectedDate, tableArticleOptions]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -189,7 +211,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
               onSearchChange={setArticleSearchTerm}
               isLoading={isArticleSearching}
               valueKey="id"
-              closeOnSelect={false}
+              closeOnSelect={true}
             />
           </div>
           <div className="search-buttons">

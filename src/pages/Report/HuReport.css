@@ -1,0 +1,115 @@
+/* HU Validation Report Custom Styles */
+
+.hu-report-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.hu-curved-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 5px 15px;
+}
+
+@media (max-width: 1200px) {
+  .hu-curved-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hu-curved-cards {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+.hu-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.hu-card-icon.blue {
+  background: #dbeafe;
+}
+
+.hu-card-icon.pink {
+  background: #fce7f3;
+}
+
+.hu-card-icon.purple {
+  background: #ede9fe;
+}
+
+.hu-card-icon.orange {
+  background: #ffedd5;
+}
+
+.hu-card-icon.green {
+  background: #d1fae5;
+}
+
+.curve-card:hover .hu-card-icon {
+  transform: scale(1.1);
+}
+
+.hu-drilldown-link {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  cursor: pointer !important;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.hu-drilldown-link:hover {
+  color: #15803d !important;
+  text-decoration-thickness: 2px !important;
+}
+
+.hu-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.hu-status-badge.pass {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.hu-status-badge.fail {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-back-dc {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 0 18px;
+  height: 34px;
+  border-radius: 13px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-back-dc:hover {
+  background: #475569;
+  transform: translateY(-2px);
+}

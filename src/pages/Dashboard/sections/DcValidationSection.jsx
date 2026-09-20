@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './DcValidationSection.css';
 import { useDcValidation } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -20,11 +21,59 @@ const COLOR_PROCESSED = '#10b981'; // Green (Completed)
 const COLOR_UNPROCESSED = '#f59e0b'; // Amber (Pending/Unprocessed)
 
 export default function DcValidationSection() {
+  const navigate = useNavigate();
   const { data, totals, isLoading, error, highlightedPlant, connectionStatus } = useDcValidation();
 
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('UNPROCESSED_DESC');
   const [tableSort, setTableSort] = useState('UNPROCESSED_DESC');
+
+  const handleStoreClick = (row) => {
+    const storeCode = row.Reciving_Plant || row.Store_Code || '';
+    if (!storeCode) return;
+
+    // Calculate last 7 days (current - 7)
+    const today = new Date();
+    const past = new Date();
+    past.setDate(today.getDate() - 7);
+
+    const formatDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    navigate('/reports/dc-report', {
+      state: {
+        storeCode,
+        storeName: row.STORE_NAME || '',
+        fromDate: formatDate(past),
+        toDate: formatDate(today)
+      }
+    });
+  };
+
+  const handleHuClick = (row, status) => {
+    const storeCode = row.Reciving_Plant || row.Store_Code || '';
+    if (!storeCode) return;
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayFormatted = `${year}-${month}-${day}`;
+
+    navigate('/reports/hu-report', {
+      state: {
+        receivingPlant: storeCode,
+        huStatus: status, // '1' for Processed, '0' for Unprocessed
+        fromDate: todayFormatted,
+        toDate: todayFormatted,
+        date: todayFormatted
+      }
+    });
+  };
 
   const sortOptions = useMemo(() => [
     { value: 'PROCESSED_DESC', label: 'Most Processed HU' },
@@ -260,9 +309,16 @@ export default function DcValidationSection() {
 
           return (
             <tr key={row.Reciving_Plant || idx} className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}>
-              <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ width: '100px' }}>
+              <td 
+                className="cc-data-grid-td cc-data-grid-td-bold" 
+                style={{ width: '100px', cursor: 'pointer' }}
+                onClick={() => handleStoreClick(row)}
+                title="Click to view DC Store Report"
+              >
                 <div className="cc-row-tooltip-wrapper">
-                  {row.Reciving_Plant || '—'}
+                  <span style={{ color: '#2563eb', textDecoration: 'underline', textUnderlineOffset: '3px', fontWeight: 700 }}>
+                    {row.Reciving_Plant || '—'}
+                  </span>
                   {row.STORE_NAME && (
                     <div className="cc-row-tooltip">
                       {row.STORE_NAME}
@@ -270,12 +326,24 @@ export default function DcValidationSection() {
                   )}
                 </div>
               </td>
-              <td className="cc-data-grid-td" style={{ width: '130px', textAlign: 'center' }}>
-                <span style={{ color: COLOR_PROCESSED, fontWeight: 700 }}>{processed.toLocaleString('en-IN')}</span>
+              <td 
+                className="cc-data-grid-td" 
+                style={{ width: '130px', textAlign: 'center', cursor: 'pointer' }}
+                onClick={() => handleHuClick(row, '1')}
+                title="Click to view Processed HU Details"
+              >
+                <span style={{ color: COLOR_PROCESSED, fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+                  {processed.toLocaleString('en-IN')}
+                </span>
               </td>
-              <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
+              <td 
+                className="cc-data-grid-td" 
+                style={{ width: '150px', textAlign: 'center', cursor: 'pointer' }}
+                onClick={() => handleHuClick(row, '0')}
+                title="Click to view Unprocessed HU Details"
+              >
                 {unprocessed > 0 ? (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px', textDecoration: 'underline' }}>
                     {unprocessed.toLocaleString('en-IN')}
                   </span>
                 ) : (

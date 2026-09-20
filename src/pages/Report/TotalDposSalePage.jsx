@@ -162,8 +162,78 @@ export default function TotalDposSalePage() {
     return () => controller.abort();
   }, [selectedStore, fromDate, toDate, columnName]);
 
+  // Table-derived options
+  const tableArticleOptions = useMemo(() => {
+    if (!tableData || tableData.length === 0) return [];
+    const seen = new Set();
+    const list = [];
+    for (const row of tableData) {
+      const art = row.ITEM_CD || row.item_cd || row.ARTICLE || row.article;
+      if (art && !seen.has(String(art))) {
+        seen.add(String(art));
+        list.push({ value: String(art), id: String(art), text: String(art) });
+      }
+    }
+    return list;
+  }, [tableData]);
+
+  const tableEanOptions = useMemo(() => {
+    if (!tableData || tableData.length === 0) return [];
+    const seen = new Set();
+    const list = [];
+    for (const row of tableData) {
+      const eanVal = row.EAN || row.ean || row.BARCODE || row.barcode;
+      if (eanVal && !seen.has(String(eanVal))) {
+        seen.add(String(eanVal));
+        list.push({ value: String(eanVal), id: String(eanVal), text: String(eanVal) });
+      }
+    }
+    return list;
+  }, [tableData]);
+
+  const tablePosOptions = useMemo(() => {
+    if (!tableData || tableData.length === 0) return [];
+    const seen = new Set();
+    const list = [];
+    for (const row of tableData) {
+      const posVal = row.COUNTER_NO || row.counter_no || row.POS || row.pos;
+      if (posVal && !seen.has(String(posVal))) {
+        seen.add(String(posVal));
+        list.push({ value: String(posVal), id: String(posVal), text: String(posVal) });
+      }
+    }
+    return list;
+  }, [tableData]);
+
+  const displayPosOptions = useMemo(() => {
+    if (posOptions && posOptions.length > 0) return posOptions;
+    return tablePosOptions;
+  }, [posOptions, tablePosOptions]);
+
+  const [articleSearchTerm, setArticleSearchTerm] = useState('');
+  const [eanSearchTerm, setEanSearchTerm] = useState('');
+
+  // Sync Article & EAN options with table data when not actively searching
+  useEffect(() => {
+    if (!articleSearchTerm.trim()) {
+      setArticleOptions(tableArticleOptions);
+    }
+  }, [articleSearchTerm, tableArticleOptions]);
+
+  useEffect(() => {
+    if (!eanSearchTerm.trim()) {
+      setEanOptions(tableEanOptions);
+    }
+  }, [eanSearchTerm, tableEanOptions]);
+
   // 3. Search Articles
   const handleArticleSearch = useCallback(async (term) => {
+    setArticleSearchTerm(term || '');
+    const trimmed = (term || '').trim();
+    if (!trimmed) {
+      setArticleOptions(tableArticleOptions);
+      return;
+    }
     try {
       const data = await searchSaleArticles({
         columnName,
@@ -171,7 +241,7 @@ export default function TotalDposSalePage() {
         pos: selectedPos,
         fromDate,
         toDate,
-        searchTerm: term
+        searchTerm: trimmed
       });
       if (Array.isArray(data)) {
         setArticleOptions(data.map(item => ({ value: item.id || item.text, text: item.text || item.id })));
@@ -179,10 +249,16 @@ export default function TotalDposSalePage() {
     } catch (err) {
       console.error("Failed to search articles", err);
     }
-  }, [columnName, selectedStore, selectedPos, fromDate, toDate]);
+  }, [columnName, selectedStore, selectedPos, fromDate, toDate, tableArticleOptions]);
 
   // 4. Search EANs
   const handleEanSearch = useCallback(async (term) => {
+    setEanSearchTerm(term || '');
+    const trimmed = (term || '').trim();
+    if (!trimmed) {
+      setEanOptions(tableEanOptions);
+      return;
+    }
     try {
       const data = await searchSaleEans({
         columnName,
@@ -191,7 +267,7 @@ export default function TotalDposSalePage() {
         fromDate,
         toDate,
         material: selectedArticle,
-        searchTerm: term
+        searchTerm: trimmed
       });
       if (Array.isArray(data)) {
         setEanOptions(data.map(item => ({ value: item.id || item.text, text: item.text || item.id })));
@@ -199,7 +275,7 @@ export default function TotalDposSalePage() {
     } catch (err) {
       console.error("Failed to search EANs", err);
     }
-  }, [columnName, selectedStore, selectedPos, fromDate, toDate, selectedArticle]);
+  }, [columnName, selectedStore, selectedPos, fromDate, toDate, selectedArticle, tableEanOptions]);
 
   const fetchControllerRef = useRef(null);
 
@@ -446,10 +522,11 @@ export default function TotalDposSalePage() {
                   <SearchableDropdown
                     value={selectedPos}
                     onChange={(val) => setSelectedPos(val)}
-                    options={posOptions}
+                    options={displayPosOptions}
                     placeholder="All Counters"
                     labelKey="text"
                     valueKey="value"
+                    closeOnSelect={true}
                   />
                 </div>
 
@@ -460,10 +537,12 @@ export default function TotalDposSalePage() {
                     onChange={(val) => setSelectedArticle(val)}
                     options={articleOptions}
                     placeholder="Search Article..."
+                    searchPlaceholder="Search Article..."
                     isAsync={true}
                     onSearchChange={handleArticleSearch}
                     labelKey="text"
                     valueKey="value"
+                    closeOnSelect={true}
                   />
                 </div>
 
@@ -474,10 +553,12 @@ export default function TotalDposSalePage() {
                     onChange={(val) => setSelectedEan(val)}
                     options={eanOptions}
                     placeholder="Search EAN..."
+                    searchPlaceholder="Search EAN..."
                     isAsync={true}
                     onSearchChange={handleEanSearch}
                     labelKey="text"
                     valueKey="value"
+                    closeOnSelect={true}
                   />
                 </div>
               </>

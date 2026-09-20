@@ -1,0 +1,59 @@
+/* DC Report Custom Styles */
+
+.dc-report-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.dc-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.dc-card-icon.pink {
+  background: #fce7f3;
+}
+
+.dc-card-icon.green {
+  background: #d1fae5;
+}
+
+.dc-card-icon.purple {
+  background: #ede9fe;
+}
+
+.curve-card:hover .dc-card-icon {
+  transform: scale(1.1);
+}
+
+.dc-drilldown-link {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  cursor: pointer !important;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.dc-drilldown-link:hover {
+  color: #15803d !important;
+  text-decoration-thickness: 2px !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

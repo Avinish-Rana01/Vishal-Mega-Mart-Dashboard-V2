@@ -13,6 +13,8 @@ import VoidDetailsReportPage from './pages/Report/VoidDetailsReportPage';
 import VoidReconciliationReportPage from './pages/Report/VoidReconciliationReportPage';
 import ReturnDetailsReportPage from './pages/Report/ReturnDetailsReportPage';
 import ReturnReconciliationReportPage from './pages/Report/ReturnReconciliationReportPage';
+import DcReportPage from './pages/Report/DcReportPage';
+import HuReportPage from './pages/Report/HuReportPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -132,6 +134,24 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <ReturnReconciliationReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/dc-report" 
+              element={
+                <ProtectedRoute>
+                  <DcReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/hu-report" 
+              element={
+                <ProtectedRoute>
+                  <HuReportPage />
                 </ProtectedRoute>
               } 
             />

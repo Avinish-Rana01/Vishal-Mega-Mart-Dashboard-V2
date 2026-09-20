@@ -522,4 +522,122 @@ export const getGrcModalDetails = async ({
   return response.data;
 };
 
+// ==============================================================
+// DC Validation & Drilldown APIs
+// ==============================================================
+
+export const getDCDetails = async ({
+  storeName = '',
+  fromDate = '',
+  toDate = '',
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = '',
+  sortColumn = 'DATE',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (storeName) params.append('StoreName', storeName);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(`${API_BASE}/api/Stock/GetDCDetails?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getHuDetails = async ({
+  receivingPlant = '',
+  huStatus = '',
+  fromDate = '',
+  toDate = '',
+  huNo = '',
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = '',
+  sortColumn = 'HU_Number',
+  sortDirection = 'asc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (receivingPlant) params.append('ReceivingPlant', receivingPlant);
+  if (huStatus !== undefined && huStatus !== null && huStatus !== '') params.append('HUStatus', huStatus);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (huNo) params.append('HUNo', huNo);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(`${API_BASE}/api/stock/Hu-details?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getEncodingStoreData = async ({
+  storeName = '',
+  fromDate = '',
+  toDate = '',
+  ean = '',
+  articleNo = '',
+  userId = null,
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = '',
+  sortColumn = 'ARTICLE',
+  sortDirection = 'asc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (storeName) params.append('StoreName', storeName);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (ean) params.append('Ean', ean);
+  if (articleNo) params.append('ArticleNo', articleNo);
+  params.append('UserId', userId ?? getActiveUserId());
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(`${API_BASE}/api/Stock/GetEncodingStoreData?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const searchValidationHuNumbers = async ({
+  huStatus = '1',
+  receivingPlant = '',
+  fromDate = '',
+  toDate = '',
+  searchTerm = ''
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (huStatus !== undefined && huStatus !== null) params.append('huStatus', huStatus);
+  if (receivingPlant) params.append('receivingPlant', receivingPlant);
+  if (fromDate) params.append('fromDate', fromDate);
+  if (toDate) params.append('toDate', toDate);
+  if (searchTerm) params.append('searchTerm', searchTerm);
+
+  const response = await axios.get(`${API_BASE}/api/stock/hu-numbers/search?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+
+
 

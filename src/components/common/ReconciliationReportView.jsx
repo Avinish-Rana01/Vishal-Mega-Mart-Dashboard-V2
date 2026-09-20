@@ -88,14 +88,41 @@ export default function ReconciliationReportView({ type = 'return' }) {
     return () => controller.abort();
   }, [isReturn, selectedStore, fromDate, toDate]);
 
-  // Fetch EAN Options based on search term (debounced)
+  // POS Counter Options derived from current table data
+  const tablePosOptions = useMemo(() => {
+    if (!reportData || reportData.length === 0) return [];
+    const seen = new Set();
+    const list = [];
+    for (const row of reportData) {
+      const counter = row.COUNTER_NO || row.POS || row.CounterNo;
+      if (counter && !seen.has(String(counter))) {
+        seen.add(String(counter));
+        list.push({ id: String(counter), value: String(counter), text: String(counter) });
+      }
+    }
+    return list;
+  }, [reportData]);
+
+  const displayPosOptions = useMemo(() => {
+    if (tablePosOptions && tablePosOptions.length > 0) return tablePosOptions;
+    return posOptions;
+  }, [tablePosOptions, posOptions]);
+
+  // Fetch EAN Options based on search term (only when user actively types)
   useEffect(() => {
+    const trimmed = eanSearchTerm.trim();
+    if (!trimmed) {
+      setEanOptions([]);
+      setIsEanSearching(false);
+      return;
+    }
+
     const controller = new AbortController();
     const delayDebounceFn = setTimeout(async () => {
       setIsEanSearching(true);
       try {
         const fetchApi = isReturn ? getReturnSearchEAN : getVoidSearchEAN;
-        const data = await fetchApi(selectedStore, fromDate, toDate, eanSearchTerm, pos, controller.signal);
+        const data = await fetchApi(selectedStore, fromDate, toDate, trimmed, pos, controller.signal);
         setEanOptions(Array.isArray(data) ? data : (data?.eans || []));
       } catch (err) {
         if (err.name !== 'AbortError') console.error("Failed to fetch EAN numbers", err);
@@ -260,11 +287,12 @@ export default function ReconciliationReportView({ type = 'return' }) {
             <div className="search-field">
               <label>POS Counter</label>
               <SearchableDropdown
-                options={posOptions}
+                options={displayPosOptions}
                 value={pos}
                 onChange={setPos}
                 placeholder="Select POS Counter"
                 valueKey="id"
+                closeOnSelect={true}
               />
             </div>
 
@@ -275,12 +303,12 @@ export default function ReconciliationReportView({ type = 'return' }) {
                 value={ean}
                 onChange={setEan}
                 placeholder="Select EAN"
-                searchPlaceholder="Search EAN"
+                searchPlaceholder="Search EAN..."
                 isAsync={true}
                 onSearchChange={setEanSearchTerm}
                 isLoading={isEanSearching}
                 valueKey="id"
-                closeOnSelect={false}
+                closeOnSelect={true}
               />
             </div>
 

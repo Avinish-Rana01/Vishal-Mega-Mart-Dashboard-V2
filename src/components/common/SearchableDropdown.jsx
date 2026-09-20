@@ -18,14 +18,43 @@ export default function SearchableDropdown({
   const [searchTerm, setSearchTerm] = useState('');
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
-  
+  const getOptVal = (opt) => {
+    if (opt === null || opt === undefined) return undefined;
+    if (typeof opt === 'string' || typeof opt === 'number') return opt;
+    if (opt[valueKey] !== undefined) return opt[valueKey];
+    if (opt.value !== undefined) return opt.value;
+    if (opt.id !== undefined) return opt.id;
+    if (opt.code !== undefined) return opt.code;
+    return opt[labelKey];
+  };
+
+  const getOptLabel = (opt) => {
+    if (opt === null || opt === undefined) return '';
+    if (typeof opt === 'string' || typeof opt === 'number') return String(opt);
+    if (opt[labelKey] !== undefined) return opt[labelKey];
+    if (opt.text !== undefined) return opt.text;
+    if (opt.label !== undefined) return opt.label;
+    if (opt.name !== undefined) return opt.name;
+    return String(getOptVal(opt) ?? '');
+  };
+
   // The displayed text in the trigger
-  const selectedOption = options.find(opt => opt[valueKey] === value) || (value ? { [labelKey]: value, [valueKey]: value } : null);
+  const selectedOption = options.find(opt => String(getOptVal(opt)) === String(value)) || (value ? { [labelKey]: value, [valueKey]: value } : null);
   
   // Local filtering if not async
   const displayOptions = isAsync 
     ? options 
-    : options.filter(opt => (opt[labelKey] || '').toString().toLowerCase().includes(searchTerm.toLowerCase()));
+    : options.filter(opt => (getOptLabel(opt) || '').toString().toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const handleSelectOption = (opt) => {
+    const optVal = getOptVal(opt);
+    onChange(optVal, opt);
+    setSearchTerm('');
+    if (isAsync && onSearchChange) {
+      onSearchChange('');
+    }
+    if (closeOnSelect) setIsOpen(false);
+  };
 
   const handleClear = (e) => {
     e.stopPropagation();
@@ -72,7 +101,7 @@ export default function SearchableDropdown({
         }}
       >
         <span className={value ? 'has-value' : 'is-empty'}>
-          {selectedOption ? selectedOption[labelKey] : placeholder}
+          {selectedOption ? getOptLabel(selectedOption) : placeholder}
         </span>
         <div className="custom-select-trigger-actions">
           {value && (
@@ -152,27 +181,25 @@ export default function SearchableDropdown({
                 <div className="custom-select-option-loading" role="status" aria-live="polite">Searching...</div>
               ) : displayOptions.length > 0 ? (
                 displayOptions.slice(0, 50).map(opt => {
-                  const isSelected = opt[valueKey] === value;
+                  const optVal = getOptVal(opt);
+                  const optLbl = getOptLabel(opt);
+                  const isSelected = String(optVal) === String(value);
                   return (
                     <div 
-                      key={opt[valueKey]} 
+                      key={String(optVal ?? optLbl)} 
                       className={`custom-select-option ${isSelected ? 'selected' : ''}`}
                       role="option"
                       aria-selected={isSelected}
                       tabIndex={0}
-                      onClick={() => {
-                        onChange(opt[valueKey], opt);
-                        if (closeOnSelect) setIsOpen(false);
-                      }}
+                      onClick={() => handleSelectOption(opt)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          onChange(opt[valueKey], opt);
-                          if (closeOnSelect) setIsOpen(false);
+                          handleSelectOption(opt);
                         }
                       }}
                     >
-                      <span>{opt[labelKey]}</span>
+                      <span>{optLbl}</span>
                       {isSelected && (
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="20 6 9 17 4 12"></polyline>
