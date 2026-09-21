@@ -753,6 +753,8 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
 .vmm-table-container {
   overflow-x: auto;
   width: 100%;
+  padding-right: 1px;
+  box-sizing: border-box;
   /* min-height: 160px; */
   /* border: 1px solid #000000; */
 
@@ -781,6 +783,8 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
   border-collapse: collapse;
   font-size: 11px;
   text-align: center !important;
+  border-right: 1px solid #bebebe;
+  border-bottom: 1px solid #bebebe;
 }
 
 .vmm-table th {
@@ -808,6 +812,10 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
   color: #1e293b;
   white-space: nowrap;
   text-align: center !important;
+}
+
+.vmm-table tbody tr:last-child td {
+  border-bottom: 1px solid #bebebe !important;
 }
 
 .vmm-table-striped tbody tr:nth-child(odd) {

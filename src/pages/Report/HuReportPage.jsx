@@ -362,7 +362,8 @@ export default function HuReportPage() {
 
         {/* Selected Status / Date Subheader Bar */}
         <ReportStatsHeader 
-            storeName={displayStoreTitle}
+            leftLabel="HU STATUS"
+            leftValue={receivingPlant ? `${displayStatusLabel} | PLANT: ${receivingPlant}` : displayStatusLabel}
             fromDate={fromDate}
             toDate={toDate}
           />

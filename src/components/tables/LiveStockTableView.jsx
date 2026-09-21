@@ -6,6 +6,7 @@ import CurvedCard from "../common/CurvedCard";
 import ReportStatsHeader from "../common/ReportStatsHeader";
 import { getReportStores, searchReportArticles, getReportLiveStock } from "../../services/stockService";
 import './LiveStockTableView.css'; // We'll copy LiveStockReport.css styles here
+import '../../pages/Report/common-reports.css';
 
 export default function LiveStockTableView({ initialStore = 'HD44', initialDate = new Date().toISOString().split('T')[0] }) {
   const [selectedStore, setSelectedStore] = useState(initialStore);

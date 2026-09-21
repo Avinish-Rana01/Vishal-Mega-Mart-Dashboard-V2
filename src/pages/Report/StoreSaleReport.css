@@ -3,7 +3,7 @@
 
 /* Filter Card Margins & 3-Column Grid */
 .report-search-card {
-  margin: 12px 10px 6px 10px !important;
+  margin: 15px 15px 5px 15px !important;
   border-radius: 14px;
 }
 
@@ -101,7 +101,7 @@
 
 /* Info Bar Margins */
 .report-selected-info-bar {
-  margin: 4px 10px 8px 10px !important;
+  margin: 0 15px 5px 15px !important;
   padding: 8px 14px !important;
 }
 
@@ -109,8 +109,8 @@
 .store-sale-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 14px !important;
-  margin: 8px 10px 14px 10px !important;
+  gap: 5px !important;
+  margin: 0 15px 5px 15px !important;
 }
 
 @media (max-width: 1024px) {
@@ -127,7 +127,7 @@
 
 /* Data Table Wrapper Margins */
 .report-table-wrapper {
-  padding: 0 10px 20px 10px !important;
+  padding: 0 15px 20px 15px !important;
 }
 
 /* Custom Clickable Link in Table */

@@ -255,8 +255,6 @@ export default function StoreSaleReportPage() {
         onBackClick: () => navigate('/dashboard')
       }}
     >
-      <main className="vmm-dashboard-body">
-        
         {/* Filter Card */}
         <div className="report-search-card">
           <div className="report-search-header">
@@ -377,8 +375,6 @@ export default function StoreSaleReportPage() {
             sortDirection={sortDirection}
           />
         </div>
-
-      </main>
     </AppLayout>
   );
 }

@@ -8,6 +8,7 @@ import CustomDatePicker from './CustomDatePicker';
 import CurvedCard from './CurvedCard';
 import ReportStatsHeader from './ReportStatsHeader';
 import '../../pages/Report/LiveStockReport.css'; // Standard report styles
+import '../../pages/Report/common-reports.css';
 import {
   getVoidReconciliationData,
   getVoidPosCounters,

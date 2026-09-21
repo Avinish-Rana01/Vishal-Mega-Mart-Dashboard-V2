@@ -203,7 +203,6 @@ export default function StoreGrcReportPage() {
         onBackClick: () => navigate('/dashboard')
       }}
     >
-        <main className="vmm-dashboard-body">
           {/* Search Card */}
           <div className="report-search-card">
             <div className="report-search-header">
@@ -358,7 +357,6 @@ export default function StoreGrcReportPage() {
               totalRecords={totalRecords}
             />
           </div>
-        </main>
     </AppLayout>
   );
 }

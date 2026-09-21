@@ -2,8 +2,8 @@
 
 .report-curved-cards {
   display: flex;
-  gap: 15px;
-  margin: 5px 15px;
+  gap: 5px;
+  margin: 0 15px 5px 15px;
 }
 
 .curve-card {

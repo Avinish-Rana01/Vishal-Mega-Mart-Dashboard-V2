@@ -202,3 +202,34 @@
   padding: 6px 4px;
   color: #6b7280;
 }
+
+/* Ensure data table container and closing borders on every report page */
+.vmm-table-container {
+  overflow-x: auto;
+  width: 100%;
+  padding-right: 1px;
+  box-sizing: border-box;
+}
+
+.vmm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: center !important;
+  border-right: 1px solid #bebebe;
+  border-bottom: 1px solid #bebebe;
+}
+
+.vmm-table th,
+.vmm-table td {
+  border: 1px solid #bebebe;
+}
+
+.vmm-table th:last-child,
+.vmm-table td:last-child {
+  border-right: 1px solid #bebebe !important;
+}
+
+.vmm-table tbody tr:last-child td {
+  border-bottom: 1px solid #bebebe !important;
+}

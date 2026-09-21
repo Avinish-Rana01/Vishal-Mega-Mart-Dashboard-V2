@@ -5,8 +5,10 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CycleCountModal from '../../components/modals/CycleCountModal';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { getCycleCountReport, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
+import './common-reports.css';
 
 export default function CycleCountReportPage() {
   const location = useLocation();
@@ -179,9 +181,11 @@ export default function CycleCountReportPage() {
 
           {/* Info Banner */}
           {selectedStore && (
-            <div className="report-selected-info-bar">
-              <div>SELECTED STORE : {storeDisplay}</div>
-            </div>
+            <ReportStatsHeader 
+              storeName={storeDisplay}
+              fromDate={fromDate}
+              toDate={toDate}
+            />
           )}
 
           {/* Data Table */}
