@@ -147,15 +147,6 @@ export default function StoreSaleReportPage() {
     };
   }, [fetchReport, pageIndex, pageSize]);
 
-  // Handle Search button
-  const handleSearch = () => {
-    if (pageIndex === 1) {
-      fetchReport(1, pageSize);
-    } else {
-      setPageIndex(1);
-    }
-  };
-
   // Handle Clear / Reset
   const handleClear = () => {
     setSelectedStore(initialStore);
@@ -311,13 +302,6 @@ export default function StoreSaleReportPage() {
             </div>
 
             <div className="store-sale-search-actions">
-              <button 
-                type="button" 
-                className="store-sale-btn-search"
-                onClick={handleSearch}
-              >
-                <Search size={15} /> Search
-              </button>
               <button 
                 type="button" 
                 className="store-sale-btn-clear"

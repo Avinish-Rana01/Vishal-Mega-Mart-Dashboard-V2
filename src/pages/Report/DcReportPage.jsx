@@ -133,10 +133,6 @@ export default function DcReportPage() {
   }, [fetchReportData]);
 
   // Search & Filter actions
-  const handleSearch = () => {
-    setPageIndex(1);
-    fetchReportData();
-  };
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
@@ -264,7 +260,7 @@ export default function DcReportPage() {
                 <input
                   type="text"
                   value={selectedStore}
-                  onChange={(e) => setSelectedStore(e.target.value.toUpperCase())}
+                  onChange={(e) => { setSelectedStore(e.target.value.toUpperCase()); setPageIndex(1); }}
                   placeholder="Enter Store Code (e.g. HD44)"
                 />
                 {selectedStore && (
@@ -282,22 +278,15 @@ export default function DcReportPage() {
 
             <div className="search-field">
               <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={setFromDate} />
+              <CustomDatePicker value={fromDate} onChange={(val) => { setFromDate(val); setPageIndex(1); }} />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <CustomDatePicker value={toDate} onChange={setToDate} />
+              <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
             </div>
 
             <div className="search-buttons">
-              <button
-                className="btn-search"
-                onClick={handleSearch}
-                disabled={isLoading}
-              >
-                Search
-              </button>
               <button
                 className="btn-clear"
                 onClick={handleClear}

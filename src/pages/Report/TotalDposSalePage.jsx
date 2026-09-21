@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, RotateCcw, ShoppingBag, BarChart2, Hash, Layers, FileText, Tag } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
@@ -6,6 +6,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { 
   getReportStores, 
   getSaleData, 
@@ -14,6 +15,7 @@ import {
   searchSaleEans 
 } from '../../services/stockService';
 import './SalesReport.css';
+import './common-reports.css';
 
 const COLUMN_TYPES = [
   { value: 'TOTAL_DPOS_SALE', label: 'Total POS Sale' },
@@ -386,7 +388,7 @@ export default function TotalDposSalePage() {
           sortable: true,
           render: (val, row) => {
             const d = val || row?.BILL_DATE || row?.bill_date || row?.checkout_date;
-            return d ? String(d).split('T')[0] : '—';
+            return d ? String(d).split('T')[0] : 'â€”';
           }
         },
         { key: 'STORE_CODE', label: 'STORE CODE', sortable: true },
@@ -412,7 +414,7 @@ export default function TotalDposSalePage() {
           sortable: true,
           render: (val, row) => {
             const d = val || row?.BILL_DATE || row?.bill_date;
-            return d ? String(d).split('T')[0] : '—';
+            return d ? String(d).split('T')[0] : 'â€”';
           }
         },
         { key: 'STORE_CODE', label: 'STORE CODE', sortable: true },
@@ -436,7 +438,7 @@ export default function TotalDposSalePage() {
         sortable: true,
         render: (val, row) => {
           const d = val || row?.CHECKOUT_DATE || row?.checkout_date || row?.bill_date;
-          return d ? String(d).split('T')[0] : '—';
+          return d ? String(d).split('T')[0] : 'â€”';
         }
       },
       { key: 'STORE_CODE', label: 'STORE CODE', sortable: true },
@@ -475,14 +477,14 @@ export default function TotalDposSalePage() {
     >
       <div className="sales-report-container">
         {/* Filter Card */}
-        <div className="sales-filter-card">
-          <div className="sales-filter-header">
+        <div className="report-search-card">
+          <div className="report-search-header">
             NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </div>
 
-          <div className={`sales-filter-body ${isThreeCardMode ? 'rfid-filter-body' : ''}`}>
+          <div className={`report-search-body ${isThreeCardMode ? 'report-search-body' : ''}`}>
             {/* Store Selection */}
-            <div className="sales-filter-field">
+            <div className="search-field">
               <label>Store <span>*</span></label>
               <SearchableDropdown
                 value={selectedStore}
@@ -495,7 +497,7 @@ export default function TotalDposSalePage() {
             </div>
 
             {/* From Date */}
-            <div className="sales-filter-field">
+            <div className="search-field">
               <label>From Date {!isThreeCardMode && <span>*</span>}</label>
               <CustomDatePicker
                 value={fromDate}
@@ -505,7 +507,7 @@ export default function TotalDposSalePage() {
             </div>
 
             {/* To Date */}
-            <div className="sales-filter-field">
+            <div className="search-field">
               <label>To Date {!isThreeCardMode && <span>*</span>}</label>
               <CustomDatePicker
                 value={toDate}
@@ -517,7 +519,7 @@ export default function TotalDposSalePage() {
             {/* In DPOS mode: POS Counter, Article No, EAN */}
             {!isThreeCardMode && (
               <>
-                <div className="sales-filter-field">
+                <div className="search-field">
                   <label>POS Counter</label>
                   <SearchableDropdown
                     value={selectedPos}
@@ -530,7 +532,7 @@ export default function TotalDposSalePage() {
                   />
                 </div>
 
-                <div className="sales-filter-field">
+                <div className="search-field">
                   <label>Article No</label>
                   <SearchableDropdown
                     value={selectedArticle}
@@ -546,7 +548,7 @@ export default function TotalDposSalePage() {
                   />
                 </div>
 
-                <div className="sales-filter-field">
+                <div className="search-field">
                   <label>EAN</label>
                   <SearchableDropdown
                     value={selectedEan}
@@ -565,24 +567,10 @@ export default function TotalDposSalePage() {
             )}
 
             {/* Action Buttons */}
-            <div className="sales-actions-wrapper">
+            <div className="search-buttons">
               <button 
                 type="button" 
-                className="sales-btn-search"
-                onClick={() => {
-                  if (pageIndex === 1) {
-                    fetchData(1, pageSize);
-                  } else {
-                    setPageIndex(1);
-                  }
-                }}
-              >
-                <Search size={15} /> Search
-              </button>
-
-              <button 
-                type="button" 
-                className="sales-btn-reset"
+                className="btn-clear"
                 onClick={handleResetFilters}
               >
                 <RotateCcw size={15} /> {isThreeCardMode ? 'Clear' : 'Reset'}
@@ -607,19 +595,21 @@ export default function TotalDposSalePage() {
 
         {/* Info Banner for RFID Checkout or Manual Sale */}
         {isThreeCardMode && (
-          <div className="sales-info-banner">
-            <span>REPORT TYPE : {reportTitle}</span>
-            <span>FROM DATE : {fromDate || '—'} | TO DATE : {toDate || '—'}</span>
-          </div>
+          <ReportStatsHeader 
+            leftLabel="REPORT TYPE"
+            leftValue={reportTitle}
+            fromDate={fromDate || '—'}
+            toDate={toDate || '—'}
+          />
         )}
 
         {/* Row 2: KPI Summary Cards */}
         {isThreeCardMode ? (
           /* 3 Cards for RFID Checkout and Manual Sale */
-          <div className="sales-kpi-container rfid-kpi-container">
+          <div className="report-curved-cards report-curved-cards">
             <CurvedCard
               title="STORE"
-              value={selectedStore || '—'}
+              value={selectedStore || 'â€”'}
               waveColor={cardGradients[0]}
               icon={<ShoppingBag size={20} color="#ffffff" />}
               animate={false}
@@ -641,10 +631,10 @@ export default function TotalDposSalePage() {
           </div>
         ) : (
           /* 4 Cards for Total DPOS Sale */
-          <div className="sales-kpi-container">
+          <div className="report-curved-cards">
             <CurvedCard
               title="ASSIGNED STORE"
-              value={selectedStore || '—'}
+              value={selectedStore || 'â€”'}
               waveColor={cardGradients[0]}
               icon={<ShoppingBag size={20} color="#ffffff" />}
               animate={false}
@@ -674,7 +664,7 @@ export default function TotalDposSalePage() {
         )}
 
         {/* Row 3: Data Table Card */}
-        <div className="sales-table-wrapper">
+        <div className="report-table-wrapper">
           <ReportDataTableCard
             columns={tableColumns}
             data={tableData}
@@ -703,3 +693,4 @@ export default function TotalDposSalePage() {
     </AppLayout>
   );
 }
+

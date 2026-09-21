@@ -5,6 +5,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { getReportStores, getStoreGrcReport } from '../../services/stockService';
 import './StoreGrcReport.css'; // We will create this or use LiveStockReport.css
 
@@ -247,14 +248,11 @@ export default function StoreGrcReportPage() {
           </div>
 
           {/* Selected Info Bar */}
-          <div className="report-selected-info-bar">
-            <div>
-              SELECTED STORE : { getSelectedStoreName() }
-            </div>
-            <div>
-              FROM DATE : {fromDate} | TO DATE : {toDate}
-            </div>
-          </div>
+          <ReportStatsHeader 
+            storeName={getSelectedStoreName()}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
 
           {/* Curved Cards */}
           <div className="report-curved-cards grc-report-cards">

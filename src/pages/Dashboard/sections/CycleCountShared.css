@@ -43,7 +43,7 @@
 .cc-split-layout {
   display: grid;
   grid-template-columns: 50% 50%;
-  gap: 8px;
+  gap: 4px;
   align-items: stretch;
 }
 

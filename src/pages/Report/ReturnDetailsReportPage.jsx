@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RotateCcw } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
@@ -9,6 +9,7 @@ import CurvedCard from '../../components/common/CurvedCard';
 import './LiveStockReport.css'; // Standard report styles
 import { getReturnDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
+import './common-reports.css';
 
 export default function ReturnDetailsReportPage() {
   const location = useLocation();
@@ -170,12 +171,12 @@ export default function ReturnDetailsReportPage() {
             
             <div className="search-field">
               <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={setFromDate} />
+              <CustomDatePicker value={fromDate} onChange={(val) => { setFromDate(val); setPageIndex(1); }} />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <CustomDatePicker value={toDate} onChange={setToDate} />
+              <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
             </div>
 
             <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
@@ -254,3 +255,4 @@ export default function ReturnDetailsReportPage() {
     </AppLayout>
   );
 }
+

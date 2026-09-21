@@ -1,0 +1,15 @@
+.report-stats-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 15px;
+  margin: 0 15px 0px 15px;
+  min-height: 40px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  text-transform: uppercase;
+}

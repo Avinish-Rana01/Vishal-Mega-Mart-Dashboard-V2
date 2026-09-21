@@ -26,7 +26,7 @@ export default function CycleCountReportPage() {
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalRecords, setTotalRecords] = useState(0);
-  const [searchTrigger, setSearchTrigger] = useState(0);
+
   const [sortColumn, setSortColumn] = useState('DATE');
   const [sortDirection, setSortDirection] = useState('DESC');
 
@@ -77,14 +77,7 @@ export default function CycleCountReportPage() {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [pageIndex, pageSize, searchTerm, selectedStore, searchTrigger, sortColumn, sortDirection]);
-
-  const handleSearch = () => {
-    if (pageIndex !== 1) {
-      setPageIndex(1);
-    }
-    setSearchTrigger(prev => prev + 1);
-  };
+  }, [pageIndex, pageSize, searchTerm, selectedStore, fromDate, toDate, sortColumn, sortDirection]);
 
   const handleClear = () => {
     setSelectedStore('');
@@ -179,7 +172,6 @@ export default function CycleCountReportPage() {
               </div>
 
               <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
-                <button className="btn-search" onClick={handleSearch} style={{ padding: '8px 24px', backgroundColor: '#0284c7', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>Search</button>
                 <button className="btn-clear" onClick={handleClear} style={{ padding: '8px 24px', backgroundColor: '#94a3b8', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>Clear</button>
               </div>
             </div>

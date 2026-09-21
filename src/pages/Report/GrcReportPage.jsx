@@ -5,6 +5,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { getReportStores, searchGrcHuNumbers, getGrcDetails } from '../../services/stockService';
 import GrcDetailsModal from '../../components/modals/GrcDetailsModal';
 import './GrcReport.css';
@@ -261,7 +262,6 @@ export default function GrcReportPage() {
             </div>
             
             <div className="search-buttons">
-              <button className="btn-search">Search</button>
               <button 
                 className="btn-clear"
                 onClick={() => {
@@ -279,9 +279,11 @@ export default function GrcReportPage() {
           </div>
 
           {/* Stats Header */}
-          <div className="report-stats-header">
-            <div className="date-info">FROM DATE : {fromDate} | TO DATE : {toDate}</div>
-          </div>
+          <ReportStatsHeader 
+            storeName={storeOptions.find(s => s.id === selectedStore)?.text || selectedStore || 'ALL STORES'}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
 
           <div className="report-curved-cards">
             <CurvedCard 

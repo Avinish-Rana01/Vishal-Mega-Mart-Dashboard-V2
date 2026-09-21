@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import LiveStockTableView from '../../components/tables/LiveStockTableView';
+import './common-reports.css';
 
 export default function LiveStockReportPage() {
   const location = useLocation();
@@ -25,3 +26,4 @@ export default function LiveStockReportPage() {
     </AppLayout>
   );
 }
+

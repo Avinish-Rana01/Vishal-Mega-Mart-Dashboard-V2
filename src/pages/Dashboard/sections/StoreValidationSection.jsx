@@ -98,7 +98,7 @@ const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true, onCell
 // ─── Custom Gap Label for Validated Bar ─────────────────────────────────────────
 const CustomGapLabel = (props) => {
   const { x, y, width, height, value, index, data } = props;
-  const row = data ? data[index] : null;
+  const row = data && index !== undefined ? data[index] : null;
   const pending = row ? Number(row.STORE_PENDING_QTY || 0) : 0;
   
   return (
@@ -142,6 +142,7 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
                 animationDuration={500} 
                 animationEasing="ease-out"
                 cursor="pointer"
+                minPointSize={2}
                 onClick={(entry) => onCellClick && onCellClick(entry, '4')}
               >
                 <LabelList dataKey="HU_RECEIVED_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_RECEIVED }} />
@@ -156,6 +157,7 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
                 animationDuration={500} 
                 animationEasing="ease-out"
                 cursor="pointer"
+                minPointSize={2}
                 onClick={(entry) => onCellClick && onCellClick(entry, '1')}
               >
                 <LabelList dataKey="HU_VALIDATED_QTY" content={<CustomGapLabel data={chartData} />} />

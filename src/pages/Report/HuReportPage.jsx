@@ -167,12 +167,6 @@ export default function HuReportPage() {
     return () => controller.abort();
   }, [fetchReportData]);
 
-  // Filter actions
-  const handleSearch = () => {
-    setPageIndex(1);
-    fetchReportData();
-  };
-
   const handleClear = () => {
     setHuStatus(initialStatus);
     setReceivingPlant(initialPlant);
@@ -346,13 +340,6 @@ export default function HuReportPage() {
             </div>
 
             <div className="search-buttons">
-              <button
-                className="btn-search"
-                onClick={handleSearch}
-                disabled={isLoading}
-              >
-                Search
-              </button>
               <button
                 className="btn-clear"
                 onClick={handleClear}
