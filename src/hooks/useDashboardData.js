@@ -935,26 +935,31 @@ export const useWarehouseEncoding = () => {
         setData([{ timeBlock: 'TOTAL', count: patch.totalCount || total }, ...formatted]);
         setChartData(formatted);
       } else if (patch.timeBlock) {
-        setChartData((prev) => {
-          return prev.map((item) => {
-            if (item.timeBlock === patch.timeBlock) {
-              return { ...item, count: patch.newCount };
-            }
-            return item;
+        if (patch.timeBlock === 'TOTAL' && (patch.totalCount === 0 || patch.newCount === 0)) {
+          setChartData((prev) => prev.map((item) => ({ ...item, count: 0 })));
+          setData((prev) => prev.map((item) => ({ ...item, count: 0 })));
+        } else {
+          setChartData((prev) => {
+            return prev.map((item) => {
+              if (item.timeBlock === patch.timeBlock) {
+                return { ...item, count: patch.newCount };
+              }
+              return item;
+            });
           });
-        });
 
-        setData((prev) => {
-          return prev.map((item) => {
-            if (item.timeBlock === 'TOTAL' && patch.totalCount !== undefined) {
-              return { ...item, count: patch.totalCount };
-            }
-            if (item.timeBlock === patch.timeBlock) {
-              return { ...item, count: patch.newCount };
-            }
-            return item;
+          setData((prev) => {
+            return prev.map((item) => {
+              if (item.timeBlock === 'TOTAL' && patch.totalCount !== undefined) {
+                return { ...item, count: patch.totalCount };
+              }
+              if (item.timeBlock === patch.timeBlock) {
+                return { ...item, count: patch.newCount };
+              }
+              return item;
+            });
           });
-        });
+        }
       }
 
       setHighlightedBlock(patch.timeBlock);
