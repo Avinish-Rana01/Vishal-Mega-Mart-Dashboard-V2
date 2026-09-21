@@ -5,6 +5,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import './LiveStockReport.css';
 import './HuReport.css';
 import { getHuDetails, searchValidationHuNumbers } from '../../services/stockService';
@@ -357,22 +358,14 @@ export default function HuReportPage() {
           </div>
         </div>
 
-        {error && <div className="ds-error" style={{ margin: '0 15px 15px 15px' }}>{error}</div>}
+        {error && <div className="report-error-banner">{error}</div>}
 
         {/* Selected Status / Date Subheader Bar */}
-        <div className="report-stats-header">
-          <div>
-            HU STATUS : <strong style={{ color: '#0f172a' }}>{displayStatusLabel}</strong>
-            {receivingPlant && (
-              <span style={{ marginLeft: '12px', color: '#64748b' }}>
-                | PLANT : <strong style={{ color: '#0f172a' }}>{receivingPlant}</strong>
-              </span>
-            )}
-          </div>
-          <div>
-            FROM DATE : <strong>{fromDate}</strong> | TO DATE : <strong>{toDate}</strong>
-          </div>
-        </div>
+        <ReportStatsHeader 
+            storeName={displayStoreTitle}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
 
         {/* 5 Curved KPI Cards */}
         <div className="hu-curved-cards">
@@ -429,7 +422,7 @@ export default function HuReportPage() {
         </div>
 
         {/* Data Table */}
-        <div className="report-table-wrapper" style={{ margin: '10px 15px 25px 15px' }}>
+        <div className="report-table-wrapper">
           <ReportDataTableCard
             columns={columns}
             data={reportData}

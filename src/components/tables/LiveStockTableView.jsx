@@ -3,6 +3,7 @@ import ReportDataTableCard from "../common/ReportDataTableCard";
 import SearchableDropdown from "../common/SearchableDropdown";
 import CustomDatePicker from "../common/CustomDatePicker";
 import CurvedCard from "../common/CurvedCard";
+import ReportStatsHeader from "../common/ReportStatsHeader";
 import { getReportStores, searchReportArticles, getReportLiveStock } from "../../services/stockService";
 import './LiveStockTableView.css'; // We'll copy LiveStockReport.css styles here
 
@@ -235,10 +236,10 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       </div>
 
       {/* Selected Info Bar */}
-      <div className="report-selected-info-bar">
-        <div>SELECTED STORE : { getSelectedStoreName() }</div>
-        <div>STOCK DATE : {selectedDate}</div>
-      </div>
+      <ReportStatsHeader 
+        storeName={getSelectedStoreName()}
+        date={selectedDate}
+      />
 
       {/* KPI Cards */}
       <div className="report-curved-cards">

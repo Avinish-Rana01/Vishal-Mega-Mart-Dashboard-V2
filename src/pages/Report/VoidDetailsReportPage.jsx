@@ -5,6 +5,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import './LiveStockReport.css'; // Import standard report styles
 import { getVoidDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
@@ -113,7 +114,7 @@ export default function VoidDetailsReportPage() {
     { key: 'DATE', label: 'DATE', render: dateRenderer },
     { key: 'VOID_QTY', label: 'VOID QTY', render: (val, row) => (
         <span 
-          style={{ color: '#2563eb', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+          className="report-link-action"
           onClick={() => handleNavigateToRecon(row)}
         >
           {numRenderer(val)}
@@ -122,7 +123,7 @@ export default function VoidDetailsReportPage() {
     },
     { key: 'ENCODE_QTY', label: 'ENCODED VS VOID (QTY)', render: (val, row) => (
         <span 
-          style={{ color: '#2563eb', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+          className="report-link-action"
           onClick={() => handleNavigateToRecon(row)}
         >
           {numRenderer(val)}
@@ -131,7 +132,7 @@ export default function VoidDetailsReportPage() {
     },
     { key: 'DIFFERENCE_QTY', label: 'PENDING QTY', render: (val, row) => (
         <span 
-          style={{ color: '#ef4444', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+          className="report-link-action-danger"
           onClick={() => handleNavigateToRecon(row)}
         >
           {numRenderer(val)}
@@ -180,30 +181,27 @@ export default function VoidDetailsReportPage() {
               <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
             </div>
 
-            <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
-              <button className="btn-clear" onClick={handleClear} disabled={isLoading} style={{ height: '38px', padding: '0 24px', backgroundColor: '#ef4444', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '12px' }}>
+            <div className="search-buttons">
+              <button className="btn-clear" onClick={handleClear}>
                 Clear
               </button>
-              <button onClick={() => navigate(-1)} style={{ height: '38px', padding: '0 24px', backgroundColor: '#9ca3af', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '12px' }}>
+              <button onClick={() => navigate(-1)} className="report-btn-secondary">
                 Back to Void Summary
               </button>
             </div>
           </div>
         </div>
 
-      {error && <div className="ds-error" style={{ margin: '0 15px' }}>{error}</div>}
+      {error && <div className="report-error-banner">{error}</div>}
 
-      <div className="report-selected-info-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          SELECTED STORE : {getStoreName()}
-        </div>
-        <div>
-          FROM DATE : {fromDate} | TO DATE : {toDate}
-        </div>
-      </div>
+      <ReportStatsHeader 
+        storeName={selectedStore || 'ALL STORES'}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
 
-      <div className="ds-kpi-row" style={{ margin: '0 12px 20px 15px', gap: '20px', display: 'flex', flexDirection: 'row' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="ds-kpi-row">
+          <div className="ds-kpi-item">
             <CurvedCard
               title="VOID QUANTITY"
               value={totals.voidQty.toLocaleString('en-IN')}
@@ -213,7 +211,7 @@ export default function VoidDetailsReportPage() {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="ENCODE QUANTITY"
               value={totals.encodeQty.toLocaleString('en-IN')}
@@ -223,7 +221,7 @@ export default function VoidDetailsReportPage() {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="DIFFERENCE QUANTITY"
               value={totals.differenceQty.toLocaleString('en-IN')}

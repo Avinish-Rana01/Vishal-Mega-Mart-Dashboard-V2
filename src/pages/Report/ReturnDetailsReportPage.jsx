@@ -6,6 +6,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import './LiveStockReport.css'; // Standard report styles
 import { getReturnDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
@@ -112,7 +113,7 @@ export default function ReturnDetailsReportPage() {
     { key: 'DATE', label: 'DATE', render: (val, row) => dateRenderer(val || row.BILL_DATE) },
     { key: 'RETURN_QTY', label: 'RETURN QTY', render: (val, row) => (
         <span 
-          style={{ color: '#2563eb', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+          className="report-link-action"
           onClick={() => handleNavigateToRecon(row)}
         >
           {numRenderer(val ?? row.QTY)}
@@ -121,7 +122,7 @@ export default function ReturnDetailsReportPage() {
     },
     { key: 'ENCODE_QTY', label: 'ENCODED VS RETURN (QTY)', render: (val, row) => (
         <span 
-          style={{ color: '#2563eb', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+          className="report-link-action"
           onClick={() => handleNavigateToRecon(row)}
         >
           {numRenderer(val ?? row.ENCODED_QTY)}
@@ -130,7 +131,7 @@ export default function ReturnDetailsReportPage() {
     },
     { key: 'DIFFERENCE_QTY', label: 'PENDING QTY', render: (val, row) => (
         <span 
-          style={{ color: '#ef4444', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+          className="report-link-action-danger"
           onClick={() => handleNavigateToRecon(row)}
         >
           {numRenderer(val ?? row.DIFF_QTY)}
@@ -179,30 +180,27 @@ export default function ReturnDetailsReportPage() {
               <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
             </div>
 
-            <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
-              <button className="btn-clear" onClick={handleClear} disabled={isLoading} style={{ height: '38px', padding: '0 24px', backgroundColor: '#ef4444', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '12px' }}>
+            <div className="search-buttons">
+              <button className="btn-clear" onClick={handleClear}>
                 Clear
               </button>
-              <button onClick={() => navigate(-1)} style={{ height: '38px', padding: '0 24px', backgroundColor: '#9ca3af', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '12px' }}>
+              <button onClick={() => navigate(-1)} className="report-btn-secondary">
                 Back to Return Summary
               </button>
             </div>
           </div>
         </div>
 
-      {error && <div className="ds-error" style={{ margin: '0 15px' }}>{error}</div>}
+      {error && <div className="report-error-banner">{error}</div>}
 
-      <div className="report-selected-info-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          SELECTED STORE : {getStoreName()}
-        </div>
-        <div>
-          FROM DATE : {fromDate} | TO DATE : {toDate}
-        </div>
-      </div>
+      <ReportStatsHeader 
+        storeName={selectedStore || 'ALL STORES'}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
 
-      <div className="ds-kpi-row" style={{ margin: '0 12px 20px 15px', gap: '20px', display: 'flex', flexDirection: 'row' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="ds-kpi-row">
+          <div className="ds-kpi-item">
             <CurvedCard
               title="RETURN QUANTITY"
               value={totals.returnQty.toLocaleString('en-IN')}
@@ -210,7 +208,7 @@ export default function ReturnDetailsReportPage() {
               icon={<RotateCcw size={18} color="#15803d" />}
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="ENCODE QUANTITY"
               value={totals.encodeQty.toLocaleString('en-IN')}
@@ -220,7 +218,7 @@ export default function ReturnDetailsReportPage() {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="DIFFERENCE QUANTITY"
               value={totals.differenceQty.toLocaleString('en-IN')}

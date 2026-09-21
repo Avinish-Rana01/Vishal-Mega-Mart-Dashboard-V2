@@ -5,6 +5,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import './LiveStockReport.css';
 import './DcReport.css';
 import { getDCDetails, getBindStores } from '../../services/stockService';
@@ -298,21 +299,18 @@ export default function DcReportPage() {
           </div>
         </div>
 
-        {error && <div className="ds-error" style={{ margin: '0 15px 15px 15px' }}>{error}</div>}
+        {error && <div className="report-error-banner">{error}</div>}
 
         {/* Selected Store / Date Subheader Bar */}
-        <div className="report-stats-header">
-          <div>
-            SELECTED STORE : <strong style={{ color: '#0f172a' }}>{displayStoreTitle}</strong>
-          </div>
-          <div>
-            FROM DATE : <strong>{fromDate}</strong> | TO DATE : <strong>{toDate}</strong>
-          </div>
-        </div>
+        <ReportStatsHeader 
+            storeName={displayStoreTitle}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
 
         {/* 3 Curved KPI Cards */}
         <div className="report-curved-cards">
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="PROCESSED HU QTY"
               value={totals.processedCount.toLocaleString('en-IN')}
@@ -324,7 +322,7 @@ export default function DcReportPage() {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="UNPROCESSED HU QTY"
               value={totals.unprocessedCount.toLocaleString('en-IN')}
@@ -336,7 +334,7 @@ export default function DcReportPage() {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="VALIDATED ARTICLE QTY"
               value={totals.validatedCount.toLocaleString('en-IN')}
@@ -351,7 +349,7 @@ export default function DcReportPage() {
         </div>
 
         {/* Data Table */}
-        <div className="report-table-wrapper" style={{ margin: '10px 15px 25px 15px' }}>
+        <div className="report-table-wrapper">
           <ReportDataTableCard
             columns={columns}
             data={reportData}

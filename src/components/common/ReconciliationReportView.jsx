@@ -6,6 +6,7 @@ import ReportDataTableCard from './ReportDataTableCard';
 import SearchableDropdown from './SearchableDropdown';
 import CustomDatePicker from './CustomDatePicker';
 import CurvedCard from './CurvedCard';
+import ReportStatsHeader from './ReportStatsHeader';
 import '../../pages/Report/LiveStockReport.css'; // Standard report styles
 import {
   getVoidReconciliationData,
@@ -312,30 +313,27 @@ export default function ReconciliationReportView({ type = 'return' }) {
               />
             </div>
 
-            <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
-              <button className="btn-clear" onClick={handleClear} disabled={isLoading} style={{ height: '38px', padding: '0 24px', backgroundColor: '#ef4444', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '12px' }}>
+            <div className="search-buttons">
+              <button className="btn-clear" onClick={handleClear}>
                 Clear
               </button>
-              <button onClick={() => navigate(-1)} style={{ height: '38px', padding: '0 24px', backgroundColor: '#9ca3af', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '12px' }}>
+              <button onClick={() => navigate(-1)} className="report-btn-secondary">
                 {isReturn ? 'Back to Return Summary' : 'Back to Void Summary'}
               </button>
             </div>
           </div>
         </div>
 
-      {error && <div className="ds-error" style={{ margin: '0 15px' }}>{error}</div>}
+      {error && <div className="report-error-banner">{error}</div>}
 
-      <div className="report-selected-info-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          SELECTED STORE : {getStoreName()}
-        </div>
-        <div>
-          FROM DATE : {fromDate} | TO DATE : {toDate}
-        </div>
-      </div>
+      <ReportStatsHeader 
+        storeName={getStoreName()}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
 
-      <div className="ds-kpi-row" style={{ margin: '0 12px 20px 15px', gap: '20px', display: 'flex', flexDirection: 'row' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="ds-kpi-row">
+          <div className="ds-kpi-item">
             <CurvedCard
               title="STORE"
               value={getStoreName()}
@@ -345,7 +343,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title={isReturn ? "RETURN QUANTITY" : "VOID QUANTITY"}
               value={totals.qty.toLocaleString('en-IN')}
@@ -356,7 +354,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="ENCODE QUANTITY"
               value={totals.encodeQty.toLocaleString('en-IN')}
@@ -366,7 +364,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
               }
             />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ds-kpi-item">
             <CurvedCard
               title="DIFFERENCE QUANTITY"
               value={totals.differenceQty.toLocaleString('en-IN')}

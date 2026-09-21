@@ -6,6 +6,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
+import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { getReportStores, getStoreSaleReport } from '../../services/stockService';
 import './StoreSaleReport.css';
 
@@ -314,14 +315,11 @@ export default function StoreSaleReportPage() {
         </div>
 
         {/* Selected Store & Date Info Bar (Image 2) */}
-        <div className="report-selected-info-bar">
-          <div>
-            SELECTED STORE : {getSelectedStoreName()}
-          </div>
-          <div>
-            FROM DATE : {fromDate} | TO DATE : {toDate}
-          </div>
-        </div>
+        <ReportStatsHeader 
+          storeName={getSelectedStoreName()}
+          fromDate={fromDate}
+          toDate={toDate}
+        />
 
         {/* 4 KPI Curved Cards (Image 2) */}
         <div className="store-sale-cards">
