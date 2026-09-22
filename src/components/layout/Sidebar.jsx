@@ -45,7 +45,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             onClick={() => setIsTooltipOpen(!isTooltipOpen)}
             tabIndex="0"
           >
-            <LayoutDashboard size={24} strokeWidth={2} />
+            <LayoutDashboard size={20} strokeWidth={2} />
           </div>
           <div className={`vmm-nav-tooltip ${isTooltipOpen ? 'force-show' : ''}`}>
             <h4 className="vmm-nav-tooltip-title">Home</h4>
@@ -68,21 +68,21 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           className={({ isActive }) => `vmm-nav-item ${isActive ? 'active' : ''}`}
           title="Store Reports"
         >
-          <Store size={24} strokeWidth={2} />
+          <Store size={20} strokeWidth={2} />
         </NavLink>
         <NavLink
           to="/tags"
           className={({ isActive }) => `vmm-nav-item ${isActive ? 'active' : ''}`}
           title="Tag Management"
         >
-          <Tags size={24} strokeWidth={2} />
+          <Tags size={20} strokeWidth={2} />
         </NavLink>
         <NavLink
           to="/settings"
           className={({ isActive }) => `vmm-nav-item ${isActive ? 'active' : ''}`}
           title="Settings"
         >
-          <Settings size={24} strokeWidth={2} />
+          <Settings size={20} strokeWidth={2} />
         </NavLink>
       </nav>
     </aside>

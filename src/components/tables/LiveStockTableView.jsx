@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { ClipboardList, Radio, Scale } from 'lucide-react';
 import ReportDataTableCard from "../common/ReportDataTableCard";
 import SearchableDropdown from "../common/SearchableDropdown";
 import CustomDatePicker from "../common/CustomDatePicker";
@@ -19,24 +20,12 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
   const [error, setError] = useState(null);
   const [reportSummary, setReportSummary] = useState(null);
 
-  const [cardGradients, setCardGradients] = useState([
-    ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff']
-  ]);
-
-  // Generate 5 random distinct gradients on initial load
-  useEffect(() => {
-    const baseHue = Math.floor(Math.random() * 360);
-    const gradients = [0, 1, 2, 3, 4]
-      .map(i => {
-        const hue = Math.floor((baseHue + i * (360 / 5)) % 360);
-        return [
-          `hsl(${hue}, 80%, 75%)`, 
-          `hsl(${(hue + 30) % 360}, 85%, 55%)`
-        ];
-      })
-      .sort(() => Math.random() - 0.5); // Shuffle them
-    setCardGradients(gradients);
-  }, []);
+  // Vibrant gradient pairs matching Store Sale Report design
+  const cardGradients = useMemo(() => [
+    ['#7dd3fc', '#0284c7'], // Blue: SAP STOCK COUNT
+    ['#86efac', '#22c55e'], // Green: RFID STOCK COUNT
+    ['#f472b6', '#db2777']  // Pink: DIFFERENCE COUNT
+  ], []);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -246,44 +235,21 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
           title="SAP STOCK COUNT" 
           value={reportSummary?.sapQty?.toLocaleString('en-IN') || '0'} 
           waveColor={cardGradients[0]}
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="3" width="6" height="4" rx="1" />
-              <path d="M9 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
-              <path d="M15 3h2a2 2 0 0 1 2 2v4" />
-              <path d="M5 8h2" />
-              <path d="M17 8h2" />
-              <path d="M9 11h6" />
-              <path d="M9 15h3" />
-              <circle cx="16" cy="16" r="4" fill="#ffffff" />
-              <path d="M18.8 18.8L22 22" />
-            </svg>
-          }
+          icon={<ClipboardList size={20} color="#ffffff" />}
         />
 
         <CurvedCard 
           title="RFID STOCK COUNT" 
           value={reportSummary?.rfidQty?.toLocaleString('en-IN') || '0'} 
           waveColor={cardGradients[1]}
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-              <path d="m3.3 7 8.7 5 8.7-5"/>
-              <path d="M12 22V12"/>
-            </svg>
-          }
+          icon={<Radio size={20} color="#ffffff" />}
         />
 
         <CurvedCard 
           title="DIFFERENCE COUNT" 
           value={reportSummary?.diffQty?.toLocaleString('en-IN') || '0'} 
           waveColor={cardGradients[2]}
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M8 12h8"/>
-            </svg>
-          }
+          icon={<Scale size={20} color="#ffffff" />}
         />
       </div>
 

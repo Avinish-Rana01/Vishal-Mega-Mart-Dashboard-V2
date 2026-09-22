@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingBag, Package } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -34,24 +35,11 @@ export default function GrcReportPage() {
   const [selectedModalRow, setSelectedModalRow] = useState(null);
   const [storeOptions, setStoreOptions] = useState([]);
 
-  const [cardGradients, setCardGradients] = useState([
-    ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff']
-  ]);
-
-  // Generate 5 random distinct gradients on initial load
-  React.useEffect(() => {
-    const baseHue = Math.floor(Math.random() * 360);
-    const gradients = [0, 1, 2, 3, 4]
-      .map(i => {
-        const hue = Math.floor((baseHue + i * (360 / 5)) % 360);
-        return [
-          `hsl(${hue}, 80%, 75%)`, 
-          `hsl(${(hue + 30) % 360}, 85%, 55%)`
-        ];
-      })
-      .sort(() => Math.random() - 0.5); // Shuffle them
-    setCardGradients(gradients);
-  }, []);
+  // Vibrant gradient wave colors matching Store Sale Report design
+  const cardGradients = useMemo(() => [
+    ['#7dd3fc', '#0284c7'], // Blue: GRC STATUS
+    ['#86efac', '#22c55e']  // Green: HU COUNT
+  ], []);
 
   // Ensure state updates if we navigate with new state
   React.useEffect(() => {
@@ -289,28 +277,14 @@ export default function GrcReportPage() {
               title="GRC STATUS" 
               value={getGrcStatusText()} 
               waveColor={cardGradients[0]}
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                  <path d="M3 6h18"></path>
-                  <path d="M16 10a4 4 0 0 1-8 0"></path>
-                </svg>
-              }
+              icon={<ShoppingBag size={20} color="#ffffff" />}
             />
 
             <CurvedCard 
               title="HU COUNT" 
               value={totalRecords.toLocaleString('en-IN')} 
               waveColor={cardGradients[1]}
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-              }
+              icon={<Package size={20} color="#ffffff" />}
             />
           </div>
 

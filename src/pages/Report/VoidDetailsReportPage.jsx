@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Ban, CheckCircle, MinusCircle } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -202,30 +203,24 @@ export default function VoidDetailsReportPage() {
             <CurvedCard
               title="VOID QUANTITY"
               value={totals.voidQty.toLocaleString('en-IN')}
-              waveColor={['#a7f3d0', '#86efac']} // Greenish
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-              }
+              waveColor={['#f472b6', '#db2777']}
+              icon={<Ban size={20} color="#ffffff" />}
             />
           </div>
           <div className="ds-kpi-item">
             <CurvedCard
               title="ENCODE QUANTITY"
               value={totals.encodeQty.toLocaleString('en-IN')}
-              waveColor={['#bae6fd', '#93c5fd']} // Blueish
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="8" y2="16"></line><line x1="12" y1="8" x2="12" y2="16"></line><line x1="16" y1="10" x2="16" y2="16"></line></svg>
-              }
+              waveColor={['#7dd3fc', '#0284c7']}
+              icon={<CheckCircle size={20} color="#ffffff" />}
             />
           </div>
           <div className="ds-kpi-item">
             <CurvedCard
               title="DIFFERENCE QUANTITY"
               value={totals.differenceQty.toLocaleString('en-IN')}
-              waveColor={['#ecfccb', '#d9f99d']} // Lime/Yellowish
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7c0f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-              }
+              waveColor={['#fcd34d', '#ea580c']}
+              icon={<MinusCircle size={20} color="#ffffff" />}
             />
         </div>
       </div>

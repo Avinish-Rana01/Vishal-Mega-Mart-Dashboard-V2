@@ -5,12 +5,16 @@
 
 .custom-dropdown-container {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   outline: none;
 }
 
 .ls-filter-select {
-  padding: 3px 16px 3px 8px;
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 18px 0 8px;
   border-radius: 999px;
   border: 1px solid #cbd5e1;
   background-color: #ffffff;

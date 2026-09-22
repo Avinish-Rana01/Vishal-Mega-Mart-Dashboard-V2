@@ -369,52 +369,32 @@ export default function HuReportPage() {
           <CurvedCard
             title="HU COUNT"
             value={totals.recordCount.toLocaleString('en-IN')}
-            waveColor={['#bfdbfe', '#60a5fa']}
-            icon={
-              <div className="hu-card-icon blue">
-                <Icons.Package size={18} color="#2563eb" />
-              </div>
-            }
+            waveColor={['#7dd3fc', '#0284c7']}
+            icon={<Icons.Package size={20} color="#ffffff" />}
           />
           <CurvedCard
             title="MATERIAL COUNT"
             value={totals.materialQty.toLocaleString('en-IN')}
-            waveColor={['#fbcfe8', '#f472b6']}
-            icon={
-              <div className="hu-card-icon pink">
-                <Icons.FileText size={18} color="#db2777" />
-              </div>
-            }
+            waveColor={['#f472b6', '#db2777']}
+            icon={<Icons.Layers size={20} color="#ffffff" />}
           />
           <CurvedCard
             title="ACTUAL QTY"
             value={totals.actualQty.toLocaleString('en-IN')}
-            waveColor={['#ddd6fe', '#a78bfa']}
-            icon={
-              <div className="hu-card-icon purple">
-                <Icons.FileText size={18} color="#7c3aed" />
-              </div>
-            }
+            waveColor={['#c084fc', '#9333ea']}
+            icon={<Icons.FileText size={20} color="#ffffff" />}
           />
           <CurvedCard
             title="SCANNED QTY"
             value={totals.scannedQty.toLocaleString('en-IN')}
-            waveColor={['#fed7aa', '#fb923c']}
-            icon={
-              <div className="hu-card-icon orange">
-                <Icons.ScanLine size={18} color="#ea580c" />
-              </div>
-            }
+            waveColor={['#fcd34d', '#ea580c']}
+            icon={<Icons.ScanLine size={20} color="#ffffff" />}
           />
           <CurvedCard
             title="INVALID TAGS"
             value={totals.invalidTags.toLocaleString('en-IN')}
-            waveColor={['#a7f3d0', '#34d399']}
-            icon={
-              <div className="hu-card-icon green">
-                <Icons.Tag size={18} color="#059669" />
-              </div>
-            }
+            waveColor={['#86efac', '#22c55e']}
+            icon={<Icons.Tag size={20} color="#ffffff" />}
           />
         </div>
 

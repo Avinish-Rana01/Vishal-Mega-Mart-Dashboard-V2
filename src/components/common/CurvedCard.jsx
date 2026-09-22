@@ -2,6 +2,27 @@ import React from 'react';
 import { useCountUp } from '../../hooks/useCountUp';
 import './CurvedCard.css';
 
+// Helper to safely generate hex or color-mix alpha for any color format (hex, rgb, hsl)
+function getAlphaColor(color, alphaHex = '22') {
+  if (!color || typeof color !== 'string') return '#3b82f622';
+  const c = color.trim();
+  if (c.startsWith('#')) {
+    let hex = c.slice(1);
+    if (hex.length === 3) {
+      hex = hex.split('').map(char => char + char).join('');
+    }
+    if (hex.length === 6) {
+      return `#${hex}${alphaHex}`;
+    }
+    if (hex.length === 8) {
+      return `#${hex.slice(0, 6)}${alphaHex}`;
+    }
+    return c;
+  }
+  const pct = alphaHex === '22' ? '15%' : alphaHex === '44' ? '28%' : '20%';
+  return `color-mix(in srgb, ${c} ${pct}, transparent)`;
+}
+
 export default function CurvedCard({ 
   title, 
   value, 
@@ -15,7 +36,7 @@ export default function CurvedCard({
   const colors = Array.isArray(waveColor) ? waveColor : [waveColor, waveColor];
   
   // We need a unique ID for the SVG gradient so they don't clash on the page
-  const gradientId = `wave-grad-${title.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const gradientId = `wave-grad-${String(title || 'card').replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const { ref, animatedValue } = useCountUp(value, 1000, animate);
 
@@ -33,16 +54,22 @@ export default function CurvedCard({
         <div 
           className="curve-card-icon-wrapper" 
           style={{ 
-            background: `linear-gradient(135deg, ${colors[0]}22, ${colors[1]}44)`, // Hex transparency
-            border: `1px solid ${colors[0]}44` 
+            background: `linear-gradient(135deg, ${getAlphaColor(colors[0], '22')}, ${getAlphaColor(colors[1], '44')})`,
+            border: `1px solid ${getAlphaColor(colors[0], '44')}` 
           }}
         >
-          <div style={{ position: 'relative', zIndex: 1, color: colors[1], display: 'flex' }}>
-            {icon || (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21.6 5.34l-3.23-1.78c-.28-.15-.59-.22-.91-.22H6.54c-.32 0-.63.07-.91.22L2.4 5.34C1.56 5.81 1.25 6.89 1.7 7.73l.6 1.08c.46.84 1.53 1.15 2.38.68l.32-.18V20c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V9.31l.32.18c.85.47 1.92.16 2.38-.68l.6-1.08c.45-.84.14-1.92-.7-2.39zM12 4c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2z"/>
-              </svg>
-            )}
+          <div style={{ position: 'relative', zIndex: 1, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {React.isValidElement(icon)
+              ? React.cloneElement(icon, {
+                  size: icon.props?.size || 20,
+                  color: '#ffffff',
+                  stroke: '#ffffff'
+                })
+              : icon || (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+                  <path d="M21.6 5.34l-3.23-1.78c-.28-.15-.59-.22-.91-.22H6.54c-.32 0-.63.07-.91.22L2.4 5.34C1.56 5.81 1.25 6.89 1.7 7.73l.6 1.08c.46.84 1.53 1.15 2.38.68l.32-.18V20c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V9.31l.32.18c.85.47 1.92.16 2.38-.68l.6-1.08c.45-.84.14-1.92-.7-2.39zM12 4c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2z"/>
+                </svg>
+              )}
           </div>
         </div>
       </div>

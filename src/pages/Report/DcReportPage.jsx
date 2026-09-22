@@ -312,36 +312,24 @@ export default function DcReportPage() {
             <CurvedCard
               title="PROCESSED HU QTY"
               value={totals.processedCount.toLocaleString('en-IN')}
-              waveColor={['#fbcfe8', '#f472b6']}
-              icon={
-                <div className="dc-card-icon pink">
-                  <Icons.PackageCheck size={18} color="#db2777" />
-                </div>
-              }
+              waveColor={['#f472b6', '#db2777']}
+              icon={<Icons.PackageCheck size={20} color="#ffffff" />}
             />
           </div>
           <div className="ds-kpi-item">
             <CurvedCard
               title="UNPROCESSED HU QTY"
               value={totals.unprocessedCount.toLocaleString('en-IN')}
-              waveColor={['#a7f3d0', '#34d399']}
-              icon={
-                <div className="dc-card-icon green">
-                  <Icons.Clock size={18} color="#059669" />
-                </div>
-              }
+              waveColor={['#86efac', '#22c55e']}
+              icon={<Icons.Clock size={20} color="#ffffff" />}
             />
           </div>
           <div className="ds-kpi-item">
             <CurvedCard
               title="VALIDATED ARTICLE QTY"
               value={totals.validatedCount.toLocaleString('en-IN')}
-              waveColor={['#ddd6fe', '#a78bfa']}
-              icon={
-                <div className="dc-card-icon purple">
-                  <Icons.FileText size={18} color="#7c3aed" />
-                </div>
-              }
+              waveColor={['#c084fc', '#9333ea']}
+              icon={<Icons.FileText size={20} color="#ffffff" />}
             />
           </div>
         </div>

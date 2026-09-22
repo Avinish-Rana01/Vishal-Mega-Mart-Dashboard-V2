@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Package, Building2, Store, Clock, AlertTriangle } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -7,7 +8,7 @@ import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { getReportStores, getStoreGrcReport } from '../../services/stockService';
-import './StoreGrcReport.css'; // We will create this or use LiveStockReport.css
+import './StoreGrcReport.css';
 
 export default function StoreGrcReportPage() {
   const location = useLocation();
@@ -85,25 +86,14 @@ export default function StoreGrcReportPage() {
     setPageIndex(1);
   };
 
-  const [cardGradients, setCardGradients] = useState([
-    ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff'], ['#fff', '#fff']
-  ]);
-
-  // Generate 5 random distinct gradients on initial load
-  useEffect(() => {
-    const baseHue = Math.floor(Math.random() * 360);
-    const gradients = [0, 1, 2, 3, 4]
-      .map(i => {
-        const hue = Math.floor((baseHue + i * (360 / 5)) % 360);
-        // Create a beautiful gradient by shifting the hue slightly and dropping the lightness
-        return [
-          `hsl(${hue}, 80%, 75%)`, 
-          `hsl(${(hue + 30) % 360}, 85%, 55%)`
-        ];
-      })
-      .sort(() => Math.random() - 0.5); // Shuffle them
-    setCardGradients(gradients);
-  }, []);
+  // Vibrant gradient pairs matching Store Sale Report design
+  const cardGradients = useMemo(() => [
+    ['#7dd3fc', '#0284c7'], // Blue: HU RECEIVED QTY
+    ['#86efac', '#22c55e'], // Green: WH VALIDATED QTY
+    ['#c084fc', '#9333ea'], // Purple: STORE VALIDATED QTY
+    ['#fcd34d', '#ea580c'], // Orange: PENDING FOR VALIDATION
+    ['#f472b6', '#db2777']  // Pink: WRONG HU QTY
+  ], []);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -259,77 +249,35 @@ export default function StoreGrcReportPage() {
               title="HU RECEIVED QTY" 
               value={reportSummary?.huReceivedQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[0]}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M60,160 Q40,160 45,130 Q50,70 100,70 Q150,70 155,130 Q160,160 140,160 Z" fill="black" stroke="black" strokeWidth="2"></path>
-                  <path d="M85,70 L75,40 Q100,30 125,40 L115,70 Z" fill="black" stroke="black" strokeWidth="2"></path>
-                  <rect x="82" y="65" width="36" height="8" rx="4" fill="black" stroke="black" strokeWidth="1"></rect>
-                  <text x="100" y="130" fontFamily="Arial" fontSize="35" fill="white" textAnchor="middle" fontWeight="bold">$</text>
-                  <path d="M70,100 Q80,105 90,100" fill="none"></path>
-                </svg>
-              }
+              icon={<Package size={20} color="#ffffff" />}
             />
 
             <CurvedCard 
               title="WH VALIDATED QTY" 
               value={reportSummary?.whValidatedQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[1]}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 21H21" stroke="#334155" strokeWidth="2" strokeLinecap="round"></path>
-                  <path d="M4 21V11H20V21" stroke="#334155" strokeWidth="2" strokeLinejoin="round"></path>
-                  <path d="M3 7L4 11H20L21 7H3Z" fill="#334155" stroke="#334155" strokeWidth="2" strokeLinejoin="round"></path>
-                  <path d="M3 7L12 3L21 7" stroke="#334155" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
-                  <rect x="10" y="15" width="4" height="6" stroke="#334155" strokeWidth="2" strokeLinejoin="round"></rect>
-                  <rect x="6" y="14" width="2" height="3" rx="0.5" fill="#334155" stroke="#334155" strokeWidth="1"></rect>
-                  <rect x="16" y="14" width="2" height="3" rx="0.5" fill="#334155" stroke="#334155" strokeWidth="1"></rect>
-                </svg>
-              }
+              icon={<Building2 size={20} color="#ffffff" />}
             />
 
             <CurvedCard 
               title="STORE VALIDATED QTY" 
               value={reportSummary?.storeValidatedQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[2]}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 21H21" stroke="#334155" strokeWidth="2" strokeLinecap="round"></path>
-                  <path d="M4 21V11H20V21" stroke="#334155" strokeWidth="2" strokeLinejoin="round"></path>
-                  <path d="M3 7L4 11H20L21 7H3Z" fill="#334155" stroke="#334155" strokeWidth="2" strokeLinejoin="round"></path>
-                  <path d="M3 7L12 3L21 7" stroke="#334155" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
-                  <rect x="10" y="15" width="4" height="6" stroke="#334155" strokeWidth="2" strokeLinejoin="round"></rect>
-                  <rect x="6" y="14" width="2" height="3" rx="0.5" fill="#334155" stroke="#334155" strokeWidth="1"></rect>
-                  <rect x="16" y="14" width="2" height="3" rx="0.5" fill="#334155" stroke="#334155" strokeWidth="1"></rect>
-                </svg>
-              }
+              icon={<Store size={20} color="#ffffff" />}
             />
 
             <CurvedCard 
               title="PENDING FOR VALIDATION" 
               value={reportSummary?.pendingQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[3]}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M60,160 Q40,160 45,130 Q50,70 100,70 Q150,70 155,130 Q160,160 140,160 Z" fill="#000000" stroke="#000000" strokeWidth="3"></path>
-                  <path d="M85,70 L75,40 Q100,20 125,40 L115,70 Z" fill="#000000" stroke="#000000" strokeWidth="3"></path>
-                  <rect x="82" y="65" width="36" height="8" rx="4" fill="#000000"></rect>
-                  <circle cx="100" cy="120" r="28" fill="white" stroke="#000000" strokeWidth="4"></circle>
-                  <line x1="100" y1="120" x2="100" y2="105" stroke="#000000" strokeWidth="4" strokeLinecap="round"></line>
-                  <line x1="100" y1="120" x2="112" y2="128" stroke="#000000" strokeWidth="4" strokeLinecap="round"></line>
-                </svg>
-              }
+              icon={<Clock size={20} color="#ffffff" />}
             />
 
             <CurvedCard 
               title="WRONG HU QTY" 
               value={reportSummary?.wrongHuQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[4]}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="9" stroke="black" strokeWidth="2"></circle>
-                  <path d="M9 9L15 15M15 9L9 15" stroke="black" strokeWidth="2" strokeLinecap="round"></path>
-                </svg>
-              }
+              icon={<AlertTriangle size={20} color="#ffffff" />}
             />
           </div>
 

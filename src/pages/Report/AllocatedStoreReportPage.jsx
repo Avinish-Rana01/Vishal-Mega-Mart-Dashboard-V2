@@ -379,20 +379,20 @@ export default function AllocatedStoreReportPage() {
           <CurvedCard
             title="ASSIGNED STORE"
             value={searchParams.storeName || 'ALL'}
-            icon={<Store size={20} />}
-            waveColor={['#bfdbfe', '#60a5fa']}
+            icon={<Store size={20} color="#ffffff" />}
+            waveColor={['#7dd3fc', '#0284c7']}
           />
           <CurvedCard
             title="EAN COUNT"
             value={totalEan}
-            icon={<Hash size={20} />}
-            waveColor={['#ede9fe', '#a78bfa']}
+            icon={<Hash size={20} color="#ffffff" />}
+            waveColor={['#c084fc', '#9333ea']}
           />
           <CurvedCard
             title="ENCODING TAGS COUNT"
             value={totalTags.toLocaleString('en-IN')}
-            icon={<Tag size={20} />}
-            waveColor={['#fed7aa', '#fb923c']}
+            icon={<Tag size={20} color="#ffffff" />}
+            waveColor={['#fcd34d', '#ea580c']}
           />
         </div>
 

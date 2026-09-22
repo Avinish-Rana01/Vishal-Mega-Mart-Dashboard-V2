@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { RotateCcw } from 'lucide-react';
+import { Store, RotateCcw, Ban, CheckCircle, MinusCircle } from 'lucide-react';
 import AppLayout from '../layout/AppLayout';
 import ReportDataTableCard from './ReportDataTableCard';
 import SearchableDropdown from './SearchableDropdown';
@@ -338,20 +338,18 @@ export default function ReconciliationReportView({ type = 'return' }) {
             <CurvedCard
               title="STORE"
               value={getStoreName()}
-              waveColor={['#ecfccb', '#d9f99d']} // Lime/Yellowish
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7c0f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-              }
+              waveColor={['#7dd3fc', '#0284c7']}
+              icon={<Store size={20} color="#ffffff" />}
             />
           </div>
           <div className="ds-kpi-item">
             <CurvedCard
               title={isReturn ? "RETURN QUANTITY" : "VOID QUANTITY"}
               value={totals.qty.toLocaleString('en-IN')}
-              waveColor={['#fbcfe8', '#f9a8d4']} // Pinkish
+              waveColor={['#f472b6', '#db2777']}
               icon={isReturn 
-                ? <RotateCcw size={18} color="#be185d" />
-                : <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#be185d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                ? <RotateCcw size={20} color="#ffffff" />
+                : <Ban size={20} color="#ffffff" />
               }
             />
           </div>
@@ -359,20 +357,16 @@ export default function ReconciliationReportView({ type = 'return' }) {
             <CurvedCard
               title="ENCODE QUANTITY"
               value={totals.encodeQty.toLocaleString('en-IN')}
-              waveColor={['#bae6fd', '#93c5fd']} // Blueish
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="8" y2="16"></line><line x1="12" y1="8" x2="12" y2="16"></line><line x1="16" y1="10" x2="16" y2="16"></line></svg>
-              }
+              waveColor={['#86efac', '#22c55e']}
+              icon={<CheckCircle size={20} color="#ffffff" />}
             />
           </div>
           <div className="ds-kpi-item">
             <CurvedCard
               title="DIFFERENCE QUANTITY"
               value={totals.differenceQty.toLocaleString('en-IN')}
-              waveColor={['#ccfbf1', '#99f6e4']} // Teal
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-              }
+              waveColor={['#fcd34d', '#ea580c']}
+              icon={<MinusCircle size={20} color="#ffffff" />}
             />
         </div>
       </div>

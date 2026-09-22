@@ -70,28 +70,13 @@ export default function TotalDposSalePage() {
   const [sortColumn, setSortColumn] = useState('ITEM_CD');
   const [sortDirection, setSortDirection] = useState('asc');
 
-  // Gradient presets for CurvedCard
-  const [cardGradients, setCardGradients] = useState([
-    ['hsl(220, 80%, 75%)', 'hsl(250, 85%, 55%)'],
-    ['hsl(160, 80%, 70%)', 'hsl(190, 85%, 50%)'],
-    ['hsl(280, 80%, 75%)', 'hsl(310, 85%, 55%)'],
-    ['hsl(35, 90%, 70%)', 'hsl(15, 90%, 55%)']
-  ]);
-
-  // Generate random distinct gradients on initial mount (like other report pages)
-  useEffect(() => {
-    const baseHue = Math.floor(Math.random() * 360);
-    const gradients = [0, 1, 2, 3, 4]
-      .map(i => {
-        const hue = Math.floor((baseHue + i * (360 / 5)) % 360);
-        return [
-          `hsl(${hue}, 80%, 75%)`, 
-          `hsl(${(hue + 30) % 360}, 85%, 55%)`
-        ];
-      })
-      .sort(() => Math.random() - 0.5);
-    setCardGradients(gradients);
-  }, []);
+  // Vibrant gradient pairs matching Store Sale Report design
+  const cardGradients = useMemo(() => [
+    ['#7dd3fc', '#0284c7'], // Blue: STORE / ASSIGNED STORE
+    ['#86efac', '#22c55e'], // Green: EAN COUNT / TOTAL ARTICLES
+    ['#f472b6', '#db2777'], // Pink: SALE QTY
+    ['#fcd34d', '#ea580c']  // Orange: POS COUNTERS
+  ], []);
 
   // Sync state if location.state changes
   useEffect(() => {
@@ -601,7 +586,7 @@ export default function TotalDposSalePage() {
           <div className="report-curved-cards report-curved-cards">
             <CurvedCard
               title="STORE"
-              value={selectedStore || 'â€”'}
+              value={selectedStore || '—'}
               waveColor={cardGradients[0]}
               icon={<ShoppingBag size={20} color="#ffffff" />}
               animate={false}
@@ -626,7 +611,7 @@ export default function TotalDposSalePage() {
           <div className="report-curved-cards">
             <CurvedCard
               title="ASSIGNED STORE"
-              value={selectedStore || 'â€”'}
+              value={selectedStore || '—'}
               waveColor={cardGradients[0]}
               icon={<ShoppingBag size={20} color="#ffffff" />}
               animate={false}

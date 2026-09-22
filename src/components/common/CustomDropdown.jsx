@@ -39,12 +39,12 @@ export default function CustomDropdown({ options, value, onChange, prefix, butto
     <div 
       ref={containerRef}
       className="custom-dropdown-container"
-      style={{ position: 'relative', width: width ? width : 'auto' }}
+      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: width ? width : 'auto' }}
     >
       <button 
         type="button"
         className="ls-filter-select"
-        style={{ paddingRight: '24px', width: '100%', textAlign: 'left', ...buttonStyle }}
+        style={{ display: 'inline-flex', alignItems: 'center', paddingRight: '22px', width: '100%', textAlign: 'left', ...buttonStyle }}
         onClick={() => setIsOpen(!isOpen)}
       >
         {prefix && <span className="cd-prefix" style={{ color: '#94a3b8', marginRight: '6px' }}>{prefix}</span>}

@@ -69,12 +69,34 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   transition: transform 0.3s ease;
 }
 
 .curve-card-modern:hover .curve-card-icon-wrapper {
   transform: scale(1.1) rotate(5deg);
+}
+
+.curve-card-icon-wrapper svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+/* Strip legacy nested circular badges if present */
+.curve-card-icon-wrapper .hu-card-icon,
+.curve-card-icon-wrapper .dc-card-icon {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .curve-card-waves {
