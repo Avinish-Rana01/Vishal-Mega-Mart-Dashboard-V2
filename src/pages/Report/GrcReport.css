@@ -79,7 +79,7 @@
 }
 
 .report-search-header {
-  background: linear-gradient(to right, #1F4E79, #2F6DA3, #3C7DB8);
+  background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%);
   color: white;
   padding: 4px 20px;
   font-size: 11px;

@@ -8,9 +8,10 @@
 }
 
 .report-search-header {
-  background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
-  color: #ffffff;
-  padding: 6px 20px !important;
+  background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%) !important;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 8px 8px 0 0;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;

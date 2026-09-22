@@ -139,6 +139,7 @@ export default function CustomDatePicker({
         id={id}
         name={name}
         popperPlacement="bottom-start"
+        portalId="root-portal"
         customInput={
           <CustomDateInput 
             placeholder={placeholder} 

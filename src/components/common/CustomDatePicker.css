@@ -9,8 +9,8 @@
 }
 
 /* Ensure react-datepicker wrapper takes full width */
-.vmm-datepicker-wrapper .react-datepicker-wrapper,
-.vmm-datepicker-wrapper .react-datepicker__input-container {
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
   display: block;
   width: 100%;
 }
@@ -38,7 +38,7 @@
 }
 
 .vmm-date-input-container:focus,
-.vmm-datepicker-wrapper .react-datepicker-wrapper:focus-within .vmm-date-input-container {
+.react-datepicker-wrapper:focus-within .vmm-date-input-container {
   background-color: #ffffff;
   border-color: #1d4ed8;
   box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
@@ -108,12 +108,12 @@
    React Datepicker Popover Overrides
    ========================================================================== */
 
-.vmm-datepicker-wrapper .react-datepicker-popper {
+.react-datepicker-popper {
   z-index: 1050 !important;
   padding-top: 6px !important;
 }
 
-.vmm-datepicker-wrapper .react-datepicker {
+.react-datepicker {
   font-family: inherit !important;
   background-color: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
@@ -125,7 +125,7 @@
 }
 
 /* Hide default header */
-.vmm-datepicker-wrapper .react-datepicker__header {
+.react-datepicker__header {
   background-color: #ffffff !important;
   border-bottom: 1px solid #f1f5f9 !important;
   padding: 0 !important;
@@ -222,7 +222,7 @@
 }
 
 /* Day Names Header (S M T W T F S) */
-.vmm-datepicker-wrapper .react-datepicker__day-names {
+.react-datepicker__day-names {
   display: flex;
   justify-content: space-around;
   padding: 8px 10px 4px 10px;
@@ -230,7 +230,7 @@
   background-color: #ffffff;
 }
 
-.vmm-datepicker-wrapper .react-datepicker__day-name {
+.react-datepicker__day-name {
   color: #64748b !important;
   font-size: 11px !important;
   font-weight: 600 !important;
@@ -242,18 +242,18 @@
 }
 
 /* Month & Days Grid */
-.vmm-datepicker-wrapper .react-datepicker__month {
+.react-datepicker__month {
   padding: 4px 10px 8px 10px;
   margin: 0 !important;
 }
 
-.vmm-datepicker-wrapper .react-datepicker__week {
+.react-datepicker__week {
   display: flex;
   justify-content: space-around;
   margin-bottom: 2px;
 }
 
-.vmm-datepicker-wrapper .react-datepicker__day {
+.react-datepicker__day {
   width: 32px !important;
   height: 32px !important;
   line-height: 32px !important;
@@ -267,47 +267,47 @@
   cursor: pointer;
 }
 
-.vmm-datepicker-wrapper .react-datepicker__day:hover:not(.react-datepicker__day--disabled) {
+.react-datepicker__day:hover:not(.react-datepicker__day--disabled) {
   background-color: #eff6ff !important;
   color: #1d4ed8 !important;
   border-radius: 8px !important;
 }
 
 /* Selected Day Style */
-.vmm-datepicker-wrapper .react-datepicker__day--selected,
-.vmm-datepicker-wrapper .react-datepicker__day--keyboard-selected {
-  background-color: #1d4ed8 !important;
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.3) !important;
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.4) !important;
   border-radius: 8px !important;
 }
 
 /* Today Day Style */
-.vmm-datepicker-wrapper .react-datepicker__day--today {
+.react-datepicker__day--today {
   border: 1px solid #bfdbfe !important;
   font-weight: 600 !important;
 }
 
-.vmm-datepicker-wrapper .react-datepicker__day--today.react-datepicker__day--selected {
+.react-datepicker__day--today.react-datepicker__day--selected {
   border: 1px solid #1d4ed8 !important;
 }
 
 /* Outside Month Day */
-.vmm-datepicker-wrapper .react-datepicker__day--outside-month {
+.react-datepicker__day--outside-month {
   color: #cbd5e1 !important;
   pointer-events: none;
 }
 
 /* Disabled Day */
-.vmm-datepicker-wrapper .react-datepicker__day--disabled {
+.react-datepicker__day--disabled {
   color: #cbd5e1 !important;
   cursor: not-allowed !important;
   opacity: 0.5;
 }
 
 /* Hide default triangle pointer */
-.vmm-datepicker-wrapper .react-datepicker__triangle {
+.react-datepicker__triangle {
   display: none !important;
 }
 
@@ -334,9 +334,9 @@
 }
 
 .vmm-dp-today-btn:hover {
-  background-color: #1d4ed8;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
   color: #ffffff;
-  border-color: #1d4ed8;
+  border-color: transparent;
 }
 
 .vmm-dp-footer-clear-btn {
