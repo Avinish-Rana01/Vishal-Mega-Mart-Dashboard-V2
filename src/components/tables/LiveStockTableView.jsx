@@ -4,6 +4,7 @@ import SearchableDropdown from "../common/SearchableDropdown";
 import CustomDatePicker from "../common/CustomDatePicker";
 import CurvedCard from "../common/CurvedCard";
 import ReportStatsHeader from "../common/ReportStatsHeader";
+import { ClearButton } from "../common/ReportActionButton";
 import { getReportStores, searchReportArticles, getReportLiveStock } from "../../services/stockService";
 import './LiveStockTableView.css'; // We'll copy LiveStockReport.css styles here
 import '../../pages/Report/common-reports.css';
@@ -222,16 +223,13 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
             />
           </div>
           <div className="search-buttons">
-            <button 
-              className="btn-clear"
+            <ClearButton
               onClick={() => {
                 setSelectedArticle('');
                 setArticleSearchTerm('');
                 setPageIndex(1);
               }}
-            >
-              Clear
-            </button>
+            />
           </div>
         </div>
       </div>

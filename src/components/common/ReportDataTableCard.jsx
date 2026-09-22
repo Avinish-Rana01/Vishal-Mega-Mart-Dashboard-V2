@@ -144,11 +144,11 @@ export default function ReportDataTableCard({
     <div className="ls-table-wrapper">
       
       <div className="ls-toolbar-top">
-        <button className="ls-export-btn" onClick={handleExportCSV}>
-          Export Data To Excel
-        </button>
-        
-        <div className="ls-toolbar-controls">
+        <div className="ls-toolbar-left">
+          <button className="ls-export-btn" onClick={handleExportCSV}>
+            Export Data To Excel
+          </button>
+          
           <div className="ls-entries-select">
             <span>Show</span>
             
@@ -195,16 +195,16 @@ export default function ReportDataTableCard({
 
             <span>entries</span>
           </div>
-          
-          <div className="ls-search-box">
-            <span>Search:</span>
-            <input 
-              type="text" 
-              placeholder={searchPlaceholder} 
-              value={internalSearch}
-              onChange={(e) => setInternalSearch(e.target.value)}
-            />
-          </div>
+        </div>
+        
+        <div className="ls-search-box">
+          <span>Search:</span>
+          <input 
+            type="text" 
+            placeholder={searchPlaceholder} 
+            value={internalSearch}
+            onChange={(e) => setInternalSearch(e.target.value)}
+          />
         </div>
       </div>
 

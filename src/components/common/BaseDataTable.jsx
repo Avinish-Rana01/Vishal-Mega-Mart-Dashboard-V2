@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 /**
  * Pure React Data Table Component
  * Completely flicker-free: No jQuery DataTables DOM destruction or remounting.
- * Preserves the table structure in the DOM and reconciles row cells in-place.
+ * Modern, clean DashboardDataGrid design system.
  */
 export default function BaseDataTable({
   columns = [],
@@ -89,8 +90,10 @@ export default function BaseDataTable({
             <thead>
               <tr>
                 {columns.map((col) => (
-                  <th key={col.key} className="dt-orderable-asc dt-orderable-desc">
-                    <span className="dt-column-title">{col.label}</span>
+                  <th key={col.key} className="vmm-th">
+                    <div className="vmm-th-content">
+                      <span className="dt-column-title">{col.label}</span>
+                    </div>
                   </th>
                 ))}
               </tr>
@@ -126,17 +129,31 @@ export default function BaseDataTable({
             <thead>
               <tr>
                 {columns.map((col) => {
+                  const isSortable = col.sortable !== false && ordering;
                   const isSorted = activeSortCol === col.key;
-                  const sortClass = isSorted 
-                    ? (activeSortDir === 'asc' ? 'dt-ordering-asc' : 'dt-ordering-desc') 
-                    : '';
                   return (
                     <th 
                       key={col.key} 
-                      className={`dt-orderable-asc dt-orderable-desc ${ordering ? 'sortable' : ''} ${sortClass}`}
-                      onClick={() => handleSort(col.key)}
+                      className={`vmm-th ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`}
+                      onClick={() => isSortable && handleSort(col.key)}
+                      style={col.width ? { width: col.width } : undefined}
                     >
-                      <span className="dt-column-title">{col.label}</span>
+                      <div className="vmm-th-content">
+                        <span className="dt-column-title">{col.label}</span>
+                        {isSortable && (
+                          <span className="vmm-sort-icon-box">
+                            {isSorted ? (
+                              activeSortDir === 'asc' ? (
+                                <ChevronUp size={13} className="vmm-sort-active" />
+                              ) : (
+                                <ChevronDown size={13} className="vmm-sort-active" />
+                              )
+                            ) : (
+                              <ChevronsUpDown size={12} className="vmm-sort-idle" />
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </th>
                   );
                 })}
@@ -145,7 +162,7 @@ export default function BaseDataTable({
             <tbody>
               {sortedData.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                  <td colSpan={columns.length} style={{ textAlign: 'center', padding: '36px 20px', color: '#94a3b8', fontSize: '13px' }}>
                     No matching records found
                   </td>
                 </tr>
@@ -156,9 +173,10 @@ export default function BaseDataTable({
                       key={rowIdx}
                       onClick={() => onRowClick && onRowClick(row)}
                       style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                      className="vmm-tr"
                     >
                       {columns.map((col) => (
-                        <td key={col.key}>
+                        <td key={col.key} className={col.className || ''}>
                           {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
                         </td>
                       ))}
@@ -188,3 +206,4 @@ export default function BaseDataTable({
     </div>
   );
 }
+

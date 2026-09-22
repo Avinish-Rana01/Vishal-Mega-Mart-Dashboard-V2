@@ -781,58 +781,83 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
 .vmm-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
-  text-align: center !important;
-  border-right: 1px solid #bebebe;
-  border-bottom: 1px solid #bebebe;
+  text-align: left;
+  background: #ffffff;
+  border-radius: 8px;
+  font-size: 12px;
+  border: none !important;
 }
 
-.vmm-table th {
-  background-color: #dfdddd;
-  color: #334155;
-  font-weight: 700;
-  padding: 4px 6px !important;
-  border: 1px solid #bebebe;
+.vmm-table thead {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 10;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.vmm-table th,
+.vmm-th {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+  border: none !important;
+  border-bottom: 2px solid #e2e8f0 !important;
   white-space: nowrap;
   user-select: none;
   text-align: center !important;
+  font-size: 12px !important;
 }
 
-.vmm-table th.sortable {
+.vmm-th.sortable {
   cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-.vmm-table th.sortable:hover {
-  background-color: #d8d8d8;
+.vmm-th.sortable:hover {
+  color: #1e40af !important;
+  background-color: #f8fafc !important;
+}
+
+.vmm-th.sorted {
+  color: #1e3a8a !important;
+}
+
+.vmm-tr,
+.vmm-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.vmm-tr:hover,
+.vmm-table tbody tr:hover {
+  background-color: #f8fafc !important;
 }
 
 .vmm-table td {
-  padding: 4px 6px !important;
-  border: 1px solid #bebebe;
-  color: #1e293b;
+  padding: 9px 12px !important;
+  border: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  color: #0f172a;
   white-space: nowrap;
   text-align: center !important;
+  font-size: 12px;
 }
 
-.vmm-table tbody tr:last-child td {
-  border-bottom: 1px solid #bebebe !important;
-}
-
-.vmm-table-striped tbody tr:nth-child(odd) {
-  background-color: #f7f7f7;
-}
-
-.vmm-table tbody tr:hover {
-  background-color: #f1f5f9;
+.vmm-table-striped tbody tr:nth-child(even) {
+  background-color: #fafbfc;
 }
 
 .vmm-table tfoot td {
   font-weight: 700;
-  background-color: #ffffff;
-  border-top: 2px solid #bebebe;
-  border-bottom: 1px solid #bebebe;
+  background-color: #f8fafc;
+  border: none !important;
+  border-top: 2px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
   color: #0f172a;
-  padding: 4px 6px !important;
+  padding: 9px 12px !important;
+  font-size: 12px;
 }
 
 /* Pagination Styling */

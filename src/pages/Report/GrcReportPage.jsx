@@ -6,6 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getReportStores, searchGrcHuNumbers, getGrcDetails } from '../../services/stockService';
 import GrcDetailsModal from '../../components/modals/GrcDetailsModal';
 import './GrcReport.css';
@@ -262,19 +263,17 @@ export default function GrcReportPage() {
             </div>
             
             <div className="search-buttons">
-              <button 
-                className="btn-clear"
+              <ClearButton 
                 onClick={() => {
                   setSelectedHu('');
                   setHuSearchTerm('');
                   setPageIndex(1);
                 }}
-              >
-                Clear
-              </button>
-              <button className="btn-back-summary" onClick={() => navigate(-1)}>
-                Back to GRC Summary
-              </button>
+              />
+              <BackButton 
+                onClick={() => navigate(-1)} 
+                label="Back to GRC Summary" 
+              />
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import './LiveStockReport.css';
 import './DcReport.css';
 import { getDCDetails, getBindStores } from '../../services/stockService';
@@ -288,13 +289,10 @@ export default function DcReportPage() {
             </div>
 
             <div className="search-buttons">
-              <button
-                className="btn-clear"
+              <ClearButton
                 onClick={handleClear}
                 disabled={isLoading}
-              >
-                Clear
-              </button>
+              />
             </div>
           </div>
         </div>

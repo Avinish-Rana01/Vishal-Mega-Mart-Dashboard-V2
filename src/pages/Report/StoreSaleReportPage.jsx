@@ -7,6 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getReportStores, getStoreSaleReport } from '../../services/stockService';
 import './StoreSaleReport.css';
 
@@ -300,14 +301,8 @@ export default function StoreSaleReportPage() {
               />
             </div>
 
-            <div className="store-sale-search-actions">
-              <button 
-                type="button" 
-                className="store-sale-btn-clear"
-                onClick={handleClear}
-              >
-                <RotateCcw size={15} /> Clear
-              </button>
+            <div className="search-buttons">
+              <ClearButton onClick={handleClear} />
             </div>
           </div>
         </div>

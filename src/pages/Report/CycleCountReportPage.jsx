@@ -6,6 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CycleCountModal from '../../components/modals/CycleCountModal';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton } from '../../components/common/ReportActionButton';
 import { getCycleCountReport, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
 import './common-reports.css';
@@ -174,7 +175,7 @@ export default function CycleCountReportPage() {
               </div>
 
               <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
-                <button className="btn-clear" onClick={handleClear} style={{ padding: '8px 24px', backgroundColor: '#94a3b8', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>Clear</button>
+                <ClearButton onClick={handleClear} />
               </div>
             </div>
           </div>

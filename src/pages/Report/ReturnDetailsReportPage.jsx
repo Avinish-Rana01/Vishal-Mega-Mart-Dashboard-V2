@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RotateCcw } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
@@ -7,6 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import './LiveStockReport.css'; // Standard report styles
 import { getReturnDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
@@ -181,12 +182,8 @@ export default function ReturnDetailsReportPage() {
             </div>
 
             <div className="search-buttons">
-              <button className="btn-clear" onClick={handleClear}>
-                Clear
-              </button>
-              <button onClick={() => navigate(-1)} className="report-btn-secondary">
-                Back to Return Summary
-              </button>
+              <ClearButton onClick={handleClear} />
+              <BackButton onClick={() => navigate(-1)} label="Back to Return Summary" />
             </div>
           </div>
         </div>

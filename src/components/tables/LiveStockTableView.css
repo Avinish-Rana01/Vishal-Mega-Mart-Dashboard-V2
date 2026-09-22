@@ -175,9 +175,10 @@
 
 .search-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-end;
   margin-top: 31px;
+  flex-shrink: 0;
 }
 
 .btn-search {
@@ -275,3 +276,25 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Universal scrollbar hiding for Live Stock page layout while preserving scroll functionality */
+.vmm-dashboard-body,
+.vmm-main-wrapper,
+.flex-col-main,
+.livestock-table-view,
+.livestock-report-table-wrapper {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.vmm-dashboard-body::-webkit-scrollbar,
+.vmm-main-wrapper::-webkit-scrollbar,
+.flex-col-main::-webkit-scrollbar,
+.livestock-table-view::-webkit-scrollbar,
+.livestock-report-table-wrapper::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+

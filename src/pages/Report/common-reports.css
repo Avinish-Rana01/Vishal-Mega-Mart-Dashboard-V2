@@ -92,7 +92,7 @@
 
 .report-search-body {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 15px;
   padding: 8px 20px 10px 20px;
 }
@@ -178,8 +178,9 @@
 .search-buttons {
   display: flex;
   gap: 10px;
-  align-items: flex-end;
-  margin-top: 31px;
+  align-items: center;
+  margin-top: 20px; /* Label height (11px + 4px margin) + small visual tweak */
+  height: 38px; /* Match standard input height to center button */
 }
 
 .btn-search {
@@ -330,35 +331,163 @@
   border: 1px solid #fecaca;
 }
 
-/* Ensure data table container and closing borders on every report page */
 .vmm-table-container {
   overflow-x: auto;
   width: 100%;
-  padding-right: 1px;
   box-sizing: border-box;
+  margin: 6px 0 10px 0;
+  scrollbar-width: thin !important;
+  scrollbar-color: #cbd5e1 #f8fafc !important;
+  -ms-overflow-style: auto !important;
+}
+
+.vmm-table-container::-webkit-scrollbar {
+  display: block !important;
+  height: 6px !important;
+  width: 6px !important;
+}
+
+.vmm-table-container::-webkit-scrollbar-track {
+  background: #f8fafc !important;
+  border-radius: 10px;
+}
+
+.vmm-table-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1 !important;
+  border-radius: 10px;
+}
+
+.vmm-table-container::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8 !important;
 }
 
 .vmm-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
-  text-align: center !important;
-  border-right: 1px solid #bebebe;
-  border-bottom: 1px solid #bebebe;
+  text-align: left;
+  background: #ffffff;
+  border-radius: 8px;
+  font-size: 12px;
+  border: none !important;
+}
+
+.vmm-table thead {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 10;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .vmm-table th,
+.vmm-th {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+  border: none !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  white-space: nowrap;
+  user-select: none;
+  text-align: center !important;
+  font-size: 12px !important;
+}
+
+.vmm-th.sortable {
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.vmm-th.sortable:hover {
+  color: #1e40af !important;
+  background-color: #f8fafc !important;
+}
+
+.vmm-th.sorted {
+  color: #1e3a8a !important;
+}
+
+.vmm-th-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.vmm-sort-icon-box {
+  display: inline-flex;
+  align-items: center;
+}
+
+.vmm-sort-idle {
+  color: #94a3b8;
+  opacity: 0.6;
+}
+
+.vmm-sort-active {
+  color: #2563eb;
+}
+
+.vmm-tr,
+.vmm-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.vmm-tr:hover,
+.vmm-table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
 .vmm-table td {
-  border: 1px solid #bebebe;
+  padding: 9px 12px !important;
+  border: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  color: #0f172a;
+  white-space: nowrap;
+  text-align: center !important;
+  font-size: 12px;
 }
 
-.vmm-table th:last-child,
-.vmm-table td:last-child {
-  border-right: 1px solid #bebebe !important;
+.vmm-table-striped tbody tr:nth-child(even) {
+  background-color: #fafbfc;
 }
 
-.vmm-table tbody tr:last-child td {
-  border-bottom: 1px solid #bebebe !important;
+.vmm-table tfoot td {
+  font-weight: 700;
+  background-color: #f8fafc;
+  border: none !important;
+  border-top: 2px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #0f172a;
+  padding: 9px 12px !important;
+  font-size: 12px;
 }
+
+/* Universal scrollbar hiding for outer page containers while preserving scroll functionality */
+.vmm-dashboard-body,
+.vmm-main-wrapper,
+.flex-col-main,
+.common-reports-container,
+.livestock-table-view,
+.livestock-report-table-wrapper,
+.report-page-container {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.vmm-dashboard-body::-webkit-scrollbar,
+.vmm-main-wrapper::-webkit-scrollbar,
+.flex-col-main::-webkit-scrollbar,
+.common-reports-container::-webkit-scrollbar,
+.livestock-table-view::-webkit-scrollbar,
+.livestock-report-table-wrapper::-webkit-scrollbar,
+.report-page-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+
 
 

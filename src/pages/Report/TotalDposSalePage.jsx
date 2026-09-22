@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, RotateCcw, ShoppingBag, BarChart2, Hash, Layers, FileText, Tag } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
@@ -7,6 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { 
   getReportStores, 
   getSaleData, 
@@ -568,17 +569,9 @@ export default function TotalDposSalePage() {
 
             {/* Action Buttons */}
             <div className="search-buttons">
-              <button 
-                type="button" 
-                className="btn-clear"
-                onClick={handleResetFilters}
-              >
-                <RotateCcw size={15} /> {isThreeCardMode ? 'Clear' : 'Reset'}
-              </button>
+              <ClearButton onClick={handleResetFilters} />
 
-              <button
-                type="button"
-                className="sales-btn-back"
+              <BackButton
                 onClick={() => navigate('/reports/store-sale', {
                   state: {
                     store: selectedStore,
@@ -586,9 +579,8 @@ export default function TotalDposSalePage() {
                     toDate
                   }
                 })}
-              >
-                Back to Sale Summary
-              </button>
+                label="Back to Sale Summary"
+              />
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import SearchableDropdown from './SearchableDropdown';
 import CustomDatePicker from './CustomDatePicker';
 import CurvedCard from './CurvedCard';
 import ReportStatsHeader from './ReportStatsHeader';
+import { ClearButton, BackButton } from './ReportActionButton';
 import '../../pages/Report/LiveStockReport.css'; // Standard report styles
 import '../../pages/Report/common-reports.css';
 import {
@@ -315,12 +316,11 @@ export default function ReconciliationReportView({ type = 'return' }) {
             </div>
 
             <div className="search-buttons">
-              <button className="btn-clear" onClick={handleClear}>
-                Clear
-              </button>
-              <button onClick={() => navigate(-1)} className="report-btn-secondary">
-                {isReturn ? 'Back to Return Summary' : 'Back to Void Summary'}
-              </button>
+              <ClearButton onClick={handleClear} />
+              <BackButton 
+                onClick={() => navigate(-1)} 
+                label={isReturn ? 'Back to Return Summary' : 'Back to Void Summary'} 
+              />
             </div>
           </div>
         </div>

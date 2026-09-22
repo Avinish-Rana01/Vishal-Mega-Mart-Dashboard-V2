@@ -6,6 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import './LiveStockReport.css';
 import './HuReport.css';
 import { getHuDetails, searchValidationHuNumbers } from '../../services/stockService';
@@ -341,19 +342,14 @@ export default function HuReportPage() {
             </div>
 
             <div className="search-buttons">
-              <button
-                className="btn-clear"
+              <ClearButton
                 onClick={handleClear}
                 disabled={isLoading}
-              >
-                Clear
-              </button>
-              <button
-                className="btn-back-dc"
+              />
+              <BackButton
                 onClick={() => navigate('/reports/dc-report', { state: { storeCode: receivingPlant } })}
-              >
-                Back to DC Summary
-              </button>
+                label="Back to DC Summary"
+              />
             </div>
           </div>
         </div>
