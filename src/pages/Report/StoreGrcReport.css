@@ -4,8 +4,8 @@
 .grc-report-cards {
   display: grid;
   grid-template-columns: repeat(5, 1fr) !important; /* 5 columns instead of 3 */
-  gap: 5px;
-  margin: 0 15px 5px 15px;
+  gap: 4px;
+  margin: 0 12px 4px 12px;
   /* padding: 0 15px; */
 }
 

@@ -3,7 +3,7 @@
   background-color: #eceef0;
   overflow-y: auto;
   height: 100%;
-  padding: 16px 12px;
+  padding: 13px 10px;
   
 }
 
@@ -16,15 +16,15 @@
   margin: 0 auto;
   /* margin: 20px; */
   border: solid rgb(232, 232, 232) 2px;
-  padding: 14px;
-  border-radius: 18px;
+  padding: 11px;
+  border-radius: 14px;
   background-color: #ffffff;
   
 }
 .ls-grid2 {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  gap: 11px;
   min-width: 0;
 }
 /* Ensure any copied section cards take up full width in V2 */

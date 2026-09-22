@@ -1,9 +1,9 @@
 .vmm-chart-card {
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
   border: 1px solid #e2e8f0;
-  padding: 12px 16px;
+  padding: 10px 13px;
   height: 100%;
   display: flex;
 }
@@ -16,13 +16,13 @@
 .vmm-chart-container {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 13px;
   position: relative;
 }
 
 .vmm-chart-graphic {
   flex: 0 0 45%;
-  min-width: 200px;
+  min-width: 160px;
 }
 
 .vmm-chart-legend {
@@ -32,51 +32,51 @@
 }
 
 .vmm-chart-header h3 {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   color: #1e293b;
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
 }
 
 .vmm-chart-header p {
-  font-size: 13px;
+  font-size: 10px;
   color: #94a3b8;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
 }
 
 .vmm-mb-large {
-  margin-bottom: 16px !important;
+  margin-bottom: 13px !important;
 }
 
 .vmm-chart-legend-items {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 11px;
 }
 
 .vmm-compact-items {
-  gap: 8px;
+  gap: 6px;
 }
 
 .vmm-legend-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
-  font-size: 14px;
+  margin-bottom: 5px;
+  font-size: 11px;
 }
 
 .vmm-legend-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #475569;
   font-weight: 500;
 }
 
 .vmm-legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   display: inline-block;
 }
@@ -84,7 +84,7 @@
 .vmm-legend-stats {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .vmm-legend-value {
@@ -94,8 +94,8 @@
 
 .vmm-legend-percent {
   color: #94a3b8;
-  font-size: 13px;
-  min-width: 45px;
+  font-size: 10px;
+  min-width: 36px;
   text-align: right;
 }
 
@@ -116,17 +116,17 @@
 }
 
 .vmm-recycle-icon {
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .vmm-semi-circle-label {
-  font-size: 12px;
+  font-size: 10px;
   color: #64748b;
   margin-bottom: 2px;
 }
 
 .vmm-semi-circle-value {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: #1e293b;
 }
@@ -137,20 +137,20 @@
   right: 0;
   background-color: #f1f5f9;
   border: 1px solid #cbd5e1;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 13px;
+  font-size: 10px;
   color: #334155;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .vmm-chart-badge-corner strong {
   color: #0d9488;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .vmm-trend-icon {
-  font-size: 16px;
+  font-size: 13px;
 }

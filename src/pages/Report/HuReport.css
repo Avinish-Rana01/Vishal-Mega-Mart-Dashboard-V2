@@ -10,8 +10,8 @@
 .hu-curved-cards {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 5px;
-  margin: 0 15px 5px 15px;
+  gap: 4px;
+  margin: 0 12px 4px 12px;
 }
 
 @media (max-width: 1200px) {
@@ -27,8 +27,8 @@
 }
 
 .hu-card-icon {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -78,9 +78,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -99,12 +99,12 @@
   background: #64748b;
   color: white;
   border: none;
-  padding: 0 18px;
-  height: 34px;
-  border-radius: 13px;
+  padding: 0 14px;
+  height: 27px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 10px;
   transition: all 0.2s ease;
   white-space: nowrap;
 }

@@ -4,10 +4,10 @@
 }
 
 .custom-select-trigger {
-  padding: 0 15px;
+  padding: 0 12px;
   width: 100%;
-  height: 38px;
-  border-radius: 13px;
+  height: 30px;
+  border-radius: 10px;
   background: #f9f9f9;
   border: 1px solid #cbd5e1;
   display: flex;
@@ -17,7 +17,7 @@
 }
 
 .custom-select-trigger span {
-  font-size: 11px;
+  font-size: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -34,7 +34,7 @@
 .custom-select-trigger-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .custom-select-clear-btn {
@@ -69,30 +69,30 @@
   left: 0;
   right: 0;
   background: white;
-  margin-top: 4px;
+  margin-top: 3px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  padding: 8px 0;
+  padding: 6px 0;
   z-index: 1100;
 }
 
 .custom-select-search-wrapper {
-  padding: 0 8px 8px 8px;
+  padding: 0 6px 6px 6px;
   border-bottom: 1px solid #f1f5f9;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   position: relative;
 }
 
 .custom-select-search-wrapper input.custom-select-search-input {
   width: 100% !important;
-  padding: 8px 12px !important;
-  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
   border: 1px solid #cbd5e1 !important;
   outline: none !important;
   box-shadow: none !important;
   appearance: none !important;
-  font-size: 11px !important;
+  font-size: 10px !important;
   box-sizing: border-box !important;
   color: #334155 !important;
   background-color: #ffffff !important;
@@ -107,14 +107,14 @@
 }
 
 .custom-select-options-list {
-  max-height: 200px;
+  max-height: 160px;
   overflow-y: auto;
 }
 
 .custom-select-option {
-  padding: 8px 16px;
+  padding: 6px 13px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 10px;
   color: #334155;
   display: flex;
   justify-content: space-between;
@@ -131,17 +131,17 @@
 }
 
 .custom-select-option-empty {
-  padding: 8px 16px;
+  padding: 6px 13px;
   color: #94a3b8;
   font-style: italic;
   cursor: default;
-  font-size: 13px;
+  font-size: 10px;
 }
 
 .custom-select-option-loading {
-  padding: 8px 16px;
+  padding: 6px 13px;
   color: #ef4444;
   font-style: italic;
   cursor: default;
-  font-size: 13px;
+  font-size: 10px;
 }

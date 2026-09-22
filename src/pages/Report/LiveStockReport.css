@@ -2,18 +2,18 @@
 
 .report-curved-cards {
   display: flex;
-  gap: 5px;
-  margin: 0 15px 5px 15px;
+  gap: 4px;
+  margin: 0 12px 4px 12px;
 }
 
 .curve-card {
   flex: 1;
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0,0,0,0.02);
   position: relative;
   overflow: hidden;
-  min-height: 80px;
+  min-height: 64px;
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(226, 232, 240, 0.8);
@@ -34,13 +34,13 @@
 .card-top {
   display: flex;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 8px 16px;
   z-index: 1;
 }
 
 .card-content p {
   margin: 0;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
@@ -48,18 +48,18 @@
 
 .card-content h3 {
   margin: -1px 0 0 0;
-  font-size: 22px;
+  font-size: 18px;
   color: #0f172a;
 }
 
 .card-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 15px;
+  margin-top: 12px;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
@@ -96,7 +96,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 40px;
+  height: 32px;
   background-size: cover;
   background-repeat: no-repeat;
 }

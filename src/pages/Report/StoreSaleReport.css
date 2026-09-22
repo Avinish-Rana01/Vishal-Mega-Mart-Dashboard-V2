@@ -3,16 +3,16 @@
 
 /* Filter Card Margins & 3-Column Grid */
 .report-search-card {
-  margin: 15px 15px 5px 15px !important;
-  border-radius: 14px;
+  margin: 12px 12px 4px 12px !important;
+  border-radius: 11px;
 }
 
 .report-search-header {
   background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%) !important;
   color: #fff;
-  padding: 8px 15px;
-  border-radius: 8px 8px 0 0;
-  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 6px 6px 0 0;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-align: right;
@@ -23,8 +23,8 @@
 .report-search-body-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr 1fr auto !important;
-  gap: 20px !important;
-  padding: 18px 24px !important;
+  gap: 16px !important;
+  padding: 14px 19px !important;
   align-items: flex-start;
 }
 
@@ -35,9 +35,9 @@
 }
 
 .report-search-body-grid .search-field label {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   color: #475569;
 }
 
@@ -47,8 +47,8 @@
   flex-direction: row !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 14px !important;
-  margin-top: 10px !important;
+  gap: 11px !important;
+  margin-top: 8px !important;
   height: auto !important;
 }
 
@@ -56,15 +56,15 @@
   background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
   color: #ffffff !important;
   border: none !important;
-  padding: 0 24px !important;
-  height: 38px !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
+  padding: 0 19px !important;
+  height: 30px !important;
+  border-radius: 16px !important;
+  font-size: 10px !important;
   font-weight: 600 !important;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   box-shadow: 0 2px 6px rgba(29, 78, 216, 0.25);
   transition: all 0.2s ease;
 }
@@ -79,15 +79,15 @@
   background: #94a3b8 !important;
   color: #ffffff !important;
   border: 1px solid #94a3b8 !important;
-  padding: 0 22px !important;
-  height: 38px !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
+  padding: 0 18px !important;
+  height: 30px !important;
+  border-radius: 16px !important;
+  font-size: 10px !important;
   font-weight: 600 !important;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   box-shadow: 0 2px 4px rgba(148, 163, 184, 0.2);
   transition: all 0.2s ease;
 }
@@ -102,16 +102,16 @@
 
 /* Info Bar Margins */
 .report-selected-info-bar {
-  margin: 0 15px 5px 15px !important;
-  padding: 8px 14px !important;
+  margin: 0 12px 4px 12px !important;
+  padding: 6px 11px !important;
 }
 
 /* 4 KPI Curved Cards */
 .store-sale-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 5px !important;
-  margin: 0 15px 5px 15px !important;
+  gap: 4px !important;
+  margin: 0 12px 4px 12px !important;
 }
 
 @media (max-width: 1024px) {
@@ -128,7 +128,7 @@
 
 /* Data Table Wrapper Margins */
 .report-table-wrapper {
-  padding: 0 15px 20px 15px !important;
+  padding: 0 12px 16px 12px !important;
 }
 
 /* Custom Clickable Link in Table */

@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 8px 16px;
   background-color: #f1f5f9;
   border-bottom: 1px solid #cbd5e1;
 }
@@ -13,15 +13,15 @@
 }
 
 .vmm-page-title {
-  margin: 0 0 4px 0;
-  font-size: 16px;
+  margin: 0 0 3px 0;
+  font-size: 13px;
   color: #1e293b;
   font-weight: 800;
   letter-spacing: 0.5px;
 }
 
 .vmm-breadcrumb {
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
@@ -33,16 +33,16 @@
 
 .vmm-header-right {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .btn-back {
   background: #ef4444;
   color: white;
   border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -54,9 +54,9 @@
   background: #1e293b;
   color: white;
   border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -65,8 +65,8 @@
 
 .report-search-card {
   background: #ffffff;
-  margin: 10px 0;
-  border-radius: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0,0,0,0.02);
   border: 1px solid rgba(226, 232, 240, 0.8);
   transition: box-shadow 0.3s ease;
@@ -81,8 +81,8 @@
 .report-search-header {
   background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%);
   color: white;
-  padding: 4px 20px;
-  font-size: 11px;
+  padding: 3px 16px;
+  font-size: 10px;
   font-weight: 700;
   text-align: right;
   border-top-left-radius: 11px;
@@ -92,8 +92,8 @@
 .report-search-body {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 8px 20px 10px 20px;
+  gap: 12px;
+  padding: 6px 16px 8px 16px;
 }
 
 .search-field {
@@ -103,9 +103,9 @@
 }
 
 .search-field label {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   color: #64748b;
 }
 
@@ -113,10 +113,10 @@
   display: flex;
   align-items: center;
   border: 1px solid #cbd5e1;
-  border-radius: 13px;
+  border-radius: 10px;
   background: #f9f9f9;
   overflow: hidden;
-  height: 40px;
+  height: 32px;
   transition: all 0.2s ease;
 }
 
@@ -128,34 +128,34 @@
 
 .input-group input {
   flex: 1;
-  padding: 0 15px;
+  padding: 0 12px;
   border: none;
   background: transparent;
   outline: none;
-  font-size: 13px;
+  font-size: 10px;
   color: #334155;
 }
 
 .btn-input-clear {
   background: transparent;
   border: none;
-  padding: 0 12px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #94a3b8;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .search-field select {
-  padding: 0 15px;
+  padding: 0 12px;
   border: 1px solid #cbd5e1;
-  border-radius: 13px;
+  border-radius: 10px;
   background: #f8fafc;
   width: 100%;
-  height: 34px;
-  font-size: 13px;
+  height: 27px;
+  font-size: 10px;
   color: #334155;
   outline: none;
   transition: all 0.2s ease;
@@ -164,7 +164,7 @@
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 16px;
-  padding-right: 40px;
+  padding-right: 32px;
 }
 
 .search-field select:focus {
@@ -175,22 +175,22 @@
 
 .search-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-end;
-  margin-top: 31px;
+  margin-top: 25px;
 }
 
 .btn-search {
   background: #3575ad;
   color: white;
   border: none;
-  padding: 0 25px;
-  height: 34px;
-  border-radius: 13px;
+  padding: 0 20px;
+  height: 27px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
-  width: 143px;
+  font-size: 10px;
+  width: 114px;
 }
 
 .btn-search:hover {
@@ -203,13 +203,13 @@
   background: #9ca3af;
   color: white;
   border: none;
-  padding: 0 25px;
-  height: 34px;
-  border-radius: 13px;
+  padding: 0 20px;
+  height: 27px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
-  width: 143px;
+  font-size: 10px;
+  width: 114px;
 }
 
 .btn-clear:hover {
@@ -221,9 +221,9 @@
 .report-stats-header {
   display: flex;
   justify-content: space-between;
-  padding: 4px 20px;
+  padding: 3px 16px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 10px;
   color: #334155;
   background: transparent;
   margin: 0 0;
@@ -232,18 +232,18 @@
 
 .report-curved-cards {
   display: flex;
-  gap: 15px;
-  margin: 15px 0;
+  gap: 12px;
+  margin: 12px 0;
 }
 
 .curve-card {
   flex: 1;
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0,0,0,0.02);
   position: relative;
   overflow: hidden;
-  min-height: 80px;
+  min-height: 64px;
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(226, 232, 240, 0.8);
@@ -252,12 +252,12 @@
 
 /* .report-selected-info-bar {
   display: flex;
-  gap: 30px;
-  padding: 8px 15px;
+  gap: 24px;
+  padding: 6px 12px;
   background: #e2e8f0;
-  border-radius: 8px;
-  margin: 10px 0;
-  font-size: 12px;
+  border-radius: 6px;
+  margin: 8px 0;
+  font-size: 10px;
   font-weight: 700;
   color: #1e293b;
   border: 1px solid #cbd5e1;
@@ -273,7 +273,7 @@
   flex: 1;
   margin: 0;
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0,0,0,0.02);
   border: 1px solid rgba(226, 232, 240, 0.8);
   overflow: hidden;

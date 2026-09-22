@@ -12,7 +12,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   gap: 0px;
 }
 
@@ -24,7 +24,7 @@
 }
 
 .vmm-toolbar-title {
-  font-size: 15px;
+  font-size: 12px;
   /* font-weight: 700; */
   color: #1e3a8a;
   text-transform: uppercase;
@@ -53,7 +53,7 @@
 
 .vmm-search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -69,16 +69,16 @@
 }
 
 .vmm-search-input {
-  width: 130px;
-  padding: 8px 16px 8px 36px;
+  width: 104px;
+  padding: 6px 13px 6px 29px;
   background: transparent;
   border: none;
   outline: none;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 500;
   color: #1e293b;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 35px;
+  height: 28px;
 }
 
 .vmm-search-input::placeholder {
@@ -88,18 +88,18 @@
 
 .vmm-search-clear {
   position: absolute;
-  right: 10px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
   border: none;
   color: #94a3b8;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 3px;
 }
 
 .vmm-search-clear:hover {
@@ -112,7 +112,7 @@
     flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 8px !important;
+    gap: 6px !important;
   }
 
   .vmm-toolbar-title {
@@ -126,14 +126,14 @@
     align-items: center !important;
     justify-content: flex-end !important;
     flex-wrap: wrap !important;
-    gap: 8px !important;
+    gap: 6px !important;
   }
 
   .vmm-search-container {
     width: 100% !important;
-    height: 35px;
+    height: 28px;
     order: 3;
-    margin-top: 8px;
+    margin-top: 6px;
   }
   
   .vmm-search-input {
@@ -156,17 +156,17 @@
 }
 
 .vmm-chart-scroll-container::-webkit-scrollbar {
-  height: 6px;
+  height: 5px;
 }
 
 .vmm-chart-scroll-container::-webkit-scrollbar-track {
   background: #f8fafc;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .vmm-chart-scroll-container::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .vmm-chart-scroll-container::-webkit-scrollbar-thumb:hover {

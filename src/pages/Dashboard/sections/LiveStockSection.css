@@ -3,7 +3,7 @@
 .ls-dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: #334155;
@@ -13,36 +13,36 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .ls-header h1 {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #0f172a;
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
 }
 
 .ls-header p {
-  font-size: 14px;
+  font-size: 11px;
   color: #64748b;
   margin: 0;
 }
 
 .ls-header-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .ls-btn {
-  padding: 10px 16px;
+  padding: 8px 13px;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s ease;
 }
 
@@ -71,7 +71,7 @@
 .ls-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -79,8 +79,8 @@
 .ls-card {
   /* background: white; */
   background: #ffffff;
-  border-radius: 20px;
-  padding: 2px 10px 8px 10px;
+  border-radius: 16px;
+  padding: 2px 8px 6px 8px;
   /* box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); */
   position: relative;
   display: flex;
@@ -91,10 +91,10 @@
 }
 
 .ls-card-title {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 500;
   color: #475569;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
 }
 
 .ls-card-active .ls-card-title {
@@ -102,9 +102,9 @@
 }
 
 .ls-card-value {
-  font-size: clamp(14px, 1.8vw, 28px);
+  font-size: clamp(11px, 1.8vw, 22px);
   font-weight: 700;
-  margin: 0 0 16px 0;
+  margin: 0 0 13px 0;
   color: #0f172a;
   line-height: 1;
   white-space: nowrap;
@@ -118,10 +118,10 @@
 
 .ls-card-icon {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 32px;
-  height: 32px;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -140,8 +140,8 @@
 .ls-card-subtext {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 10px;
   color: #64748b;
   margin-top: auto;
 }
@@ -161,9 +161,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 10px;
   font-weight: 700;
   background: #dcfce7;
   color: #166534;
@@ -190,30 +190,30 @@
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 5px;
+  gap: 4px;
 }
 
 .ls-section-title {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   color: #0f172a;
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
 }
 
 /* Donut Chart Layout */
 .ls-donut-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 60px;
+  gap: 48px;
   align-items: center;
   justify-content: center;
-  margin: 0 10px 0 10px;
+  margin: 0 8px 0 8px;
 }
 
 .ls-donut-wrapper {
   position: relative;
-  width: 190px;
-  height: 190px;
+  width: 152px;
+  height: 152px;
   flex-shrink: 0;
 }
 
@@ -221,14 +221,14 @@
 .ls-list-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 10px;
+  padding: 10px 0;
   border-bottom: 1px solid #c9c9c9;
 }
 
 .ls-list-item:hover {
   background-color: #dfdfdf;
-  border-radius: 9px;
+  border-radius: 7px;
 
 }
 
@@ -237,8 +237,8 @@
 }
 
 .ls-item-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #eff6ff;
   color: #1d4ed8;
@@ -256,25 +256,25 @@
 }
 
 .ls-item-title {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   color: #0f172a;
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .ls-item-subtitle {
-  font-size: 12px;
+  font-size: 10px;
   color: #64748b;
   margin: 0;
 }
 
 .ls-item-status {
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -297,14 +297,14 @@
 .ls-donut-container {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 32px;
   height: 100%;
 }
 
 .ls-donut-wrapper {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 176px;
+  height: 176px;
   flex-shrink: 0;
 }
 
@@ -344,13 +344,13 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  gap: 12px;
+  margin-bottom: 6px;
+  gap: 10px;
 }
 
 .ls-toolbar-controls {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -359,17 +359,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   position: relative;
   z-index: 9;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .ls-toolbar-controls-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -388,8 +388,8 @@
   .ls-toolbar-secondary {
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 5px;
+    margin-bottom: 5px;
   }
 
   .ls-toolbar-controls-left {
@@ -402,25 +402,25 @@
 
   .ls-toolbar-controls-left > div:first-child,
   .ls-search-wrapper {
-    width: calc(50% - 6px) !important;
+    width: calc(50% - 5px) !important;
     flex: none !important;
   }
 
   .ls-filter-container {
     width: 100%;
     justify-content: space-between;
-    height: 35px;
+    height: 28px;
   }
 
   /* Donut Responsive */
   .ls-donut-container {
     flex-direction: column;
-    gap: 30px !important;
+    gap: 24px !important;
   }
 
   .ls-donut-wrapper {
     margin: 0 auto;
-    width: min(220px, 100vw - 60px) !important;
+    width: min(176px, 100vw - 48px) !important;
     height: auto !important;
     aspect-ratio: 1;
   }
@@ -435,13 +435,13 @@
   backdrop-filter: blur(8px);
   border: 1px solid rgba(203, 213, 225, 0.5);
   border-radius: 999px;
-  padding:  0 4px;
+  padding:  0 3px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02), inset 0 1px 2px rgba(255, 255, 255, 0.8);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: center;
   position: relative;
   z-index: 10;
-  height: 35px;
+  height: 28px;
 }
 
 .ls-filter-container:focus-within {
@@ -452,9 +452,9 @@
 }
 
 .ls-filter-label {
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   color: #1e293b;
   background: rgba(241, 245, 249, 0.8);
@@ -465,7 +465,7 @@
 }
 
 .ls-filter-select {
-  padding: 4px 20px 4px 8px;
+  padding: 3px 16px 3px 6px;
   border-radius: 999px;
   border: none;
   background-color: transparent;
@@ -476,7 +476,7 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
   color: #3b82f6;
   outline: none;
@@ -492,16 +492,16 @@
   position: relative;
   display: flex;
   align-items: center;
-  margin: 0 4px;
+  margin: 0 3px;
 }
 
 .ls-filter-input {
-  width: 55px;
-  padding: 4px 18px 4px 8px;
+  width: 44px;
+  padding: 3px 14px 3px 6px;
   border-radius: 999px;
   border: 1px solid transparent;
   background: rgba(241, 245, 249, 0.4);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   color: #0f172a;
   outline: none;
@@ -522,18 +522,18 @@
 
 .ls-filter-percent {
   position: absolute;
-  right: 10px;
+  right: 8px;
   color: #64748b;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   pointer-events: none;
 }
 
 .ls-filter-btn {
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 999px;
   border: none;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -570,15 +570,15 @@
 /* Custom Animated Dropdown */
 .ls-dropdown-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   left: 0;
-  min-width: 130px;
+  min-width: 104px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 6px;
+  border-radius: 10px;
+  padding: 5px;
   z-index: 9999;
   animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -596,9 +596,9 @@
 }
 
 .ls-dropdown-item {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 10px;
   font-weight: 600;
   color: #475569;
   cursor: pointer;
@@ -620,7 +620,7 @@
   .ls-coverage-legend {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px 14px !important;
+    gap: 10px 11px !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -634,22 +634,22 @@
   }
 
   .ls-coverage-label-row {
-    font-size: 13px !important;
-    gap: 4px !important;
+    font-size: 10px !important;
+    gap: 3px !important;
   }
 
   .ls-coverage-name {
-    font-size: 13px !important;
-    gap: 6px !important;
+    font-size: 10px !important;
+    gap: 5px !important;
   }
 
   .ls-coverage-values {
-    gap: 6px !important;
+    gap: 5px !important;
   }
 
   .ls-coverage-values span:last-child {
-    font-size: 11px !important;
-    min-width: 36px !important;
+    font-size: 10px !important;
+    min-width: 29px !important;
   }
 }
 
@@ -660,10 +660,10 @@
 .live-sync-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 3px 8px;
   border-radius: 9999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
   transition: all 0.3s ease;
@@ -690,8 +690,8 @@
 }
 
 .live-sync-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: currentColor;
 }

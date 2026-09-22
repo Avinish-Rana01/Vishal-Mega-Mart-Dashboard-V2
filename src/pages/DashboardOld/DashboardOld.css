@@ -30,14 +30,14 @@
 
 /* Left Sidebar */
 .vmm-sidebar {
-  width: 76px;
+  width: 61px;
   background: linear-gradient(180deg, #0ea5e9 0%, #2563eb 100%);
   border-right: none;
   display: flex;
   gap: -1px;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 16px 0;
   z-index: 100;
   /* box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1); */
   position: relative;
@@ -63,18 +63,18 @@
 .vmm-sidebar-logo {
   border-radius: 50%;
   /* background: #ffffff;
-  padding: 10px; */
-  width: 50px;
-  height: 50px;
+  padding: 8px; */
+  width: 40px;
+  height: 40px;
   /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 13px;
   /* overflow: hidden; */
   /* padding: 4px; */
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
   position: relative;
   z-index: 1;
@@ -89,7 +89,7 @@
 .vmm-sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 19px;
   width: 100%;
   align-items: center;
   position: relative;
@@ -97,9 +97,9 @@
 }
 
 .vmm-nav-item {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,7 +127,7 @@
 /* Responsive Sidebar / Bottom Nav */
 @media (max-width: 767px) {
   .vmm-sidebar {
-    width: 76px;
+    width: 61px;
     height: 100vh;
     position: fixed;
     top: 0;
@@ -187,12 +187,12 @@
 
 /* Top Header Bar */
 .vmm-top-header {
-  height: 60px;
+  height: 48px;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 19px;
   /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); */
   z-index: 50;
 }
@@ -201,11 +201,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .vmm-brand-title {
-  font-size: clamp(16px, 4vw, 22px);
+  font-size: clamp(13px, 4vw, 18px);
   font-weight: 700;
   color: #0f172a;
   letter-spacing: 0.5px;
@@ -213,7 +213,7 @@
 }
 
 .vmm-breadcrumbs {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: #64748b;
   letter-spacing: 0.5px;
@@ -229,7 +229,7 @@
   }
 
   .vmm-top-header {
-    padding: 0 16px;
+    padding: 0 13px;
   }
 }
 
@@ -249,13 +249,13 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .vmm-user-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
   color: #ffffff;
   display: flex;
@@ -276,9 +276,9 @@
   background: #ef4444;
   color: white;
   border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -292,14 +292,14 @@
 
 .vmm-user-dropdown {
   position: absolute;
-  top: 48px;
+  top: 38px;
   right: 0;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  width: 200px;
-  padding: 12px;
+  width: 160px;
+  padding: 10px;
   z-index: 1000;
   animation: fadeIn 0.15s ease;
 }
@@ -317,33 +317,33 @@
 }
 
 .vmm-user-info {
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .vmm-user-name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 11px;
   color: #0f172a;
 }
 
 .vmm-user-role {
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
 }
 
 .vmm-dropdown-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 8px;
-  font-size: 13px;
+  padding: 6px;
+  font-size: 10px;
   color: #dc2626;
   background: none;
   border: none;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -367,7 +367,7 @@
 .vmm-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
   align-items: stretch;
   width: 100%;
 }
@@ -384,11 +384,11 @@
 
 @media (max-width: 767px) {
   .vmm-dashboard-body {
-    padding: 16px 12px;
+    padding: 13px 10px;
   }
 
   .vmm-dashboard-grid {
-    gap: 12px;
+    gap: 10px;
   }
 }
 
@@ -399,7 +399,7 @@
   align-items: center;
   background: #ffffff;
   /* border-bottom: 1px solid #cbd5e1; */
-  padding: 0 40px;
+  padding: 0 32px;
 }
 
 .vmm-tab-nav {
@@ -417,10 +417,10 @@
 }
 
 .vmm-grid-cell {
-  border-radius: 25px;
+  border-radius: 20px;
   /* border: 1px solid #cbd5e1; */
   /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); */
-  padding: 10px;
+  padding: 8px;
   min-width: 0;
   overflow: hidden;
 }
@@ -432,9 +432,9 @@
 
 .vmm-tab-scroll-btn {
   position: absolute;
-  top: 16px;
+  top: 13px;
   bottom: 0;
-  width: 40px;
+  width: 32px;
   /* background: #1d4ed8; */
   border: none;
   cursor: pointer;
@@ -467,13 +467,13 @@
 .vmm-tab-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
+  gap: 6px;
+  padding: 8px 14px;
   border: none;
-  border-radius: 12px 12px 0 0;
+  border-radius: 10px 10px 0 0;
   background: transparent;
   color: #64748b;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -502,10 +502,10 @@
 .vmm-tab-content {
   flex: 1;
   background: transparent;
-  padding: 24px 20px;
+  padding: 19px 16px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 22px;
   overflow-y: auto;
 }
 
@@ -524,24 +524,24 @@
 .vmm-cards-grid {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 19px;
 }
 
 
 
 .vmm-summary-actions {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .vmm-btn-summary {
   background-color: #2563eb;
   color: #ffffff;
   border: none;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-size: 11px;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
@@ -554,7 +554,7 @@
 /* Dashboard Card Styling */
 .vmm-card {
   background: #ffffff;
-  border-radius: 19px;
+  border-radius: 15px;
   border: 1px solid #ffffff;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
   overflow: hidden;
@@ -567,14 +567,14 @@
   background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%);
   color: #ffffff;
   border-bottom: 1px solid #000000;
-  padding: 10px 16px;
+  padding: 8px 13px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .vmm-card-title {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -584,16 +584,16 @@
 .vmm-card-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .vmm-meta-btn {
   background: #ffffff;
   /* border: 1px solid rgba(255, 255, 255, 0.3); */
   color: #000000;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -603,9 +603,9 @@
   /* background: rgba(255, 255, 255, 0.15); */
   /* border: 1px solid rgba(255, 255, 255, 0.3); */
   color: #ffffff;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -613,58 +613,58 @@
 
 /* Card Body & Table Toolbar */
 .vmm-card-body {
-  padding: 12px;
+  padding: 10px;
   flex: 1;
 }
 
 .vmm-card-body-tag {
   background: #f8fafc;
-  padding: 12px 16px;
+  padding: 10px 13px;
 }
 
 .vmm-btn-hu-summary {
-  padding: 6px 14px;
-  font-size: 13px;
+  padding: 5px 11px;
+  font-size: 10px;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .vmm-table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  gap: 8px;
+  margin-bottom: 8px;
+  gap: 6px;
 }
 
 .vmm-toolbar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .vmm-toolbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-left: auto;
 }
 
 .vmm-search-input {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 10px;
   color: #475569;
 }
 
 .vmm-search-input input {
   border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 10px;
   outline: none;
-  width: 160px;
+  width: 128px;
   transition: border-color 0.2s;
 }
 
@@ -691,14 +691,14 @@
       #f1f5f9 75%);
   background-size: 200% 100%;
   animation: vmmShimmer 1.5s infinite linear;
-  border-radius: 4px;
+  border-radius: 3px;
   display: inline-block;
-  height: 10.2px;
+  height: 8px;
   vertical-align: middle;
 }
 
 .vmm-skeleton-row td {
-  padding: 4px 6px !important;
+  padding: 3px 5px !important;
   border: 1px solid #bebebe;
   text-align: center !important;
   box-sizing: border-box !important;
@@ -727,7 +727,7 @@ table.dataTable thead th .dt-column-title {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 table.dataTable thead th.dt-orderable-asc .dt-column-title::before {
@@ -765,8 +765,8 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
 
 /* Chrome, Edge, and Safari */
 .vmm-table-container::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
+  height: 5px;
+  width: 5px;
 }
 
 .vmm-table-container::-webkit-scrollbar-track {
@@ -775,7 +775,7 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
 
 .vmm-table-container::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .vmm-table {
@@ -783,8 +783,8 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
   border-collapse: collapse;
   text-align: left;
   background: #ffffff;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 6px;
+  font-size: 10px;
   border: none !important;
 }
 
@@ -801,13 +801,13 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
   background-color: #ffffff !important;
   color: #475569 !important;
   font-weight: 600 !important;
-  padding: 10px 12px !important;
+  padding: 8px 10px !important;
   border: none !important;
   border-bottom: 2px solid #e2e8f0 !important;
   white-space: nowrap;
   user-select: none;
   text-align: center !important;
-  font-size: 12px !important;
+  font-size: 10px !important;
 }
 
 .vmm-th.sortable {
@@ -836,13 +836,13 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
 }
 
 .vmm-table td {
-  padding: 9px 12px !important;
+  padding: 7px 10px !important;
   border: none !important;
   border-bottom: 1px solid #f1f5f9 !important;
   color: #0f172a;
   white-space: nowrap;
   text-align: center !important;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .vmm-table-striped tbody tr:nth-child(even) {
@@ -856,8 +856,8 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
   border-top: 2px solid #e2e8f0 !important;
   border-bottom: 1px solid #e2e8f0 !important;
   color: #0f172a;
-  padding: 9px 12px !important;
-  font-size: 12px;
+  padding: 7px 10px !important;
+  font-size: 10px;
 }
 
 /* Pagination Styling */
@@ -865,26 +865,26 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
-  margin-top: 8px;
+  padding-top: 8px;
+  margin-top: 6px;
   border-top: 1px solid #e2e8f0;
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
 }
 
 .vmm-pagination-controls {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .vmm-page-btn {
   border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #334155;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -910,7 +910,7 @@ table.dataTable thead th.dt-ordering-desc .dt-column-title::after {
 }
 
 .vmm-page-ellipsis {
-  padding: 0 4px;
+  padding: 0 3px;
   color: #94a3b8;
 }
 
@@ -921,12 +921,12 @@ div.dt-container .bottom {
   justify-content: space-between;
   align-items: center;
   /* border-top: 1px solid #e2e8f0; */
-  margin-top: 8px;
-  padding-top: 10px;
+  margin-top: 6px;
+  padding-top: 8px;
 }
 
 div.dt-container .dt-info {
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
   padding-top: 0 !important;
 }
@@ -943,9 +943,9 @@ div.dt-container .dt-paging .dt-paging-button {
   color: #000000 !important;
   /* Deep blue text */
   border: none !important;
-  border-radius: 6px !important;
-  padding: 5px 12px !important;
-  font-size: 12px !important;
+  border-radius: 5px !important;
+  padding: 4px 10px !important;
+  font-size: 10px !important;
   font-weight: 500 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
@@ -982,8 +982,8 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
   color: #ffffff;
   font-weight: 700;
   font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 12px;
+  padding: 2px 6px;
+  border-radius: 10px;
   display: inline-block;
   text-align: center;
 }
@@ -1018,10 +1018,10 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
   background-color: #ffffff;
   color: #1e293b;
   text-align: center;
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 5px 10px;
+  border-radius: 6px;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   border: 1px solid #cbd5e1;
@@ -1034,7 +1034,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
   content: '';
   position: absolute;
   top: 100%;
-  left: 15px;
+  left: 12px;
   /* Shift arrow to align with the text start */
   border-width: 6px;
   border-style: solid;
@@ -1046,7 +1046,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
   content: '';
   position: absolute;
   top: 100%;
-  left: 14px;
+  left: 11px;
   border-width: 7px;
   border-style: solid;
   border-color: #cbd5e1 transparent transparent transparent;
@@ -1063,9 +1063,9 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
   background: #2563eb;
   color: white;
   border: none;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
@@ -1077,14 +1077,14 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 
 /* Footer Line */
 .vmm-footer {
-  height: 52px;
+  height: 42px;
   background-color: #ffffff;
   border-top: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
-  font-size: 13px;
+  padding: 0 26px;
+  font-size: 10px;
   color: #64748b;
   font-weight: 500;
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.02);
@@ -1092,10 +1092,10 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 
 @media (max-width: 767px) {
   .vmm-footer {
-    height: 52px;
-    padding: 0 12px;
+    height: 42px;
+    padding: 0 10px;
     justify-content: space-between;
-    font-size: 11px;
+    font-size: 10px;
   }
   
   .vmm-footer-left .dot,
@@ -1108,7 +1108,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 .vmm-footer-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .vmm-footer-left .copyright {
@@ -1118,15 +1118,15 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 
 .vmm-footer-left .dot {
   color: #cbd5e1;
-  font-size: 16px;
+  font-size: 13px;
   line-height: 1;
 }
 
 .vmm-footer-left .version {
   background: #f1f5f9;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
   font-weight: 600;
   color: #475569;
 }
@@ -1134,8 +1134,8 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 .vmm-footer-right {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 10px;
 }
 
 .vmm-vyapti-tag {
@@ -1165,7 +1165,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 
 .vmm-modal-content {
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 10px;
   width: 96%;
   /* max-width: 900px; */
   min-height: 75vh;
@@ -1178,7 +1178,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 }
 
 .vmm-modal-header {
-  padding: 14px 20px;
+  padding: 11px 16px;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
@@ -1187,7 +1187,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 }
 
 .vmm-modal-title {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
   color: #0f172a;
   text-transform: uppercase;
@@ -1196,12 +1196,12 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 .vmm-modal-close {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   color: #64748b;
   cursor: pointer;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
 .vmm-modal-close:hover {
@@ -1210,7 +1210,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 }
 
 .vmm-modal-body {
-  padding: 20px;
+  padding: 16px;
   overflow-y: auto;
   flex: 1;
 }
@@ -1218,13 +1218,13 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 .vmm-modal-meta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 13px;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 13px;
   background: #f1f5f9;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 10px 13px;
+  border-radius: 6px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -1234,26 +1234,26 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 }
 
 .mt-12 {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .breakdown-title {
-  font-size: 13px;
-  margin-bottom: 8px;
+  font-size: 10px;
+  margin-bottom: 6px;
   color: #0f172a;
 }
 
 .empty-table-msg {
   text-align: center;
-  padding: 20px;
+  padding: 16px;
   color: #64748b;
 }
 
 .vmm-modal-cards-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 @media (max-width: 768px) {
@@ -1265,8 +1265,8 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 .vmm-curve-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 10px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -1279,21 +1279,21 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 }
 
 .vmm-curve-title {
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .vmm-curve-val {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: #0f172a;
 }
 
 .vmm-curve-icon {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: #e0f2fe;
   color: #0284c7;

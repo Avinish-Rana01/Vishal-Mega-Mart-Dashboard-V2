@@ -12,24 +12,24 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  padding: 8px 20px 16px 20px;
+  gap: 10px;
+  padding: 6px 16px 13px 16px;
 }
 
 .report-search-center-actions .btn-search {
   background: #0284c7;
   color: white;
   border: none;
-  padding: 0 28px;
-  height: 36px;
-  border-radius: 10px;
+  padding: 0 22px;
+  height: 29px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
 }
@@ -43,16 +43,16 @@
   background: #64748b;
   color: white;
   border: none;
-  padding: 0 24px;
-  height: 36px;
-  border-radius: 10px;
+  padding: 0 19px;
+  height: 29px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.2s ease;
 }
 
@@ -65,16 +65,16 @@
   background: #64748b;
   color: white;
   border: none;
-  padding: 0 24px;
-  height: 36px;
-  border-radius: 10px;
+  padding: 0 19px;
+  height: 29px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.2s ease;
 }
 
@@ -87,8 +87,8 @@
 .allocated-date-badge-bar {
   display: flex;
   justify-content: flex-end;
-  padding: 0 20px 8px 20px;
-  font-size: 12px;
+  padding: 0 16px 6px 16px;
+  font-size: 10px;
   font-weight: 700;
   color: #334155;
   letter-spacing: 0.5px;
@@ -98,8 +98,8 @@
 .allocated-curved-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 15px;
-  margin: 0 15px 5px 15px;
+  gap: 12px;
+  margin: 0 12px 4px 12px;
 }
 
 @media (max-width: 900px) {
@@ -110,7 +110,7 @@
 
 /* Table wrapper padding */
 .allocated-table-wrapper {
-  padding: 0 15px 30px 15px;
+  padding: 0 12px 24px 12px;
 }
 
 @keyframes fadeIn {

@@ -2,15 +2,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  margin: 0 15px 5px 15px;
-  min-height: 48px;
+  padding: 10px 16px;
+  margin: 0 12px 4px 12px;
+  min-height: 38px;
   
   /* Beautiful soft gradient */
   background: white;
-  border-radius: 10px;
+  border-radius: 8px;
   
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 500;
   color: #334155;
   
@@ -38,7 +38,7 @@
 .report-header-left, .report-header-date {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* Icons coloring */
@@ -57,14 +57,14 @@
   color: #0f172a;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.7);
-  padding: 3px 10px;
-  border-radius: 6px;
+  padding: 2px 8px;
+  border-radius: 5px;
   /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); */
-  margin-left: 4px;
+  margin-left: 3px;
 }
 
 .report-header-date .divider {
   color: #94a3b8;
-  margin: 0 12px;
+  margin: 0 10px;
   font-weight: 300;
 }

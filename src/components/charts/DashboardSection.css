@@ -9,7 +9,7 @@
 .ds-section {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -20,48 +20,48 @@
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
   background-color: #eceef0;
-  padding: 5px;
-  border-radius: 12px;
+  padding: 4px;
+  border-radius: 10px;
   align-items: center;
 }
 
 /* .vmm-section-container{
   display: flex;
-  gap: 14px;
+  gap: 11px;
 } */
 
 .ds-header-text h1 {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: #0f172a;
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
   text-transform: uppercase;
 }
 
 .ds-header-text p {
-  font-size: 13px;
+  font-size: 10px;
   color: #64748b;
   margin: 0;
 }
 
 .ds-header-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 /* ---- Buttons ---- */
 .ds-btn {
-  padding: 9px 16px;
+  padding: 7px 13px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
@@ -91,13 +91,13 @@
 .ds-kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  gap: 11px;
 }
 
 /* ---- Charts Row ---- */
 .ds-charts-row {
   display: grid;
-  gap: 4px;
+  gap: 3px;
 }
 
 /* Let a row grow to fill leftover vertical space in the section */
@@ -126,8 +126,8 @@
 /* ---- Card (White Box) ---- */
 .ds-card {
   background: #ffffff;
-  border-radius: 20px;
-  padding:10px 10px 8px 10px        ;
+  border-radius: 16px;
+  padding:8px 8px 6px 8px        ;
   /* box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); */
   border: 1px solid #f1f5f9;
   display: flex;
@@ -136,7 +136,7 @@
 }
 
 .ds-card-title {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
   color: #0f172a;
   /* margin: 0 0 16px 0; */
@@ -146,11 +146,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 13px;
 }
 
 .ds-card-title--flex h3 {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
   color: #0f172a;
   margin: 0;
@@ -159,11 +159,11 @@
 /* ---- Skeleton Loading ---- */
 .ds-skeleton-row {
   display: grid;
-  gap: 16px;
+  gap: 13px;
 }
 
 .ds-skeleton-box {
-  border-radius: 20px;
+  border-radius: 16px;
   background: white;
   overflow: hidden;
   position: relative;
@@ -189,11 +189,11 @@
 
 /* ---- Error State ---- */
 .ds-error {
-  padding: 20px;
+  padding: 16px;
   background: #fee2e2;
-  border-radius: 12px;
+  border-radius: 10px;
   color: #b91c1c;
-  font-size: 14px;
+  font-size: 11px;
   border: 1px solid #fca5a5;
 }
 
@@ -203,20 +203,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 38px 19px;
   color: #94a3b8;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ds-empty svg {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   opacity: 0.4;
 }
 
 .ds-empty p {
-  font-size: 14px;
+  font-size: 11px;
   margin: 0;
 }
 
@@ -257,12 +257,12 @@
   .ds-donut-layout {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 20px !important;
+    gap: 16px !important;
   }
 
   .ds-donut-chart-box {
     width: 100% !important;
-    height: 200px !important;
+    height: 160px !important;
   }
 
   .ds-donut-legend-box {
@@ -272,7 +272,7 @@
   .ds-donut-legend-grid {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px 14px !important;
+    gap: 10px 11px !important;
     width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
@@ -284,21 +284,21 @@
 
   .ds-header-text h1,
   .ds-section-title {
-    font-size: 15px !important;
+    font-size: 12px !important;
   }
 
   .ds-date-badge {
-    padding: 4px 8px !important;
-    font-size: 11px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
   }
 }
 
 .ds-section-title {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .ds-date-badge {
-  padding: 6px 14px;
+  padding: 5px 11px;
 }
 
 /* Donut & Progress Bar Flex Layout */
@@ -307,7 +307,7 @@
   flex: 1;
   min-height: 0;
   align-items: center;
-  gap: 16px;
+  gap: 13px;
 }
 
 .ds-donut-chart-box {
@@ -321,5 +321,5 @@
   flex: 1.2;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 11px;
 }

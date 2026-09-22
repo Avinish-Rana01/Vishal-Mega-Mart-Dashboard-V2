@@ -8,7 +8,7 @@
 .cc-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   height: 100%;
   width: 100%;
   min-width: 0;
@@ -20,14 +20,14 @@
 .cc-kpi-row {
   display: grid;
   grid-template-columns: repeat(var(--kpi-cols, 5), 1fr);
-  gap: 14px;
+  gap: 11px;
 }
 
 /* ---- Chart Card ---- */
 .cc-card {
   background: #ffffff;
-  border-radius: 20px;
-  padding: 10px 10px 8px 10px;
+  border-radius: 16px;
+  padding: 8px 8px 6px 8px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
   position: relative;
   display: flex;
@@ -43,14 +43,14 @@
 .cc-split-layout {
   display: grid;
   grid-template-columns: 50% 50%;
-  gap: 4px;
+  gap: 3px;
   align-items: stretch;
 }
 
 @media (max-width: 1200px) {
   .cc-split-layout {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 19px;
   }
 }
 
@@ -59,8 +59,8 @@
 .cc-chart-scroll {
   width: 100%;
   flex: 1;
-  min-height: 294px;
-  max-height: 294px;
+  min-height: 235px;
+  max-height: 235px;
   overflow-y: auto;
   overflow-x: auto;
 }
@@ -68,7 +68,7 @@
 
 
 .cc-bar-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   fill: #334155;
 }
@@ -78,27 +78,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
+  padding: 14px 16px;
   border-bottom: 1px solid #e2e8f0;
   background: #f9f9fb;
-  border-radius: 20px 20px 0 0;
+  border-radius: 16px 16px 0 0;
 }
 
 .cc-grid-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
   color: #1e3a8a;
   text-transform: uppercase;
 }
 
 .cc-grid-count {
-  font-size: 13px;
+  font-size: 10px;
   color: #64748b;
   font-weight: 500;
   background: #f1f5f9;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 3px 8px;
+  border-radius: 16px;
 }
 
 
@@ -106,8 +106,8 @@
 .cc-action-btn {
   background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-radius: 6px;
+  padding: 5px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,8 +124,8 @@
 .cc-export-btn {
   color: #1d4ed8;
   font-weight: 600;
-  gap: 8px;
-  padding: 6px 16px;
+  gap: 6px;
+  padding: 5px 13px;
 }
 
 /* ---- Empty / Error States ---- */
@@ -134,10 +134,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 38px 19px;
   color: #94a3b8;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .cc-empty svg {
@@ -145,7 +145,7 @@
 }
 
 .cc-empty p {
-  font-size: 14px;
+  font-size: 11px;
   margin: 0;
   color: #94a3b8;
 }
@@ -166,10 +166,10 @@
   transform: translateY(10px);
   background-color: #ffffff;
   color: #1e293b;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
   white-space: nowrap;
@@ -182,7 +182,7 @@
   content: '';
   position: absolute;
   top: 100%;
-  left: 20px;
+  left: 16px;
   border-width: 6px;
   border-style: solid;
   border-color: #ffffff transparent transparent transparent;
@@ -192,7 +192,7 @@
   content: '';
   position: absolute;
   top: 100%;
-  left: 19px;
+  left: 15px;
   border-width: 7px;
   border-style: solid;
   border-color: #e2e8f0 transparent transparent transparent;
@@ -208,11 +208,11 @@
 
 
 .cc-error {
-  padding: 20px;
+  padding: 16px;
   background: #fee2e2;
-  border-radius: 12px;
+  border-radius: 10px;
   color: #b91c1c;
-  font-size: 14px;
+  font-size: 11px;
   border: 1px solid #fca5a5;
 }
 
@@ -255,7 +255,7 @@
   .cc-card .vmm-search-container {
     order: 3;
     width: 100%;
-    margin-top: 12px;
+    margin-top: 10px;
   }
 
   .cc-card .vmm-toolbar-title {
@@ -295,25 +295,25 @@
   /* Firefox thumb & track colors */
   min-width: 0;
   /* margin: 0 8px; */
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 /* Override global ::-webkit-scrollbar { display: none } */
 .cc-native-table-scroll::-webkit-scrollbar {
   display: block !important;
-  height: 10px;
+  height: 8px;
   background-color: #f1f5f9;
 }
 
 .cc-native-table-scroll::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid #e2e8f0;
 }
 
 .cc-native-table-scroll::-webkit-scrollbar-thumb {
   background: #94a3b8;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 2px solid #f1f5f9;
 }
 
@@ -324,8 +324,8 @@
 /* NATIVE DATA GRID CLASSES */
 .cc-data-grid-card {
   background: #ffffff;
-  border-radius: 20px;
-  padding: 10px 10px 8px 10px;
+  border-radius: 16px;
+  padding: 8px 8px 6px 8px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
   position: relative;
   flex: 1;
@@ -341,12 +341,12 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #e2e8f0;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .cc-data-grid-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
   color: #1e3a8a;
 }
@@ -360,7 +360,7 @@
   border-collapse: collapse;
   text-align: left;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -373,8 +373,8 @@
 }
 
 .cc-data-grid-th {
-  padding: 8px 12px;
-  font-size: 12px;
+  padding: 6px 10px;
+  font-size: 10px;
   font-weight: 600;
   color: #334155;
   border-bottom: 2px solid #e2e8f0;
@@ -384,9 +384,9 @@
 
 .cc-data-grid-empty-cell {
   text-align: center;
-  padding: 30px;
+  padding: 24px;
   color: #64748b;
-  font-size: 13px;
+  font-size: 10px;
 }
 
 .cc-data-grid-tr {
@@ -400,8 +400,8 @@
 }
 
 .cc-data-grid-td {
-  padding: 6px 1px;
-  font-size: 12px;
+  padding: 5px 1px;
+  font-size: 10px;
   color: #0f172a;
   /* border-bottom: 1px solid #f1f5f9; */
   white-space: nowrap;
@@ -422,9 +422,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -441,17 +441,17 @@
 }
 
 .cc-native-table-scroll {
-  max-height: 204px;
+  max-height: 163px;
   overflow-y: auto;
 }
 
 .cc-native-table-scroll::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .cc-native-table-scroll::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .cc-native-table-scroll::-webkit-scrollbar-track {
