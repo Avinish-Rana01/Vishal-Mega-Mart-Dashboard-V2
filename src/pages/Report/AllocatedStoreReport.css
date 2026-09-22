@@ -1,0 +1,125 @@
+/* Allocated Store Report Styles */
+
+.allocated-store-report-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+/* Search Card Actions centered */
+.report-search-center-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px 16px 20px;
+}
+
+.report-search-center-actions .btn-search {
+  background: #0284c7;
+  color: white;
+  border: none;
+  padding: 0 28px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
+}
+
+.report-search-center-actions .btn-search:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+}
+
+.report-search-center-actions .btn-clear {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 0 24px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.report-search-center-actions .btn-clear:hover {
+  background: #475569;
+  transform: translateY(-1px);
+}
+
+.report-search-center-actions .btn-back-dc {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 0 24px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.report-search-center-actions .btn-back-dc:hover {
+  background: #475569;
+  transform: translateY(-1px);
+}
+
+/* Date Info Bar */
+.allocated-date-badge-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px 8px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: 0.5px;
+}
+
+/* 3 KPI Curved Cards in one row */
+.allocated-curved-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  margin: 0 15px 5px 15px;
+}
+
+@media (max-width: 900px) {
+  .allocated-curved-cards {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Table wrapper padding */
+.allocated-table-wrapper {
+  padding: 0 15px 30px 15px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

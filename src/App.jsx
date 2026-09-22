@@ -15,6 +15,7 @@ import ReturnDetailsReportPage from './pages/Report/ReturnDetailsReportPage';
 import ReturnReconciliationReportPage from './pages/Report/ReturnReconciliationReportPage';
 import DcReportPage from './pages/Report/DcReportPage';
 import HuReportPage from './pages/Report/HuReportPage';
+import AllocatedStoreReportPage from './pages/Report/AllocatedStoreReportPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -152,6 +153,15 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <HuReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/allocated-store-report" 
+              element={
+                <ProtectedRoute>
+                  <AllocatedStoreReportPage />
                 </ProtectedRoute>
               } 
             />

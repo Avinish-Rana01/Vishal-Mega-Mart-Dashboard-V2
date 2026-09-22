@@ -33,7 +33,7 @@ const getHeaders = () => ({
     } catch (e) {
       // fallback if parse fails
     }
-    return API_DEFAULTS.USER_ID;
+    return 1;
   };
 
 // ==============================================================
@@ -611,6 +611,34 @@ export const getEncodingStoreData = async ({
   if (sortDirection) params.append('SortDirection', sortDirection);
 
   const response = await axios.get(`${API_BASE}/api/Stock/GetEncodingStoreData?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getEncodingStoreSearchEAN = async (storeName = '', fromDate = '', toDate = '', searchTerm = '', signal) => {
+  const params = new URLSearchParams();
+  if (storeName) params.append('StoreName', storeName);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+
+  const response = await axios.get(`${API_BASE}/api/Stock/encoding-store-SearchEAN?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getEncodingStoreSearchArticle = async (storeName = '', fromDate = '', toDate = '', searchTerm = '', signal) => {
+  const params = new URLSearchParams();
+  if (storeName) params.append('StoreName', storeName);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+
+  const response = await axios.get(`${API_BASE}/api/Stock/encoding-store-SearchArticle?${params.toString()}`, {
     headers: getHeaders(),
     signal
   });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw, ArrowLeft } from 'lucide-react';
+import { RotateCcw, ArrowLeft, Search } from 'lucide-react';
 import './ReportActionButton.css';
 
 /**
@@ -25,7 +25,7 @@ export const ClearButton = ({ onClick, disabled = false, label = 'Clear' }) => (
  * BackButton — Modern glassmorphism "navigate back" pill button.
  * @param {Object} props
  * @param {Function} props.onClick - Click handler (typically navigate(-1) or navigate('/path'))
- * @param {string} props.label - Button text (e.g. "Back to DC Summary")
+ * @param {string} [props.label] - Button text (e.g. "Back to DC Summary")
  * @param {boolean} [props.disabled] - Disabled state
  */
 export const BackButton = ({ onClick, label = 'Back', disabled = false }) => (
@@ -36,6 +36,25 @@ export const BackButton = ({ onClick, label = 'Back', disabled = false }) => (
     disabled={disabled}
   >
     <ArrowLeft size={14} />
+    {label}
+  </button>
+);
+
+/**
+ * SearchButton — Modern vibrant blue gradient pill button matching VMM primary actions.
+ * @param {Object} props
+ * @param {Function} props.onClick - Click handler
+ * @param {boolean} [props.disabled] - Disabled state
+ * @param {string} [props.label] - Button text (default: "Search")
+ */
+export const SearchButton = ({ onClick, disabled = false, label = 'Search' }) => (
+  <button
+    type="button"
+    className="report-action-btn report-action-btn--search"
+    onClick={onClick}
+    disabled={disabled}
+  >
+    <Search size={14} />
     {label}
   </button>
 );

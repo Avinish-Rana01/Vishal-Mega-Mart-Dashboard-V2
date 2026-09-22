@@ -600,6 +600,7 @@ export const useDcValidation = () => {
     dcValidationTotals
   );
 
+
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedPlant, setHighlightedPlant] = useState(null);

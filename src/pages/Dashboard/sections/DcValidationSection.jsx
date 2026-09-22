@@ -75,6 +75,25 @@ export default function DcValidationSection() {
     });
   };
 
+  const handleArticleQtyClick = (row) => {
+    const storeCode = row.Reciving_Plant || row.Store_Code || '';
+    if (!storeCode) return;
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayFormatted = `${year}-${month}-${day}`;
+
+    navigate('/reports/allocated-store-report', {
+      state: {
+        storeCode: storeCode,
+        fromDate: todayFormatted,
+        toDate: todayFormatted
+      }
+    });
+  };
+
   const sortOptions = useMemo(() => [
     { value: 'PROCESSED_DESC', label: 'Most Processed HU' },
     { value: 'PROCESSED_ASC', label: 'Least Processed HU' },
@@ -350,8 +369,15 @@ export default function DcValidationSection() {
                   <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clear</span>
                 )}
               </td>
-              <td className="cc-data-grid-td" style={{ width: '150px', textAlign: 'center' }}>
-                <span style={{ fontWeight: 600 }}>{articles.toLocaleString('en-IN')}</span>
+              <td 
+                className="cc-data-grid-td" 
+                style={{ width: '150px', textAlign: 'center', cursor: 'pointer' }}
+                onClick={() => handleArticleQtyClick(row)}
+                title="Click to view Allocated Store Report"
+              >
+                <span style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+                  {articles.toLocaleString('en-IN')}
+                </span>
               </td>
             </tr>
           );
