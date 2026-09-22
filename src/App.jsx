@@ -167,6 +167,11 @@ export default function App() {
             />
 
             <Route 
+              path="/reports/encoding-store-report" 
+              element={<Navigate to="/reports/allocated-store-report" replace />} 
+            />
+
+            <Route 
               path="/reports/total-dpos-sale" 
               element={
                 <ProtectedRoute>

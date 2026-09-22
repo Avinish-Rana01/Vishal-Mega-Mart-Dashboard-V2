@@ -30,7 +30,8 @@ export default function CurvedCard({
   icon, 
   progress, 
   progressText, 
-  animate = true 
+  animate = true,
+  onClick
 }) {
   // Ensure we have an array for gradient, fallback to same color if string passed
   const colors = Array.isArray(waveColor) ? waveColor : [waveColor, waveColor];
@@ -41,7 +42,12 @@ export default function CurvedCard({
   const { ref, animatedValue } = useCountUp(value, 1000, animate);
 
   return (
-    <div ref={ref} className="curve-card-modern">
+    <div 
+      ref={ref} 
+      className={`curve-card-modern ${onClick ? 'curve-card-clickable' : ''}`}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
       
       {/* Content wrapper to stay above background waves */}
       <div className="curve-card-content">

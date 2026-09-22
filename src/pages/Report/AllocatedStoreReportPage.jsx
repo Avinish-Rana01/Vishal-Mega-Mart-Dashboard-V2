@@ -233,7 +233,13 @@ export default function AllocatedStoreReportPage() {
       render: (val, row) => {
         const eanVal = row.EAN ?? row.Ean ?? row.ean;
         return (
-          <span style={{ color: '#16a34a', fontWeight: 600 }}>
+          <span
+            className="allocated-drilldown-link"
+            title={`EAN: ${eanVal || '—'}`}
+            onClick={() => {
+              if (eanVal) navigator.clipboard?.writeText(String(eanVal));
+            }}
+          >
             {eanVal || '—'}
           </span>
         );
@@ -245,7 +251,13 @@ export default function AllocatedStoreReportPage() {
       render: (val, row) => {
         const tagVal = row.ENCODING_TAGS ?? row.Encoding_Tags ?? row.TAGS ?? row.QTY ?? row.Qty ?? 0;
         return (
-          <span style={{ color: '#16a34a', fontWeight: 600 }}>
+          <span
+            className="allocated-drilldown-link"
+            title={`Encoding Tags: ${tagVal}`}
+            onClick={() => {
+              // Placeholder for future drilldown action
+            }}
+          >
             {Number(tagVal).toLocaleString('en-IN')}
           </span>
         );
@@ -266,6 +278,17 @@ export default function AllocatedStoreReportPage() {
   const totalEan = new Set(data.map(d => d.EAN || d.Ean || d.ean)).size;
   const totalTags = data.reduce((sum, row) => sum + (Number(row.ENCODING_TAGS || row.Encoding_Tags || row.TAGS || row.QTY) || 0), 0);
 
+  const handleBackToDcSummary = () => {
+    navigate('/reports/dc-report', {
+      state: {
+        storeCode: storeName || passedState.storeCode,
+        storeName: passedState.storeName,
+        fromDate: fromDate || passedState.fromDate,
+        toDate: toDate || passedState.toDate
+      }
+    });
+  };
+
   return (
     <AppLayout
       headerProps={{
@@ -275,7 +298,7 @@ export default function AllocatedStoreReportPage() {
           </>
         ),
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: handleBackToDcSummary
       }}
     >
       <div className="allocated-store-report-container">
@@ -363,7 +386,7 @@ export default function AllocatedStoreReportPage() {
           <div className="report-search-center-actions">
             <SearchButton onClick={handleSearch} disabled={isLoading} />
             <ClearButton onClick={handleClear} disabled={isLoading} />
-            <BackButton onClick={() => navigate('/dashboard')} label="Back to DC Summary" />
+            <BackButton onClick={handleBackToDcSummary} label="Back to DC Summary" />
           </div>
         </div>
 

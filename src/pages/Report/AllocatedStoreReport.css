@@ -113,13 +113,17 @@
   padding: 0 12px 24px 12px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.allocated-drilldown-link {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  cursor: pointer !important;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
+
+.allocated-drilldown-link:hover {
+  color: #15803d !important;
+  text-decoration-thickness: 2px !important;
+}
+

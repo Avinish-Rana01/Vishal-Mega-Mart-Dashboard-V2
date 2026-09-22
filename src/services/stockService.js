@@ -584,6 +584,37 @@ export const getHuDetails = async ({
   return response.data;
 };
 
+export const getHuReportViewDetails = async ({
+  searchTerm = '',
+  pageIndex = 1,
+  pageSize = 10,
+  huStatus = '1',
+  huNo = '',
+  fromDate = '',
+  toDate = '',
+  refNo = '',
+  sortColumn = 'HU_Number',
+  sortDirection = 'asc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (huStatus !== undefined && huStatus !== null && huStatus !== '') params.append('HUStatus', huStatus);
+  if (huNo) params.append('HUNo', huNo);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (refNo) params.append('RefNo', refNo);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(`${API_BASE}/api/stock/hu-report-details?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
 export const getEncodingStoreData = async ({
   storeName = '',
   fromDate = '',
@@ -611,6 +642,37 @@ export const getEncodingStoreData = async ({
   if (sortDirection) params.append('SortDirection', sortDirection);
 
   const response = await axios.get(`${API_BASE}/api/Stock/GetEncodingStoreData?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+export const getEncodingReportDetailsModal = async ({
+  storeName = '',
+  fromDate = '',
+  toDate = '',
+  ean = '',
+  articleNo = '',
+  pageIndex = 1,
+  pageSize = 10,
+  searchTerm = '',
+  sortColumn = 'ARTICLE',
+  sortDirection = 'asc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (storeName) params.append('StoreName', storeName);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (ean) params.append('Ean', ean);
+  if (articleNo) params.append('ArticleNo', articleNo);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(`${API_BASE}/api/Stock/GetEncodingReportDetailsModal?${params.toString()}`, {
     headers: getHeaders(),
     signal
   });

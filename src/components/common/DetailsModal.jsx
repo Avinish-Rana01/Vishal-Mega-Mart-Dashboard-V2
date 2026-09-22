@@ -50,17 +50,20 @@ export default function DetailsModal({
 
           {/* CurvedCards Grid */}
           {summaryCards && summaryCards.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(summaryCards.length, 6)}, 1fr)`, gap: '15px' }}>
-              {summaryCards.map((card, idx) => (
-                <CurvedCard 
-                  key={idx}
-                  title={card.title} 
-                  value={card.value} 
-                  waveColor={card.waveColor} 
-                  icon={card.icon} 
-                />
-              ))}
-            </div>
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(summaryCards.length, 6)}, 1fr)`, gap: '15px' }}>
+                {summaryCards.map((card, idx) => (
+                  <CurvedCard 
+                    key={idx}
+                    title={card.title} 
+                    value={card.value} 
+                    waveColor={card.waveColor} 
+                    icon={card.icon} 
+                  />
+                ))}
+              </div>
+              <div style={{ borderBottom: '1px dashed #cbd5e1', margin: '4px 0 0 0' }} />
+            </>
           )}
 
           {/* Data Table */}

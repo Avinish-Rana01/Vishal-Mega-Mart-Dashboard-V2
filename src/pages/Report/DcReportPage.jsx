@@ -153,26 +153,28 @@ export default function DcReportPage() {
   };
 
   const handleNavigateToHuReport = (row, huStatus) => {
-    const rowDate = getRowDateString(row);
+    const rowDate = row ? getRowDateString(row) : '';
     navigate('/reports/hu-report', {
       state: {
-        receivingPlant: selectedStore || row.Reciving_Plant,
-        date: rowDate,
+        receivingPlant: row?.Reciving_Plant || selectedStore,
+        storeName: row?.STORE_NAME || storeDisplayName,
+        date: rowDate || fromDate,
         huStatus: huStatus,
-        fromDate: rowDate,
-        toDate: rowDate
+        fromDate: rowDate || fromDate,
+        toDate: rowDate || toDate
       }
     });
   };
 
-  const handleNavigateToEncodingReport = (row) => {
-    const rowDate = getRowDateString(row);
-    navigate('/reports/encoding-store-report', {
+  const handleNavigateToAllocatedStoreReport = (row) => {
+    const rowDate = row ? getRowDateString(row) : '';
+    navigate('/reports/allocated-store-report', {
       state: {
-        storeCode: selectedStore || row.Reciving_Plant,
-        date: rowDate,
-        fromDate: rowDate,
-        toDate: rowDate
+        storeCode: row?.Reciving_Plant || selectedStore,
+        storeName: row?.STORE_NAME || storeDisplayName,
+        date: rowDate || fromDate,
+        fromDate: rowDate || fromDate,
+        toDate: rowDate || toDate
       }
     });
   };
@@ -221,14 +223,14 @@ export default function DcReportPage() {
       render: (val, row) => (
         <span
           className="dc-drilldown-link"
-          onClick={() => handleNavigateToEncodingReport(row)}
-          title="Click to view Validated Article details"
+          onClick={() => handleNavigateToAllocatedStoreReport(row)}
+          title="Click to view Allocated Store Report"
         >
           {numRenderer(val ?? 0)}
         </span>
       )
     }
-  ], [pageIndex, pageSize, selectedStore]);
+  ], [pageIndex, pageSize, selectedStore, storeDisplayName, fromDate, toDate]);
 
   const displayStoreTitle = useMemo(() => {
     if (storeDisplayName) {
@@ -314,6 +316,7 @@ export default function DcReportPage() {
               value={totals.processedCount.toLocaleString('en-IN')}
               waveColor={['#f472b6', '#db2777']}
               icon={<Icons.PackageCheck size={20} color="#ffffff" />}
+              onClick={() => handleNavigateToHuReport(null, '1')}
             />
           </div>
           <div className="ds-kpi-item">
@@ -322,6 +325,7 @@ export default function DcReportPage() {
               value={totals.unprocessedCount.toLocaleString('en-IN')}
               waveColor={['#86efac', '#22c55e']}
               icon={<Icons.Clock size={20} color="#ffffff" />}
+              onClick={() => handleNavigateToHuReport(null, '0')}
             />
           </div>
           <div className="ds-kpi-item">
@@ -330,6 +334,7 @@ export default function DcReportPage() {
               value={totals.validatedCount.toLocaleString('en-IN')}
               waveColor={['#c084fc', '#9333ea']}
               icon={<Icons.FileText size={20} color="#ffffff" />}
+              onClick={() => handleNavigateToAllocatedStoreReport(null)}
             />
           </div>
         </div>

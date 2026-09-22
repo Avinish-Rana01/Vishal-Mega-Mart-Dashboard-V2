@@ -10,8 +10,9 @@ import { ClearButton, BackButton } from '../../components/common/ReportActionBut
 import './LiveStockReport.css';
 import './HuReport.css';
 import { getHuDetails, searchValidationHuNumbers } from '../../services/stockService';
-import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
+import { dateRenderer } from '../../utils/dashboardColumns';
 import * as Icons from 'lucide-react';
+import HuDetailsModal from '../../components/modals/HuDetailsModal';
 
 export default function HuReportPage() {
   const location = useLocation();
@@ -48,6 +49,7 @@ export default function HuReportPage() {
   const [reportData, setReportData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedHuRow, setSelectedHuRow] = useState(null);
 
   // Pagination & Sorting
   const [pageIndex, setPageIndex] = useState(1);
@@ -202,12 +204,13 @@ export default function HuReportPage() {
     {
       key: 'HU_Number',
       label: 'HU NUMBER',
-      render: (val) => (
+      render: (val, row) => (
         <span
           className="hu-drilldown-link"
-          title={`HU Number: ${val}`}
-          onClick={() => {
-            navigator.clipboard?.writeText(String(val));
+          title={`Click to view details for HU: ${val}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedHuRow(row);
           }}
         >
           {val || '—'}
@@ -217,29 +220,22 @@ export default function HuReportPage() {
     {
       key: 'MATERIAL_COUNT',
       label: 'MATERIAL COUNT',
-      render: (val) => numRenderer(val ?? 0)
+      render: (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0))
     },
     {
       key: 'Act_Qty',
       label: 'ACTUAL QUANTITY',
-      render: (val) => numRenderer(val ?? 0)
+      render: (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0))
     },
     {
       key: 'Scan_Qty',
       label: 'SCANNED QUANTITY',
-      render: (val) => numRenderer(val ?? 0)
+      render: (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0))
     },
     {
       key: 'Status',
       label: 'STATUS',
-      render: (val) => {
-        const isPass = String(val).toUpperCase() === 'PASS';
-        return (
-          <span className={`hu-status-badge ${isPass ? 'pass' : 'fail'}`}>
-            {val || '—'}
-          </span>
-        );
-      }
+      render: (val) => val || '—'
     },
     {
       key: 'Scan_Date',
@@ -249,9 +245,14 @@ export default function HuReportPage() {
     {
       key: 'HU_Created_By',
       label: 'HU CREATED BY',
-      render: (val) => val || '—'
+      render: (val, row) => val || row?.HU_Created_By || '—'
+    },
+    {
+      key: 'HU_Validation_By',
+      label: 'HU VALIDATED BY',
+      render: (val, row) => val || row?.HU_Validation_By || row?.Hu_Validation_By || '—'
     }
-  ], [pageIndex, pageSize]);
+  ], [pageIndex, pageSize, huStatus]);
 
   const displayStatusLabel = useMemo(() => {
     if (huStatus === '0') return 'UNPROCESSED HU';
@@ -421,6 +422,16 @@ export default function HuReportPage() {
             onSearch={(term) => setSearchTerm(term)}
           />
         </div>
+
+        {selectedHuRow && (
+          <HuDetailsModal
+            huRow={selectedHuRow}
+            huStatus={huStatus}
+            fromDate={fromDate}
+            toDate={toDate}
+            onClose={() => setSelectedHuRow(null)}
+          />
+        )}
       </div>
     </AppLayout>
   );
