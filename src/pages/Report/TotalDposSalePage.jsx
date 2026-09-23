@@ -277,6 +277,7 @@ export default function TotalDposSalePage() {
     fetchControllerRef.current = controller;
 
     setIsLoading(true);
+    setTableData([]);
     setError(null);
     try {
       const result = await getSaleData({

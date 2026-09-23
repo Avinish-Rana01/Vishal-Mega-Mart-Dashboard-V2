@@ -103,6 +103,7 @@ export default function StoreSaleReportPage() {
     fetchControllerRef.current = controller;
 
     setIsLoading(true);
+    setTableData([]);
     setError(null);
     try {
       const result = await getStoreSaleReport({

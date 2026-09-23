@@ -108,6 +108,7 @@ export default function GrcReportPage() {
     const controller = new AbortController();
     const fetchReport = async () => {
       setIsLoading(true);
+      setGrcData([]);
       setError(null);
       try {
         const result = await getGrcDetails(pageIndex, pageSize, grcStatus, selectedStore, selectedHu, fromDate, toDate, sortColumn, sortDirection, controller.signal);

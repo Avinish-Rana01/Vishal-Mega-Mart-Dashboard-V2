@@ -47,7 +47,7 @@ export default function HuReportPage() {
 
   // Table Data State
   const [reportData, setReportData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedHuRow, setSelectedHuRow] = useState(null);
 
@@ -130,6 +130,7 @@ export default function HuReportPage() {
   // Fetch HU details
   const fetchReportData = useCallback(async (signal) => {
     setIsLoading(true);
+    setReportData([]);
     setError(null);
     try {
       const result = await getHuDetails({
@@ -161,7 +162,9 @@ export default function HuReportPage() {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [receivingPlant, huStatus, fromDate, toDate, huNumber, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
 

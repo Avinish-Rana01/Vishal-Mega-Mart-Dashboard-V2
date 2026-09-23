@@ -23,7 +23,7 @@ export const useEncodingStoreData = ({
 }) => {
   const [data, setData] = useState([]);
   const [summary, setSummary] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -59,11 +59,8 @@ export const useEncodingStoreData = ({
     const controller = new AbortController();
     
     const fetchData = async () => {
-      if (data.length === 0) {
-        setIsLoading(true);
-      } else {
-        setIsRefreshing(true);
-      }
+      setIsLoading(true);
+      setData([]);
       setError(null);
 
       try {
