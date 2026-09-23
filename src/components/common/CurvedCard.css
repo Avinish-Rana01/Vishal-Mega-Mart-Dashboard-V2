@@ -93,8 +93,7 @@
 }
 
 .curve-card-icon-wrapper svg {
-  color: #ffffff;
-  stroke: #ffffff;
+  transition: transform 0.2s ease;
 }
 
 /* Strip legacy nested circular badges if present */

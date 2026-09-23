@@ -10,6 +10,7 @@ import { SearchButton, ClearButton, BackButton } from '../../components/common/R
 import { useEncodingStoreData } from '../../hooks/useEncodingStoreData';
 import { getReportStores, getEncodingStoreSearchEAN, getEncodingStoreSearchArticle } from '../../services/stockService';
 import { Store, Tag, Hash } from 'lucide-react';
+import EncodingDetailsModal from '../../components/modals/EncodingDetailsModal';
 import './common-reports.css';
 import './LiveStockReport.css';
 import './AllocatedStoreReport.css';
@@ -28,6 +29,7 @@ export default function AllocatedStoreReportPage() {
   const [ean, setEan] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [storeOptions, setStoreOptions] = useState([]);
+  const [selectedEncodingRow, setSelectedEncodingRow] = useState(null);
 
   // Async dropdown states
   const [eanSearchTerm, setEanSearchTerm] = useState('');
@@ -235,9 +237,10 @@ export default function AllocatedStoreReportPage() {
         return (
           <span
             className="allocated-drilldown-link"
-            title={`EAN: ${eanVal || '—'}`}
-            onClick={() => {
-              if (eanVal) navigator.clipboard?.writeText(String(eanVal));
+            title={`Click to view details for EAN: ${eanVal || '—'}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedEncodingRow(row);
             }}
           >
             {eanVal || '—'}
@@ -253,9 +256,10 @@ export default function AllocatedStoreReportPage() {
         return (
           <span
             className="allocated-drilldown-link"
-            title={`Encoding Tags: ${tagVal}`}
-            onClick={() => {
-              // Placeholder for future drilldown action
+            title={`Click to view details for Encoding Tags: ${tagVal}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedEncodingRow(row);
             }}
           >
             {Number(tagVal).toLocaleString('en-IN')}
@@ -435,6 +439,16 @@ export default function AllocatedStoreReportPage() {
             exportFileName={`Allocated_Store_Report_${searchParams.fromDate}`}
           />
         </div>
+
+        {selectedEncodingRow && (
+          <EncodingDetailsModal
+            rowData={selectedEncodingRow}
+            storeName={searchParams.storeName || storeName}
+            fromDate={searchParams.fromDate || fromDate}
+            toDate={searchParams.toDate || toDate}
+            onClose={() => setSelectedEncodingRow(null)}
+          />
+        )}
       </div>
     </AppLayout>
   );

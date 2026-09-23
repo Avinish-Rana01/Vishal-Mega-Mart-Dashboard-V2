@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { useCountUp } from '../../hooks/useCountUp';
 import './CurvedCard.css';
 
@@ -33,11 +33,12 @@ export default function CurvedCard({
   animate = true,
   onClick
 }) {
+  const autoId = useId();
   // Ensure we have an array for gradient, fallback to same color if string passed
   const colors = Array.isArray(waveColor) ? waveColor : [waveColor, waveColor];
   
-  // We need a unique ID for the SVG gradient so they don't clash on the page
-  const gradientId = `wave-grad-${String(title || 'card').replace(/[^a-zA-Z0-9]/g, '')}`;
+  // Use unique ID to prevent gradient collisions across modals and page cards
+  const gradientId = `wave-grad-${String(title || 'card').replace(/[^a-zA-Z0-9]/g, '')}-${autoId.replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const { ref, animatedValue } = useCountUp(value, 1000, animate);
 
@@ -60,19 +61,20 @@ export default function CurvedCard({
         <div 
           className="curve-card-icon-wrapper" 
           style={{ 
-            background: `linear-gradient(135deg, ${getAlphaColor(colors[0], '22')}, ${getAlphaColor(colors[1], '44')})`,
-            border: `1px solid ${getAlphaColor(colors[0], '44')}` 
+            background: `linear-gradient(135deg, ${getAlphaColor(colors[0], '22')}, ${getAlphaColor(colors[1], '38')})`,
+            border: `1px solid ${getAlphaColor(colors[0], '44')}`,
+            boxShadow: `0 4px 14px ${getAlphaColor(colors[1], '25')}`
           }}
         >
-          <div style={{ position: 'relative', zIndex: 1, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'relative', zIndex: 1, color: colors[1], display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {React.isValidElement(icon)
               ? React.cloneElement(icon, {
-                  size: icon.props?.size || 20,
-                  color: '#ffffff',
-                  stroke: '#ffffff'
+                  size: icon.props?.size || 18,
+                  color: colors[1],
+                  stroke: colors[1]
                 })
               : icon || (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill={colors[1]}>
                   <path d="M21.6 5.34l-3.23-1.78c-.28-.15-.59-.22-.91-.22H6.54c-.32 0-.63.07-.91.22L2.4 5.34C1.56 5.81 1.25 6.89 1.7 7.73l.6 1.08c.46.84 1.53 1.15 2.38.68l.32-.18V20c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V9.31l.32.18c.85.47 1.92.16 2.38-.68l.6-1.08c.45-.84.14-1.92-.7-2.39zM12 4c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2z"/>
                 </svg>
               )}

@@ -28,7 +28,7 @@ export default function HuDetailsModal({ huRow, huStatus, fromDate, toDate, onCl
         searchTerm,
         pageIndex,
         pageSize,
-        huStatus: String(huStatus || '1'),
+        huStatus: (huStatus !== undefined && huStatus !== null && String(huStatus).trim() !== '') ? String(huStatus) : '1',
         huNo: huRow.HU_Number || huRow.hu_number || '',
         refNo: huRow.Ref_No || huRow.ref_No || '',
         fromDate: fromDate || '',
@@ -63,26 +63,26 @@ export default function HuDetailsModal({ huRow, huStatus, fromDate, toDate, onCl
     {
       title: 'HU STATUS',
       value: String(huStatus) === '0' ? 'UNPROCESSED HU' : 'PROCESSED HU',
-      waveColor: ['#86efac', '#22c55e'],
-      icon: <Icons.PackageCheck size={20} color="#ffffff" />
+      waveColor: ['#7dd3fc', '#0284c7'],
+      icon: <Icons.PackageCheck size={20} />
     },
     {
       title: 'HU NUMBER',
       value: huRow.HU_Number || huRow.hu_number || '—',
       waveColor: ['#bef264', '#84cc16'],
-      icon: <Icons.FileText size={20} color="#ffffff" />
+      icon: <Icons.FileText size={20} />
     },
     {
       title: 'ACTUAL QTY',
       value: Number(summaryData.actualQty || 0).toLocaleString('en-IN'),
-      waveColor: ['#fde047', '#eab308'],
-      icon: <Icons.CheckSquare size={20} color="#ffffff" />
+      waveColor: ['#c084fc', '#9333ea'],
+      icon: <Icons.CheckSquare size={20} />
     },
     {
       title: 'SCANNED QTY',
       value: Number(summaryData.scannedQty || 0).toLocaleString('en-IN'),
-      waveColor: ['#f472b6', '#db2777'],
-      icon: <Icons.Scan size={20} color="#ffffff" />
+      waveColor: ['#fcd34d', '#ea580c'],
+      icon: <Icons.Scan size={20} />
     }
   ], [huRow, huStatus, summaryData]);
 
