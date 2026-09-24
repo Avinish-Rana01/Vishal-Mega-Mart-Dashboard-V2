@@ -256,8 +256,8 @@ export default function DcValidationSection() {
           { color: COLOR_UNPROCESSED, label: 'Unprocessed HU' },
         ]} />
 
-        {/* Chart Scroll Area */}
-        <div className="cc-chart-scroll" style={{ minHeight: '275px', maxHeight: '275px', overflowY: 'hidden' }}>
+        {/* Chart Container */}
+        <div style={{ minHeight: '275px', maxHeight: '275px', height: '275px', width: '100%', overflow: 'hidden', position: 'relative' }}>
           {chartData.length === 0 ? (
             <SearchEmptyState 
               searchFilter={searchFilter}
@@ -266,7 +266,7 @@ export default function DcValidationSection() {
               onClearSearch={() => setSearchFilter('')}
             />
           ) : (
-            <div style={{ minWidth: `max(100%, ${chartData.length * 60}px)`, height: '100%' }}>
+            <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
               <GroupedBarChart
                 data={chartData}
                 bars={[
@@ -276,6 +276,7 @@ export default function DcValidationSection() {
                 height="100%"
                 hideLegend={true}
                 showValues={true}
+                isAnimationActive={false}
               />
             </div>
           )}

@@ -5,12 +5,12 @@ import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import LiveTickerValue from '../../../components/common/LiveTickerValue';
-import StoreRankList from '../../../components/charts/StoreRankList';
 import DonutChart from '../../../components/charts/DonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartLegend from '../../../components/common/ChartLegend';
+import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
 import * as Icons from 'lucide-react';
@@ -81,7 +81,7 @@ export default function DcEncodingSection() {
       );
     }
     return (
-      <div style={{ width: '100%', height: '100%' }}>
+      <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 25, right: 10, left: -15, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -103,7 +103,7 @@ export default function DcEncodingSection() {
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
               formatter={(value) => value.toLocaleString('en-IN')}
             />
-            <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={24} isAnimationActive={true}>
+            <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={24} isAnimationActive={false}>
               <LabelList
                 dataKey="Encoded"
                 position="top"
@@ -152,8 +152,9 @@ export default function DcEncodingSection() {
         <KpiCard2 title="Average Encoding / Hour" value={<LiveTickerValue value={Number(avgPerHour) || 0} />} icon={<Icons.TrendingUp />} />
       </div>
 
-      {/* 2. Charts Row */}
-      <div className="ds-charts-row" style={{ height: '370px' }}>
+      {/* 2. Side-by-side Charts Row (70% Hourly Activity + 30% Target Progress) */}
+      <div className="ds-charts-row" style={{ gridTemplateColumns: '7fr 3fr', height: '320px' }}>
+        {/* Left (70%): Hourly Encoding Activity Bar Graph */}
         <div className="ds-card ds-card--main" style={{ display: 'flex', flexDirection: 'column' }}>
           <ChartToolbar
             leftContent={
@@ -163,68 +164,58 @@ export default function DcEncodingSection() {
                 </h3>
               </div>
             }
+            rightContent={
+              <NeuromorphicButton value="Here" />
+            }
           />
 
           {/* Legend */}
           <ChartLegend items={[
-            { color: '#0ea5e9', label: 'Tags Encoded' }
+            { color: '#3b82f6', label: 'Tags Encoded' }
           ]} />
 
-          <div style={{ flex: 1, minHeight: 0, position: 'relative' }} ref={chartRef}>
-            <div style={{ position: 'absolute', inset: 0, overflowX: 'auto', overflowY: 'hidden' }}>
-              <div style={{ minWidth: `max(100%, ${chartData.length * 56}px)`, height: '100%' }}>
-                {chartVisible && memoizedChart}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Split Layout (Rank List & Donut Chart) */}
-      <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
-        {/* Left: Most Active Hours */}
-        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
-            Most Active Hours
-          </h3>
-          <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto', overflowX: 'hidden' }}>
-            <StoreRankList
-              items={rankList}
-              labelKey="timeBlock"
-              sublabelKey=""
-              valueKey="count"
-              statusFn={() => 'info'}
-              formatValue={(val) => `${val} Tags`}
-              maxItems={3}
-            />
+          <div style={{ flex: 1, minHeight: 0, width: '100%', height: '100%', position: 'relative' }} ref={chartRef}>
+            {chartVisible && memoizedChart}
           </div>
         </div>
 
-        {/* Right: Target Progress */}
+        {/* Right (30%): Encoding Target Progress Semicircle */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
-            Encoding Target Progress
-          </h3>
+          <ChartToolbar
+            leftContent={
+              <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
+                Encoding Target Progress
+              </h3>
+            }
+          />
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {(() => {
-              const TARGET_ENCODING = 2500; // Adjusted for mock data volume
+              const TARGET_ENCODING = 5000;
               const percent = totalEncoded > 0 ? Math.min((totalEncoded / TARGET_ENCODING) * 100, 100).toFixed(0) : 0;
               const remaining = Math.max(TARGET_ENCODING - totalEncoded, 0);
               
               return (
                 <DonutChart
                   segments={[
-                    { name: 'Encoded', value: totalEncoded, color: '#c026d3' },
+                    { name: 'Encoded', value: totalEncoded, color: '#3b82f6' },
                     { name: 'Remaining', value: remaining, color: '#e2e8f0' }
                   ]}
                   centerText={`${percent}%`}
                   centerSubtext={
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                      <span>{`${totalEncoded.toLocaleString('en-IN')} / ${TARGET_ENCODING.toLocaleString('en-IN')}`}</span>
-                      {/* <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>Encoded</span> */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                      <span style={{ fontSize: '15px', fontWeight: 700, color: '#1e293b' }}>
+                        {`${totalEncoded.toLocaleString('en-IN')} / ${TARGET_ENCODING.toLocaleString('en-IN')}`}
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: 500, color: '#64748b' }}>
+                        Tags Target
+                      </span>
                     </div>
                   }
                   height={220}
+                  innerRadius="64%"
+                  outerRadius="88%"
+                  cy="78%"
+                  centerTop="73%"
                   showLegend={false}
                   halfCircle={true}
                   tooltipFormatter={(value, name) => 

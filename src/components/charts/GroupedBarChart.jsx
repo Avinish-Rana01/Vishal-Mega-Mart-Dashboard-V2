@@ -36,7 +36,8 @@ export default function GroupedBarChart({
   margin,
   xAxisTickFormatter,
   onAxisClick,
-  xAxisFontSize = 11
+  xAxisFontSize = 11,
+  isAnimationActive = true
 }) {
   if (!data || data.length === 0) {
     if (!emptyText) {
@@ -137,6 +138,7 @@ export default function GroupedBarChart({
                 fill={striped && idx === 0 ? 'url(#gchart-stripe)' : bar.color}
                 radius={stacked ? 0 : 12}
                 barSize={maxBarWidth || (stacked ? 32 : 24)}
+                isAnimationActive={isAnimationActive}
                 onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
                 cursor={onBarClick ? 'pointer' : 'default'}
               >

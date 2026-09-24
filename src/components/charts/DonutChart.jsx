@@ -18,6 +18,10 @@ export default function DonutChart({
   height = 220,
   showLegend = true,
   halfCircle = false,
+  innerRadius,
+  outerRadius,
+  cy,
+  centerTop,
   tooltipFormatter = (value) => value.toLocaleString('en-IN'),
 }) {
   if (!segments || segments.length === 0) {
@@ -37,6 +41,11 @@ export default function DonutChart({
 
   const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
+  const defaultCy = halfCircle ? "75%" : (showLegend ? "45%" : "50%");
+  const defaultInner = innerRadius || (halfCircle ? "65%" : "55%");
+  const defaultOuter = outerRadius || (halfCircle ? "95%" : "80%");
+  const defaultCenterTop = centerTop || (halfCircle ? '72%' : (showLegend ? '45%' : '50%'));
+
   return (
     <div ref={containerRef} style={{ position: 'relative', height: height, width: '100%' }}>
       {hasBeenVisible && (
@@ -46,11 +55,11 @@ export default function DonutChart({
               <Pie
                 data={segments}
                 cx="50%"
-                cy={halfCircle ? "75%" : (showLegend ? "45%" : "50%")}
+                cy={cy || defaultCy}
                 startAngle={halfCircle ? 180 : 360}
                 endAngle={0}
-                innerRadius="55%"
-                outerRadius="80%"
+                innerRadius={defaultInner}
+                outerRadius={defaultOuter}
                 paddingAngle={1.5}
                 dataKey="value"
                 stroke="none"
@@ -80,7 +89,7 @@ export default function DonutChart({
           {(centerText || centerSubtext) && (
             <div style={{
               position: 'absolute',
-              top: halfCircle ? '70%' : (showLegend ? '45%' : '50%'),
+              top: defaultCenterTop,
               left: '50%',
               transform: 'translate(-50%, -50%)',
               textAlign: 'center',
