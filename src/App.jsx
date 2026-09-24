@@ -16,6 +16,7 @@ import ReturnReconciliationReportPage from './pages/Report/ReturnReconciliationR
 import DcReportPage from './pages/Report/DcReportPage';
 import HuReportPage from './pages/Report/HuReportPage';
 import AllocatedStoreReportPage from './pages/Report/AllocatedStoreReportPage';
+import WHEncodingSummaryPage from './pages/Report/WHEncodingSummaryPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -169,6 +170,15 @@ export default function App() {
             <Route 
               path="/reports/encoding-store-report" 
               element={<Navigate to="/reports/allocated-store-report" replace />} 
+            />
+
+            <Route 
+              path="/reports/dc-encoding-summary" 
+              element={
+                <ProtectedRoute>
+                  <WHEncodingSummaryPage />
+                </ProtectedRoute>
+              } 
             />
 
             <Route 

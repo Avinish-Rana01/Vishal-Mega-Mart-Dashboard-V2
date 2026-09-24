@@ -32,8 +32,14 @@ export default function BaseDataTable({
   const activeSortCol = onSortChange ? externalSortCol : sortCol;
   const activeSortDir = onSortChange ? externalSortDir : sortDir;
 
-  // Show shimmer skeleton ONLY on initial load when there is NO data yet to fill
-  const showSkeleton = isLoading && (!data || data.length === 0);
+  // Track if data has ever been loaded so skeleton shimmer NEVER reappears during pagination or sorting
+  const hasLoadedOnceRef = React.useRef(false);
+  if (data && data.length > 0) {
+    hasLoadedOnceRef.current = true;
+  }
+
+  // Show shimmer skeleton ONLY on the very first initial load when there is NO data yet
+  const showSkeleton = isLoading && (!data || data.length === 0) && !hasLoadedOnceRef.current;
 
   const handleSort = (colKey) => {
     if (!ordering) return;

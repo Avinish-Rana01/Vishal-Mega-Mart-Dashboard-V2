@@ -729,5 +729,39 @@ export const searchValidationHuNumbers = async ({
 };
 
 
+// ==============================================================
+// Warehouse (DC) Encoding Summary Report
+// ==============================================================
 
+export const getWHEncodingDetails = async ({
+  searchTerm = '',
+  pageIndex = 1,
+  pageSize = 10,
+  user = '',
+  fromDate = '',
+  toDate = '',
+  sortColumn = 'ENCODE_DATE',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (user) {
+    if (!isNaN(user) && Number(user) > 0) {
+      params.append('User', user);
+    } else if (!searchTerm) {
+      params.append('SearchTerm', user);
+    }
+  }
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
 
+  const response = await axios.get(`${API_BASE}/GetWHEncodingDetails?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};

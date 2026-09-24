@@ -1,63 +1,59 @@
 /* ==========================================================================
-   Neuromorphic Pill Button (.vmm-neuro-btn)
-   Soft extruded / embossed neuromorphic aesthetics with subtle inner shadows
+   Dashboard Pill Button (.vmm-neuro-btn)
+   Matches the DC Encoding / Dashboard card design system:
+   white bg, blue accent, subtle border, pill shape
    ========================================================================== */
 
 .vmm-neuro-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 6px 18px;
-  min-height: 32px;
-  border-radius: 9999px; /* full pill */
-  font-family: inherit;
-  font-size: 13px;
+  gap: 6px;
+  padding: 5px 16px;
+  min-height: 30px;
+  border-radius: 9999px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
   font-weight: 600;
-  color: #1e3a8a;
-  background: #f1f5f9;
+  color: #1d4ed8;
+  background: #eff6ff;
   cursor: pointer;
   user-select: none;
-  /* border: 1px solid rgba(255, 255, 255, 0.9); */
-  
-  /* Classic convex soft neuromorphism: bright highlight top-left, soft shadow bottom-right */
-  box-shadow:
-    -3px -3px 7px rgba(255, 255, 255, 0.95),
-     3px  3px 7px rgba(160, 175, 200, 0.35),
-     inset 1px 1px 1px rgba(255, 255, 255, 0.8);
-     
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.03em;
+  border: 1.5px solid #93c5fd;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  white-space: nowrap;
 }
 
 .vmm-neuro-btn:hover {
-  color: #1d4ed8; 
-  background: #eef2f6;
-  box-shadow:
-    -4px -4px 9px rgba(255, 255, 255, 1),
-     4px  4px 10px rgba(160, 175, 200, 0.45),
-     inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+  color: #1e40af;
+  background: #dbeafe;
+  border-color: #60a5fa;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.22), 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* Pressed / Active state: inset concave recess effect */
+/* Pressed / Active state */
 .vmm-neuro-btn:active,
 .vmm-neuro-btn--active {
-  color: #2563eb;
-  background: #e2e8f0;
-  box-shadow:
-    inset -2px -2px 5px rgba(255, 255, 255, 0.8),
-    inset  2px  2px 5px rgba(148, 163, 184, 0.45);
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #3b82f6;
+  box-shadow: inset 0 1px 3px rgba(59, 130, 246, 0.2);
 }
 
 .vmm-neuro-btn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
-  box-shadow:
-    -1px -1px 3px rgba(255, 255, 255, 0.6),
-     1px  1px 3px rgba(160, 175, 200, 0.2);
+  box-shadow: none;
 }
 
 .vmm-neuro-btn__value {
   display: inline-block;
-  letter-spacing: 0.02em;
+}
+
+.vmm-neuro-btn__icon {
+  display: inline-flex;
+  align-items: center;
 }

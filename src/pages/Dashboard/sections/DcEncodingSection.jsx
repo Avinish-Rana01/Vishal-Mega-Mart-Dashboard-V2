@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './DcEncodingSection.css';
 import { useWarehouseEncoding } from '../../../hooks/useDashboardData';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
@@ -17,6 +18,7 @@ import * as Icons from 'lucide-react';
 
 
 export default function DcEncodingSection() {
+  const navigate = useNavigate();
   const { chartData: apiData, isLoading, isRefreshing, error, highlightedBlock, connectionStatus } = useWarehouseEncoding();
   const [chartRef, chartVisible] = useIsInViewport({ threshold: 0.1 });
 
@@ -165,7 +167,11 @@ export default function DcEncodingSection() {
               </div>
             }
             rightContent={
-              <NeuromorphicButton value="Here" />
+              <NeuromorphicButton 
+                value="View Summary" 
+                icon={<Icons.ArrowUpRight size={12} />} 
+                onClick={() => navigate('/reports/dc-encoding-summary')}
+              />
             }
           />
 

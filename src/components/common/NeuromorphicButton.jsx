@@ -35,8 +35,8 @@ export default function NeuromorphicButton({
       title={title}
       {...props}
     >
-      {icon && <span className="vmm-neuro-btn__icon">{icon}</span>}
       <span className="vmm-neuro-btn__value">{children ?? value}</span>
+      {icon && <span className="vmm-neuro-btn__icon">{icon}</span>}
     </button>
   );
 }

@@ -1,0 +1,170 @@
+/* ==============================================
+   WHEncodingSummary.css
+   Styles for Warehouse Encoding Summary Report
+   ============================================== */
+
+/* ---- EPC Range Breakdown Container ---- */
+.wh-range-container {
+  margin: 6px 10px 4px 10px;
+}
+
+/* ---- EPC Range Breakdown Row ---- */
+.wh-range-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 6px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.wh-range-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.wh-range-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.wh-range-card {
+  flex: 0 0 auto;
+  min-width: 100px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.wh-range-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 10px 10px 0 0;
+}
+
+.wh-range-card:hover {
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.12);
+  border-color: #93c5fd;
+}
+
+.wh-range-card--total {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-color: #93c5fd;
+  min-width: 110px;
+}
+
+.wh-range-card--total::before {
+  background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+  height: 4px;
+}
+
+.wh-range-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.wh-range-card--total .wh-range-title {
+  color: #1e3a8a;
+}
+
+.wh-range-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wh-range-check {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.wh-range-check svg {
+  flex-shrink: 0;
+}
+
+.wh-range-error {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.wh-range-error svg {
+  flex-shrink: 0;
+}
+
+.wh-range-pct {
+  font-size: 9px;
+  font-weight: 600;
+  color: #ef4444;
+  margin-top: 1px;
+}
+
+.wh-range-pct--zero {
+  color: #16a34a;
+}
+
+/* ---- Section label above range row ---- */
+.wh-range-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+/* ---- Page layout overrides ---- */
+.wh-encoding-page .report-curved-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.wh-encoding-page .report-curved-cards .ds-kpi-item {
+  min-width: 0;
+}
+
+/* ---- Total Error % cell highlight ---- */
+.wh-error-cell {
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.wh-error-cell--zero {
+  color: #16a34a;
+}
+
+/* ---- Total count cell ---- */
+.wh-total-cell {
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+/* ---- Export buttons row above table ---- */
+.wh-export-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}

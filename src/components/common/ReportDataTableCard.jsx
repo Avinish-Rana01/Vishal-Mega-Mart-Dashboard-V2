@@ -66,17 +66,30 @@ export default function ReportDataTableCard({
     return () => clearTimeout(handler);
   }, [internalSearch]);
 
+  // Maintain previously loaded rows so pagination / sorting swaps data seamlessly without showing skeleton
+  const [displayData, setDisplayData] = useState(data || []);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setDisplayData(data);
+    } else if (!isLoading && !isRefreshing) {
+      // Only set to empty if loading has finished and the result is truly empty
+      setDisplayData([]);
+    }
+  }, [data, isLoading, isRefreshing]);
+
   // Filter Data Internally only if onSearch is NOT provided (client-side fallback)
   const filteredData = useMemo(() => {
-    if (onSearch || !internalSearch.trim()) return data;
+    const sourceData = (data && data.length > 0) ? data : displayData;
+    if (onSearch || !internalSearch.trim()) return sourceData;
     const term = internalSearch.toLowerCase();
-    return data.filter((row) => {
+    return sourceData.filter((row) => {
       return columns.some((col) => {
         const val = row[col.key];
         return val !== undefined && val !== null && String(val).toLowerCase().includes(term);
       });
     });
-  }, [data, internalSearch, columns, onSearch]);
+  }, [data, displayData, internalSearch, columns, onSearch]);
 
   // Handle Export to CSV
   const handleExportCSV = () => {
