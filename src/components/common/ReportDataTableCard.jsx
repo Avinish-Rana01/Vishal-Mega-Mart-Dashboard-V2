@@ -6,6 +6,7 @@ export default function ReportDataTableCard({
   columns = [],
   data = [],
   isLoading = false,
+  isRefreshing = false,
   skeletonRowsCount = 10,
   striped = true,
   onRowClick = null,
@@ -211,7 +212,7 @@ export default function ReportDataTableCard({
       <BaseDataTable
         columns={columns}
         data={filteredData}
-        isLoading={isLoading}
+        isLoading={isLoading || isRefreshing}
         skeletonRowsCount={skeletonRowsCount}
         onRowClick={onRowClick}
         striped={striped}

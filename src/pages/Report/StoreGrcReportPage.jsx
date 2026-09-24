@@ -115,6 +115,7 @@ export default function StoreGrcReportPage() {
     const controller = new AbortController();
     const fetchReport = async () => {
       setIsLoading(true);
+      setTableData([]);
       setError(null);
       try {
         const result = await getStoreGrcReport(selectedStore, fromDate, toDate, pageIndex, pageSize, sortColumn, sortDirection, controller.signal);

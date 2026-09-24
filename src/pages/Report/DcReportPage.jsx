@@ -48,7 +48,7 @@ export default function DcReportPage() {
 
   const [storeOptions, setStoreOptions] = useState([]);
   const [reportData, setReportData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Pagination & Sorting
@@ -93,6 +93,7 @@ export default function DcReportPage() {
   // Fetch DC Report Data
   const fetchReportData = useCallback(async (signal) => {
     setIsLoading(true);
+    setReportData([]);
     setError(null);
     try {
       const result = await getDCDetails({

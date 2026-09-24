@@ -60,6 +60,7 @@ export default function ReturnDetailsReportPage() {
   // Fetch Report Data
   const fetchReportData = async (signal) => {
     setIsLoading(true);
+    setReportData([]);
     setError(null);
     try {
       const result = await getReturnDetails(selectedStore, fromDate, toDate, pageIndex, pageSize, sortColumn || 'DATE', sortDirection || 'asc', signal);

@@ -10,7 +10,7 @@ export default function DetailsModal({
   tableColumns = [],
   tableData = [],
   totalRecords = 0,
-  isLoading = false,
+  isLoading = true,
   pageIndex = 1,
   onPageChange,
   pageSize = 10,

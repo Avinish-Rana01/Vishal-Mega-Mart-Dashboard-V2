@@ -61,6 +61,7 @@ export default function CycleCountReportPage() {
     }
     
     setIsLoading(true);
+    setReportData([]);
     setError(null);
     try {
       const result = await getCycleCountReport(pageIndex, pageSize, searchTerm, selectedStore, fromDate, toDate, sortColumn, sortDirection, signal);
