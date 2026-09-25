@@ -28,6 +28,7 @@ export default function CurvedCard({
   value, 
   waveColor = ['#3b82f6', '#2563eb'], // Default elegant blue
   icon, 
+  badge,
   progress, 
   progressText, 
   animate = true,
@@ -55,6 +56,7 @@ export default function CurvedCard({
         <div className="curve-card-text">
           <p className="curve-card-title">{title}</p>
           <h3 className="curve-card-value">{animatedValue}</h3>
+          {badge && <div className="curve-card-badge-wrapper">{badge}</div>}
         </div>
         
         {/* Dynamic Glassmorphic Icon Wrapper */}

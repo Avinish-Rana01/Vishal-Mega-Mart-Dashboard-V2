@@ -765,3 +765,75 @@ export const getWHEncodingDetails = async ({
   });
   return response.data;
 };
+
+// ==============================================================
+// HU Summary Report (DC Validation)
+// ==============================================================
+
+export const getHUSummaryDetails = async ({
+  searchTerm = '',
+  pageIndex = 1,
+  pageSize = 10,
+  hu = '',
+  fromDate = '',
+  toDate = '',
+  sortColumn = 'ENCODE_DATE',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (hu && hu !== 'ALL HU') params.append('HU', hu);
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const response = await axios.get(`${API_BASE}/api/Stock/GetHUSummaryDetails?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
+// ==============================================================
+// Tag Inventory & Recycle Distribution Report (Tag Management)
+// ==============================================================
+
+export const getTagDetails = async ({
+  searchTerm = '',
+  pageIndex = 1,
+  pageSize = 10,
+  sortColumn = 'CYCLE_COUNT',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const url = `${API_BASE}/api/Stock/GetTagDetails?${params.toString()}`;
+  try {
+    const response = await axios.get(url, {
+      headers: getHeaders(),
+      signal
+    });
+    return response.data;
+  } catch (err) {
+    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
+      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
+      const fallbackUrl = `${fallbackBase}/api/Stock/GetTagDetails?${params.toString()}`;
+      const response = await axios.get(fallbackUrl, {
+        headers: getHeaders(),
+        signal
+      });
+      return response.data;
+    }
+    throw err;
+  }
+};
+
+

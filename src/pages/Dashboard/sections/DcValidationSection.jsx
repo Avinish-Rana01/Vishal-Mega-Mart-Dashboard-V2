@@ -13,6 +13,7 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import LiveTickerValue from '../../../components/common/LiveTickerValue';
+import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import '../../../components/charts/DashboardSection.css';
 import './CycleCountShared.css';
 import * as Icons from 'lucide-react';
@@ -298,14 +299,22 @@ export default function DcValidationSection() {
         innerWrapperStyle={{ minWidth: 'auto' }}
         tableStyle={{ width: 'auto', margin: '0 auto' }}
         headerAction={
-          <CustomDropdown
-            options={sortOptions}
-            value={tableSort}
-            onChange={setTableSort}
-            prefix="Sort:"
-            buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-            menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CustomDropdown
+              options={sortOptions}
+              value={tableSort}
+              onChange={setTableSort}
+              prefix="Sort:"
+              buttonStyle={{ minWidth: 'auto', gap: '8px', height: '28px', display: 'inline-flex', alignItems: 'center' }}
+              menuStyle={{ left: 'auto', right: 0, minWidth: '200px' }}
+            />
+            <NeuromorphicButton 
+              value="View Summary" 
+              icon={<Icons.ArrowUpRight size={12} />} 
+              onClick={() => navigate('/reports/hu-summary')}
+              style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
+            />
+          </div>
         }
         headers={[
           <div style={{ width: '100px' }}>Store</div>,

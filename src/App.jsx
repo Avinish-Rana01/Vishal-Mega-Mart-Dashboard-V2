@@ -17,6 +17,8 @@ import DcReportPage from './pages/Report/DcReportPage';
 import HuReportPage from './pages/Report/HuReportPage';
 import AllocatedStoreReportPage from './pages/Report/AllocatedStoreReportPage';
 import WHEncodingSummaryPage from './pages/Report/WHEncodingSummaryPage';
+import HuSummaryReportPage from './pages/Report/HuSummaryReportPage';
+import TagInventoryDistributionPage from './pages/Report/TagInventoryDistributionPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -182,6 +184,33 @@ export default function App() {
             />
 
             <Route 
+              path="/reports/hu-summary" 
+              element={
+                <ProtectedRoute>
+                  <HuSummaryReportPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/tag-management/distribution" 
+              element={
+                <ProtectedRoute>
+                  <TagInventoryDistributionPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/tag-distribution" 
+              element={
+                <ProtectedRoute>
+                  <TagInventoryDistributionPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
               path="/reports/total-dpos-sale" 
               element={
                 <ProtectedRoute>
@@ -208,7 +237,7 @@ export default function App() {
               path="/tags" 
               element={
                 <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Tag Management" />
+                  <TagInventoryDistributionPage />
                 </ProtectedRoute>
               } 
             />

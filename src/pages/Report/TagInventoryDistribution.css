@@ -1,0 +1,385 @@
+/* ==============================================================
+   Tag Inventory & Recycle Distribution Report Page Styles
+   Integrates with common-reports.css classes
+   ============================================================== */
+
+.report-page-container.tag-dist-page {
+  padding: 12px 16px 28px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 65px);
+  box-sizing: border-box;
+}
+
+/* ---- Top KPI Curved Cards Row (Common Reports Integration) ---- */
+.report-page-container .report-curved-cards {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  width: 100%;
+}
+
+.report-page-container .report-curved-cards .ds-kpi-item {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .report-page-container .report-curved-cards {
+    flex-direction: column;
+  }
+}
+
+/* Custom Badges inside Top Curved Cards */
+.tag-kpi-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+
+.tag-kpi-pill--red {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.tag-kpi-pill--purple {
+  background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%);
+}
+
+.tag-kpi-pill--green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.tag-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: inline-block;
+}
+
+/* Section Dotted Divider */
+.tag-section-divider {
+  width: 100%;
+  height: 1px;
+  border-bottom: 1.5px dotted #cbd5e1;
+  margin: 0;
+}
+
+/* ---- Middle Section: Store Wise Tag Inventory Card ---- */
+.tag-store-inventory-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  padding: 16px 20px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.tag-store-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tag-store-title-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tag-store-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: #ede9fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  flex-shrink: 0;
+}
+
+.tag-store-title-left h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+}
+
+.tag-store-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tag-stat-badge {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-stat-badge strong {
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.tag-chart-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-chart-icon-btn:hover {
+  background: #ede9fe;
+  transform: translateY(-1px);
+}
+
+/* Note: GRC Incomplete */
+.tag-grc-note-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+
+.tag-grc-note {
+  font-size: 11px;
+  color: #6366f1;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.tag-grc-note-bold {
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.tag-grc-note-star {
+  color: #ef4444;
+  margin-right: 2px;
+}
+
+/* Carousel / Slider Container */
+.tag-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.tag-slider-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+
+.tag-slider-arrow:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  transform: scale(1.05);
+}
+
+.tag-slider-track {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  padding: 8px 4px;
+  flex: 1;
+}
+
+.tag-slider-track::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Individual Store Cards in Slider */
+.tag-store-item-card {
+  flex: 0 0 240px;
+  min-width: 220px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #eef2f6;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.tag-store-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+.tag-store-item-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease;
+}
+
+.tag-store-item-card:hover .tag-store-item-icon-box {
+  transform: scale(1.1);
+}
+
+/* Color variations for store cards */
+.tag-store-item-icon-box--purple {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+.tag-store-item-icon-box--green {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.tag-store-item-icon-box--orange {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+.tag-store-item-icon-box--blue {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.tag-store-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.tag-store-item-name .star {
+  color: #ef4444;
+  margin-left: 2px;
+  font-weight: 700;
+}
+
+.tag-store-item-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0284c7;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Bottom Data Table Pill Badges ---- */
+
+.tag-id-cell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #334155;
+  letter-spacing: 0.02em;
+}
+
+/* Tag Location Pill Badges */
+.tag-location-pill {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 80px;
+}
+
+.tag-location-pill--warehouse {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+.tag-location-pill--store {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+/* Status Pill Badges */
+.tag-status-pill {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 110px;
+}
+
+.tag-status-pill--warehouse {
+  background-color: #f3e8ff;
+  color: #9333ea;
+}
+
+.tag-status-pill--grc {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.tag-status-pill--cycle {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.tag-status-pill--default {
+  background-color: #f1f5f9;
+  color: #475569;
+}

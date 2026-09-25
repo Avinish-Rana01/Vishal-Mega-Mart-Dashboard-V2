@@ -38,17 +38,17 @@ export default function DashboardDataGrid({
 
   return (
     <div className="cc-data-grid-card">
-      <div className="cc-data-grid-header">
+      <div className="cc-data-grid-header" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <h3 className="cc-data-grid-title">{title}</h3>
+          <h3 className="cc-data-grid-title" style={{ margin: 0, display: 'flex', alignItems: 'center' }}>{title}</h3>
           {subtitle && (
-            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, display: 'inline-flex', alignItems: 'center' }}>
               {subtitle}
             </span>
           )}
         </div>
         {headerAction && (
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             {headerAction}
           </div>
         )}

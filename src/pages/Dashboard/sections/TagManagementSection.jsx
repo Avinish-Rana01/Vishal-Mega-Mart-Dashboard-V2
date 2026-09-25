@@ -1,5 +1,6 @@
 import React from 'react';
-import { Tags } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Tags, ArrowUpRight } from 'lucide-react';
 import './TagManagementSection.css';
 import { useTagCharts } from '../../../hooks/useDashboardData';
 import KpiCard2 from '../../../components/charts/KpiCard2';
@@ -8,6 +9,7 @@ import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
+import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 
 import '../../../components/charts/DashboardSection.css';
 
@@ -20,6 +22,7 @@ const Icons = {
 };
 
 export default function TagManagementSection() {
+  const navigate = useNavigate();
   const {
     locationData,
     locationTotal,
@@ -162,6 +165,12 @@ export default function TagManagementSection() {
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="ds-card-title--flex" style={{ marginBottom: '1px' }}>
             <h3 className="ds-card-title" style={{ margin: 0 }}>Tag Recycling Distribution</h3>
+            <NeuromorphicButton 
+              value="View Summary" 
+              icon={<ArrowUpRight size={12} />} 
+              onClick={() => navigate('/tag-management/distribution')}
+              style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
+            />
           </div>
 
           <div className="ds-donut-layout">
