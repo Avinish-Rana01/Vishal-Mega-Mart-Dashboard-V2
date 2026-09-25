@@ -7,7 +7,7 @@ import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getWHEncodingDetails } from '../../services/stockService';
-import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
+import { dateRenderer, numRenderer, numRendererRed } from '../../utils/dashboardColumns';
 import * as Icons from 'lucide-react';
 import './common-reports.css';
 import './WHEncodingSummary.css';
@@ -28,19 +28,14 @@ const EPC_RANGES = [
   { key: '7TO8',   dataKey: 'N7_TO_8',   errKey: 'N7_TO_8_ERR',   label: '7 TO 8',   summaryKey: 'c19TO20', summaryErrKey: 'c19TO20_ERR' },
 ];
 
-// ---- Helper: date string generators ----
-const getSixMonthsAgo = () => {
-  const d = new Date();
-  d.setMonth(d.getMonth() - 6);
-  return d.toISOString().split('T')[0];
-};
+// ---- Helper: date string generator ----
 const getTodayDate = () => new Date().toISOString().split('T')[0];
 
 export default function WHEncodingSummaryPage() {
   const navigate = useNavigate();
 
-  // Filter state
-  const [fromDate, setFromDate] = useState(getSixMonthsAgo());
+  // Filter state - default to current date
+  const [fromDate, setFromDate] = useState(getTodayDate());
   const [toDate, setToDate] = useState(getTodayDate());
   const [selectedUser, setSelectedUser] = useState('');
 
@@ -131,7 +126,7 @@ export default function WHEncodingSummaryPage() {
 
   // ---- Handlers ----
   const handleClear = () => {
-    setFromDate(getSixMonthsAgo());
+    setFromDate(getTodayDate());
     setToDate(getTodayDate());
     setSelectedUser('');
     setSearchTerm('');
@@ -197,7 +192,7 @@ export default function WHEncodingSummaryPage() {
         const err = row.TOTAL_ERROR_EPC ?? val ?? 0;
         return (
           <span className={err > 0 ? 'wh-error-cell' : 'wh-error-cell--zero'}>
-            {numRenderer(err)}
+            {err > 0 ? numRendererRed(err) : numRenderer(err)}
           </span>
         );
       }

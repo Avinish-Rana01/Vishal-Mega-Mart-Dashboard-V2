@@ -29,7 +29,7 @@
 
 .wh-range-card {
   flex: 0 0 auto;
-  min-width: 100px;
+  min-width: 105px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
@@ -61,7 +61,7 @@
 .wh-range-card--total {
   background: linear-gradient(135deg, #eff6ff, #dbeafe);
   border-color: #93c5fd;
-  min-width: 110px;
+  min-width: 115px;
 }
 
 .wh-range-card--total::before {
@@ -89,29 +89,35 @@
 }
 
 .wh-range-check {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 3px;
   font-size: 12px;
   font-weight: 700;
   color: #16a34a;
+  white-space: nowrap;
 }
 
 .wh-range-check svg {
   flex-shrink: 0;
+  width: 11px;
+  height: 11px;
 }
 
 .wh-range-error {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 3px;
   font-size: 12px;
   font-weight: 700;
   color: #ef4444;
+  white-space: nowrap;
 }
 
 .wh-range-error svg {
   flex-shrink: 0;
+  width: 11px;
+  height: 11px;
 }
 
 .wh-range-pct {
@@ -119,6 +125,7 @@
   font-weight: 600;
   color: #ef4444;
   margin-top: 1px;
+  white-space: nowrap;
 }
 
 .wh-range-pct--zero {
@@ -146,13 +153,20 @@
   min-width: 0;
 }
 
-/* ---- Total Error % cell highlight ---- */
-.wh-error-cell {
+/* ---- Total Error cell highlight ---- */
+.wh-error-cell,
+.wh-error-cell .vmm-link-num {
   font-weight: 700;
-  color: #ef4444;
+  color: #ef4444 !important;
 }
 
-.wh-error-cell--zero {
+.wh-error-cell:hover,
+.wh-error-cell .vmm-link-num:hover {
+  color: #dc2626 !important;
+}
+
+.wh-error-cell--zero,
+.wh-error-cell--zero .vmm-link-num {
   color: #16a34a;
 }
 
@@ -167,4 +181,37 @@
   display: flex;
   gap: 8px;
   margin-bottom: 6px;
+}
+
+/* ---- Remove underline and make table compact to avoid horizontal scroll ---- */
+.wh-encoding-page .report-table-wrapper td,
+.wh-encoding-page .report-table-wrapper td *,
+.wh-encoding-page .report-table-wrapper .vmm-link-num {
+  text-decoration: none !important;
+  cursor: default;
+}
+
+.wh-encoding-page .report-table-wrapper td:hover,
+.wh-encoding-page .report-table-wrapper td *:hover,
+.wh-encoding-page .report-table-wrapper .vmm-link-num:hover {
+  text-decoration: none !important;
+}
+
+.wh-encoding-page .vmm-table th,
+.wh-encoding-page .vmm-th {
+  padding: 6px 3px !important;
+  font-size: 10px !important;
+}
+
+.wh-encoding-page .vmm-th-content {
+  gap: 2px;
+}
+
+.wh-encoding-page .vmm-table td {
+  padding: 5px 3px !important;
+  font-size: 10px !important;
+}
+
+.wh-encoding-page .vmm-table-container {
+  margin: 4px 0 6px 0;
 }
