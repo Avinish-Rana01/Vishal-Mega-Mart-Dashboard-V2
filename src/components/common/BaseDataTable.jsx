@@ -140,7 +140,7 @@ export default function BaseDataTable({
                   return (
                     <th 
                       key={col.key} 
-                      className={`vmm-th ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`}
+                      className={`vmm-th ${col.className || ''} ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`.trim()}
                       onClick={() => isSortable && handleSort(col.key)}
                       style={col.width ? { width: col.width } : undefined}
                     >

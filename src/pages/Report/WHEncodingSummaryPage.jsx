@@ -8,25 +8,10 @@ import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getWHEncodingDetails } from '../../services/stockService';
 import { dateRenderer, numRenderer, numRendererRed } from '../../utils/dashboardColumns';
+import EpcRangeBreakdown, { DEFAULT_EPC_RANGES as EPC_RANGES } from '../../components/common/EpcRangeBreakdown';
 import * as Icons from 'lucide-react';
 import './common-reports.css';
 import './WHEncodingSummary.css';
-
-// ---- EPC Range definition with exact DB column mappings ----
-const EPC_RANGES = [
-  { key: '8TO9',   dataKey: 'N8_TO_9',   errKey: 'N8_TO_9_ERR',   label: '8 TO 9',   summaryKey: 'c8TO9',   summaryErrKey: 'c8TO9_ERR' },
-  { key: '9TO10',  dataKey: 'N9_TO_10',  errKey: 'N9_TO_10_ERR',  label: '9 TO 10',  summaryKey: 'c9TO10',  summaryErrKey: 'c9TO10_ERR' },
-  { key: '10TO11', dataKey: 'N10_TO_11', errKey: 'N10_TO_11_ERR', label: '10 TO 11', summaryKey: 'c10TO11', summaryErrKey: 'c10TO11_ERR' },
-  { key: '11TO12', dataKey: 'N11_TO_12', errKey: 'N11_TO_12_ERR', label: '11 TO 12', summaryKey: 'c11TO12', summaryErrKey: 'c11TO12_ERR' },
-  { key: '12TO1',  dataKey: 'N12_TO_1',  errKey: 'N12_TO_1_ERR',  label: '12 TO 1',  summaryKey: 'c12TO13', summaryErrKey: 'c12TO13_ERR' },
-  { key: '1TO2',   dataKey: 'N1_TO_2',   errKey: 'N1_TO_2_ERR',   label: '1 TO 2',   summaryKey: 'c13TO14', summaryErrKey: 'c13TO14_ERR' },
-  { key: '2TO3',   dataKey: 'N2_TO_3',   errKey: 'N2_TO_3_ERR',   label: '2 TO 3',   summaryKey: 'c14TO15', summaryErrKey: 'c14TO15_ERR' },
-  { key: '3TO4',   dataKey: 'N3_TO_4',   errKey: 'N3_TO_4_ERR',   label: '3 TO 4',   summaryKey: 'c15TO16', summaryErrKey: 'c15TO16_ERR' },
-  { key: '4TO5',   dataKey: 'N4_TO_5',   errKey: 'N4_TO_5_ERR',   label: '4 TO 5',   summaryKey: 'c16TO17', summaryErrKey: 'c16TO17_ERR' },
-  { key: '5TO6',   dataKey: 'N5_TO_6',   errKey: 'N5_TO_6_ERR',   label: '5 TO 6',   summaryKey: 'c17TO18', summaryErrKey: 'c17TO18_ERR' },
-  { key: '6TO7',   dataKey: 'N6_TO_7',   errKey: 'N6_TO_7_ERR',   label: '6 TO 7',   summaryKey: 'c18TO19', summaryErrKey: 'c18TO19_ERR' },
-  { key: '7TO8',   dataKey: 'N7_TO_8',   errKey: 'N7_TO_8_ERR',   label: '7 TO 8',   summaryKey: 'c19TO20', summaryErrKey: 'c19TO20_ERR' },
-];
 
 // ---- Helper: date string generator ----
 const getTodayDate = () => new Date().toISOString().split('T')[0];
@@ -135,15 +120,6 @@ export default function WHEncodingSummaryPage() {
     setPageIndex(1);
   };
 
-  // ---- Compute total EPC range counts ----
-  const totalRangeCount = useMemo(() => {
-    return EPC_RANGES.reduce((sum, { key }) => sum + (rangeSummary[key]?.count || 0), 0);
-  }, [rangeSummary]);
-
-  const totalRangeError = useMemo(() => {
-    return EPC_RANGES.reduce((sum, { key }) => sum + (rangeSummary[key]?.error || 0), 0);
-  }, [rangeSummary]);
-
   // ---- Table Columns ----
   const columns = useMemo(() => {
     const cols = [
@@ -178,9 +154,10 @@ export default function WHEncodingSummaryPage() {
     cols.push({
       key: 'TOTAL_ENCODE_EPC',
       label: 'TOTAL COUNT',
+      className: 'wh-col-total-count',
       render: (val, row) => (
-        <span className="wh-total-cell">
-          {numRenderer(row.TOTAL_ENCODE_EPC ?? row.TOTAL_ENC ?? val ?? 0)}
+        <span className="wh-badge-count">
+          {(row.TOTAL_ENCODE_EPC ?? row.TOTAL_ENC ?? val ?? 0).toLocaleString('en-IN')}
         </span>
       )
     });
@@ -188,11 +165,12 @@ export default function WHEncodingSummaryPage() {
     cols.push({
       key: 'TOTAL_ERROR_EPC',
       label: 'TOTAL ERROR',
+      className: 'wh-col-total-error',
       render: (val, row) => {
         const err = row.TOTAL_ERROR_EPC ?? val ?? 0;
         return (
-          <span className={err > 0 ? 'wh-error-cell' : 'wh-error-cell--zero'}>
-            {err > 0 ? numRendererRed(err) : numRenderer(err)}
+          <span className={err > 0 ? 'wh-badge-error' : 'wh-badge-error--zero'}>
+            {err.toLocaleString('en-IN')}
           </span>
         );
       }
@@ -213,12 +191,6 @@ export default function WHEncodingSummaryPage() {
 
     return cols;
   }, [pageIndex, pageSize]);
-
-  // ---- Helper: compute error % for a range ----
-  const getRangeErrorPct = (count, error) => {
-    if (!count || count === 0) return 0;
-    return ((error / count) * 100).toFixed(1);
-  };
 
   return (
     <AppLayout
@@ -333,48 +305,8 @@ export default function WHEncodingSummaryPage() {
           </div>
         </div>
 
-        {/* EPC Range Breakdown */}
-        <div className="wh-range-container">
-          <div className="wh-range-label">Total EPC Count By Range</div>
-          <div className="wh-range-scroll">
-            {EPC_RANGES.map(({ key, label }) => {
-              const count = rangeSummary[key]?.count || 0;
-              const error = rangeSummary[key]?.error || 0;
-              const pct = getRangeErrorPct(count, error);
-              return (
-                <div key={key} className="wh-range-card">
-                  <div className="wh-range-title">{label}</div>
-                  <div className="wh-range-stats">
-                    <span className="wh-range-check">
-                      <Icons.Check size={11} /> {count.toLocaleString('en-IN')}
-                    </span>
-                    <span className="wh-range-error">
-                      <Icons.Triangle size={11} /> {error.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <div className={`wh-range-pct ${parseFloat(pct) === 0 ? 'wh-range-pct--zero' : ''}`}>
-                    {pct}% error
-                  </div>
-                </div>
-              );
-            })}
-            {/* TOTAL TAGS card */}
-            <div className="wh-range-card wh-range-card--total">
-              <div className="wh-range-title">TOTAL TAGS</div>
-              <div className="wh-range-stats">
-                <span className="wh-range-check">
-                  <Icons.Check size={11} /> {totalRangeCount.toLocaleString('en-IN')}
-                </span>
-                <span className="wh-range-error">
-                  <Icons.Triangle size={11} /> {totalRangeError.toLocaleString('en-IN')}
-                </span>
-              </div>
-              <div className={`wh-range-pct ${totalRangeCount === 0 ? 'wh-range-pct--zero' : ''}`}>
-                {getRangeErrorPct(totalRangeCount, totalRangeError)}% error
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Reusable EPC Range Breakdown Component */}
+        <EpcRangeBreakdown rangeSummary={rangeSummary} />
 
         {/* Data Table */}
         <div className="report-table-wrapper" style={{ marginTop: '6px' }}>
