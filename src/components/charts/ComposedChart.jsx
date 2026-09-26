@@ -35,6 +35,9 @@ export default function ComposedChart({
   hideLegend = false,
   barSize = 20,
   showValues = false,
+  onBarClick,
+  onAxisClick,
+  xAxisTickFormatter
 }) {
   if (!data || data.length === 0) {
     return (
@@ -101,8 +104,28 @@ export default function ComposedChart({
             dataKey="name" 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fill: '#64748b', fontSize: 11 }} 
-            dy={10} 
+            tick={
+              onAxisClick 
+              ? (props) => {
+                  const { x, y, payload } = props;
+                  return (
+                    <g transform={`translate(${x},${y})`}>
+                      <text
+                        x={0} y={0} dy={16}
+                        textAnchor="middle"
+                        fill="#2563eb"
+                        fontSize={11}
+                        fontWeight="bold"
+                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => onAxisClick(payload.value)}
+                      >
+                        {xAxisTickFormatter ? xAxisTickFormatter(payload.value) : (payload.value && payload.value.length > 10 ? payload.value.substring(0, 10) + '…' : payload.value)}
+                      </text>
+                    </g>
+                  );
+                }
+              : { fill: '#64748b', fontSize: 11, dy: 10 }
+            }
             interval={0}
           />
           
@@ -143,6 +166,8 @@ export default function ComposedChart({
               fill={bar.color} 
               barSize={barSize}
               radius={[12, 12, 0, 0]} 
+              onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
+              cursor={onBarClick ? 'pointer' : 'default'}
             >
               {data.map((entry, idx) => (
                 <Cell key={`cell-${index}-${idx}`} fill={bar.color} />

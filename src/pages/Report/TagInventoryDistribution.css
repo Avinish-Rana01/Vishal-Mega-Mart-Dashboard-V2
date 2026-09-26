@@ -14,20 +14,20 @@
 }
 
 /* ---- Top KPI Curved Cards Row (Common Reports Integration) ---- */
-.report-page-container .report-curved-cards {
+.tag-dist-page .report-curved-cards {
   display: flex;
   gap: 14px;
   margin: 0;
   width: 100%;
 }
 
-.report-page-container .report-curved-cards .ds-kpi-item {
+.tag-dist-page .report-curved-cards .ds-kpi-item {
   flex: 1;
   min-width: 0;
 }
 
 @media (max-width: 900px) {
-  .report-page-container .report-curved-cards {
+  .tag-dist-page .report-curved-cards {
     flex-direction: column;
   }
 }

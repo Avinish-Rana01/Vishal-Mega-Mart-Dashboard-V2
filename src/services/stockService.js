@@ -836,4 +836,49 @@ export const getTagDetails = async ({
   }
 };
 
+// ==============================================================
+// Vendor HU Discrepancy Report (Vendor-Wise Discrepancy)
+// ==============================================================
+
+export const getVendorHUDiscrepancyData = async ({
+  searchTerm = '',
+  vendorCode = '',
+  fromDate = '',
+  toDate = '',
+  pageIndex = 1,
+  pageSize = 10,
+  sortColumn = 'DATE',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+  params.append('VendorCode', vendorCode || '');
+  if (fromDate) params.append('FromDate', fromDate);
+  if (toDate) params.append('ToDate', toDate);
+  params.append('PageIndex', pageIndex);
+  params.append('PageSize', pageSize);
+  if (sortColumn) params.append('SortColumn', sortColumn);
+  if (sortDirection) params.append('SortDirection', sortDirection);
+
+  const url = `${API_BASE}/api/HUDiscrepancy/GetVendorHUDiscrepancyData?${params.toString()}`;
+  try {
+    const response = await axios.get(url, {
+      headers: getHeaders(),
+      signal
+    });
+    return response.data;
+  } catch (err) {
+    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
+      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
+      const fallbackUrl = `${fallbackBase}/api/HUDiscrepancy/GetVendorHUDiscrepancyData?${params.toString()}`;
+      const response = await axios.get(fallbackUrl, {
+        headers: getHeaders(),
+        signal
+      });
+      return response.data;
+    }
+    throw err;
+  }
+};
+
 

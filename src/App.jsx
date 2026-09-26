@@ -19,6 +19,7 @@ import AllocatedStoreReportPage from './pages/Report/AllocatedStoreReportPage';
 import WHEncodingSummaryPage from './pages/Report/WHEncodingSummaryPage';
 import HuSummaryReportPage from './pages/Report/HuSummaryReportPage';
 import TagInventoryDistributionPage from './pages/Report/TagInventoryDistributionPage';
+import VendorDiscrepancySummaryPage from './pages/Report/VendorDiscrepancySummaryPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -206,6 +207,15 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <TagInventoryDistributionPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/reports/vendor-discrepancy-summary" 
+              element={
+                <ProtectedRoute>
+                  <VendorDiscrepancySummaryPage />
                 </ProtectedRoute>
               } 
             />

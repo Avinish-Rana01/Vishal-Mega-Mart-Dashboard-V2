@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './VendorDiscrepancySection.css';
 import { useVendorDiscrepancy } from '../../../hooks/useDashboardData';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
@@ -9,11 +10,13 @@ import ComposedChart from '../../../components/charts/ComposedChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
+import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import '../../../components/charts/DashboardSection.css';
 import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
 
 export default function VendorDiscrepancySection() {
+  const navigate = useNavigate();
   const { data, totals, isLoading, isRefreshing, error, highlightedVendor, connectionStatus } = useVendorDiscrepancy();
   const [chartView, setChartView] = useState('volume');
   const [sortBy, setSortBy] = useState('EXPECTED_DESC');
@@ -41,6 +44,8 @@ export default function VendorDiscrepancySection() {
     const barData = top10.map(row => ({
       name: row.VENDOR_NAME,
       fullName: row.VENDOR_NAME,
+      vendorCode: row.VENDOR_CODE || '',
+      vendorName: row.VENDOR_NAME || '',
       TOTAL_QTY: Number(row.TOTAL_QTY || 0),
       Expected: Number(row.ACTUAL_QTY || 0),
       Scanned: Number(row.SCANNED_QTY || 0)
@@ -49,6 +54,8 @@ export default function VendorDiscrepancySection() {
     const composedData = top10.map(row => ({
       name: row.VENDOR_NAME,
       fullName: row.VENDOR_NAME,
+      vendorCode: row.VENDOR_CODE || '',
+      vendorName: row.VENDOR_NAME || '',
       TOTAL_QTY: Number(row.TOTAL_QTY || 0),
       DIFF_QTY: Math.abs(Number(row.DIFF_QTY || 0)),
       DIFF_PER: Number(row.DIFF_PER || 0)
@@ -65,6 +72,34 @@ export default function VendorDiscrepancySection() {
 
     return { barData, composedData, totalExpectedRaw, totalScannedRaw, discrepancyPercent };
   }, [data, totals, sortBy]);
+
+  // Navigate to summary report filtered by clicked vendor
+  const handleVendorClick = (vendorParam) => {
+    let code = '';
+    let name = '';
+
+    if (typeof vendorParam === 'string') {
+      // Clicked on XAxis text label (vendor name)
+      const match = data?.find(row => row.VENDOR_NAME === vendorParam);
+      code = match?.VENDOR_CODE || '';
+      name = vendorParam;
+    } else if (vendorParam && typeof vendorParam === 'object') {
+      // Clicked on Bar payload object
+      code = vendorParam.vendorCode || vendorParam.VENDOR_CODE || '';
+      name = vendorParam.fullName || vendorParam.vendorName || vendorParam.name || '';
+      if (!code && name) {
+        const match = data?.find(row => row.VENDOR_NAME === name);
+        code = match?.VENDOR_CODE || '';
+      }
+    }
+
+    navigate('/reports/vendor-discrepancy-summary', {
+      state: {
+        vendorCode: code,
+        vendorName: name
+      }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -193,18 +228,26 @@ export default function VendorDiscrepancySection() {
               />
             }
             rightContent={
-              <CustomDropdown
-                options={[
-                  { value: 'EXPECTED_DESC', label: 'Highest Expected' },
-                  { value: 'DIFF_QTY_DESC', label: 'Highest Variance' },
-                  { value: 'DIFF_PER_DESC', label: 'Highest Discrepancy %' }
-                ]}
-                value={sortBy}
-                onChange={setSortBy}
-                prefix="Sort:"
-                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-                menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CustomDropdown
+                  options={[
+                    { value: 'EXPECTED_DESC', label: 'Highest Expected' },
+                    { value: 'DIFF_QTY_DESC', label: 'Highest Variance' },
+                    { value: 'DIFF_PER_DESC', label: 'Highest Discrepancy %' }
+                  ]}
+                  value={sortBy}
+                  onChange={setSortBy}
+                  prefix="Sort:"
+                  buttonStyle={{ minWidth: 'auto', gap: '8px', height: '28px', display: 'inline-flex', alignItems: 'center' }}
+                  menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
+                />
+                <NeuromorphicButton 
+                  value="View Summary" 
+                  icon={<Icons.ArrowUpRight size={12} />} 
+                  onClick={() => navigate('/reports/vendor-discrepancy-summary')}
+                  style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
+                />
+              </div>
             }
             style={{ marginBottom: '8px' }}
           />
@@ -254,6 +297,8 @@ export default function VendorDiscrepancySection() {
                   showValues={true}
                   margin={{ top: 30, right: 0, left: -20, bottom: 10 }}
                   xAxisTickFormatter={(val) => val}
+                  onBarClick={handleVendorClick}
+                  onAxisClick={handleVendorClick}
                   customTooltip={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
                       const dataObj = payload[0].payload;
@@ -289,6 +334,8 @@ export default function VendorDiscrepancySection() {
                   height={220}
                   hideLegend={true}
                   showValues={true}
+                  onBarClick={handleVendorClick}
+                  onAxisClick={handleVendorClick}
                   tooltipFormatter={(val, name) => name === 'Discrepancy Qty' ? `-${val}` : `${val}%`}
                 />
               )}

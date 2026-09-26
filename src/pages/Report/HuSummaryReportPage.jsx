@@ -11,7 +11,6 @@ import { getHUSummaryDetails, searchValidationHuNumbers } from '../../services/s
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
 import * as Icons from 'lucide-react';
 import './common-reports.css';
-import './HuSummaryReport.css';
 
 // Helper for date string
 const getTodayDate = () => new Date().toISOString().split('T')[0];
@@ -270,7 +269,7 @@ export default function HuSummaryReportPage() {
       }}
       mainClassName="flex-col-main"
     >
-      <div className="report-page-container hu-summary-page">
+      <div className="report-page-container">
         {/* Filter Card */}
         <div className="report-search-card">
           <div className="report-search-header">
@@ -339,7 +338,7 @@ export default function HuSummaryReportPage() {
         />
 
         {/* 4 KPI Curved Cards (Matching Legacy Screenshot) */}
-        <div className="report-curved-cards" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+        <div className="report-curved-cards">
           <div className="ds-kpi-item">
             <CurvedCard
               title="SELECTED HU NUMBER"
