@@ -108,8 +108,13 @@
    React Datepicker Popover Overrides
    ========================================================================== */
 
+#root-portal {
+  position: relative;
+  z-index: 100050 !important;
+}
+
 .react-datepicker-popper {
-  z-index: 1050 !important;
+  z-index: 100050 !important;
   padding-top: 5px !important;
 }
 

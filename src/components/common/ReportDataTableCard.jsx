@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import BaseDataTable from './BaseDataTable';
+import ExportOptionsModal from './ExportOptionsModal';
 import { useStreamingExport } from '../../hooks/useStreamingExport';
 import { getActiveUserId } from '../../services/stockService';
 import './LiveStockDataTable.css';
@@ -29,6 +30,9 @@ export default function ReportDataTableCard({
   exportParams = {}
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
   const onSearchRef = useRef(onSearch);
   onSearchRef.current = onSearch;
 
@@ -97,60 +101,89 @@ export default function ReportDataTableCard({
 
   const { isExporting, progressPercent, exportError, startExport, cancelExport } = useStreamingExport();
 
-  // Universal Export Handler
-  const handleExport = () => {
-    // If reportName is provided, use Universal Server-Side Streaming (.xlsx)
+  // Triggered when user clicks "Export Data To Excel" button in toolbar
+  const handleExportButtonClick = () => {
     if (reportName) {
-      const activeUid = getActiveUserId();
-      const params = new URLSearchParams();
-      params.append('reportName', reportName);
-      params.append('format', 'xlsx');
-
-      // Bind all passed exportParams
-      if (exportParams && typeof exportParams === 'object') {
-        Object.entries(exportParams).forEach(([k, v]) => {
-          if (v !== undefined && v !== null && String(v).trim() !== '') {
-            params.append(k, String(v).trim());
-          }
-        });
-      }
-
-      // Ensure userId is present for role-based scoping
-      if (!params.has('userId') && !params.has('user')) {
-        if (activeUid) {
-          params.append('userId', String(activeUid));
-        }
-      }
-
-      // Ensure current search query is passed if applicable
-      if (internalSearch.trim() && !params.has('searchTerm')) {
-        params.append('searchTerm', internalSearch.trim());
-      }
-
-      // Ensure current sorting is passed if applicable
-      if (sortColumn && !params.has('sortColumn')) {
-        params.append('sortColumn', sortColumn);
-      }
-      if (sortDirection && !params.has('sortDirection')) {
-        params.append('sortDirection', sortDirection);
-      }
-
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-      const downloadUrl = `${apiBase}/api/reports/export?${params.toString()}`;
-      const defaultName = (exportFileName && exportFileName.toLowerCase().endsWith('.xlsx'))
-        ? exportFileName
-        : `${reportName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-
-      startExport({
-        downloadUrl,
-        fileName: defaultName,
-        totalRecords
-      });
+      setIsExportModalOpen(true);
       return;
     }
-
-    // Fallback: in-memory CSV export for legacy / unmigrated pages
     handleExportCSV();
+  };
+
+  // Triggered when user confirms from the ExportOptionsModal
+  const handleModalExportConfirm = ({ preset, fromDate, toDate, searchTerm: modalSearchTerm }) => {
+    setIsExportModalOpen(false);
+
+    const activeUid = getActiveUserId();
+    const params = new URLSearchParams();
+    params.append('reportName', reportName);
+    params.append('format', 'xlsx');
+
+    // Bind base exportParams (e.g. storeCode, vendorCode, etc.), excluding dates
+    if (exportParams && typeof exportParams === 'object') {
+      Object.entries(exportParams).forEach(([k, v]) => {
+        if (k.toLowerCase() === 'fromdate' || k.toLowerCase() === 'todate') {
+          return; // Modal selection takes absolute precedence
+        }
+        if (v !== undefined && v !== null && String(v).trim() !== '') {
+          params.append(k, String(v).trim());
+        }
+      });
+    }
+
+    // Apply the chosen dates from the modal (if preset is full, fromDate/toDate stay empty -> full lifetime)
+    if (fromDate) {
+      params.append('fromDate', fromDate);
+    }
+    if (toDate) {
+      params.append('toDate', toDate);
+    }
+
+    // Ensure userId is present for role-based scoping
+    if (!params.has('userId') && !params.has('user')) {
+      if (activeUid) {
+        params.append('userId', String(activeUid));
+      }
+    }
+
+    // Apply search filter if selected in modal
+    if (modalSearchTerm && modalSearchTerm.trim()) {
+      params.append('searchTerm', modalSearchTerm.trim());
+    }
+
+    // Ensure current sorting is passed if applicable
+    if (sortColumn && !params.has('sortColumn')) {
+      params.append('sortColumn', sortColumn);
+    }
+    if (sortDirection && !params.has('sortDirection')) {
+      params.append('sortDirection', sortDirection);
+    }
+
+    const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+    const downloadUrl = `${apiBase}/api/reports/export?${params.toString()}`;
+    const defaultName = (exportFileName && exportFileName.toLowerCase().endsWith('.xlsx'))
+      ? exportFileName
+      : `${reportName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    startExport({
+      downloadUrl,
+      fileName: defaultName,
+      totalRecords,
+      onNoData: () => {
+        setToastMessage({
+          title: 'No Records Found',
+          message: 'No data exists for the selected date range and filter criteria. Export cancelled.'
+        });
+        setTimeout(() => setToastMessage(null), 5000);
+      },
+      onError: (err) => {
+        setToastMessage({
+          title: 'Export Failed',
+          message: err.message || 'An error occurred while streaming report.'
+        });
+        setTimeout(() => setToastMessage(null), 5000);
+      }
+    });
   };
 
   // Handle Export to CSV
@@ -251,7 +284,7 @@ export default function ReportDataTableCard({
           ) : (
             <button 
               className="ls-export-btn" 
-              onClick={handleExport}
+              onClick={handleExportButtonClick}
               disabled={isLoading || isRefreshing}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }}>
@@ -400,6 +433,43 @@ export default function ReportDataTableCard({
           </div>
         )}
       </div>
+
+      {/* Export Range & Filter Selection Modal */}
+      <ExportOptionsModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onConfirm={handleModalExportConfirm}
+        reportName={reportName}
+        totalRecords={totalRecords}
+        searchTerm={internalSearch}
+        currentFromDate={exportParams?.fromDate || exportParams?.fromdate}
+        currentToDate={exportParams?.toDate || exportParams?.todate}
+        isExporting={isExporting}
+      />
+
+      {/* Floating Warning Toast Notification for 0 records */}
+      {toastMessage && (
+        <div className="vmm-floating-toast warning">
+          <div className="vmm-toast-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div className="vmm-toast-content">
+            <div className="vmm-toast-title">{toastMessage.title}</div>
+            <div className="vmm-toast-message">{toastMessage.message}</div>
+          </div>
+          <button 
+            type="button" 
+            className="vmm-toast-close" 
+            onClick={() => setToastMessage(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
     </div>
   );

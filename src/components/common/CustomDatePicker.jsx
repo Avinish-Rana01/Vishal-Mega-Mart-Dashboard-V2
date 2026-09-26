@@ -186,7 +186,7 @@ export default function CustomDatePicker({
                 menuStyle={{
                   minWidth: '85px',
                   maxHeight: '170px',
-                  zIndex: 99999,
+                  zIndex: 100060,
                 }}
               />
 
@@ -207,7 +207,7 @@ export default function CustomDatePicker({
                 menuStyle={{
                   minWidth: '85px',
                   maxHeight: '170px',
-                  zIndex: 99999,
+                  zIndex: 100060,
                 }}
               />
             </div>

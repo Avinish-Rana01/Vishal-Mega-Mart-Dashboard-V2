@@ -25,7 +25,8 @@ export const useStreamingExport = () => {
     fileName = 'Report.xlsx',
     totalRecords = 0,
     onSuccess,
-    onError
+    onError,
+    onNoData
   }) => {
     setIsExporting(true);
     setProgressPercent(5);
@@ -59,6 +60,15 @@ export const useStreamingExport = () => {
         signal: controller.signal
       });
 
+      // Guard: 204 No Content returned by backend when 0 records exist
+      if (response.status === 204) {
+        clearInterval(progressTimer);
+        setIsExporting(false);
+        setProgressPercent(0);
+        if (onNoData) onNoData();
+        return { success: false, noData: true };
+      }
+
       if (!response.ok) {
         const errorText = await response.text().catch(() => response.statusText);
         throw new Error(errorText || `Server returned HTTP ${response.status}`);
@@ -88,6 +98,14 @@ export const useStreamingExport = () => {
       }
 
       clearInterval(progressTimer);
+
+      if (chunks.length === 0 || receivedBytes === 0) {
+        setIsExporting(false);
+        setProgressPercent(0);
+        if (onNoData) onNoData();
+        return { success: false, noData: true };
+      }
+
       setProgressPercent(100);
 
       // Extract filename from Content-Disposition header if available
