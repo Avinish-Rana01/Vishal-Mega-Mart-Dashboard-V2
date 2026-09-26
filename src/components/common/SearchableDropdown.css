@@ -3,6 +3,17 @@
   width: 100%;
 }
 
+.custom-select-container.open,
+.custom-select-container:focus-within {
+  z-index: 1050;
+}
+
+.search-field:has(.custom-select-container.open),
+.search-field:focus-within {
+  position: relative;
+  z-index: 20;
+}
+
 .custom-select-trigger {
   padding: 0 12px;
   width: 100%;

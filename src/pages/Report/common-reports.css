@@ -72,11 +72,21 @@
   border: 1px solid rgba(226, 232, 240, 0.8);
   transition: box-shadow 0.3s ease;
   position: relative;
-  z-index: 50; /* Increased to render above sticky table headers */
+  z-index: 100 !important; /* Always above sticky table headers (z-index: 10) */
 }
 
-.report-search-card:hover {
+.report-search-card:hover,
+.sales-filter-card:hover {
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06), 0 0 4px rgba(0,0,0,0.03);
+}
+
+.report-search-card:focus-within,
+.sales-filter-card:focus-within,
+.report-search-card:has(.custom-select-container.open),
+.sales-filter-card:has(.custom-select-container.open),
+.report-search-card:has(.custom-select-trigger.open),
+.sales-filter-card:has(.custom-select-trigger.open) {
+  z-index: 500 !important;
 }
 
 .report-search-header {

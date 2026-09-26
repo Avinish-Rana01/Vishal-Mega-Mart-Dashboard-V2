@@ -366,11 +366,34 @@ export const getCycleCountReport = async (pageIndex = 1, pageSize = 100, searchT
   return response.data;
 };
 
-export const getCycleCountDetails = async (pageIndex = 1, pageSize = 100, searchTerm = '', storeCode = '', fromDate = '', toDate = '', refNo = '', signal) => {
+export const getCycleCountDetails = async (
+  pageIndex = 1, 
+  pageSize = 100, 
+  searchTerm = '', 
+  storeCode = '', 
+  fromDate = '', 
+  toDate = '', 
+  refNo = '', 
+  sortColumnOrSignal = 'STORE_CODE', 
+  sortDirection = 'asc', 
+  signalParam = null
+) => {
+  let sortColumn = 'STORE_CODE';
+  let sortDir = sortDirection || 'asc';
+  let signal = signalParam;
+
+  if (sortColumnOrSignal && typeof sortColumnOrSignal === 'object' && ('aborted' in sortColumnOrSignal || sortColumnOrSignal.constructor?.name === 'AbortSignal')) {
+    signal = sortColumnOrSignal;
+  } else if (typeof sortColumnOrSignal === 'string') {
+    sortColumn = sortColumnOrSignal;
+  }
+
   const term = encodeURIComponent(searchTerm || '');
   const store = encodeURIComponent(storeCode || '');
   const ref = encodeURIComponent(refNo || '');
-  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&refNo=${ref}&sortColumn=STORE_CODE&sortDirection=asc`, {
+  const sCol = encodeURIComponent(sortColumn || 'STORE_CODE');
+  const sDir = encodeURIComponent(sortDir || 'asc');
+  const response = await axios.get(`${API_BASE}/api/stock/cycle-count-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&storeCode=${store}&fromDate=${fromDate}&toDate=${toDate}&refNo=${ref}&sortColumn=${sCol}&sortDirection=${sDir}`, {
     headers: getHeaders(),
     signal
   });
@@ -499,21 +522,32 @@ export const getGrcModalDetails = async ({
   huNo = '',
   article = '',
   scanTime = '',
+  date = '',
   storeCode = '',
   grcStatus = '',
   pageIndex = 1,
   pageSize = 10,
-  searchTerm = ''
+  searchTerm = '',
+  sortColumn = 'GRC_DATE',
+  sortDirection = 'asc'
 } = {}, signal) => {
   const params = new URLSearchParams();
   if (huNo) params.append('huNo', huNo);
   if (article) params.append('article', article);
-  if (scanTime) params.append('scanTime', scanTime);
+  const effectiveDate = date || scanTime;
+  if (effectiveDate) {
+    params.append('date', effectiveDate);
+    params.append('scanTime', effectiveDate);
+  }
   if (storeCode) params.append('storeCode', storeCode);
-  if (grcStatus) params.append('grcStatus', grcStatus);
+  if (grcStatus !== undefined && grcStatus !== null && grcStatus !== '') {
+    params.append('grcStatus', grcStatus);
+  }
   params.append('pageIndex', pageIndex);
   params.append('pageSize', pageSize);
   if (searchTerm) params.append('searchTerm', searchTerm);
+  if (sortColumn) params.append('sortColumn', sortColumn);
+  if (sortDirection) params.append('sortDirection', sortDirection);
 
   const response = await axios.get(`${API_BASE}/api/grc-report/modal-details?${params.toString()}`, {
     headers: getHeaders(),

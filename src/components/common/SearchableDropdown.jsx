@@ -84,7 +84,7 @@ export default function SearchableDropdown({
   }, [isOpen]);
 
   return (
-    <div className="custom-select-container" ref={dropdownRef}>
+    <div className={`custom-select-container ${isOpen ? 'open' : ''}`} ref={dropdownRef}>
       <div 
         className={`custom-select-trigger ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}

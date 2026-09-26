@@ -70,3 +70,19 @@ path:focus,
 rect:focus {
   outline: none !important;
 }
+
+/* Global Report Filter & Search Card Stacking Context Invariant */
+.report-search-card,
+.sales-filter-card {
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+.report-search-card:focus-within,
+.sales-filter-card:focus-within,
+.report-search-card:has(.custom-select-container.open),
+.sales-filter-card:has(.custom-select-container.open),
+.report-search-card:has(.custom-select-trigger.open),
+.sales-filter-card:has(.custom-select-trigger.open) {
+  z-index: 500 !important;
+}

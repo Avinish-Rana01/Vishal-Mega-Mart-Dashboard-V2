@@ -24,7 +24,7 @@ const formatDate = (val) => {
   return d || 'N/A';
 };
 
-export default function GrcDetailsModal({ modalData, onClose }) {
+export default function GrcDetailsModal({ modalData, grcStatus: propGrcStatus, date: propDate, onClose }) {
   if (!modalData) return null;
 
   // Case-insensitive lookup helper
@@ -37,15 +37,17 @@ export default function GrcDetailsModal({ modalData, onClose }) {
 
   const storeCode = getVal(modalData, 'storeCode') || getVal(modalData, 'STORE_CODE') || getVal(modalData, 'STORE') || '';
   const huNo = getVal(modalData, 'huNumber') || getVal(modalData, 'HU') || getVal(modalData, 'HU_NO') || '';
-  const scanTime = getVal(modalData, 'grcDate') || getVal(modalData, 'GRC_DATE') || getVal(modalData, 'scanTime') || '';
-  const status = getVal(modalData, 'status') || getVal(modalData, 'RECEIVED_STATUS') || getVal(modalData, 'GRC_STATUS') || 'HU RECEIVED QTY';
+  const dateVal = propDate || getVal(modalData, 'rawGrcDate') || getVal(modalData, 'grcDate') || getVal(modalData, 'GRC_DATE') || getVal(modalData, 'scanTime') || '';
+  const scanTime = dateVal;
 
-  const exportFilters = useMemo(() => ({
-    storeCode,
-    huNo,
-    scanTime,
-    grcStatus: status
-  }), [storeCode, huNo, scanTime, status]);
+  // Status determination
+  const effectiveGrcStatus = (propGrcStatus !== undefined && propGrcStatus !== null && propGrcStatus !== '')
+    ? String(propGrcStatus)
+    : ((getVal(modalData, 'grcStatus') !== undefined && getVal(modalData, 'grcStatus') !== null && getVal(modalData, 'grcStatus') !== '')
+      ? String(getVal(modalData, 'grcStatus'))
+      : '1');
+
+  const statusDisplay = getVal(modalData, 'status') || getVal(modalData, 'RECEIVED_STATUS') || getVal(modalData, 'GRC_STATUS') || 'HU RECEIVED QTY';
 
   const [tableData, setTableData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -53,7 +55,21 @@ export default function GrcDetailsModal({ modalData, onClose }) {
 
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sortColumn, setSortColumn] = useState('GRC_DATE');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [isLoading, setIsLoading] = useState(true);
+
+  const exportFilters = useMemo(() => ({
+    storeCode,
+    huNo,
+    scanTime: dateVal,
+    date: dateVal,
+    fromDate: dateVal,
+    toDate: dateVal,
+    grcStatus: effectiveGrcStatus,
+    sortColumn,
+    sortDirection
+  }), [storeCode, huNo, dateVal, effectiveGrcStatus, sortColumn, sortDirection]);
 
   const fetchDetails = useCallback(async (signal) => {
     setIsLoading(true);
@@ -61,12 +77,15 @@ export default function GrcDetailsModal({ modalData, onClose }) {
       const result = await getGrcModalDetails({
         huNo,
         article: '',
-        scanTime,
+        scanTime: dateVal,
+        date: dateVal,
         storeCode,
-        grcStatus: '',
+        grcStatus: effectiveGrcStatus,
         pageIndex,
         pageSize,
-        searchTerm: ''
+        searchTerm: '',
+        sortColumn,
+        sortDirection
       }, signal);
 
       const items = result?.data || result?.Data || result?.items || result?.Items || [];
@@ -86,7 +105,7 @@ export default function GrcDetailsModal({ modalData, onClose }) {
         setIsLoading(false);
       }
     }
-  }, [huNo, scanTime, storeCode, pageIndex, pageSize]);
+  }, [huNo, dateVal, storeCode, effectiveGrcStatus, pageIndex, pageSize, sortColumn, sortDirection]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -109,15 +128,15 @@ export default function GrcDetailsModal({ modalData, onClose }) {
         return isEmpty(q) ? '0' : Number(q).toLocaleString('en-IN');
       } 
     },
-    { key: 'RECEIVED_STATUS', label: 'RECEIVED STATUS', render: (val, row) => formatValue(val || row?.receivedStatus || row?.Status || status) },
-    { key: 'GRC_DATE', label: 'GRC DATE', render: (val, row) => formatDate(val || row?.grcDate) }
-  ], [pageIndex, pageSize, status]);
+    { key: 'RECEIVED_STATUS', label: 'RECEIVED STATUS', render: (val, row) => formatValue(val || row?.receivedStatus || row?.Status || statusDisplay) },
+    { key: 'GRC_DATE', label: 'GRC DATE', render: (val, row) => formatDate(val || row?.grcDate || dateVal) }
+  ], [pageIndex, pageSize, statusDisplay, dateVal]);
 
   const metaInfo = [
     { label: 'STORE', value: formatValue(storeCode), valueColor: '#004cff' },
     { label: 'HU NUMBER', value: formatValue(huNo), valueColor: '#004cff' },
-    { label: 'GRC DATE', value: formatValue(scanTime) },
-    { label: 'STATUS', value: formatValue(status) }
+    { label: 'GRC DATE', value: formatDate(dateVal) },
+    { label: 'STATUS', value: formatValue(statusDisplay) }
   ];
 
   const safeNum = (val) => (val !== undefined && val !== null ? val : 0).toLocaleString('en-IN');
@@ -125,7 +144,7 @@ export default function GrcDetailsModal({ modalData, onClose }) {
   const summaryCards = [
     { 
       title: "GRC STATUS", 
-      value: status || "HU RECEIVED QTY", 
+      value: statusDisplay || "HU RECEIVED QTY", 
       waveColor: ['#c7d2fe', '#818cf8'], 
       icon: (
         <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -164,10 +183,20 @@ export default function GrcDetailsModal({ modalData, onClose }) {
       pageIndex={pageIndex}
       onPageChange={setPageIndex}
       pageSize={pageSize}
-      onPageSizeChange={setPageSize}
+      onPageSizeChange={(newSize) => {
+        setPageSize(newSize);
+        setPageIndex(1);
+      }}
+      onSortChange={(col, dir) => {
+        setSortColumn(col);
+        setSortDirection(dir);
+        setPageIndex(1);
+      }}
+      sortColumn={sortColumn}
+      sortDirection={sortDirection}
       reportName="GRC_ARTICLE_ITEM_DETAILS"
       exportFilters={exportFilters}
-      exportFileName={`GRC_Details_${storeCode || 'ALL'}_${huNo || 'Report'}.xlsx`}
+      exportFileName={`GRC_Details_${storeCode || 'ALL'}_${huNo || 'Report'}_${dateVal || 'All'}.xlsx`}
     />
   );
 }

@@ -53,15 +53,6 @@ export default function ReconciliationDetailsModal({ modalData, onClose, type = 
   const pos = getVal(modalData, 'COUNTER_NO') || getVal(modalData, 'CounterNo') || getVal(modalData, 'POS') || getVal(modalData, 'pos') || '';
   const ean = getVal(modalData, 'EAN') || getVal(modalData, 'ean') || '';
 
-  const exportFilters = useMemo(() => ({
-    storeCode,
-    billDate,
-    pos,
-    ean,
-    sortColumn,
-    sortDirection
-  }), [storeCode, billDate, pos, ean, sortColumn, sortDirection]);
-
   const [tableData, setTableData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [summaryData, setSummaryData] = useState(null);
@@ -72,6 +63,15 @@ export default function ReconciliationDetailsModal({ modalData, onClose, type = 
   const [sortColumn, setSortColumn] = useState(isReturn ? 'BILL_DATE' : 'VOID_DATE');
   const [sortDirection, setSortDirection] = useState('ASC');
   const [isLoading, setIsLoading] = useState(true);
+
+  const exportFilters = useMemo(() => ({
+    storeCode,
+    billDate,
+    pos,
+    ean,
+    sortColumn,
+    sortDirection
+  }), [storeCode, billDate, pos, ean, sortColumn, sortDirection]);
 
   // Close modal on Escape key
   useEffect(() => {

@@ -169,7 +169,7 @@
   font-size: 12px;
 }
 
-.custom-select-trigger {
+.ls-entries-select .custom-select-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -186,18 +186,18 @@
   transition: all 0.2s ease;
 }
 
-.custom-select-trigger:hover {
+.ls-entries-select .custom-select-trigger:hover {
   border-color: #cbd5e1;
   background-color: #ffffff;
 }
 
-.custom-select-trigger.open {
+.ls-entries-select .custom-select-trigger.open {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   background-color: #ffffff;
 }
 
-.custom-select-menu {
+.ls-entries-select .custom-select-menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -222,7 +222,7 @@
   }
 }
 
-.custom-select-option {
+.ls-entries-select .custom-select-option {
   padding: 7px 12px;
   font-size: 12px;
   font-weight: 500;
@@ -231,12 +231,12 @@
   transition: background 0.15s ease;
 }
 
-.custom-select-option:hover {
+.ls-entries-select .custom-select-option:hover {
   background: #f1f5f9;
   color: #1e293b;
 }
 
-.custom-select-option.selected {
+.ls-entries-select .custom-select-option.selected {
   background: #eff6ff;
   color: #2563eb;
   font-weight: 600;

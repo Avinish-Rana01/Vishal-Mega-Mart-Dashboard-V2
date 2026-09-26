@@ -75,7 +75,12 @@ const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true, onCell
               {wrong}
             </div>
           ) : (
-            <div style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#dcfce7', color: '#16a34a', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700 }}>
+            <div 
+              className="sv-clickable-badge"
+              onClick={(e) => onCellClick && onCellClick(d, '0', e)}
+              title="Click to view Wrong HUs in GRC Report (Status: 0)"
+              style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#dcfce7', color: '#16a34a', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+            >
               ✓
             </div>
           )}
@@ -678,7 +683,14 @@ export default function StoreValidationSection() {
                     {pending.toLocaleString('en-IN')}
                   </span>
                 ) : (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clear</span>
+                  <span 
+                    className="sv-clickable-badge"
+                    onClick={() => handleCellClick(row, '3')}
+                    title="Click to view Pending HUs in GRC Report (Status: 3)"
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    ✓ Clear
+                  </span>
                 )}
               </td>
               <td className="cc-data-grid-td">
@@ -692,7 +704,14 @@ export default function StoreValidationSection() {
                     ✕ {wrong.toLocaleString('en-IN')}
                   </span>
                 ) : (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clean</span>
+                  <span 
+                    className="sv-clickable-badge"
+                    onClick={() => handleCellClick(row, '0')}
+                    title="Click to view Wrong HUs in GRC Report (Status: 0)"
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    ✓ Clean
+                  </span>
                 )}
               </td>
             </tr>

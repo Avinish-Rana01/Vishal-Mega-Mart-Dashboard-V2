@@ -137,6 +137,9 @@ export default function CycleCountModal({ modalData, onClose }) {
   
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortColumn, setSortColumn] = useState('STORE_CODE');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [isLoading, setIsLoading] = useState(true);
 
   // Case-insensitive lookup helper
@@ -161,13 +164,26 @@ export default function CycleCountModal({ modalData, onClose }) {
     storeCode: storeCode || '',
     refNo: refNo || '',
     fromDate: fromDate || '',
-    toDate: toDate || ''
-  }), [storeCode, refNo, fromDate, toDate]);
+    toDate: toDate || '',
+    sortColumn,
+    sortDirection
+  }), [storeCode, refNo, fromDate, toDate, sortColumn, sortDirection]);
 
   const fetchDetails = useCallback(async (signal) => {
     setIsLoading(true);
     try {
-      const result = await getCycleCountDetails(pageIndex, pageSize, '', storeCode, fromDate, toDate, refNo, signal);
+      const result = await getCycleCountDetails(
+        pageIndex, 
+        pageSize, 
+        searchTerm, 
+        storeCode, 
+        fromDate, 
+        toDate, 
+        refNo, 
+        sortColumn, 
+        sortDirection, 
+        signal
+      );
       setTableData(result?.items || result?.Items || []);
       
       const summary = result?.summary || result?.Summary || {};
@@ -182,7 +198,7 @@ export default function CycleCountModal({ modalData, onClose }) {
         setIsLoading(false);
       }
     }
-  }, [pageIndex, pageSize, storeCode, fromDate, toDate, refNo]);
+  }, [pageIndex, pageSize, searchTerm, storeCode, fromDate, toDate, refNo, sortColumn, sortDirection]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -230,7 +246,23 @@ export default function CycleCountModal({ modalData, onClose }) {
         pageIndex={pageIndex}
         onPageChange={setPageIndex}
         pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={(newSize) => {
+          setPageSize(newSize);
+          setPageIndex(1);
+        }}
+        onSearch={(term) => {
+          setSearchTerm(term);
+          setPageIndex(1);
+        }}
+        searchPlaceholder="Search Records"
+        searchValue={searchTerm}
+        onSortChange={(col, dir) => {
+          setSortColumn(col);
+          setSortDirection(dir);
+          setPageIndex(1);
+        }}
+        sortColumn={sortColumn}
+        sortDirection={sortDirection}
         reportName="CYCLE_COUNT_AUDIT_DETAILS"
         exportFilters={exportFilters}
         exportFileName={`Cycle_Count_Audit_${storeCode || 'ALL'}_${refNo || 'Report'}.xlsx`}

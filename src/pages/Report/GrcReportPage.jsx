@@ -21,8 +21,12 @@ export default function GrcReportPage() {
     store: initialStore = 'HD44', 
     fromDate: rawFromDate = '2026-08-01',
     toDate: rawToDate = '2026-08-01',
-    grcStatus: initialGrcStatus = '1'
+    grcStatus: rawGrcStatus
   } = location.state || {};
+
+  const initialGrcStatus = (rawGrcStatus !== undefined && rawGrcStatus !== null && rawGrcStatus !== '')
+    ? String(rawGrcStatus)
+    : '1';
 
   // Ensure dates are just YYYY-MM-DD (Store Validation passes "2026-07-19 12:00 AM Sunday")
   const initialFromDate = rawFromDate.substring(0, 10);
@@ -47,7 +51,9 @@ export default function GrcReportPage() {
       if (location.state.store) setSelectedStore(location.state.store);
       if (location.state.fromDate) setFromDate(location.state.fromDate.substring(0, 10));
       if (location.state.toDate) setToDate(location.state.toDate.substring(0, 10));
-      if (location.state.grcStatus) setGrcStatus(location.state.grcStatus);
+      if (location.state.grcStatus !== undefined && location.state.grcStatus !== null && location.state.grcStatus !== '') {
+        setGrcStatus(String(location.state.grcStatus));
+      }
     }
   }, [location.state]);
   
@@ -131,7 +137,9 @@ export default function GrcReportPage() {
           storeCode: item.STORE_CODE,
           huNumber: item.HU,
           status: item.RECEIVED_STATUS || item.GRC_STATUS,
+          grcStatus: grcStatus,
           grcDate: item.GRC_DATE ? String(item.GRC_DATE).split('T')[0] : '',
+          rawGrcDate: item.GRC_DATE || '',
           action: 'View Details'
         }));
         
@@ -331,6 +339,8 @@ export default function GrcReportPage() {
           {selectedModalRow && (
             <GrcDetailsModal 
               modalData={selectedModalRow} 
+              grcStatus={grcStatus}
+              date={selectedModalRow.rawGrcDate || selectedModalRow.grcDate}
               onClose={() => setSelectedModalRow(null)} 
             />
           )}
