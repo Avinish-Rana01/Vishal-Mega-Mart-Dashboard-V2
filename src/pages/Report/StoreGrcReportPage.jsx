@@ -184,14 +184,15 @@ export default function StoreGrcReportPage() {
     { 
       key: 'srNo', 
       label: 'SR.NO', 
+      sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
-    { key: 'date', label: 'DATE' },
-    { key: 'huReceivedQty', label: 'HU RECEIVED QTY', render: numRenderer },
-    { key: 'whValidatedQty', label: 'WH VALIDATED QTY', render: numRenderer },
-    { key: 'storeValidatedQty', label: 'STORE VALIDATED QTY', render: numRenderer },
-    { key: 'pendingQty', label: 'STORE PENDING FOR VALIDATION (QTY)', render: numRenderer },
-    { key: 'wrongHuQty', label: 'WRONG HU QTY', render: numRenderer }
+    { key: 'date', label: 'DATE', sortKey: 'DATE' },
+    { key: 'huReceivedQty', label: 'HU RECEIVED QTY', sortKey: 'HU_RECEIVED_QTY', render: numRenderer },
+    { key: 'whValidatedQty', label: 'WH VALIDATED QTY', sortKey: 'WH_VALIDATED_QTY', render: numRenderer },
+    { key: 'storeValidatedQty', label: 'STORE VALIDATED QTY', sortKey: 'STORE_VALIDATED_QTY', render: numRenderer },
+    { key: 'pendingQty', label: 'STORE PENDING FOR VALIDATION (QTY)', sortKey: 'PENDING_QTY', render: numRenderer },
+    { key: 'wrongHuQty', label: 'WRONG HU QTY', sortKey: 'WRONG_HU_QTY', render: numRenderer }
   ];
 
   return (

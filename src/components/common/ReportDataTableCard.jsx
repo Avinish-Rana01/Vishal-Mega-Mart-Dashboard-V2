@@ -27,11 +27,18 @@ export default function ReportDataTableCard({
   sortColumn = null,
   sortDirection = null,
   reportName = null,
-  exportParams = {}
+  exportParams = {},
+  exportFilters = {}
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Merge exportFilters and exportParams for universal compatibility across reports and modal boxes
+  const activeExportParams = useMemo(() => ({
+    ...(exportFilters && typeof exportFilters === 'object' ? exportFilters : {}),
+    ...(exportParams && typeof exportParams === 'object' ? exportParams : {})
+  }), [exportFilters, exportParams]);
 
   const onSearchRef = useRef(onSearch);
   onSearchRef.current = onSearch;
@@ -119,9 +126,9 @@ export default function ReportDataTableCard({
     params.append('reportName', reportName);
     params.append('format', 'xlsx');
 
-    // Bind base exportParams (e.g. storeCode, vendorCode, etc.), excluding dates
-    if (exportParams && typeof exportParams === 'object') {
-      Object.entries(exportParams).forEach(([k, v]) => {
+    // Bind base export params (e.g. storeCode, vendorCode, etc.), excluding dates
+    if (activeExportParams && typeof activeExportParams === 'object') {
+      Object.entries(activeExportParams).forEach(([k, v]) => {
         if (k.toLowerCase() === 'fromdate' || k.toLowerCase() === 'todate') {
           return; // Modal selection takes absolute precedence
         }
@@ -442,8 +449,8 @@ export default function ReportDataTableCard({
         reportName={reportName}
         totalRecords={totalRecords}
         searchTerm={internalSearch}
-        currentFromDate={exportParams?.fromDate || exportParams?.fromdate}
-        currentToDate={exportParams?.toDate || exportParams?.todate}
+        currentFromDate={activeExportParams?.fromDate || activeExportParams?.fromdate || activeExportParams?.date || activeExportParams?.scanTime}
+        currentToDate={activeExportParams?.toDate || activeExportParams?.todate || activeExportParams?.date || activeExportParams?.scanTime}
         isExporting={isExporting}
       />
 

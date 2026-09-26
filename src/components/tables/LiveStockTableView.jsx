@@ -163,13 +163,14 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
     { 
       key: 'srNo', 
       label: 'Sr.No', 
+      sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
-    { key: 'stockDate', label: 'Stock Date' },
-    { key: 'articleNo', label: 'Article No', render: linkRenderer },
-    { key: 'sapStock', label: 'SAP Stock', render: numRenderer },
-    { key: 'rfidStock', label: 'RFID Stock', render: numRenderer },
-    { key: 'diff', label: 'Difference', render: numRenderer }
+    { key: 'stockDate', label: 'Stock Date', sortKey: 'STOCK_DATE' },
+    { key: 'articleNo', label: 'Article No', sortKey: 'ARTICLE', render: linkRenderer },
+    { key: 'sapStock', label: 'SAP Stock', sortKey: 'SAP_STOCK', render: numRenderer },
+    { key: 'rfidStock', label: 'RFID Stock', sortKey: 'RFID_STOCK', render: numRenderer },
+    { key: 'diff', label: 'Difference', sortKey: 'DIFF', render: numRenderer }
   ];
 
   return (

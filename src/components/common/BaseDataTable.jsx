@@ -41,22 +41,24 @@ export default function BaseDataTable({
   // Show shimmer skeleton ONLY on the very first initial load when there is NO data yet
   const showSkeleton = isLoading && (!data || data.length === 0) && !hasLoadedOnceRef.current;
 
-  const handleSort = (colKey) => {
+  const handleSort = (colKey, colSortKey) => {
     if (!ordering) return;
+    // colSortKey is the DB-level column name (if specified via col.sortKey), otherwise falls back to colKey
+    const serverKey = colSortKey || colKey;
     
     if (onSortChange) {
-      // Server-side sorting: delegate to parent
+      // Server-side sorting: delegate to parent using the DB column name
       let newDir;
-      if (activeSortCol !== colKey) {
+      if (activeSortCol !== serverKey) {
         newDir = 'asc';
       } else if (activeSortDir === 'asc') {
         newDir = 'desc';
       } else {
         newDir = null;
       }
-      onSortChange(newDir ? colKey : null, newDir);
+      onSortChange(newDir ? serverKey : null, newDir);
     } else {
-      // Client-side sorting
+      // Client-side sorting (uses frontend key for local array access)
       if (sortCol !== colKey) {
         setSortCol(colKey);
         setSortDir('asc');
@@ -136,12 +138,13 @@ export default function BaseDataTable({
               <tr>
                 {columns.map((col) => {
                   const isSortable = col.sortable !== false && ordering;
-                  const isSorted = activeSortCol === col.key;
+                  const effectiveSortKey = col.sortKey || col.key;
+                  const isSorted = activeSortCol === effectiveSortKey;
                   return (
                     <th 
                       key={col.key} 
                       className={`vmm-th ${col.className || ''} ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`.trim()}
-                      onClick={() => isSortable && handleSort(col.key)}
+                      onClick={() => isSortable && handleSort(col.key, col.sortKey)}
                       style={col.width ? { width: col.width } : undefined}
                     >
                       <div className="vmm-th-content">

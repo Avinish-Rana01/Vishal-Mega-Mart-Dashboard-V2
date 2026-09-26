@@ -22,8 +22,19 @@ export const AccuracyTooltip = React.memo(({ active, payload }) => {
 export const StoreBarTooltip = React.memo(({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
   const data = payload[0].payload;
+  const rawDate = data.DATE || data.Date || data.stockDate || data.STOCK_DATE || data.syncDate || data.date;
+
+  const formatDateVal = (val) => {
+    if (!val) return null;
+    let s = String(val).trim();
+    if (s.includes('T')) s = s.split('T')[0];
+    if (s.includes(' ')) s = s.split(' ')[0];
+    return s || null;
+  };
+  const displayDate = formatDateVal(rawDate);
+
   return (
-    <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', minWidth: '180px' }}>
+    <div style={{ background: '#fff', borderRadius: '12px', padding: '12px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', minWidth: '185px' }}>
       <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>{data.fullName || label}</span>
         {data.name && data.name !== data.fullName && (
@@ -31,6 +42,12 @@ export const StoreBarTooltip = React.memo(({ active, payload, label }) => {
         )}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {displayDate && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span style={{ color: '#64748b' }}>Date:</span>
+            <span style={{ fontWeight: 600, color: '#334155' }}>{displayDate}</span>
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
           <span style={{ color: '#64748b' }}>Accuracy:</span>
           <span style={{ fontWeight: 700, color: data.PERCENTAGE >= 95 ? '#16a34a' : data.PERCENTAGE >= 80 ? '#d97706' : '#dc2626' }}>

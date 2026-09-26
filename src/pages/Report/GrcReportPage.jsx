@@ -184,13 +184,14 @@ export default function GrcReportPage() {
     { 
       key: 'srNo', 
       label: 'SR.NO', 
+      sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
-    { key: 'storeCode', label: 'STORE CODE' },
-    { key: 'huNumber', label: 'HU NUMBER' },
-    { key: 'status', label: 'STATUS' },
-    { key: 'grcDate', label: 'GRC DATE' },
-    { key: 'action', label: 'ACTION', render: actionRenderer }
+    { key: 'storeCode', label: 'STORE CODE', sortKey: 'STORE_CODE' },
+    { key: 'huNumber', label: 'HU NUMBER', sortKey: 'HU' },
+    { key: 'status', label: 'STATUS', sortKey: 'RECEIVED_STATUS' },
+    { key: 'grcDate', label: 'GRC DATE', sortKey: 'GRC_DATE' },
+    { key: 'action', label: 'ACTION', sortable: false, render: actionRenderer }
   ];
 
   // Helper text mapping for the purple card

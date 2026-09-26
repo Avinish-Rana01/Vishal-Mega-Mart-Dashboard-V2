@@ -202,21 +202,25 @@ export default function HuReportPage() {
     {
       key: 'RowNumber',
       label: 'SR.NO',
+      sortable: false,
       render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1
     },
     {
       key: 'Sending_Plant',
       label: 'SENDING PLANT',
+      sortable: false,
       render: (val) => val || '—'
     },
     {
       key: 'Receiving_Plant',
       label: 'RECEIVING PLANT',
+      sortable: false,
       render: (val) => val || '—'
     },
     {
       key: 'HU_Number',
       label: 'HU NUMBER',
+      sortable: false,
       render: (val, row) => (
         <span
           className="hu-drilldown-link"
@@ -233,36 +237,43 @@ export default function HuReportPage() {
     {
       key: 'MATERIAL_COUNT',
       label: 'MATERIAL COUNT',
+      sortable: false,
       render: (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0))
     },
     {
       key: 'Act_Qty',
       label: 'ACTUAL QUANTITY',
+      sortKey: 'ACT_QTY',
       render: (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0))
     },
     {
       key: 'Scan_Qty',
       label: 'SCANNED QUANTITY',
+      sortKey: 'SCAN_QTY',
       render: (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0))
     },
     {
       key: 'Status',
       label: 'STATUS',
+      sortable: false,
       render: (val) => val || '—'
     },
     {
       key: 'Scan_Date',
       label: 'SCANNED DATE',
+      sortable: false,
       render: (val) => dateRenderer(val)
     },
     {
       key: 'HU_Created_By',
       label: 'HU CREATED BY',
+      sortable: false,
       render: (val, row) => val || row?.HU_Created_By || '—'
     },
     {
       key: 'HU_Validation_By',
       label: 'HU VALIDATED BY',
+      sortable: false,
       render: (val, row) => val || row?.HU_Validation_By || row?.Hu_Validation_By || '—'
     }
   ], [pageIndex, pageSize, huStatus]);

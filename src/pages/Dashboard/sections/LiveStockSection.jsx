@@ -271,10 +271,10 @@ export default function LiveStockSection() {
         RFID: rfid,
         SAP_STOCK: sap,
         Difference: difference,
-        DATE: row.DATE
+        DATE: row.DATE || row.Date || row.stockDate || row.STOCK_DATE || row.syncDate || todayStr
       };
     });
-  }, [filteredData]);
+  }, [filteredData, todayStr]);
 
   /**
    * Aggregates store performance into 4 distinct health buckets for the Coverage Distribution Donut Chart.
