@@ -40,6 +40,13 @@ export default function GrcDetailsModal({ modalData, onClose }) {
   const scanTime = getVal(modalData, 'grcDate') || getVal(modalData, 'GRC_DATE') || getVal(modalData, 'scanTime') || '';
   const status = getVal(modalData, 'status') || getVal(modalData, 'RECEIVED_STATUS') || getVal(modalData, 'GRC_STATUS') || 'HU RECEIVED QTY';
 
+  const exportFilters = useMemo(() => ({
+    storeCode,
+    huNo,
+    scanTime,
+    grcStatus: status
+  }), [storeCode, huNo, scanTime, status]);
+
   const [tableData, setTableData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [summaryData, setSummaryData] = useState(null);
@@ -158,6 +165,9 @@ export default function GrcDetailsModal({ modalData, onClose }) {
       onPageChange={setPageIndex}
       pageSize={pageSize}
       onPageSizeChange={setPageSize}
+      reportName="GRC_ARTICLE_ITEM_DETAILS"
+      exportFilters={exportFilters}
+      exportFileName={`GRC_Details_${storeCode || 'ALL'}_${huNo || 'Report'}.xlsx`}
     />
   );
 }

@@ -52,6 +52,14 @@ export default function WHEncodingSummaryPage() {
   // EPC Range summary data
   const [rangeSummary, setRangeSummary] = useState({});
 
+  const exportFilters = useMemo(() => ({
+    userId: selectedUser,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedUser, fromDate, toDate, sortColumn, sortDirection]);
+
   // ---- Fetch data ----
   const fetchData = useCallback(async (signal) => {
     setIsLoading(true);
@@ -326,7 +334,9 @@ export default function WHEncodingSummaryPage() {
             }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
-            exportFileName={`WH_Encoding_Summary_${fromDate}_${toDate}.csv`}
+            reportName="WAREHOUSE_ENCODING_SUMMARY"
+            exportFilters={exportFilters}
+            exportFileName={`WH_Encoding_Summary_${fromDate}_${toDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => { setSearchTerm(term); setPageIndex(1); }}
           />

@@ -66,6 +66,14 @@ export default function DcReportPage() {
     validatedCount: 0
   });
 
+  const exportFilters = useMemo(() => ({
+    storeName: selectedStore,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+
   // Fetch Store Dropdown Options
   useEffect(() => {
     const controller = new AbortController();
@@ -358,7 +366,9 @@ export default function DcReportPage() {
             }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
-            exportFileName={`DC_Report_${selectedStore}_${fromDate}_${toDate}.csv`}
+            reportName="DC_VALIDATION_DETAILS"
+            exportFilters={exportFilters}
+            exportFileName={`DC_Report_${selectedStore}_${fromDate}_${toDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => setSearchTerm(term)}
           />

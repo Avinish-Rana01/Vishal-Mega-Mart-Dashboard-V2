@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Ban, CheckCircle, MinusCircle } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
@@ -42,6 +42,14 @@ export default function VoidDetailsReportPage() {
     encodeQty: 0,
     differenceQty: 0
   });
+
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -234,6 +242,9 @@ export default function VoidDetailsReportPage() {
           totalRecords={totalRecords}
           pageIndex={pageIndex}
           pageSize={pageSize}
+          reportName="VOID_DETAILS"
+          exportFilters={exportFilters}
+          exportFileName={`Void_Details_${selectedStore || 'ALL'}_${fromDate}_to_${toDate}.xlsx`}
           onPageChange={setPageIndex}
           onPageSizeChange={setPageSize}
           isLoading={isLoading}

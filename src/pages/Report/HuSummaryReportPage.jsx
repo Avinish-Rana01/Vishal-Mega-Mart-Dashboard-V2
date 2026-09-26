@@ -56,6 +56,14 @@ export default function HuSummaryReportPage() {
     scanCount: 0
   });
 
+  const exportFilters = useMemo(() => ({
+    huNo: activeFilters.hu,
+    fromDate: activeFilters.fromDate,
+    toDate: activeFilters.toDate,
+    sortColumn,
+    sortDirection
+  }), [activeFilters, sortColumn, sortDirection]);
+
   // 1. Derive unique HU options from currently loaded table rows (default view)
   const tableHuOptions = useMemo(() => {
     const list = [{ id: '', value: '', text: 'ALL HU' }];
@@ -391,7 +399,9 @@ export default function HuSummaryReportPage() {
             }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
-            exportFileName={`HU_Summary_Report_${activeFilters.fromDate}_${activeFilters.toDate}.csv`}
+            reportName="HU_SUMMARY_VALIDATION"
+            exportFilters={exportFilters}
+            exportFileName={`HU_Summary_Report_${activeFilters.fromDate}_${activeFilters.toDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => {
               setSearchTerm(term);

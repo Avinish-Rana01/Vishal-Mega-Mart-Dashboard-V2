@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
@@ -32,6 +32,14 @@ export default function CycleCountReportPage() {
 
   const [sortColumn, setSortColumn] = useState('DATE');
   const [sortDirection, setSortDirection] = useState('DESC');
+
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -212,6 +220,9 @@ export default function CycleCountReportPage() {
               sortColumn={sortColumn}
               sortDirection={sortDirection}
               totalRecords={totalRecords}
+              reportName="CYCLE_COUNT_SUMMARY"
+              exportFilters={exportFilters}
+              exportFileName={`Cycle_Count_${selectedStore || 'ALL'}_${fromDate || 'ALL'}_${toDate || 'ALL'}.xlsx`}
               onSearch={setSearchTerm}
               searchPlaceholder="Search Records"
             />

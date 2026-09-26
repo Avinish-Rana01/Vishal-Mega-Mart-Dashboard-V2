@@ -46,6 +46,17 @@ export default function ExportOptionsModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isExporting, onClose]);
 
+  // Lock body scroll when modal is open to prevent page scrollbars & jump
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
+
   // Compute calculated date ranges for previews
   const datePreviews = useMemo(() => {
     const now = new Date();

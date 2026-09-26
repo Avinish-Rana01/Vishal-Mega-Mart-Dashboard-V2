@@ -138,6 +138,14 @@ export default function AllocatedStoreReportPage() {
     totalPages
   } = useEncodingStoreData(searchParams);
 
+  const exportFilters = useMemo(() => ({
+    storeName: searchParams.storeName,
+    fromDate: searchParams.fromDate,
+    toDate: searchParams.toDate,
+    articleNo: searchParams.articleNo,
+    ean: searchParams.ean
+  }), [searchParams]);
+
   // Derive unique Article options from currently loaded table rows
   const tableArticleOptions = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -436,7 +444,9 @@ export default function AllocatedStoreReportPage() {
             onPageChange={setPageIndex}
             onPageSizeChange={setPageSize}
             onSearch={(term) => setSearchTerm(term)}
-            exportFileName={`Allocated_Store_Report_${searchParams.fromDate}`}
+            reportName="ALLOCATED_STORE_ENCODING"
+            exportFilters={exportFilters}
+            exportFileName={`Allocated_Store_Report_${searchParams.fromDate}_${searchParams.toDate}.xlsx`}
           />
         </div>
 

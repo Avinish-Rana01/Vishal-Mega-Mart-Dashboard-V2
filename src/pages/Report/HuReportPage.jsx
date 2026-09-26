@@ -68,6 +68,16 @@ export default function HuReportPage() {
     invalidTags: 0
   });
 
+  const exportFilters = useMemo(() => ({
+    receivingPlant,
+    huStatus,
+    huNo: huNumber,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [receivingPlant, huStatus, huNumber, fromDate, toDate, sortColumn, sortDirection]);
+
   // HU Number Options derived from current table data
   const tableHuOptions = useMemo(() => {
     if (!reportData || reportData.length === 0) return [];
@@ -420,7 +430,9 @@ export default function HuReportPage() {
             }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
-            exportFileName={`HU_Report_${receivingPlant}_${huStatus}_${fromDate}.csv`}
+            reportName="HU_DETAILS"
+            exportFilters={exportFilters}
+            exportFileName={`HU_Report_${receivingPlant}_${huStatus}_${fromDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => setSearchTerm(term)}
           />

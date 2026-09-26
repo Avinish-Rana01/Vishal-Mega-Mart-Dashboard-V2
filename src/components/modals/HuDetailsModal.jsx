@@ -21,6 +21,16 @@ export default function HuDetailsModal({ huRow, huStatus, fromDate, toDate, onCl
   const [sortDirection, setSortDirection] = useState('asc');
   const [isLoading, setIsLoading] = useState(true);
 
+  const exportFilters = useMemo(() => ({
+    refNo: huRow.Ref_No || huRow.ref_No || '',
+    huNo: huRow.HU_Number || huRow.hu_number || '',
+    huStatus: (huStatus !== undefined && huStatus !== null && String(huStatus).trim() !== '') ? String(huStatus) : '1',
+    fromDate: fromDate || '',
+    toDate: toDate || '',
+    sortColumn,
+    sortDirection
+  }), [huRow, huStatus, fromDate, toDate, sortColumn, sortDirection]);
+
   const fetchModalData = useCallback(async (signal) => {
     setIsLoading(true);
     try {
@@ -169,7 +179,9 @@ export default function HuDetailsModal({ huRow, huStatus, fromDate, toDate, onCl
       }}
       sortColumn={sortColumn}
       sortDirection={sortDirection}
-      exportFileName={`HU_Details_${huRow.HU_Number || 'Report'}.csv`}
+      reportName="HU_REPORT_VIEW_DETAILS"
+      exportFilters={exportFilters}
+      exportFileName={`HU_Details_${huRow.HU_Number || 'Report'}.xlsx`}
     />
   );
 }

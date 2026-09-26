@@ -249,6 +249,14 @@ export default function StoreSaleReportPage() {
     }
   ], [selectedStore, fromDate, pageIndex, pageSize]);
 
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+
   return (
     <AppLayout 
       headerProps={{
@@ -356,7 +364,9 @@ export default function StoreSaleReportPage() {
             totalRecords={totalRecords}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            exportFileName={`Store_Sale_Report_${selectedStore}_${fromDate}_to_${toDate}.csv`}
+            reportName="STORE_SALE_REPORT"
+            exportFilters={exportFilters}
+            exportFileName={`Store_Sale_Report_${selectedStore}_${fromDate}_to_${toDate}.xlsx`}
             onPageChange={(newPg) => setPageIndex(newPg)}
             onPageSizeChange={(newSize) => {
               setPageSize(newSize);

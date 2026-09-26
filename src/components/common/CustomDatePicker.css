@@ -109,8 +109,18 @@
    ========================================================================== */
 
 #root-portal {
-  position: relative;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 0 !important;
+  overflow: visible !important;
+  pointer-events: none !important;
   z-index: 100050 !important;
+}
+
+#root-portal > * {
+  pointer-events: auto !important;
 }
 
 .react-datepicker-popper {

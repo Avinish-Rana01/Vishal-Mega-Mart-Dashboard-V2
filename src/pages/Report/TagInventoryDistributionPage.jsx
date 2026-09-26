@@ -34,6 +34,11 @@ export default function TagInventoryDistributionPage() {
   const [sortColumn, setSortColumn] = useState('CYCLE_COUNT');
   const [sortDirection, setSortDirection] = useState('desc');
 
+  const exportFilters = useMemo(() => ({
+    sortColumn,
+    sortDirection
+  }), [sortColumn, sortDirection]);
+
   // KPI Summary
   const [summary, setSummary] = useState({
     recordCount: 0,
@@ -371,7 +376,9 @@ export default function TagInventoryDistributionPage() {
             }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
-            exportFileName="Tag_Inventory_Recycle_Distribution.csv"
+            reportName="TAG_INVENTORY_DISTRIBUTION"
+            exportFilters={exportFilters}
+            exportFileName="Tag_Inventory_Recycle_Distribution.xlsx"
           />
         </div>
       </div>

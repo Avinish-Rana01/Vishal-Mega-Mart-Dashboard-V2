@@ -60,6 +60,16 @@ export default function ReconciliationReportView({ type = 'return' }) {
     differenceQty: 0
   });
 
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    pos,
+    ean,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, pos, ean, fromDate, toDate, sortColumn, sortDirection]);
+
   // Fetch Store Dropdown Options
   useEffect(() => {
     const controller = new AbortController();
@@ -389,6 +399,9 @@ export default function ReconciliationReportView({ type = 'return' }) {
           }}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          reportName={isReturn ? "RETURN_RECONCILIATION_SUMMARY" : "VOID_RECONCILIATION_SUMMARY"}
+          exportFilters={exportFilters}
+          exportFileName={`${isReturn ? 'Return' : 'Void'}_Reconciliation_${selectedStore || 'ALL'}_${fromDate}_${toDate}.xlsx`}
         />
       </div>
 

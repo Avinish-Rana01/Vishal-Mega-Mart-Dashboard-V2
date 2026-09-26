@@ -21,7 +21,9 @@ export default function DetailsModal({
   onSortChange,
   sortColumn,
   sortDirection,
-  exportFileName = "Details.csv"
+  exportFileName = "Details.csv",
+  reportName,
+  exportFilters
 }) {
 
   return (
@@ -85,6 +87,8 @@ export default function DetailsModal({
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
                 exportFileName={exportFileName}
+                reportName={reportName}
+                exportFilters={exportFilters}
               />
             </div>
           )}

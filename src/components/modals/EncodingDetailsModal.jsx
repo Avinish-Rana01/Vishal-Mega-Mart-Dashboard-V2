@@ -25,6 +25,16 @@ export default function EncodingDetailsModal({ rowData, storeName, fromDate, toD
   const assignedStoreRaw = rowData.Store_Code ?? rowData.STORE_CODE ?? rowData.ASSIGNED_STORE_NAME ?? rowData.Store_Name ?? storeName ?? '';
   const assignedStore = (assignedStoreRaw && assignedStoreRaw !== 'ALL' && assignedStoreRaw !== 'ALL STORES') ? assignedStoreRaw : '';
 
+  const exportFilters = useMemo(() => ({
+    storeName: assignedStore,
+    ean,
+    articleNo,
+    fromDate: fromDate || '',
+    toDate: toDate || '',
+    sortColumn,
+    sortDirection
+  }), [assignedStore, ean, articleNo, fromDate, toDate, sortColumn, sortDirection]);
+
   const fetchModalData = useCallback(async (signal) => {
     setIsLoading(true);
     try {
@@ -161,7 +171,9 @@ export default function EncodingDetailsModal({ rowData, storeName, fromDate, toD
       }}
       sortColumn={sortColumn}
       sortDirection={sortDirection}
-      exportFileName={`Encoding_Details_${ean || articleNo || 'Report'}.csv`}
+      reportName="ALLOCATED_STORE_ITEM_DETAILS"
+      exportFilters={exportFilters}
+      exportFileName={`Encoding_Details_${ean || articleNo || 'Report'}.xlsx`}
     />
   );
 }

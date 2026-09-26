@@ -157,6 +157,13 @@ export default function CycleCountModal({ modalData, onClose }) {
   
   const refNo = getVal(modalData, 'Ref_ID') || getVal(modalData, 'RefNo') || getVal(modalData, 'REF_NO');
 
+  const exportFilters = useMemo(() => ({
+    storeCode: storeCode || '',
+    refNo: refNo || '',
+    fromDate: fromDate || '',
+    toDate: toDate || ''
+  }), [storeCode, refNo, fromDate, toDate]);
+
   const fetchDetails = useCallback(async (signal) => {
     setIsLoading(true);
     try {
@@ -224,6 +231,9 @@ export default function CycleCountModal({ modalData, onClose }) {
         onPageChange={setPageIndex}
         pageSize={pageSize}
         onPageSizeChange={setPageSize}
+        reportName="CYCLE_COUNT_AUDIT_DETAILS"
+        exportFilters={exportFilters}
+        exportFileName={`Cycle_Count_Audit_${storeCode || 'ALL'}_${refNo || 'Report'}.xlsx`}
       />
 
       {/* Expanded Image Lightbox Overlay */}

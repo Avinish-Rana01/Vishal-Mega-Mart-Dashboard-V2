@@ -77,6 +77,14 @@ export default function StoreGrcReportPage() {
   const [sortColumn, setSortColumn] = useState('DATE');
   const [sortDirection, setSortDirection] = useState('DESC');
 
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+
   const handleClear = () => {
     setSelectedStore(initialStore);
     setFromDate(defaultFromDate);
@@ -304,6 +312,9 @@ export default function StoreGrcReportPage() {
               sortColumn={sortColumn}
               sortDirection={sortDirection}
               totalRecords={totalRecords}
+              reportName="STORE_GRC_SUMMARY"
+              exportFilters={exportFilters}
+              exportFileName={`Store_GRC_Report_${selectedStore}_${fromDate}_${toDate}.xlsx`}
             />
           </div>
     </AppLayout>

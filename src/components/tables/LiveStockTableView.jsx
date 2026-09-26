@@ -68,6 +68,15 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
   const [isArticleSearching, setIsArticleSearching] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState('');
 
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    fromDate: selectedDate,
+    toDate: selectedDate,
+    articleNo: selectedArticle,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, selectedDate, selectedArticle, sortColumn, sortDirection]);
+
   // Sync Article options: use table data by default; only call search API when user actively types a search query
   useEffect(() => {
     const trimmed = articleSearchTerm.trim();
@@ -274,6 +283,9 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
           }}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          reportName="LIVE_STOCK_REPORT"
+          exportFilters={exportFilters}
+          exportFileName={`Live_Stock_Report_${selectedStore}_${selectedDate}.xlsx`}
         />
       </div>
     </div>

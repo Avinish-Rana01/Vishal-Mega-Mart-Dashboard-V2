@@ -83,6 +83,16 @@ export default function GrcReportPage() {
   const [isHuSearching, setIsHuSearching] = useState(false);
   const [selectedHu, setSelectedHu] = useState('');
 
+  const exportFilters = useMemo(() => ({
+    storeCode: selectedStore,
+    huNo: selectedHu,
+    grcStatus,
+    fromDate,
+    toDate,
+    sortColumn,
+    sortDirection
+  }), [selectedStore, selectedHu, grcStatus, fromDate, toDate, sortColumn, sortDirection]);
+
   // Fetch HU Options based on search term
   React.useEffect(() => {
     const controller = new AbortController();
@@ -311,6 +321,9 @@ export default function GrcReportPage() {
               sortColumn={sortColumn}
               sortDirection={sortDirection}
               totalRecords={totalRecords}
+              reportName="GRC_DETAILS"
+              exportFilters={exportFilters}
+              exportFileName={`GRC_Report_${selectedStore}_${grcStatus}_${fromDate}_${toDate}.xlsx`}
             />
           </div>
 
