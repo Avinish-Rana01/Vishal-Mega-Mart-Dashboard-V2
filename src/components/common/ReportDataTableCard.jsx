@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import BaseDataTable from './BaseDataTable';
+import { useStreamingExport } from '../../hooks/useStreamingExport';
+import { getActiveUserId } from '../../services/stockService';
 import './LiveStockDataTable.css';
 
 export default function ReportDataTableCard({
@@ -16,13 +18,15 @@ export default function ReportDataTableCard({
   pageSize = 10,
   onPageSizeChange = null,
   totalRecords = 0,
-  exportFileName = "Report.csv",
+  exportFileName = "Report.xlsx",
   onSearch = null,
   searchPlaceholder = "Search Records",
   searchValue = undefined,
   onSortChange = null,
   sortColumn = null,
-  sortDirection = null
+  sortDirection = null,
+  reportName = null,
+  exportParams = {}
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
   const onSearchRef = useRef(onSearch);
@@ -90,6 +94,64 @@ export default function ReportDataTableCard({
       });
     });
   }, [data, displayData, internalSearch, columns, onSearch]);
+
+  const { isExporting, progressPercent, exportError, startExport, cancelExport } = useStreamingExport();
+
+  // Universal Export Handler
+  const handleExport = () => {
+    // If reportName is provided, use Universal Server-Side Streaming (.xlsx)
+    if (reportName) {
+      const activeUid = getActiveUserId();
+      const params = new URLSearchParams();
+      params.append('reportName', reportName);
+      params.append('format', 'xlsx');
+
+      // Bind all passed exportParams
+      if (exportParams && typeof exportParams === 'object') {
+        Object.entries(exportParams).forEach(([k, v]) => {
+          if (v !== undefined && v !== null && String(v).trim() !== '') {
+            params.append(k, String(v).trim());
+          }
+        });
+      }
+
+      // Ensure userId is present for role-based scoping
+      if (!params.has('userId') && !params.has('user')) {
+        if (activeUid) {
+          params.append('userId', String(activeUid));
+        }
+      }
+
+      // Ensure current search query is passed if applicable
+      if (internalSearch.trim() && !params.has('searchTerm')) {
+        params.append('searchTerm', internalSearch.trim());
+      }
+
+      // Ensure current sorting is passed if applicable
+      if (sortColumn && !params.has('sortColumn')) {
+        params.append('sortColumn', sortColumn);
+      }
+      if (sortDirection && !params.has('sortDirection')) {
+        params.append('sortDirection', sortDirection);
+      }
+
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const downloadUrl = `${apiBase}/api/reports/export?${params.toString()}`;
+      const defaultName = (exportFileName && exportFileName.toLowerCase().endsWith('.xlsx'))
+        ? exportFileName
+        : `${reportName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+      startExport({
+        downloadUrl,
+        fileName: defaultName,
+        totalRecords
+      });
+      return;
+    }
+
+    // Fallback: in-memory CSV export for legacy / unmigrated pages
+    handleExportCSV();
+  };
 
   // Handle Export to CSV
   const handleExportCSV = () => {
@@ -159,9 +221,47 @@ export default function ReportDataTableCard({
       
       <div className="ls-toolbar-top">
         <div className="ls-toolbar-left">
-          <button className="ls-export-btn" onClick={handleExportCSV}>
-            Export Data To Excel
-          </button>
+          {isExporting ? (
+            <div className="ls-export-progress-container" title="Exporting Excel (.xlsx)">
+              <div className="ls-export-progress-track">
+                <div 
+                  className={`ls-export-progress-bar ${progressPercent > 0 ? '' : 'indeterminate'}`} 
+                  style={{ width: `${Math.max(5, progressPercent)}%` }} 
+                />
+              </div>
+              <div className="ls-export-progress-label">
+                <svg className="ls-export-spinner animate-spin" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12" />
+                </svg>
+                <span>
+                  {progressPercent > 0 && progressPercent < 100
+                    ? `Exporting: ${progressPercent}%`
+                    : 'Exporting Excel...'}
+                </span>
+                <button 
+                  type="button" 
+                  className="ls-export-cancel-btn" 
+                  onClick={cancelExport} 
+                  title="Cancel Export"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button 
+              className="ls-export-btn" 
+              onClick={handleExport}
+              disabled={isLoading || isRefreshing}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Export Data To Excel
+            </button>
+          )}
           
           <div className="ls-entries-select">
             <span>Show</span>

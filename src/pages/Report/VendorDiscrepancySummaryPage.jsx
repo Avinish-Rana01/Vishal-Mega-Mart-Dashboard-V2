@@ -423,6 +423,12 @@ export default function VendorDiscrepancySummaryPage() {
             onPageChange={setPageIndex}
             onPageSizeChange={setPageSize}
             isLoading={isLoading}
+            reportName="VENDOR_HU_DISCREPANCY_SUMMARY"
+            exportParams={{
+              vendorCode: activeFilters.vendorCode,
+              fromDate: activeFilters.fromDate,
+              toDate: activeFilters.toDate
+            }}
             onSortChange={(col, dir) => {
               setSortColumn(col);
               setSortDirection(dir);
@@ -430,7 +436,7 @@ export default function VendorDiscrepancySummaryPage() {
             }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
-            exportFileName={`HU_Discrepancy_VendorWise_Report_${activeFilters.fromDate}_${activeFilters.toDate}.csv`}
+            exportFileName={`HU_Discrepancy_VendorWise_Report_${activeFilters.fromDate}_${activeFilters.toDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => {
               setSearchTerm(term);

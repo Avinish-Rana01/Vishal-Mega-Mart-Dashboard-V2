@@ -6,7 +6,7 @@ This document specifies the exact mapping between frontend report pages, their u
 GET /api/reports/export?reportName={reportName}&[filters...]
 ```
 
-When users click **"Export Data To Excel"** in `ReportDataTableCard`, passing `reportName` triggers a direct, server-streamed CSV download. This eliminates browser tab freezing and memory crashes even for 100,000+ records.
+When users click **"Export Data To Excel"** in `ReportDataTableCard`, passing `reportName` triggers a direct, server-streamed `.xlsx` Excel download. This eliminates browser tab freezing and memory crashes even for 100,000+ records.
 
 ---
 
@@ -63,7 +63,7 @@ Simply pass `reportName` and `exportParams` to the card:
     toDate: activeFilters.toDate,
     searchTerm: searchTerm
   }}
-  exportFileName="Vendor_HU_Discrepancy_Report.csv"
+  exportFileName="Vendor_HU_Discrepancy_Report.xlsx"
 />
 ```
 

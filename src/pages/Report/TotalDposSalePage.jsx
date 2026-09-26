@@ -443,9 +443,21 @@ export default function TotalDposSalePage() {
     ];
   }, [isRfidCheckout, isManualSale]);
 
-  useEffect(() => {
-    document.title = `${reportTitle} | Vishal Mega Mart`;
-  }, [reportTitle]);
+  const exportReportName = useMemo(() => {
+    if (columnName === 'TOTAL_RFID_CHECKOUT') return 'RFID_CHECKOUT_SALE_DATA';
+    if (columnName === 'TOTAL_MANUAL_SALE') return 'MANUAL_SALE_DATA';
+    return 'TOTAL_DPOS_SALE_DATA';
+  }, [columnName]);
+
+  const exportParams = useMemo(() => ({
+    storeCode: selectedStore,
+    fromDate,
+    toDate,
+    pos: selectedPos,
+    articleNo: selectedArticle,
+    ean: selectedEan,
+    columnName
+  }), [selectedStore, fromDate, toDate, selectedPos, selectedArticle, selectedEan, columnName]);
 
   return (
     <AppLayout
@@ -651,7 +663,9 @@ export default function TotalDposSalePage() {
             totalRecords={totalRecords}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            exportFileName={`${reportTitle.replace(/\s+/g, '_')}_${selectedStore || 'All'}_${fromDate || 'Date'}.csv`}
+            reportName={exportReportName}
+            exportParams={exportParams}
+            exportFileName={`${reportTitle.replace(/\s+/g, '_')}_${selectedStore || 'All'}_${fromDate || 'Date'}.xlsx`}
             onPageChange={(newPg) => setPageIndex(newPg)}
             onPageSizeChange={(newSize) => {
               setPageSize(newSize);
