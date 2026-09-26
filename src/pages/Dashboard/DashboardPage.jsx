@@ -52,7 +52,7 @@ export default function DashboardPage() {
   return (
     <AppLayout mainClassName="vmm-dashboard-body-v2">
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        {/* {hasSection('live_stock') && (
+        {hasSection('live_stock') && (
           <div id="section-live_stock" className="vmm-dashboard-stack">
             <LiveStockSection />
           </div>
@@ -81,8 +81,8 @@ export default function DashboardPage() {
           <div id="section-return" className="vmm-dashboard-stack">
             <ReturnDashboardSection />
           </div>
-        )} */}
-          {/* {hasSection('dc_validation') && (
+        )}
+          {hasSection('dc_validation') && (
             <div id="section-dc_validation" className="vmm-dashboard-stack">
               <DcValidationSection />
             </div>
@@ -96,7 +96,7 @@ export default function DashboardPage() {
             <div id="section-tag_management" className="vmm-dashboard-stack">
               <TagManagementSection />
             </div>
-          )} */}
+          )}
         {hasSection('vendor_discrepancy') && (
           <div id="section-vendor_discrepancy" className="vmm-dashboard-stack">
             <VendorDiscrepancySection />
