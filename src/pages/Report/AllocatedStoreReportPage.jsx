@@ -123,7 +123,9 @@ export default function AllocatedStoreReportPage() {
     storeName: passedState.storeCode || '',
     articleNo: '',
     ean: '',
-    searchTerm: ''
+    searchTerm: '',
+    sortColumn: 'ARTICLE',
+    sortDirection: 'asc'
   });
 
   const {
@@ -211,7 +213,9 @@ export default function AllocatedStoreReportPage() {
       storeName: '',
       articleNo: '',
       ean: '',
-      searchTerm: ''
+      searchTerm: '',
+      sortColumn: 'ARTICLE',
+      sortDirection: 'asc'
     });
   };
 
@@ -220,26 +224,31 @@ export default function AllocatedStoreReportPage() {
     {
       key: 'sr_no',
       label: 'SR.NO',
+      sortable: false,
       render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1
     },
     {
       key: 'ASSIGNED_STORE_NAME',
       label: 'ASSIGNED STORE NAME',
+      sortKey: 'Store_Code',
       render: (val, row) => row.ASSIGNED_STORE_NAME ?? row.Assigned_Store_Name ?? row.Store_Name ?? row.STORE_NAME ?? row.Store_Code ?? row.STORE_CODE ?? '—'
     },
     {
       key: 'ARTICLE_NO',
       label: 'ARTICLE NO',
+      sortKey: 'ARTICLE',
       render: (val, row) => row.ARTICLE_NO ?? row.Article_No ?? row.ARTICLE ?? row.Material ?? row.MATERIAL ?? '—'
     },
     {
       key: 'ARTICLE_DESCRIPTION',
       label: 'ARTICLE DESCRIPTION',
+      sortKey: 'ARTICLE_DESC',
       render: (val, row) => row.ARTICLE_DESC ?? row.Article_Desc ?? row.ARTICLE_DESCRIPTION ?? row.Article_Description ?? row.DESCRIPTION ?? '—'
     },
     {
       key: 'EAN',
       label: 'EAN',
+      sortKey: 'EAN',
       render: (val, row) => {
         const eanVal = row.EAN ?? row.Ean ?? row.ean;
         return (
@@ -259,6 +268,7 @@ export default function AllocatedStoreReportPage() {
     {
       key: 'ENCODING_TAGS',
       label: 'ENCODING TAGS',
+      sortKey: 'ENCODING_Tags',
       render: (val, row) => {
         const tagVal = row.ENCODING_TAGS ?? row.Encoding_Tags ?? row.TAGS ?? row.QTY ?? row.Qty ?? 0;
         return (
@@ -278,6 +288,7 @@ export default function AllocatedStoreReportPage() {
     {
       key: 'ENCODE_DATE',
       label: 'ENCODE DATE',
+      sortKey: 'Encode_Date',
       render: (val, row) => {
         const rawDate = row.ENCODE_DATE ?? row.Encode_Date ?? row.DATE ?? row.Date;
         if (!rawDate) return '—';
@@ -444,6 +455,16 @@ export default function AllocatedStoreReportPage() {
             onPageChange={setPageIndex}
             onPageSizeChange={setPageSize}
             onSearch={(term) => setSearchTerm(term)}
+            onSortChange={(col, dir) => {
+              setSearchParams(prev => ({
+                ...prev,
+                sortColumn: col || 'ARTICLE',
+                sortDirection: dir || 'asc'
+              }));
+              setPageIndex(1);
+            }}
+            sortColumn={searchParams.sortColumn}
+            sortDirection={searchParams.sortDirection}
             reportName="ALLOCATED_STORE_ENCODING"
             exportFilters={exportFilters}
             exportFileName={`Allocated_Store_Report_${searchParams.fromDate}_${searchParams.toDate}.xlsx`}

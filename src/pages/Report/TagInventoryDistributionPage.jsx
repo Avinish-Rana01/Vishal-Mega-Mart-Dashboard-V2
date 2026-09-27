@@ -145,7 +145,7 @@ export default function TagInventoryDistributionPage() {
     {
       key: 'RowNumber',
       label: 'SR.NO',
-      sortable: true,
+      sortable: false,
       render: (val, row, idx) => (row.rowNumber ?? row.RowNumber ?? (pageIndex - 1) * pageSize + idx + 1)
     },
     {

@@ -193,16 +193,19 @@ export default function DcReportPage() {
     {
       key: 'RowNumber',
       label: 'SR.NO',
+      sortable: false,
       render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1
     },
     {
       key: 'DATE',
       label: 'DATE',
+      sortKey: 'DATE',
       render: (val) => dateRenderer(val)
     },
     {
       key: 'PROCESSED_HU',
       label: 'PROCESSED HU QTY',
+      sortKey: 'PROCESSED HU QTY',
       render: (val, row) => (
         <span
           className="dc-drilldown-link"
@@ -216,6 +219,7 @@ export default function DcReportPage() {
     {
       key: 'UNPROCESSED_HU',
       label: 'UNPROCESSED HU QTY',
+      sortKey: 'UNPROCESSED HU QTY',
       render: (val, row) => (
         <span
           className="dc-drilldown-link"
@@ -229,6 +233,7 @@ export default function DcReportPage() {
     {
       key: 'PROCESSED_ARTICLE_QTY',
       label: 'VALIDATE HU ARTICLE QTY',
+      sortKey: 'VALIDATED HU ARTICLE QTY',
       render: (val, row) => (
         <span
           className="dc-drilldown-link"

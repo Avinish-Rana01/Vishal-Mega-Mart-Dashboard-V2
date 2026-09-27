@@ -102,10 +102,10 @@ export default function CycleCountModal({ modalData, onClose }) {
   }, [expandedImage]);
 
   const modalColumns = useMemo(() => [
-    { key: 'RowNumber', label: 'SR.NO', render: formatValue },
+    { key: 'RowNumber', label: 'SR.NO', sortable: false, render: formatValue },
     { key: 'Ref_ID', label: 'REFERENCE NO', render: formatValue },
-    { key: 'ECODE', label: 'ECODE', render: formatValue },
-    { key: 'MC', label: 'MC', render: formatValue },
+    { key: 'ECODE', label: 'ECODE', sortable: false, render: formatValue },
+    { key: 'MC', label: 'MC', sortable: false, render: formatValue },
     { key: 'MC_TEXT', label: 'MC TEXT', render: formatValue },
     { key: 'ARTICLE', label: 'ARTICLE', render: formatValue },
     { key: 'ARTICLE_DESC', label: 'ARTICLE DESCRIPTION', render: formatValue },
@@ -124,6 +124,7 @@ export default function CycleCountModal({ modalData, onClose }) {
     {
       key: 'IMAGE',
       label: 'IMAGE',
+      sortable: false,
       render: (_, row) => {
         const code = row?.ARTICLE || row?.Article || row?.article || row?.EAN || row?.Ean;
         return <ProductImageCell articleCode={code} onExpand={setExpandedImage} />;

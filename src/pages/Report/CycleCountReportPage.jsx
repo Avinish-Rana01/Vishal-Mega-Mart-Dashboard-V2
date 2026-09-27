@@ -111,6 +111,7 @@ export default function CycleCountReportPage() {
     { 
       key: 'RowNumber', 
       label: 'SR.NO', 
+      sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1)
     },
     { key: 'DATE', label: 'DATE', render: dateRenderer },
@@ -127,7 +128,7 @@ export default function CycleCountReportPage() {
         </span>
       ) 
     },
-    { key: 'CYCLE_COUNT_TYPE', label: 'CYCLE COUNT TYPE' },
+    { key: 'CYCLE_COUNT_TYPE', label: 'CYCLE COUNT TYPE', sortable: false },
     { key: 'NO_OF_ARTICLE', label: 'NO OF ARTICLES', render: numRenderer },
     { key: 'SYSTEM_STOCK', label: 'SYSTEM STOCK', render: numRenderer },
     { key: 'SCANNED_QTY', label: 'SCANNED QTY', render: numRenderer },

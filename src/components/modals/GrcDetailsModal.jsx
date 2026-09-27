@@ -114,7 +114,7 @@ export default function GrcDetailsModal({ modalData, grcStatus: propGrcStatus, d
   }, [fetchDetails]);
 
   const modalColumns = useMemo(() => [
-    { key: 'RowNumber', label: 'SR.NO', render: (val, row, idx) => formatValue(val || (pageIndex - 1) * pageSize + idx + 1) },
+    { key: 'RowNumber', label: 'SR.NO', sortable: false, render: (val, row, idx) => formatValue(val || (pageIndex - 1) * pageSize + idx + 1) },
     { key: 'STORE_CODE', label: 'STORE CODE', render: (val, row) => formatValue(val || row?.storeCode || row?.StoreCode) },
     { key: 'STORE_NAME', label: 'STORE NAME', render: (val, row) => formatValue(val || row?.storeName || row?.StoreName) },
     { key: 'HU', label: 'HU NUMBER', render: (val, row) => formatValue(val || row?.HU_NO || row?.huNumber) },

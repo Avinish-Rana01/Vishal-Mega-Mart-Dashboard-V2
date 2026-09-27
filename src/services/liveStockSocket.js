@@ -24,13 +24,24 @@ class DashboardSocketService {
     this.isConnected = false;
     this.isConnecting = false;
     this.lastConnectAttemptTime = 0;
-    this.reconnectCooldownMs = 5000;
+    this.reconnectCooldownMs = 4000;
+    this.reconnectTimer = null;
 
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', () => {
         this.disconnect();
       });
     }
+  }
+
+  scheduleReconnect(delayMs = 4000) {
+    if (this.reconnectTimer) return;
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      if (!this.isConnected && !this.isConnecting) {
+        this.connect();
+      }
+    }, delayMs);
   }
 
   getHubUrl() {
@@ -40,12 +51,14 @@ class DashboardSocketService {
   }
 
   async connect() {
-    if (this.isConnecting) {
+    if (this.isConnecting || this.isConnected) {
       return;
     }
 
     const now = Date.now();
     if (now - this.lastConnectAttemptTime < this.reconnectCooldownMs) {
+      const waitTime = Math.max(1000, this.reconnectCooldownMs - (now - this.lastConnectAttemptTime));
+      this.scheduleReconnect(waitTime);
       return;
     }
     this.lastConnectAttemptTime = now;
@@ -137,6 +150,7 @@ class DashboardSocketService {
         this.isConnected = false;
         this.isConnecting = false;
         this.notifyStatus('disconnected');
+        this.scheduleReconnect(4000);
       });
 
       await this.connection.start();
@@ -144,10 +158,11 @@ class DashboardSocketService {
       this.isConnecting = false;
       this.notifyStatus('connected');
     } catch (err) {
-      console.warn('[DashboardSocket] Initial connection failed, falling back:', err.message);
+      console.warn('[DashboardSocket] Connection failed, retrying in 4s:', err?.message || err);
       this.isConnected = false;
       this.isConnecting = false;
       this.notifyStatus('disconnected');
+      this.scheduleReconnect(4000);
     }
   }
 
@@ -162,6 +177,10 @@ class DashboardSocketService {
   }
 
   disconnect() {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.connection) {
       try {
         this.connection.stop();

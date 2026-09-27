@@ -35,6 +35,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
 
   useEffect(() => {
     const controller = new AbortController();
+    let retryTimer = null;
     
     const fetchData = async () => {
       if (!hasDataRef.current) {
@@ -53,8 +54,6 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
           const term = searchQuery.toLowerCase();
           items = items.filter(row => filterFn(row, term));
         }
-
-
 
         setData(items);
         if (items.length > 0) {
@@ -77,6 +76,13 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
         if (err.name === 'AbortError' || err.name === 'CanceledError') return;
         console.error("Error fetching data:", err);
         setError("Unable to load data. Please check your connection.");
+        if (err.message === 'Network Error' || !err.response) {
+          retryTimer = setTimeout(() => {
+            if (!controller.signal.aborted) {
+              setRefreshTrigger(prev => prev + 1);
+            }
+          }, 5000);
+        }
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -92,6 +98,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
 
     return () => {
       clearTimeout(delayDebounceFn);
+      if (retryTimer) clearTimeout(retryTimer);
       controller.abort();
     };
   }, [searchQuery, pageIndex, pageSize, refreshTrigger, apiFn, filterFn, totalsMapper]);

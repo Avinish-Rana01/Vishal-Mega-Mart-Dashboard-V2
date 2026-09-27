@@ -190,7 +190,7 @@ export default function StoreSaleReportPage() {
     { 
       key: 'RowNumber', 
       label: 'SR.NO', 
-      sortable: true,
+      sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1)
     },
     { 

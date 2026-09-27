@@ -121,9 +121,9 @@ export default function VoidDetailsReportPage() {
   };
 
   const columns = [
-    { key: 'SR_NO', label: 'SR.NO', render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1 },
-    { key: 'DATE', label: 'DATE', render: dateRenderer },
-    { key: 'VOID_QTY', label: 'VOID QTY', render: (val, row) => (
+    { key: 'SR_NO', label: 'SR.NO', sortable: false, render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1 },
+    { key: 'DATE', label: 'DATE', sortKey: 'DATE', render: dateRenderer },
+    { key: 'VOID_QTY', label: 'VOID QTY', sortKey: 'VOID QTY', render: (val, row) => (
         <span 
           className="report-link-action"
           onClick={() => handleNavigateToRecon(row)}
@@ -132,7 +132,7 @@ export default function VoidDetailsReportPage() {
         </span>
       )
     },
-    { key: 'ENCODE_QTY', label: 'ENCODED VS VOID (QTY)', render: (val, row) => (
+    { key: 'ENCODE_QTY', label: 'ENCODED VS VOID (QTY)', sortKey: 'ENCODED VS VOID (QTY)', render: (val, row) => (
         <span 
           className="report-link-action"
           onClick={() => handleNavigateToRecon(row)}
@@ -141,7 +141,7 @@ export default function VoidDetailsReportPage() {
         </span>
       )
     },
-    { key: 'DIFFERENCE_QTY', label: 'PENDING QTY', render: (val, row) => (
+    { key: 'DIFFERENCE_QTY', label: 'PENDING QTY', sortKey: 'PENDING QTY', render: (val, row) => (
         <span 
           className="report-link-action-danger"
           onClick={() => handleNavigateToRecon(row)}

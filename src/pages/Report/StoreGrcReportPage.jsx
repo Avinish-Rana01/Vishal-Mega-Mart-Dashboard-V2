@@ -74,7 +74,7 @@ export default function StoreGrcReportPage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [sortColumn, setSortColumn] = useState('DATE');
+  const [sortColumn, setSortColumn] = useState('GRC_DATE');
   const [sortDirection, setSortDirection] = useState('DESC');
 
   const exportFilters = useMemo(() => ({
@@ -89,7 +89,7 @@ export default function StoreGrcReportPage() {
     setSelectedStore(initialStore);
     setFromDate(defaultFromDate);
     setToDate(defaultToDate);
-    setSortColumn('DATE');
+    setSortColumn('GRC_DATE');
     setSortDirection('DESC');
     setPageIndex(1);
   };
@@ -187,12 +187,12 @@ export default function StoreGrcReportPage() {
       sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
-    { key: 'date', label: 'DATE', sortKey: 'DATE' },
+    { key: 'date', label: 'DATE', sortKey: 'GRC_DATE' },
     { key: 'huReceivedQty', label: 'HU RECEIVED QTY', sortKey: 'HU_RECEIVED_QTY', render: numRenderer },
-    { key: 'whValidatedQty', label: 'WH VALIDATED QTY', sortKey: 'WH_VALIDATED_QTY', render: numRenderer },
-    { key: 'storeValidatedQty', label: 'STORE VALIDATED QTY', sortKey: 'STORE_VALIDATED_QTY', render: numRenderer },
-    { key: 'pendingQty', label: 'STORE PENDING FOR VALIDATION (QTY)', sortKey: 'PENDING_QTY', render: numRenderer },
-    { key: 'wrongHuQty', label: 'WRONG HU QTY', sortKey: 'WRONG_HU_QTY', render: numRenderer }
+    { key: 'whValidatedQty', label: 'WH VALIDATED QTY', sortKey: 'HU_VALIDATED_QTY', render: numRenderer },
+    { key: 'storeValidatedQty', label: 'STORE VALIDATED QTY', sortKey: 'HHT_VALIDATE_QTY', render: numRenderer },
+    { key: 'pendingQty', label: 'STORE PENDING FOR VALIDATION (QTY)', sortKey: 'STORE_PENDING_QTY', render: numRenderer },
+    { key: 'wrongHuQty', label: 'WRONG HU QTY', sortKey: 'HU_WRONG_QTY', render: numRenderer }
   ];
 
   return (

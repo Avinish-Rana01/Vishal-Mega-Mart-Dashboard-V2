@@ -368,14 +368,14 @@ export default function TotalDposSalePage() {
   const tableColumns = useMemo(() => {
     if (isManualSale) {
       return [
-        { key: 'RowNumber', label: 'SR.NO', sortable: true },
+        { key: 'RowNumber', label: 'SR.NO', sortable: false },
         { 
           key: 'CHECKOUT_DATE', 
           label: 'CHECKOUT DATE', 
           sortable: true,
           render: (val, row) => {
             const d = val || row?.BILL_DATE || row?.bill_date || row?.checkout_date;
-            return d ? String(d).split('T')[0] : 'â€”';
+            return d ? String(d).split('T')[0] : '—';
           }
         },
         { key: 'STORE_CODE', label: 'STORE CODE', sortable: true },
@@ -394,14 +394,14 @@ export default function TotalDposSalePage() {
 
     if (isRfidCheckout) {
       return [
-        { key: 'RowNumber', label: 'SR.NO', sortable: true },
+        { key: 'RowNumber', label: 'SR.NO', sortable: false },
         { 
           key: 'CHECKOUT_DATE', 
           label: 'CHECKOUT DATE', 
           sortable: true,
           render: (val, row) => {
             const d = val || row?.BILL_DATE || row?.bill_date;
-            return d ? String(d).split('T')[0] : 'â€”';
+            return d ? String(d).split('T')[0] : '—';
           }
         },
         { key: 'STORE_CODE', label: 'STORE CODE', sortable: true },
@@ -418,7 +418,7 @@ export default function TotalDposSalePage() {
     }
 
     return [
-      { key: 'RowNumber', label: 'SR.NO', sortable: true },
+      { key: 'RowNumber', label: 'SR.NO', sortable: false },
       { 
         key: 'BILL_DATE', 
         label: 'SALE DATE', 

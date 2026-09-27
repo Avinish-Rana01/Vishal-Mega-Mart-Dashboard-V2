@@ -235,6 +235,7 @@ export default function HuSummaryReportPage() {
       key: 'HU_NUMBER',
       label: 'HU Number',
       className: 'text-center',
+      sortable: false,
       render: (val, row) => {
         const hu = val || row?.hU_NUMBER || row?.HU_No || row?.hU_NO || row?.HU_NO || '—';
         return (

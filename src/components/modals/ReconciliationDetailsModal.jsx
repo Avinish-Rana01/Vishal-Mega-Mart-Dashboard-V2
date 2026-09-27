@@ -154,14 +154,14 @@ export default function ReconciliationDetailsModal({ modalData, onClose, type = 
 
   // Modal Table Columns matching the design
   const modalColumns = useMemo(() => [
-    { key: 'RowNumber', label: 'SR.NO', render: formatValue },
-    { key: 'DATE', label: isReturn ? 'RETURN DATE' : 'VOID DATE', render: formatDate },
+    { key: 'RowNumber', label: 'SR.NO', sortable: false, render: formatValue },
+    { key: 'DATE', label: isReturn ? 'RETURN DATE' : 'VOID DATE', sortKey: isReturn ? 'BILL_DATE' : 'VOID_DATE', render: formatDate },
     { key: 'POS_TYPE', label: 'POS TYPE', render: formatValue },
     { key: 'STORE_CODE', label: 'STORE CODE', render: formatValue },
-    { key: 'COUNTER_NO', label: 'POS COUNTER', render: formatValue },
+    { key: 'COUNTER_NO', label: 'POS COUNTER', sortable: !isReturn, render: formatValue },
     { key: 'EAN', label: 'EAN', render: formatValue },
     { key: 'MATERIAL', label: 'MATERIAL', render: formatValue },
-    { key: 'QTY', label: isReturn ? 'RETURN QTY' : 'VOID QTY', render: formatNum },
+    { key: 'QTY', label: isReturn ? 'RETURN QTY' : 'VOID QTY', sortKey: isReturn ? 'RETURN_QTY' : 'VOID_QTY', render: formatNum },
     { key: 'ENCODE_QTY', label: 'ENCODE QTY', render: formatNum },
     { key: 'DIFFERENCE_QTY', label: 'DIFFERENCE QTY', render: formatNum },
     {

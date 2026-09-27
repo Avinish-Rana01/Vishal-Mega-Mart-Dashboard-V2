@@ -197,12 +197,14 @@ export default function VendorDiscrepancySummaryPage() {
       key: 'VENDOR_CODE',
       label: 'VENDOR CODE',
       className: 'text-center',
+      sortable: false,
       render: (val, row) => val || row?.vendor_code || row?.Vendor_Code || row?.VENDOR_CODE || '—'
     },
     {
       key: 'VENDOR_NAME',
       label: 'VENDOR NAME',
       className: 'text-center',
+      sortable: false,
       render: (val, row) => val || row?.vendor_name || row?.Vendor_Name || row?.VENDOR_NAME || '—'
     },
     {

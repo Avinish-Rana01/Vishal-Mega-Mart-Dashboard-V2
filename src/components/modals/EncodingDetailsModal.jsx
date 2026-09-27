@@ -103,31 +103,37 @@ export default function EncodingDetailsModal({ rowData, storeName, fromDate, toD
     {
       key: 'RowNumber',
       label: 'SR.NO',
+      sortable: false,
       render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1
     },
     {
       key: 'LOCATION_NAME',
       label: 'STORE CODE',
+      sortKey: 'Store_Code',
       render: (val, row) => val || row?.LOCATION_NAME || row?.Location_Name || '—'
     },
     {
       key: 'ARTICLE',
       label: 'ARTICLE NO',
+      sortKey: 'ARTICLE',
       render: (val, row) => val || row?.ARTICLE || row?.Article || '—'
     },
     {
       key: 'ARTICLE_DESC',
       label: 'ARTICLE DESCRIPTION',
+      sortKey: 'ARTICLE_DESC',
       render: (val, row) => val || row?.ARTICLE_DESC || row?.Article_Desc || '—'
     },
     {
       key: 'EAN',
       label: 'EAN',
+      sortKey: 'EAN',
       render: (val, row) => val || row?.EAN || row?.ean || '—'
     },
     {
       key: 'Encode_EPC',
       label: 'ENCODE EPC / TAG ID',
+      sortKey: 'Encode_EPC',
       render: (val, row) => (
         <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#2563eb' }}>
           {val || row?.Encode_EPC || row?.encode_epc || '—'}
@@ -137,6 +143,7 @@ export default function EncodingDetailsModal({ rowData, storeName, fromDate, toD
     {
       key: 'Encode_Date',
       label: 'ENCODE DATE',
+      sortKey: 'Encode_Date',
       render: (val, row) => {
         const raw = val || row?.Encode_Date || row?.encode_date;
         return raw ? String(raw).replace('T', ' ') : '—';

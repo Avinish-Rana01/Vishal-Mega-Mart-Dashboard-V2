@@ -100,6 +100,7 @@ export default function HuDetailsModal({ huRow, huStatus, fromDate, toDate, onCl
     {
       key: 'RowNumber',
       label: 'SR.NO',
+      sortable: false,
       render: (val, row, idx) => ((pageIndex - 1) * pageSize) + idx + 1
     },
     {
