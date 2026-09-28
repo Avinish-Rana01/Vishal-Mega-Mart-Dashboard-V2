@@ -228,11 +228,11 @@ export default function SaleDashboardSection() {
               </div>
             </div>
           )}
-          <div className="cc-chart-scroll">
+          <div className="cc-chart-scroll" style={{ overflowY: 'hidden' }}>
             {barData.length === 0 ? (
               <SearchEmptyState searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} />
             ) : (
-              <div style={{ minWidth: `max(100%, ${barData.length * 60}px)` }}>
+              <div style={{ minWidth: `max(100%, ${barData.length * 60}px)`, height: '100%' }}>
                 <GroupedBarChart
                   data={barData}
                   stacked={true}
@@ -242,7 +242,7 @@ export default function SaleDashboardSection() {
                     { dataKey: 'Taffeta', color: '#8b5cf6', label: 'Taffeta Sale' },
                     { dataKey: 'Manual', color: '#f59e0b', label: 'Manual Sale' }
                   ]}
-                  height={280}
+                  height={235}
                   hideLegend={true}
                 />
               </div>
