@@ -28,7 +28,8 @@ export default function ReportDataTableCard({
   sortDirection = null,
   reportName = null,
   exportParams = {},
-  exportFilters = {}
+  exportFilters = {},
+  directExport = false
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -111,13 +112,22 @@ export default function ReportDataTableCard({
   // Triggered when user clicks "Export Data To Excel" button in toolbar
   const handleExportButtonClick = () => {
     if (reportName) {
+      if (directExport) {
+        handleModalExportConfirm({
+          preset: 'custom',
+          fromDate: activeExportParams?.fromDate || activeExportParams?.stockDate,
+          toDate: activeExportParams?.toDate || activeExportParams?.stockDate,
+          searchTerm: internalSearch
+        });
+        return;
+      }
       setIsExportModalOpen(true);
       return;
     }
     handleExportCSV();
   };
 
-  // Triggered when user confirms from the ExportOptionsModal
+  // Triggered when user confirms from the ExportOptionsModal (or called directly via directExport)
   const handleModalExportConfirm = ({ preset, fromDate, toDate, searchTerm: modalSearchTerm }) => {
     setIsExportModalOpen(false);
 

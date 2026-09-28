@@ -7,7 +7,7 @@ import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
-import './LiveStockReport.css';
+import './common-reports.css';
 import './HuReport.css';
 import { getHuDetails, searchValidationHuNumbers } from '../../services/stockService';
 import { dateRenderer } from '../../utils/dashboardColumns';

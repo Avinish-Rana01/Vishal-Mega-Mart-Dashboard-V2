@@ -12,7 +12,6 @@ import { getReportStores, getEncodingStoreSearchEAN, getEncodingStoreSearchArtic
 import { Store, Tag, Hash } from 'lucide-react';
 import EncodingDetailsModal from '../../components/modals/EncodingDetailsModal';
 import './common-reports.css';
-import './LiveStockReport.css';
 import './AllocatedStoreReport.css';
 
 export default function AllocatedStoreReportPage() {

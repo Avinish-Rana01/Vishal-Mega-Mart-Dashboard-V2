@@ -23,7 +23,8 @@ export default function DetailsModal({
   sortDirection,
   exportFileName = "Details.csv",
   reportName,
-  exportFilters
+  exportFilters,
+  directExport = true
 }) {
 
   return (
@@ -37,11 +38,11 @@ export default function DetailsModal({
         </div>
 
         {/* Body */}
-        <div className="vmm-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="vmm-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 14px', flex: 1, overflow: 'hidden' }}>
           
           {/* Meta Info */}
           {metaInfo && metaInfo.length > 0 && (
-            <div className="vmm-modal-meta-row">
+            <div className="vmm-modal-meta-row" style={{ margin: '0 0 4px 0', padding: '6px 12px' }}>
               {metaInfo.map((meta, idx) => (
                 <div key={idx}>
                   {meta.label} : <span style={{ color: meta.valueColor || 'inherit' }}>{meta.value}</span>
@@ -52,25 +53,22 @@ export default function DetailsModal({
 
           {/* CurvedCards Grid */}
           {summaryCards && summaryCards.length > 0 && (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(summaryCards.length, 6)}, 1fr)`, gap: '15px' }}>
-                {summaryCards.map((card, idx) => (
-                  <CurvedCard 
-                    key={idx}
-                    title={card.title} 
-                    value={card.value} 
-                    waveColor={card.waveColor} 
-                    icon={card.icon} 
-                  />
-                ))}
-              </div>
-              <div style={{ borderBottom: '1px dashed #cbd5e1', margin: '4px 0 0 0' }} />
-            </>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(summaryCards.length, 6)}, 1fr)`, gap: '8px', margin: '0 0 2px 0' }}>
+              {summaryCards.map((card, idx) => (
+                <CurvedCard 
+                  key={idx}
+                  title={card.title} 
+                  value={card.value} 
+                  waveColor={card.waveColor} 
+                  icon={card.icon} 
+                />
+              ))}
+            </div>
           )}
 
           {/* Data Table */}
           {tableColumns && tableColumns.length > 0 && (
-            <div style={{ backgroundColor: 'white', borderRadius: '12px',  flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ backgroundColor: 'white', borderRadius: '8px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
               <ReportDataTableCard 
                 columns={tableColumns}
                 data={tableData}
@@ -89,6 +87,7 @@ export default function DetailsModal({
                 exportFileName={exportFileName}
                 reportName={reportName}
                 exportFilters={exportFilters}
+                directExport={directExport}
               />
             </div>
           )}

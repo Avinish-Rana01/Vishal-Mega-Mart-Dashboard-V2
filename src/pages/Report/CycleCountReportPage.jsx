@@ -107,6 +107,8 @@ export default function CycleCountReportPage() {
     setIsModalOpen(true);
   };
 
+  const plainNumRenderer = (val) => (typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0));
+
   const columns = [
     { 
       key: 'RowNumber', 
@@ -129,12 +131,12 @@ export default function CycleCountReportPage() {
       ) 
     },
     { key: 'CYCLE_COUNT_TYPE', label: 'CYCLE COUNT TYPE', sortable: false },
-    { key: 'NO_OF_ARTICLE', label: 'NO OF ARTICLES', render: numRenderer },
-    { key: 'SYSTEM_STOCK', label: 'SYSTEM STOCK', render: numRenderer },
-    { key: 'SCANNED_QTY', label: 'SCANNED QTY', render: numRenderer },
-    { key: 'NET_DIFF', label: 'NET DIFFERENCE', render: numRenderer },
-    { key: 'SHORT_QTY', label: 'SHORT QTY', render: numRenderer },
-    { key: 'EXCESS_QTY', label: 'EXCESS QTY', render: numRenderer },
+    { key: 'NO_OF_ARTICLE', label: 'NO OF ARTICLES', render: plainNumRenderer },
+    { key: 'SYSTEM_STOCK', label: 'SYSTEM STOCK', render: plainNumRenderer },
+    { key: 'SCANNED_QTY', label: 'SCANNED QTY', render: plainNumRenderer },
+    { key: 'NET_DIFF', label: 'NET DIFFERENCE', render: plainNumRenderer },
+    { key: 'SHORT_QTY', label: 'SHORT QTY', render: plainNumRenderer },
+    { key: 'EXCESS_QTY', label: 'EXCESS QTY', render: plainNumRenderer },
     { key: 'Start_DateTime', label: 'STARTED ON', render: dateRenderer },
     { key: 'END_DateTime', label: 'ENDED ON', render: dateRenderer },
     { key: 'Time_Taken', label: 'TIME TAKEN' }

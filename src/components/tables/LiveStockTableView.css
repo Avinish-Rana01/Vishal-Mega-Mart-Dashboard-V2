@@ -283,24 +283,35 @@
   flex-direction: column;
 }
 
-/* Universal scrollbar hiding for Live Stock page layout while preserving scroll functionality */
-.vmm-dashboard-body,
-.vmm-main-wrapper,
-.flex-col-main,
+/* Modern slim scrollbar for Live Stock page layout */
 .livestock-table-view,
 .livestock-report-table-wrapper {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #cbd5e1 #f8fafc !important;
+  -ms-overflow-style: auto !important;
 }
 
-.vmm-dashboard-body::-webkit-scrollbar,
-.vmm-main-wrapper::-webkit-scrollbar,
-.flex-col-main::-webkit-scrollbar,
 .livestock-table-view::-webkit-scrollbar,
 .livestock-report-table-wrapper::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: block !important;
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.livestock-table-view::-webkit-scrollbar-track,
+.livestock-report-table-wrapper::-webkit-scrollbar-track {
+  background: #f8fafc !important;
+}
+
+.livestock-table-view::-webkit-scrollbar-thumb,
+.livestock-report-table-wrapper::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1 !important;
+  border-radius: 10px;
+}
+
+.livestock-table-view::-webkit-scrollbar-thumb:hover,
+.livestock-report-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8 !important;
 }
 
 

@@ -474,28 +474,45 @@
   font-size: 11px;
 }
 
-/* Universal scrollbar hiding for outer page containers while preserving scroll functionality */
-.vmm-dashboard-body,
-.vmm-main-wrapper,
-.flex-col-main,
+/* Modern slim scrollbar for report page layout containers & tables */
 .common-reports-container,
 .livestock-table-view,
 .livestock-report-table-wrapper,
 .report-page-container {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #cbd5e1 #f8fafc !important;
+  -ms-overflow-style: auto !important;
 }
 
-.vmm-dashboard-body::-webkit-scrollbar,
-.vmm-main-wrapper::-webkit-scrollbar,
-.flex-col-main::-webkit-scrollbar,
 .common-reports-container::-webkit-scrollbar,
 .livestock-table-view::-webkit-scrollbar,
 .livestock-report-table-wrapper::-webkit-scrollbar,
 .report-page-container::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: block !important;
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.common-reports-container::-webkit-scrollbar-track,
+.livestock-table-view::-webkit-scrollbar-track,
+.livestock-report-table-wrapper::-webkit-scrollbar-track,
+.report-page-container::-webkit-scrollbar-track {
+  background: #f8fafc !important;
+}
+
+.common-reports-container::-webkit-scrollbar-thumb,
+.livestock-table-view::-webkit-scrollbar-thumb,
+.livestock-report-table-wrapper::-webkit-scrollbar-thumb,
+.report-page-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1 !important;
+  border-radius: 10px;
+}
+
+.common-reports-container::-webkit-scrollbar-thumb:hover,
+.livestock-table-view::-webkit-scrollbar-thumb:hover,
+.livestock-report-table-wrapper::-webkit-scrollbar-thumb:hover,
+.report-page-container::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8 !important;
 }
 
 

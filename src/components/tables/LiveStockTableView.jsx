@@ -196,11 +196,11 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
             />
           </div>
           <div className="search-field">
-            <label>Stock Date</label>
+            <label>Stock Date (Live)</label>
             <CustomDatePicker
               value={selectedDate}
-              onChange={(val) => setSelectedDate(val)}
-              placeholder="Select Stock Date"
+              disabled={true}
+              placeholder="Live Stock Date"
             />
           </div>
           <div className="search-field">
@@ -287,6 +287,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
           reportName="LIVE_STOCK_REPORT"
           exportFilters={exportFilters}
           exportFileName={`Live_Stock_Report_${selectedStore}_${selectedDate}.xlsx`}
+          directExport={true}
         />
       </div>
     </div>

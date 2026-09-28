@@ -62,7 +62,7 @@ export default function DashboardPage() {
             <CycleCountSection />
           </div>
         )}
-        {hasSection('store_validation') && (
+        {/* {hasSection('store_validation') && (
           <div id="section-store_validation" className="vmm-dashboard-stack">
             <StoreValidationSection />
           </div>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
           <div id="section-vendor_discrepancy" className="vmm-dashboard-stack">
             <VendorDiscrepancySection />
           </div>
-        )}
+        )} */}
       </div>
     </AppLayout>
   );
