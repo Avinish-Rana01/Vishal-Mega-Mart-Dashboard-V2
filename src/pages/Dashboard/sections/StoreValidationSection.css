@@ -43,3 +43,17 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
   filter: brightness(0.96);
 }
+
+/* Compact layout for Store Validation Data Grid to prevent horizontal scroll */
+.sv-grid-table th.cc-data-grid-th {
+  padding: 6px 4px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.sv-grid-table td.cc-data-grid-td {
+  padding: 5px 2px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+

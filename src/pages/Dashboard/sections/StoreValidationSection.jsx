@@ -606,6 +606,9 @@ export default function StoreValidationSection() {
           'Store', 'Date', 'Received HU', 'Validated HU', 'HHT Validated', 'Pending', 'Wrong HU'
         ]}
         data={tableData}
+        tableClassName="sv-grid-table"
+        innerWrapperStyle={{ minWidth: 'auto', width: '100%' }}
+        tableStyle={{ width: '100%', tableLayout: 'auto' }}
         emptyStateContent={
           <tr>
             <td colSpan={7} className="cc-data-grid-empty-cell">
@@ -639,7 +642,7 @@ export default function StoreValidationSection() {
                   )}
                 </div>
               </td>
-              <td className="cc-data-grid-td" style={{ fontSize: '12px', color: '#64748b' }}>
+              <td className="cc-data-grid-td" style={{ fontSize: '11px', color: '#64748b' }}>
                 {row.DATE ? row.DATE.split(' ')[0] : '—'}
               </td>
               <td className="cc-data-grid-td">
@@ -678,7 +681,7 @@ export default function StoreValidationSection() {
                     className="sv-clickable-badge"
                     onClick={() => handleCellClick(row, '3')}
                     title="Click to view Pending HUs in GRC Report (Status: 3)"
-                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '54px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 6px', fontSize: '11px' }}
                   >
                     {pending.toLocaleString('en-IN')}
                   </span>
@@ -687,7 +690,7 @@ export default function StoreValidationSection() {
                     className="sv-clickable-badge"
                     onClick={() => handleCellClick(row, '3')}
                     title="Click to view Pending HUs in GRC Report (Status: 3)"
-                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px', cursor: 'pointer' }}
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '54px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 6px', fontSize: '11px', cursor: 'pointer' }}
                   >
                     ✓ Clear
                   </span>
@@ -699,7 +702,7 @@ export default function StoreValidationSection() {
                     className="sv-clickable-badge"
                     onClick={() => handleCellClick(row, '0')}
                     title="Click to view Wrong HUs in GRC Report (Status: 0)"
-                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fee2e2', color: '#dc2626', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '54px', background: '#fee2e2', color: '#dc2626', fontWeight: 700, borderRadius: '6px', padding: '2px 6px', fontSize: '11px' }}
                   >
                     ✕ {wrong.toLocaleString('en-IN')}
                   </span>
@@ -708,7 +711,7 @@ export default function StoreValidationSection() {
                     className="sv-clickable-badge"
                     onClick={() => handleCellClick(row, '0')}
                     title="Click to view Wrong HUs in GRC Report (Status: 0)"
-                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px', cursor: 'pointer' }}
+                    style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '54px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 6px', fontSize: '11px', cursor: 'pointer' }}
                   >
                     ✓ Clean
                   </span>

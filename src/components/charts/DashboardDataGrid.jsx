@@ -22,7 +22,9 @@ export default function DashboardDataGrid({
   rowsPerPage = 5,
   tableScrollStyle = {},
   innerWrapperStyle = {},
-  tableStyle = {}
+  tableStyle = {},
+  className = '',
+  tableClassName = ''
 }) {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -37,7 +39,7 @@ export default function DashboardDataGrid({
     : data;
 
   return (
-    <div className="cc-data-grid-card">
+    <div className={`cc-data-grid-card ${className}`.trim()}>
       <div className="cc-data-grid-header" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <h3 className="cc-data-grid-title" style={{ margin: 0, display: 'flex', alignItems: 'center' }}>{title}</h3>
@@ -56,7 +58,7 @@ export default function DashboardDataGrid({
 
       <div className="cc-native-table-scroll" style={{ overflowY: 'auto', ...tableScrollStyle }}>
         <div className="cc-data-grid-inner-wrapper" style={innerWrapperStyle}>
-          <table className="cc-data-grid-table" style={tableStyle}>
+          <table className={`cc-data-grid-table ${tableClassName}`.trim()} style={tableStyle}>
             <thead className="cc-data-grid-thead">
               <tr>
                 {headers.map((header, idx) => (

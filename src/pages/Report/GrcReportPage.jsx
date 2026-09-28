@@ -8,6 +8,7 @@ import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import ViewDetailsButton from '../../components/common/ViewDetailsButton';
 import { getReportStores, searchGrcHuNumbers, getGrcDetails } from '../../services/stockService';
 import GrcDetailsModal from '../../components/modals/GrcDetailsModal';
 import './GrcReport.css';
@@ -16,11 +17,22 @@ export default function GrcReportPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Helper for date formatting
+  const getTodayDate = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayStr = getTodayDate();
+
   // If navigated from store validation, it might pass these state params
   const { 
     store: initialStore = 'HD44', 
-    fromDate: rawFromDate = '2026-08-01',
-    toDate: rawToDate = '2026-08-01',
+    fromDate: rawFromDate,
+    toDate: rawToDate,
     grcStatus: rawGrcStatus
   } = location.state || {};
 
@@ -28,9 +40,9 @@ export default function GrcReportPage() {
     ? String(rawGrcStatus)
     : '1';
 
-  // Ensure dates are just YYYY-MM-DD (Store Validation passes "2026-07-19 12:00 AM Sunday")
-  const initialFromDate = rawFromDate.substring(0, 10);
-  const initialToDate = rawToDate.substring(0, 10);
+  // Ensure dates are just YYYY-MM-DD
+  const initialFromDate = rawFromDate ? rawFromDate.substring(0, 10) : todayStr;
+  const initialToDate = rawToDate ? rawToDate.substring(0, 10) : todayStr;
 
   const [selectedStore, setSelectedStore] = useState(initialStore);
   const [fromDate, setFromDate] = useState(initialFromDate);
@@ -165,19 +177,15 @@ export default function GrcReportPage() {
   }, [selectedStore, fromDate, toDate, pageIndex, pageSize, selectedHu, grcStatus, sortColumn, sortDirection]);
 
   const actionRenderer = (val, row) => (
-    <button 
-      className="vmm-btn-view-details" 
+    <ViewDetailsButton 
+      label={val || 'View Details'}
+      variant="blue"
+      title="Click to view full HU details"
       onClick={(e) => {
         e.stopPropagation();
         setSelectedModalRow(row);
       }}
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-        <circle cx="12" cy="12" r="3"></circle>
-      </svg>
-      {val}
-    </button>
+    />
   );
 
   const columns = [
@@ -268,20 +276,22 @@ export default function GrcReportPage() {
                   closeOnSelect={false}
                 />
               </div>
-            </div>
-            
-            <div className="search-buttons">
-              <ClearButton 
-                onClick={() => {
-                  setSelectedHu('');
-                  setHuSearchTerm('');
-                  setPageIndex(1);
-                }}
-              />
-              <BackButton 
-                onClick={() => navigate(-1)} 
-                label="Back to GRC Summary" 
-              />
+
+              <div className="search-buttons">
+                <ClearButton 
+                  onClick={() => {
+                    setSelectedHu('');
+                    setHuSearchTerm('');
+                    setFromDate(todayStr);
+                    setToDate(todayStr);
+                    setPageIndex(1);
+                  }}
+                />
+                <BackButton 
+                  onClick={() => navigate(-1)} 
+                  label="Back to GRC Summary" 
+                />
+              </div>
             </div>
           </div>
 
