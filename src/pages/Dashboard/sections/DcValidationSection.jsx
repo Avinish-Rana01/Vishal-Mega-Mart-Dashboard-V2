@@ -300,8 +300,9 @@ export default function DcValidationSection() {
             {`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
           </span>
         }
-        innerWrapperStyle={{ minWidth: 'auto' }}
-        tableStyle={{ width: 'auto', margin: '0 auto' }}
+        innerWrapperStyle={{ minWidth: 'auto', width: '100%' }}
+        tableStyle={{ width: '100%', tableLayout: 'auto' }}
+        tableClassName="dc-grid-table"
         headerAction={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CustomDropdown
@@ -324,10 +325,10 @@ export default function DcValidationSection() {
           </div>
         }
         headers={[
-          <div style={{ width: '100px' }}>Store</div>,
-          <div style={{ width: '130px', textAlign: 'center' }}>Processed HU Qty</div>,
-          <div style={{ width: '150px', textAlign: 'center' }}>Unprocessed HU Qty</div>,
-          <div style={{ width: '150px', textAlign: 'center', whiteSpace: 'normal' }}>Validated HU Article Qty</div>
+          'Store',
+          'Processed HU Qty',
+          'Unprocessed HU Qty',
+          'Validated HU Article Qty'
         ]}
         data={tableData}
         emptyStateContent={
@@ -347,12 +348,11 @@ export default function DcValidationSection() {
             <tr key={row.Reciving_Plant || idx} className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}>
               <td 
                 className="cc-data-grid-td cc-data-grid-td-bold" 
-                style={{ width: '100px', cursor: 'pointer' }}
                 onClick={() => handleStoreClick(row)}
                 title="Click to view DC Store Report"
               >
-                <div className="cc-row-tooltip-wrapper">
-                  <span style={{ color: '#2563eb', textDecoration: 'underline', textUnderlineOffset: '3px', fontWeight: 700 }}>
+                <div className="cc-row-tooltip-wrapper dc-clickable-cell">
+                  <span style={{ color: '#2563eb', fontWeight: 700 }}>
                     {row.Reciving_Plant || '—'}
                   </span>
                   {row.STORE_NAME && (
@@ -364,35 +364,38 @@ export default function DcValidationSection() {
               </td>
               <td 
                 className="cc-data-grid-td" 
-                style={{ width: '130px', textAlign: 'center', cursor: 'pointer' }}
                 onClick={() => handleHuClick(row, '1')}
                 title="Click to view Processed HU Details"
               >
-                <span style={{ color: COLOR_PROCESSED, fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+                <span 
+                  className="dc-clickable-cell"
+                  style={{ color: COLOR_PROCESSED, fontWeight: 700 }}
+                >
                   {processed.toLocaleString('en-IN')}
                 </span>
               </td>
               <td 
                 className="cc-data-grid-td" 
-                style={{ width: '150px', textAlign: 'center', cursor: 'pointer' }}
                 onClick={() => handleHuClick(row, '0')}
                 title="Click to view Unprocessed HU Details"
               >
                 {unprocessed > 0 ? (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px', textDecoration: 'underline' }}>
+                  <span className="dc-clickable-cell" style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '4px', padding: '1px 6px', fontSize: '11px' }}>
                     {unprocessed.toLocaleString('en-IN')}
                   </span>
                 ) : (
-                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', minWidth: '70px', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '6px', padding: '2px 8px', fontSize: '12px' }}>✓ Clear</span>
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', background: '#dcfce7', color: '#16a34a', fontWeight: 700, borderRadius: '4px', padding: '1px 6px', fontSize: '11px' }}>✓ Clear</span>
                 )}
               </td>
               <td 
                 className="cc-data-grid-td" 
-                style={{ width: '150px', textAlign: 'center', cursor: 'pointer' }}
                 onClick={() => handleArticleQtyClick(row)}
                 title="Click to view Allocated Store Report"
               >
-                <span style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+                <span 
+                  className="dc-clickable-cell"
+                  style={{ color: '#0ea5e9', fontWeight: 700 }}
+                >
                   {articles.toLocaleString('en-IN')}
                 </span>
               </td>

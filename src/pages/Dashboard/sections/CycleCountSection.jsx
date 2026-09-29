@@ -662,12 +662,15 @@ export default function CycleCountSection() {
           />
         }
         headers={[
-          'Store Code', 'Type', 'Ref No', 'Date', 'Start Time', 'End Time', 'Duration', 'Status'
+          'Store Code', 'Type', 'Ref No', 'Date', 'Start Time', 'End Time', 'Duration'
         ]}
         data={tableData}
+        tableClassName="cycle-count-grid-table"
+        innerWrapperStyle={{ minWidth: 'auto', width: '100%' }}
+        tableStyle={{ width: '100%', tableLayout: 'auto' }}
         emptyStateContent={
           <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <td colSpan={8} className="cc-data-grid-empty-cell">
+            <td colSpan={7} className="cc-data-grid-empty-cell">
               No cycle counts found
             </td>
           </motion.tr>
@@ -683,8 +686,8 @@ export default function CycleCountSection() {
           >
             <td className="cc-data-grid-td cc-data-grid-td-bold">
               <div 
-                className="cc-row-tooltip-wrapper"
-                style={{ cursor: 'pointer', color: '#2563eb' }}
+                className="cc-row-tooltip-wrapper cc-clickable-cell"
+                style={{ color: '#2563eb' }}
                 onClick={() => {
                   saveDashboardReturnPoint('cycle_count');
                   navigate('/reports/cycle-count', { state: { storeCode: row.STORE_CODE, date: row.DATE } });
@@ -705,8 +708,8 @@ export default function CycleCountSection() {
             </td>
             <td className="cc-data-grid-td">
               <span 
-                className="cc-data-grid-ref-link"
-                style={{ cursor: 'pointer', color: '#2563eb', textDecoration: 'underline' }}
+                className="cc-data-grid-ref-link cc-clickable-cell"
+                style={{ color: '#2563eb' }}
                 onClick={() => handleRowClick(row)}
               >
                 {row.REF_NO || '—'}
@@ -716,11 +719,6 @@ export default function CycleCountSection() {
             <td className="cc-data-grid-td">{row.Start_DateTime || '—'}</td>
             <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
             <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
-            <td className="cc-data-grid-td">
-              <span className={`cc-data-grid-status-pill ${row.exceedsThreshold ? 'cc-data-grid-status-high' : 'cc-data-grid-status-normal'}`}>
-                {row.exceedsThreshold ? 'Very High' : 'Normal'}
-              </span>
-            </td>
           </motion.tr>
         )}
       />

@@ -370,6 +370,9 @@ export default function SaleDashboardSection() {
           'Store Code', 'Date', 'Total Sales', 'RFID Checkout', 'Taffeta Sales', 'Manual Sales'
         ]}
         data={tableData}
+        tableClassName="sale-grid-table"
+        innerWrapperStyle={{ minWidth: 'auto', width: '100%' }}
+        tableStyle={{ width: '100%', tableLayout: 'auto' }}
         emptyStateContent={
           <motion.tr key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <td colSpan={6} className="cc-data-grid-empty-cell">
@@ -386,14 +389,14 @@ export default function SaleDashboardSection() {
             key={row.STORE}
             className="cc-data-grid-tr"
           >
-            <td className="cc-data-grid-td cc-data-grid-td-bold" style={{ padding: '8px' }}>
+            <td className="cc-data-grid-td cc-data-grid-td-bold">
               <div 
-                className="cc-row-tooltip-wrapper"
+                className="cc-row-tooltip-wrapper sale-clickable-cell"
                 onClick={() => handleCellClick(row, 'STORE')}
                 title="Click to view daily store sales report"
-                style={{ cursor: 'pointer', color: '#1d4ed8' }}
+                style={{ color: '#1d4ed8', fontWeight: 700 }}
               >
-                <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                <span>
                   {row.STORE || '—'}
                 </span>
                 {row.STORE_NAME && (
@@ -403,39 +406,39 @@ export default function SaleDashboardSection() {
                 )}
               </div>
             </td>
-            <td className="cc-data-grid-td" style={{ padding: '8px', fontSize: '12px', color: '#64748b' }}>
+            <td className="cc-data-grid-td" style={{ color: '#64748b' }}>
               {row.DATE ? String(row.DATE).split(' ')[0].split('T')[0] : '—'}
             </td>
-            <td 
-              className="cc-data-grid-td" 
-              style={{ padding: '8px', cursor: 'pointer', color: '#1d4ed8', fontWeight: 600 }}
-              onClick={() => handleCellClick(row, 'TOTAL_DPOS_SALE')}
-              title="Click to view POS Sale details"
-            >
-              <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+            <td className="cc-data-grid-td">
+              <span 
+                className="sale-clickable-cell"
+                style={{ color: '#1d4ed8', fontWeight: 600 }}
+                onClick={() => handleCellClick(row, 'TOTAL_DPOS_SALE')}
+                title="Click to view POS Sale details"
+              >
                 {Number(row.TOTAL_DPOS_SALE || 0).toLocaleString('en-IN')}
               </span>
             </td>
-            <td 
-              className="cc-data-grid-td" 
-              style={{ padding: '8px', cursor: 'pointer', color: '#1d4ed8', fontWeight: 600 }}
-              onClick={() => handleCellClick(row, 'TOTAL_RFID_CHECKOUT')}
-              title="Click to view RFID Checkout details"
-            >
-              <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+            <td className="cc-data-grid-td">
+              <span 
+                className="sale-clickable-cell"
+                style={{ color: '#1d4ed8', fontWeight: 600 }}
+                onClick={() => handleCellClick(row, 'TOTAL_RFID_CHECKOUT')}
+                title="Click to view RFID Checkout details"
+              >
                 {Number(row.TOTAL_RFID_CHECKOUT || 0).toLocaleString('en-IN')}
               </span>
             </td>
-            <td className="cc-data-grid-td" style={{ padding: '8px' }}>
+            <td className="cc-data-grid-td">
               {Number(row.TOTAL_TAFFETA_SALE || 0).toLocaleString('en-IN')}
             </td>
-            <td 
-              className="cc-data-grid-td" 
-              style={{ padding: '8px', cursor: 'pointer', color: '#1d4ed8', fontWeight: 600 }}
-              onClick={() => handleCellClick(row, 'TOTAL_MANUAL_SALE')}
-              title="Click to view Manual Sale details"
-            >
-              <span style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+            <td className="cc-data-grid-td">
+              <span 
+                className="sale-clickable-cell"
+                style={{ color: '#1d4ed8', fontWeight: 600 }}
+                onClick={() => handleCellClick(row, 'TOTAL_MANUAL_SALE')}
+                title="Click to view Manual Sale details"
+              >
                 {Number(row.TOTAL_MANUAL_SALE || 0).toLocaleString('en-IN')}
               </span>
             </td>

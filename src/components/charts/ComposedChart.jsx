@@ -108,18 +108,22 @@ export default function ComposedChart({
               onAxisClick 
               ? (props) => {
                   const { x, y, payload } = props;
+                  const textVal = xAxisTickFormatter ? xAxisTickFormatter(payload.value) : (payload.value && payload.value.length > 10 ? payload.value.substring(0, 10) + '…' : payload.value);
                   return (
-                    <g transform={`translate(${x},${y})`}>
+                    <g 
+                      transform={`translate(${x},${y})`}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => onAxisClick(payload.value)}
+                    >
                       <text
                         x={0} y={0} dy={16}
                         textAnchor="middle"
                         fill="#2563eb"
                         fontSize={11}
-                        fontWeight="bold"
-                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                        onClick={() => onAxisClick(payload.value)}
+                        fontWeight="600"
                       >
-                        {xAxisTickFormatter ? xAxisTickFormatter(payload.value) : (payload.value && payload.value.length > 10 ? payload.value.substring(0, 10) + '…' : payload.value)}
+                        {textVal}
+                        <tspan dx={2} dy={-2} fontSize={9} fill="#2563eb">↗</tspan>
                       </text>
                     </g>
                   );
@@ -166,6 +170,7 @@ export default function ComposedChart({
               fill={bar.color} 
               barSize={barSize}
               radius={[12, 12, 0, 0]} 
+              minPointSize={4}
               onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
               cursor={onBarClick ? 'pointer' : 'default'}
             >

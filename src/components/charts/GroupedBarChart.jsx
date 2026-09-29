@@ -37,7 +37,8 @@ export default function GroupedBarChart({
   xAxisTickFormatter,
   onAxisClick,
   xAxisFontSize = 11,
-  isAnimationActive = true
+  isAnimationActive = true,
+  minPointSize = 4
 }) {
   if (!data || data.length === 0) {
     if (!emptyText) {
@@ -91,19 +92,23 @@ export default function GroupedBarChart({
                 onAxisClick 
                 ? (props) => {
                     const { x, y, payload } = props;
+                    const textVal = xAxisTickFormatter ? xAxisTickFormatter(payload.value) : (payload.value && payload.value.length > 10 ? payload.value.substring(0, 10) + '…' : payload.value);
                     return (
-                      <g transform={`translate(${x},${y})`}>
+                      <g 
+                        transform={`translate(${x},${y})`}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => onAxisClick(payload.value)}
+                      >
                         <text
                           x={0} y={0} dy={16}
                           textAnchor={isMobile ? 'end' : 'middle'}
                           fill="#2563eb"
                           fontSize={xAxisFontSize}
-                          fontWeight="bold"
-                          style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                          onClick={() => onAxisClick(payload.value)}
+                          fontWeight="600"
                           transform={isMobile ? 'rotate(-45)' : ''}
                         >
-                          {xAxisTickFormatter ? xAxisTickFormatter(payload.value) : (payload.value && payload.value.length > 10 ? payload.value.substring(0, 10) + '…' : payload.value)}
+                          {textVal}
+                          <tspan dx={2} dy={-2} fontSize={Math.max(xAxisFontSize - 2, 9)} fill="#2563eb">↗</tspan>
                         </text>
                       </g>
                     );
@@ -138,6 +143,7 @@ export default function GroupedBarChart({
                 fill={striped && idx === 0 ? 'url(#gchart-stripe)' : bar.color}
                 radius={stacked ? 0 : 12}
                 barSize={maxBarWidth || (stacked ? 32 : 24)}
+                minPointSize={minPointSize}
                 isAnimationActive={isAnimationActive}
                 onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
                 cursor={onBarClick ? 'pointer' : 'default'}

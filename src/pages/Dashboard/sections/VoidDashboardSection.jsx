@@ -63,7 +63,11 @@ const VoidVsEncodedTooltip = ({ active, payload }) => {
 
 const CustomYAxisTick = ({ x, y, payload, onClick }) => {
   return (
-    <g transform={`translate(${x},${y})`}>
+    <g 
+      transform={`translate(${x},${y})`}
+      style={{ cursor: 'pointer' }}
+      onClick={() => onClick(payload.value)}
+    >
       <text
         x={0}
         y={0}
@@ -71,11 +75,10 @@ const CustomYAxisTick = ({ x, y, payload, onClick }) => {
         textAnchor="end"
         fill="#2563eb"
         fontSize={13}
-        fontWeight="bold"
-        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-        onClick={() => onClick(payload.value)}
+        fontWeight="600"
       >
         {payload.value}
+        <tspan dx={2} dy={-2} fontSize={10} fill="#2563eb">↗</tspan>
       </text>
     </g>
   );

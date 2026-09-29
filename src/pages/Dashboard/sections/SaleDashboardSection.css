@@ -1,0 +1,32 @@
+/* ==============================================
+   SaleDashboardSection.css
+   Compact layout and styling for Sale Dashboard table
+   ============================================== */
+
+/* Compact layout for Sale Dashboard Data Grid to prevent horizontal scroll */
+.sale-grid-table th.cc-data-grid-th {
+  padding: 6px 4px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.sale-grid-table td.cc-data-grid-td {
+  padding: 5px 2px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.sale-clickable-cell {
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.15s ease-in-out;
+  padding: 2px 3px;
+  border-radius: 3px;
+}
+
+.sale-clickable-cell:hover {
+  text-decoration: underline;
+  transform: translateY(-1px);
+  filter: brightness(1.15);
+  background-color: rgba(37, 99, 235, 0.08);
+}
