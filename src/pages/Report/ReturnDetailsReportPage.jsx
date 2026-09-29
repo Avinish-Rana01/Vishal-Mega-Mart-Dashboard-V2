@@ -14,12 +14,29 @@ import './common-reports.css';
 
 export default function ReturnDetailsReportPage() {
   const location = useLocation();
-  const { storeCode: initialStore, date: initialDate } = location.state || {};
+  const { storeCode: initialStore, date: initialDate, fromDate: initialFromDate, toDate: initialToDate } = location.state || {};
 
-  const defaultDate = initialDate || '2026-08-01';
+  const { defaultFromDate, defaultToDate } = useMemo(() => {
+    if (initialDate) return { defaultFromDate: initialDate, defaultToDate: initialDate };
+    if (initialFromDate && initialToDate) return { defaultFromDate: initialFromDate, defaultToDate: initialToDate };
+
+    const today = new Date();
+    const past = new Date();
+    past.setDate(today.getDate() - 7);
+
+    const formatDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    return { defaultFromDate: formatDate(past), defaultToDate: formatDate(today) };
+  }, [initialDate, initialFromDate, initialToDate]);
+
   const [selectedStore, setSelectedStore] = useState(initialStore || '');
-  const [fromDate, setFromDate] = useState(defaultDate);
-  const [toDate, setToDate] = useState(defaultDate);
+  const [fromDate, setFromDate] = useState(defaultFromDate);
+  const [toDate, setToDate] = useState(defaultToDate);
   const [storeOptions, setStoreOptions] = useState([]);
   
   const navigate = useNavigate();

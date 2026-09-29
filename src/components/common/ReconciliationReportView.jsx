@@ -25,12 +25,29 @@ import ReconciliationDetailsModal from '../modals/ReconciliationDetailsModal';
 export default function ReconciliationReportView({ type = 'return' }) {
   const isReturn = type === 'return';
   const location = useLocation();
-  const { storeCode: initialStore, date: initialDate } = location.state || {};
+  const { storeCode: initialStore, date: initialDate, fromDate: initialFromDate, toDate: initialToDate } = location.state || {};
 
-  const defaultDate = initialDate || (isReturn ? '2026-08-01' : '2026-07-21');
+  const { defaultFromDate, defaultToDate } = useMemo(() => {
+    if (initialDate) return { defaultFromDate: initialDate, defaultToDate: initialDate };
+    if (initialFromDate && initialToDate) return { defaultFromDate: initialFromDate, defaultToDate: initialToDate };
+
+    const today = new Date();
+    const past = new Date();
+    past.setDate(today.getDate() - 7);
+
+    const fmt = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
+    return { defaultFromDate: fmt(past), defaultToDate: fmt(today) };
+  }, [initialDate, initialFromDate, initialToDate]);
+
   const [selectedStore, setSelectedStore] = useState(initialStore || '');
-  const [fromDate, setFromDate] = useState(defaultDate);
-  const [toDate, setToDate] = useState(defaultDate);
+  const [fromDate, setFromDate] = useState(defaultFromDate);
+  const [toDate, setToDate] = useState(defaultToDate);
   const [pos, setPos] = useState('');
   const [ean, setEan] = useState('');
   const [storeOptions, setStoreOptions] = useState([]);

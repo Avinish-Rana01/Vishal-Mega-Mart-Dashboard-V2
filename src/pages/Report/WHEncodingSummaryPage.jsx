@@ -5,8 +5,9 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import SearchableDropdown from '../../components/common/SearchableDropdown';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
-import { getWHEncodingDetails } from '../../services/stockService';
+import { getWHEncodingDetails, getWHEncodingUsers } from '../../services/stockService';
 import { dateRenderer, numRenderer, numRendererRed } from '../../utils/dashboardColumns';
 import EpcRangeBreakdown, { DEFAULT_EPC_RANGES as EPC_RANGES } from '../../components/common/EpcRangeBreakdown';
 import * as Icons from 'lucide-react';
@@ -23,6 +24,9 @@ export default function WHEncodingSummaryPage() {
   const [fromDate, setFromDate] = useState(getTodayDate());
   const [toDate, setToDate] = useState(getTodayDate());
   const [selectedUser, setSelectedUser] = useState('');
+  const [apiUserOptions, setApiUserOptions] = useState([]);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [isUserSearching, setIsUserSearching] = useState(false);
 
   // Data state
   const [reportData, setReportData] = useState([]);
@@ -117,11 +121,111 @@ export default function WHEncodingSummaryPage() {
     return () => controller.abort();
   }, [fetchData]);
 
+  // 1. Fetch users from API whenever date range changes
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchUsers = async () => {
+      setIsUserSearching(true);
+      try {
+        const data = await getWHEncodingUsers({ fromDate, toDate, searchTerm: '' }, controller.signal);
+        const list = (Array.isArray(data) ? data : []).map(u => ({
+          id: String(u.encode_By ?? u.Encode_By ?? u.user_Name ?? u.User_Name),
+          value: String(u.encode_By ?? u.Encode_By ?? u.user_Name ?? u.User_Name),
+          text: String(u.user_Name ?? u.User_Name ?? u.encode_By ?? u.Encode_By)
+        }));
+        setApiUserOptions(list);
+      } catch (err) {
+        if (err.name !== 'AbortError' && err.message !== 'canceled') {
+          console.error("Failed to fetch users", err);
+        }
+      } finally {
+        if (!controller.signal.aborted) setIsUserSearching(false);
+      }
+    };
+    fetchUsers();
+    return () => controller.abort();
+  }, [fromDate, toDate]);
+
+  // 2. Fetch users from API when user types in the dropdown search box
+  useEffect(() => {
+    const trimmed = userSearchTerm.trim();
+    if (!trimmed) return;
+
+    const controller = new AbortController();
+    const delayDebounceFn = setTimeout(async () => {
+      setIsUserSearching(true);
+      try {
+        const data = await getWHEncodingUsers({ fromDate, toDate, searchTerm: trimmed }, controller.signal);
+        const list = (Array.isArray(data) ? data : []).map(u => ({
+          id: String(u.encode_By ?? u.Encode_By ?? u.user_Name ?? u.User_Name),
+          value: String(u.encode_By ?? u.Encode_By ?? u.user_Name ?? u.User_Name),
+          text: String(u.user_Name ?? u.User_Name ?? u.encode_By ?? u.Encode_By)
+        }));
+        setApiUserOptions(prev => {
+          const map = new Map();
+          for (const opt of prev) map.set(String(opt.value), opt);
+          for (const opt of list) map.set(String(opt.value), opt);
+          return Array.from(map.values());
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError' && err.message !== 'canceled') {
+          console.error("Failed to search users", err);
+        }
+      } finally {
+        if (!controller.signal.aborted) setIsUserSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(delayDebounceFn);
+      controller.abort();
+    };
+  }, [userSearchTerm, fromDate, toDate]);
+
+  // Combine options from API and currently displayed table data
+  const displayUserOptions = useMemo(() => {
+    const map = new Map();
+    // 1. Add API options
+    for (const opt of apiUserOptions) {
+      if (opt.value) map.set(String(opt.value), opt);
+    }
+    // 2. Merge users found in table data
+    if (reportData && reportData.length > 0) {
+      for (const row of reportData) {
+        const val = String(row.Encode_By ?? row.ENCODE_USER ?? row.User_Name ?? '');
+        const label = String(row.User_Name ?? row.ENCODE_USER ?? row.Encode_By ?? '');
+        if (val && !map.has(val)) {
+          map.set(val, { id: val, value: val, text: label });
+        }
+      }
+    }
+    return Array.from(map.values());
+  }, [apiUserOptions, reportData]);
+
+  const selectedUserLabel = useMemo(() => {
+    if (!selectedUser) return '';
+    const match = displayUserOptions.find(opt => String(opt.value) === String(selectedUser));
+    return match ? match.text : selectedUser;
+  }, [selectedUser, displayUserOptions]);
+
   // ---- Handlers ----
+  const handleFromDateChange = (val) => {
+    setFromDate(val);
+    setSelectedUser('');
+    setPageIndex(1);
+  };
+
+  const handleToDateChange = (val) => {
+    setToDate(val);
+    setSelectedUser('');
+    setPageIndex(1);
+  };
+
   const handleClear = () => {
     setFromDate(getTodayDate());
     setToDate(getTodayDate());
     setSelectedUser('');
+    setUserSearchTerm('');
     setSearchTerm('');
     setSortColumn('ENCODE_DATE');
     setSortDirection('desc');
@@ -221,34 +325,32 @@ export default function WHEncodingSummaryPage() {
           <div className="report-search-body">
             <div className="search-field">
               <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={(val) => { setFromDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={fromDate} onChange={handleFromDateChange} />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={toDate} onChange={handleToDateChange} />
             </div>
 
             <div className="search-field">
               <label>Username</label>
-              <div className="input-group">
-                <input
-                  type="text"
-                  value={selectedUser}
-                  onChange={(e) => { setSelectedUser(e.target.value); setPageIndex(1); }}
-                  placeholder="Select User"
-                />
-                {selectedUser && (
-                  <button
-                    type="button"
-                    className="btn-input-clear"
-                    onClick={() => setSelectedUser('')}
-                    title="Clear User"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
+              <SearchableDropdown
+                options={displayUserOptions}
+                value={selectedUser}
+                onChange={(val) => {
+                  setSelectedUser(val ? String(val) : '');
+                  setPageIndex(1);
+                }}
+                placeholder="Select User"
+                searchPlaceholder="Search User..."
+                isAsync={true}
+                onSearchChange={setUserSearchTerm}
+                isLoading={isUserSearching}
+                valueKey="value"
+                labelKey="text"
+                closeOnSelect={true}
+              />
             </div>
 
             <div className="search-buttons">
@@ -264,7 +366,7 @@ export default function WHEncodingSummaryPage() {
 
         {/* Stats Sub-header */}
         <ReportStatsHeader
-          storeName={selectedUser ? `USER: ${selectedUser}` : 'ALL USERS'}
+          storeName={selectedUser ? `USER: ${selectedUserLabel}` : 'ALL USERS'}
           fromDate={fromDate}
           toDate={toDate}
         />

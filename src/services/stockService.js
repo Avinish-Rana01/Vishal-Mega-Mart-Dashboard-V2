@@ -800,6 +800,39 @@ export const getWHEncodingDetails = async ({
   return response.data;
 };
 
+export const getWHEncodingUsers = async ({
+  searchTerm = '',
+  fromDate = '',
+  toDate = ''
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('SearchTerm', searchTerm);
+
+  // Align date range with SP_NEW_REPORT SHOW_WAREHOUSE_ENCODE_DATA (which offsets by -6 days)
+  let reqFromDate = fromDate;
+  if (fromDate) {
+    try {
+      const d = new Date(fromDate);
+      d.setDate(d.getDate() - 6);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      reqFromDate = `${y}-${m}-${day}`;
+    } catch {
+      reqFromDate = fromDate;
+    }
+  }
+
+  if (reqFromDate) params.append('FromDate', reqFromDate);
+  if (toDate) params.append('ToDate', toDate);
+
+  const response = await axios.get(`${API_BASE}/SearchUsername?${params.toString()}`, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
 // ==============================================================
 // HU Summary Report (DC Validation)
 // ==============================================================
