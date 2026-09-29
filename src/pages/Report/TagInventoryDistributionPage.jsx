@@ -211,7 +211,7 @@ export default function TagInventoryDistributionPage() {
           </>
         ),
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
       mainClassName="flex-col-main"
     >

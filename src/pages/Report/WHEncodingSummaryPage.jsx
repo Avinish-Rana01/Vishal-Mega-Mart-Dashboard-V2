@@ -209,7 +209,7 @@ export default function WHEncodingSummaryPage() {
           </>
         ),
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
     >
       <div className="wh-encoding-page">

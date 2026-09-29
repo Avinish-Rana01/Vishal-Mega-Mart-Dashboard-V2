@@ -12,8 +12,37 @@ export function saveDashboardReturnPoint(sectionId) {
     const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
     const scrollTop = container ? container.scrollTop : (window.scrollY || window.pageYOffset || 0);
 
+    // If scrollTop is 0 and no sectionId given, don't accidentally overwrite an existing valid return point
+    if (scrollTop === 0 && !sectionId) {
+      const existing = getDashboardReturnPoint();
+      if (existing && existing.scrollTop > 0) return;
+    }
+
+    let targetSection = sectionId;
+    if (!targetSection) {
+      // Check if an explicit sectionId was already saved recently (e.g. from button/cell click)
+      const existing = getDashboardReturnPoint();
+      if (existing && existing.sectionId && (Date.now() - (existing.timestamp || 0) < 5000)) {
+        targetSection = existing.sectionId;
+      } else {
+        // Find which section is currently in view
+        const containerRect = container ? container.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+        const sections = document.querySelectorAll('[id^="section-"]');
+        let minDistance = Infinity;
+
+        sections.forEach(sec => {
+          const rect = sec.getBoundingClientRect();
+          const dist = Math.abs(rect.top - (containerRect.top + 60));
+          if (dist < minDistance) {
+            minDistance = dist;
+            targetSection = sec.id.replace('section-', '');
+          }
+        });
+      }
+    }
+
     const payload = {
-      sectionId,
+      sectionId: targetSection || null,
       scrollTop,
       timestamp: Date.now()
     };

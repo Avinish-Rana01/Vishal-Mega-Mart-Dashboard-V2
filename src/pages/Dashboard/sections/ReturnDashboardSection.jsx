@@ -3,6 +3,7 @@ import { RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './ReturnDashboardSection.css';
 import { useReturnDashboard } from '../../../hooks/useDashboardData';
+import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard2 from '../../../components/charts/KpiCard2';
@@ -234,12 +235,14 @@ export default function ReturnDashboardSection() {
 
   const handleStoreClick = (storeCode) => {
     const code = typeof storeCode === 'object' ? (storeCode.Store_Code || storeCode.name || storeCode.STORE_CODE) : storeCode;
+    saveDashboardReturnPoint('return');
     navigate('/reports/return-details', {
       state: { storeCode: code || '' }
     });
   };
 
   const handleBarClick = (payload) => {
+    saveDashboardReturnPoint('return');
     navigate('/reports/return-reconciliation', {
       state: { storeCode: payload?.name || payload?.Store_Code || payload?.STORE_CODE || '' }
     });

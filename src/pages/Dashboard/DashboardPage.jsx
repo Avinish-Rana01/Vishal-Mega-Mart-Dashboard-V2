@@ -24,29 +24,85 @@ export default function DashboardPage() {
     const returnPoint = getDashboardReturnPoint();
     if (!returnPoint) return;
 
-    const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+    let isUserInteracting = false;
+    let attempts = 0;
+    const maxAttempts = 50; // Watch for up to 3.5 seconds across async data renders
 
     const restoreScroll = () => {
-      if (container && typeof returnPoint.scrollTop === 'number' && returnPoint.scrollTop > 0) {
-        container.scrollTop = returnPoint.scrollTop;
-      } else if (returnPoint.sectionId) {
+      if (isUserInteracting) return;
+
+      const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+
+      // 1. Element anchor restoration (guarantees section is brought directly to top)
+      if (returnPoint.sectionId) {
         const el = document.getElementById(`section-${returnPoint.sectionId}`);
         if (el) {
           el.scrollIntoView({ behavior: 'instant', block: 'start' });
+          return;
         }
+      }
+
+      // 2. Exact coordinate restoration fallback (when no specific sectionId is known)
+      if (typeof returnPoint.scrollTop === 'number' && returnPoint.scrollTop > 0) {
+        if (container) {
+          container.scrollTop = returnPoint.scrollTop;
+        }
+        window.scrollTo({ top: returnPoint.scrollTop, behavior: 'instant' });
+        document.documentElement.scrollTop = returnPoint.scrollTop;
+        document.body.scrollTop = returnPoint.scrollTop;
       }
     };
 
+    // User interaction listeners: if user touches, wheels, or presses keys to scroll, release anchoring
+    const handleUserInteraction = () => {
+      isUserInteracting = true;
+      clearDashboardReturnPoint();
+    };
+
+    const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body') || window;
+    container.addEventListener('wheel', handleUserInteraction, { passive: true });
+    container.addEventListener('touchmove', handleUserInteraction, { passive: true });
+    container.addEventListener('keydown', handleUserInteraction, { passive: true });
+
     // Immediate attempt
+    restoreScroll();
     requestAnimationFrame(restoreScroll);
 
-    // Secondary attempt to compensate for any initial layout expansion
-    const timer = setTimeout(() => {
-      restoreScroll();
-      clearDashboardReturnPoint();
-    }, 120);
+    // Watchdog loop that re-anchors during async data loading and chart layout expansion
+    const interval = setInterval(() => {
+      if (isUserInteracting) {
+        clearInterval(interval);
+        return;
+      }
 
-    return () => clearTimeout(timer);
+      attempts++;
+      restoreScroll();
+
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        clearDashboardReturnPoint();
+      }
+    }, 70);
+
+    // ResizeObserver on the container to immediately snap section back if height shifts
+    let resizeObserver = null;
+    const scrollContainer = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+    if (scrollContainer && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        if (!isUserInteracting) {
+          restoreScroll();
+        }
+      });
+      resizeObserver.observe(scrollContainer);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (resizeObserver) resizeObserver.disconnect();
+      container.removeEventListener('wheel', handleUserInteraction);
+      container.removeEventListener('touchmove', handleUserInteraction);
+      container.removeEventListener('keydown', handleUserInteraction);
+    };
   }, []);
 
   return (

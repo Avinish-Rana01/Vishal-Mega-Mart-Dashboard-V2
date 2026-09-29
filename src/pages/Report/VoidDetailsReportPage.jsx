@@ -163,7 +163,7 @@ export default function VoidDetailsReportPage() {
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">VOID REPORT</span></>,
         showBackButton: true,
-        onBackClick: () => window.history.back()
+        onBackClick: () => navigate(-1)
       }}
     >
       <div className="report-search-card">

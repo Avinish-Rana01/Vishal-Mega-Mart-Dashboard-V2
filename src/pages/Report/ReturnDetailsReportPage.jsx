@@ -161,7 +161,7 @@ export default function ReturnDetailsReportPage() {
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">RETURN REPORT</span></>,
         showBackButton: true,
-        onBackClick: () => window.history.back()
+        onBackClick: () => navigate(-1)
       }}
     >
       <div className="report-search-card">

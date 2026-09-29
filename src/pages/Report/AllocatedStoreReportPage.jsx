@@ -301,14 +301,7 @@ export default function AllocatedStoreReportPage() {
   const totalTags = data.reduce((sum, row) => sum + (Number(row.ENCODING_TAGS || row.Encoding_Tags || row.TAGS || row.QTY) || 0), 0);
 
   const handleBackToDcSummary = () => {
-    navigate('/reports/dc-report', {
-      state: {
-        storeCode: storeName || passedState.storeCode,
-        storeName: passedState.storeName,
-        fromDate: fromDate || passedState.fromDate,
-        toDate: toDate || passedState.toDate
-      }
-    });
+    navigate(-1);
   };
 
   return (

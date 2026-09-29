@@ -262,7 +262,7 @@ export default function DcReportPage() {
           </>
         ),
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
     >
       <div className="dc-report-page-container">

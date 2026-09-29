@@ -14,6 +14,7 @@ import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import '../../../components/charts/DashboardSection.css';
 import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
+import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 
 export default function VendorDiscrepancySection() {
   const navigate = useNavigate();
@@ -93,6 +94,7 @@ export default function VendorDiscrepancySection() {
       }
     }
 
+    saveDashboardReturnPoint('vendor_discrepancy');
     navigate('/reports/vendor-discrepancy-summary', {
       state: {
         vendorCode: code,
@@ -244,7 +246,10 @@ export default function VendorDiscrepancySection() {
                 <NeuromorphicButton 
                   value="View Summary" 
                   icon={<Icons.ArrowUpRight size={12} />} 
-                  onClick={() => navigate('/reports/vendor-discrepancy-summary')}
+                  onClick={() => {
+                    saveDashboardReturnPoint('vendor_discrepancy');
+                    navigate('/reports/vendor-discrepancy-summary');
+                  }}
                   style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
                 />
               </div>

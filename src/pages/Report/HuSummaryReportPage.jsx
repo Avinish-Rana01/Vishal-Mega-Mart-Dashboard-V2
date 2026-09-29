@@ -274,7 +274,7 @@ export default function HuSummaryReportPage() {
           </>
         ),
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
       mainClassName="flex-col-main"
     >

@@ -262,7 +262,7 @@ export default function StoreSaleReportPage() {
       headerProps={{
         breadcrumb: <>HOME - PAGES - DASHBOARD - <span className="active">STORE SALE REPORT</span></>,
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
     >
         {/* Filter Card */}

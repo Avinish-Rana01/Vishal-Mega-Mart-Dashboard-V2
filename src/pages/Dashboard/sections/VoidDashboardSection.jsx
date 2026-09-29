@@ -3,6 +3,7 @@ import './VoidDashboardSection.css';
 import { Ban } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useVoidDashboard } from '../../../hooks/useDashboardData';
+import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
@@ -226,12 +227,14 @@ export default function VoidDashboardSection() {
   }, [data, totals, sortBy]);
 
   const handleStoreClick = (storeCode) => {
+    saveDashboardReturnPoint('void');
     navigate('/reports/void-details', {
       state: { storeCode: storeCode || '' }
     });
   };
 
   const handleBarClick = (payload) => {
+    saveDashboardReturnPoint('void');
     navigate('/reports/void-reconciliation', {
       state: { storeCode: payload?.name || payload?.STORE || '' }
     });

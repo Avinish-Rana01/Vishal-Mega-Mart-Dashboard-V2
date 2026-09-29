@@ -200,7 +200,7 @@ export default function StoreGrcReportPage() {
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">STORE GRC REPORT</span></>,
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
     >
           {/* Search Card */}

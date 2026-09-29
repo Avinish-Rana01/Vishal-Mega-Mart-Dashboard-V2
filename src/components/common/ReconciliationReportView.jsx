@@ -269,7 +269,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">{isReturn ? 'RETURN RECONCILIATION REPORT' : 'VOID RECONCILIATION REPORT'}</span></>,
         showBackButton: true,
-        onBackClick: () => window.history.back()
+        onBackClick: () => navigate(-1)
       }}
     >
       <div className="report-search-card">

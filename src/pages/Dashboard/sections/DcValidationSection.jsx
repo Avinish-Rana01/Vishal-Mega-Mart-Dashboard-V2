@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DcValidationSection.css';
 import { useDcValidation } from '../../../hooks/useDashboardData';
+import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
@@ -45,6 +46,7 @@ export default function DcValidationSection() {
       return `${year}-${month}-${day}`;
     };
 
+    saveDashboardReturnPoint('dc_validation');
     navigate('/reports/dc-report', {
       state: {
         storeCode,
@@ -65,6 +67,7 @@ export default function DcValidationSection() {
     const day = String(today.getDate()).padStart(2, '0');
     const todayFormatted = `${year}-${month}-${day}`;
 
+    saveDashboardReturnPoint('dc_validation');
     navigate('/reports/hu-report', {
       state: {
         receivingPlant: storeCode,
@@ -86,6 +89,7 @@ export default function DcValidationSection() {
     const day = String(today.getDate()).padStart(2, '0');
     const todayFormatted = `${year}-${month}-${day}`;
 
+    saveDashboardReturnPoint('dc_validation');
     navigate('/reports/allocated-store-report', {
       state: {
         storeCode: storeCode,
@@ -311,7 +315,10 @@ export default function DcValidationSection() {
             <NeuromorphicButton 
               value="View Summary" 
               icon={<Icons.ArrowUpRight size={12} />} 
-              onClick={() => navigate('/reports/hu-summary')}
+              onClick={() => {
+                saveDashboardReturnPoint('dc_validation');
+                navigate('/reports/hu-summary');
+              }}
               style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
             />
           </div>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import LiveStockTableView from '../../components/tables/LiveStockTableView';
@@ -16,7 +16,7 @@ export default function LiveStockReportPage() {
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">LIVE STOCK REPORT</span></>,
         showBackButton: true,
-        onBackClick: () => navigate('/dashboard')
+        onBackClick: () => navigate(-1)
       }}
       mainClassName="flex-col-main"
     >
@@ -26,4 +26,3 @@ export default function LiveStockReportPage() {
     </AppLayout>
   );
 }
-

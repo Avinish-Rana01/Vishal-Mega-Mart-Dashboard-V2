@@ -3,6 +3,7 @@ import { ShoppingCart } from 'lucide-react';
 import './SaleDashboardSection.css';
 import { useNavigate } from 'react-router-dom';
 import { useSaleDashboard } from '../../../hooks/useDashboardData';
+import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import { motion } from 'framer-motion';
@@ -90,6 +91,7 @@ export default function SaleDashboardSection() {
       pastWeek.setDate(pastWeek.getDate() - 7);
       const fDate = `${pastWeek.getFullYear()}-${String(pastWeek.getMonth() + 1).padStart(2, '0')}-${String(pastWeek.getDate()).padStart(2, '0')}`;
 
+      saveDashboardReturnPoint('sale');
       navigate('/reports/store-sale', {
         state: {
           store: storeCode,
@@ -99,6 +101,7 @@ export default function SaleDashboardSection() {
       });
       return;
     } else {
+      saveDashboardReturnPoint('sale');
       navigate('/reports/sale', {
         state: {
           store: storeCode,
@@ -115,6 +118,7 @@ export default function SaleDashboardSection() {
       ? String(tableData[0].DATE).split(' ')[0].split('T')[0] 
       : new Date().toISOString().split('T')[0];
     const defaultStore = tableData[0]?.STORE || 'HD44';
+    saveDashboardReturnPoint('sale');
     navigate('/reports/sale', {
       state: {
         store: defaultStore,
