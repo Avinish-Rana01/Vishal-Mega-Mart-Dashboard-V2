@@ -66,6 +66,13 @@ export default function StockTakeReportPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Helper to extract store code from option
+  const getStoreCode = (opt) => {
+    if (!opt) return '';
+    if (typeof opt === 'string' || typeof opt === 'number') return String(opt);
+    return opt.value ?? opt.id ?? opt.code ?? opt.storeCode ?? opt.Store_Code ?? opt.text ?? '';
+  };
+
   // Fetch Store dropdown options
   useEffect(() => {
     const controller = new AbortController();
@@ -74,6 +81,22 @@ export default function StockTakeReportPage() {
         const data = await getBindStores(fromDate, toDate, controller.signal);
         const list = Array.isArray(data) ? data : (data?.stores || data?.Stores || []);
         setStoreOptions(list);
+
+        // Keep one default store selected from the dropdown
+        if (list.length > 0) {
+          const firstCode = getStoreCode(list[0]);
+          if (firstCode) {
+            setSelectedStore((prev) => {
+              if (prev) return prev;
+              // If no store was selected, set default and apply it immediately
+              setAppliedFilters((currentFilters) => ({
+                ...currentFilters,
+                storeCode: currentFilters.storeCode || firstCode
+              }));
+              return firstCode;
+            });
+          }
+        }
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.error('Failed to fetch stores:', err);
@@ -152,12 +175,13 @@ export default function StockTakeReportPage() {
 
   // Handle Clear click
   const handleClear = () => {
-    setSelectedStore('');
+    const defaultStore = storeOptions.length > 0 ? getStoreCode(storeOptions[0]) : '';
+    setSelectedStore(defaultStore);
     setFromDate(todayStr);
     setToDate(todayStr);
     setPageIndex(1);
     setAppliedFilters({
-      storeCode: '',
+      storeCode: defaultStore,
       fromDate: todayStr,
       toDate: todayStr,
       searchTerm: ''
