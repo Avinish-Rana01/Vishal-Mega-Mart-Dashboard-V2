@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import { getCounterStatusStores, getCounterStatusDetails } from '../../services/storeService';
-import { RefreshCw, Monitor, Layers, Wifi, WifiOff } from 'lucide-react';
+import { RefreshCw, Monitor, Layers, Wifi, WifiOff, Radio } from 'lucide-react';
+import { liveStockSocket } from '../../services/liveStockSocket';
 import './StoreCounterStatusPage.css';
 
 // Fallback stores matching legacy VMM store identifiers
@@ -27,6 +28,8 @@ export default function StoreCounterStatusPage() {
   const [isLoadingStores, setIsLoadingStores] = useState(false);
   const [isLoadingCounters, setIsLoadingCounters] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(null);
+  const [recentlyUpdatedIds, setRecentlyUpdatedIds] = useState(new Set());
+  const [isSocketConnected, setIsSocketConnected] = useState(liveStockSocket.isConnected);
 
   // 1. Fetch authorized stores list
   const fetchStores = useCallback(async () => {
@@ -98,6 +101,84 @@ export default function StoreCounterStatusPage() {
       fetchCounters(selectedStore);
     }
   }, [selectedStore, fetchCounters]);
+
+  // 3. Real-Time WebSocket / SignalR Subscription for Counter Status
+  useEffect(() => {
+    if (!selectedStore) return;
+
+    const numericStoreId = Number(selectedStore);
+
+    const handleCounterPatch = (patch) => {
+      if (!patch || Number(patch.storeId) !== numericStoreId) return;
+
+      const changedItems = patch.changedCounters || [];
+      if (!Array.isArray(changedItems) || changedItems.length === 0) return;
+
+      setCounters((prevCounters) => {
+        const next = [...prevCounters];
+        const newUpdatedKeys = new Set();
+
+        changedItems.forEach((change) => {
+          const changeCounterNum = String(change.cashCounter).trim();
+          const targetIndex = next.findIndex(
+            (c) => String(c.cash_Counter || c.Cash_Counter || '').trim() === changeCounterNum
+          );
+
+          if (targetIndex !== -1) {
+            next[targetIndex] = {
+              ...next[targetIndex],
+              status: change.status,
+              STATUS: change.status,
+              lasT_UPDATED_DATE: change.lastUpdatedDate || next[targetIndex].lasT_UPDATED_DATE
+            };
+            newUpdatedKeys.add(changeCounterNum);
+          } else {
+            next.push({
+              cash_Counter: changeCounterNum,
+              status: change.status,
+              lasT_UPDATED_DATE: change.lastUpdatedDate || new Date().toLocaleString()
+            });
+            newUpdatedKeys.add(changeCounterNum);
+          }
+        });
+
+        // Trigger pulse highlight on changed cards
+        setRecentlyUpdatedIds((prev) => new Set([...prev, ...newUpdatedKeys]));
+        setTimeout(() => {
+          setRecentlyUpdatedIds((prev) => {
+            const nextSet = new Set(prev);
+            newUpdatedKeys.forEach((id) => nextSet.delete(id));
+            return nextSet;
+          });
+        }, 2500);
+
+        return next.sort((a, b) => {
+          const numA = parseInt((a.cash_Counter || a.Cash_Counter || '0').replace(/\D/g, ''), 10) || 0;
+          const numB = parseInt((b.cash_Counter || b.Cash_Counter || '0').replace(/\D/g, ''), 10) || 0;
+          return numA - numB;
+        });
+      });
+
+      setLastRefreshed(new Date().toLocaleTimeString());
+    };
+
+    const unsubscribeStatus = liveStockSocket.onStatusChange((status) => {
+      setIsSocketConnected(status === 'connected');
+    });
+
+    let unsubscribeCounters = () => {};
+    liveStockSocket.subscribeStoreCounters(numericStoreId, handleCounterPatch).then((unsub) => {
+      if (typeof unsub === 'function') {
+        unsubscribeCounters = unsub;
+      }
+    });
+
+    return () => {
+      unsubscribeCounters();
+      unsubscribeStatus();
+      liveStockSocket.unsubscribeStoreCounters(numericStoreId, handleCounterPatch);
+    };
+  }, [selectedStore]);
 
   // Derived metrics for header badges: status === 0 is Online (Green), otherwise Offline (Red)
   const totalCounters = useMemo(() => counters.length, [counters]);
@@ -184,20 +265,30 @@ export default function StoreCounterStatusPage() {
             <span>Counter Status ({selectedStoreName})</span>
           </div>
 
-          <button
-            className="counter-refresh-btn"
-            onClick={() => fetchCounters(selectedStore)}
-            disabled={isLoadingCounters}
-            title="Refresh Counter Status"
-          >
-            <RefreshCw size={13} className={isLoadingCounters ? 'animate-spin' : ''} />
-            <span>{isLoadingCounters ? 'Refreshing...' : 'Refresh'}</span>
-            {lastRefreshed && (
-              <span style={{ fontSize: '10px', color: '#94a3b8', marginLeft: '4px' }}>
-                ({lastRefreshed})
-              </span>
-            )}
-          </button>
+          <div className="counter-toolbar-right">
+            <span
+              className={`counter-live-badge ${isSocketConnected ? 'live' : 'reconnecting'}`}
+              title={isSocketConnected ? 'Connected to live WebSocket counter updates' : 'Reconnecting to live WebSocket server...'}
+            >
+              <span className="live-indicator-dot" />
+              {isSocketConnected ? 'Live Updates Active' : 'Connecting...'}
+            </span>
+
+            <button
+              className="counter-refresh-btn"
+              onClick={() => fetchCounters(selectedStore)}
+              disabled={isLoadingCounters}
+              title="Refresh Counter Status"
+            >
+              <RefreshCw size={13} className={isLoadingCounters ? 'animate-spin' : ''} />
+              <span>{isLoadingCounters ? 'Refreshing...' : 'Refresh'}</span>
+              {lastRefreshed && (
+                <span style={{ fontSize: '10px', color: '#94a3b8', marginLeft: '4px' }}>
+                  ({lastRefreshed})
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         {isLoadingCounters && counters.length === 0 ? (
@@ -214,14 +305,15 @@ export default function StoreCounterStatusPage() {
           <div className="counter-grid">
             {counters.map((counter, idx) => {
               const isOnline = Number(counter.status ?? counter.STATUS) === 0;
-              const rawName = counter.cash_Counter || counter.Cash_Counter || `${idx + 1}`;
+              const rawName = String(counter.cash_Counter || counter.Cash_Counter || `${idx + 1}`).trim();
               const counterName = rawName.toLowerCase().startsWith('counter') ? rawName : `Counter ${rawName}`;
               const lastUpdated = counter.lasT_UPDATED_DATE || counter.LAST_UPDATED_DATE || counter.last_Updated_Date || counter.lastUpdatedDate || 'N/A';
+              const isJustUpdated = recentlyUpdatedIds.has(rawName);
 
               return (
                 <div
                   key={counter.cash_Counter || counter.Cash_Counter || idx}
-                  className={`counter-card ${isOnline ? 'online' : 'offline'}`}
+                  className={`counter-card ${isOnline ? 'online' : 'offline'} ${isJustUpdated ? 'just-updated' : ''}`}
                 >
                   <div className="counter-card-header">
                     <span className="counter-card-title">

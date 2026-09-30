@@ -19,6 +19,8 @@ class DashboardSocketService {
     this.tagManagementPatchListeners = new Set();
     this.vendorDiscrepancyPatchListeners = new Set();
     this.dcValidationPatchListeners = new Set();
+    this.counterStatusListeners = new Set();
+    this.activeStoreSubscriptions = new Set();
 
     this.statusListeners = new Set();
     this.isConnected = false;
@@ -136,14 +138,27 @@ class DashboardSocketService {
         this.dispatch(this.dcValidationPatchListeners, patch, 'DcValidation');
       });
 
+      // 8. Cash Counter Status
+      this.connection.on('ReceiveCounterStatusPatch', (patch) => {
+        this.dispatch(this.counterStatusListeners, patch, 'CounterStatus');
+      });
+
       this.connection.onreconnecting(() => {
         this.isConnected = false;
         this.notifyStatus('reconnecting');
       });
 
-      this.connection.onreconnected(() => {
+      this.connection.onreconnected(async () => {
         this.isConnected = true;
         this.notifyStatus('connected');
+        // Resubscribe to active store counters if any
+        for (const storeId of this.activeStoreSubscriptions) {
+          try {
+            await this.connection.invoke('SubscribeStoreCounters', Number(storeId));
+          } catch (e) {
+            // ignore
+          }
+        }
       });
 
       this.connection.onclose(() => {
@@ -247,6 +262,62 @@ class DashboardSocketService {
     this.dcValidationPatchListeners.add(callback);
     return () => {
       this.dcValidationPatchListeners.delete(callback);
+    };
+  }
+
+  // Cash Counter Status Subscriptions
+  async ensureConnected() {
+    if (this.isConnected && this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+      return;
+    }
+    await this.connect();
+  }
+
+  async subscribeStoreCounters(storeId, callback) {
+    if (!storeId) return () => {};
+    const numericStoreId = Number(storeId);
+    this.activeStoreSubscriptions.add(numericStoreId);
+
+    if (callback) {
+      this.counterStatusListeners.add(callback);
+    }
+
+    await this.ensureConnected();
+
+    try {
+      if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+        await this.connection.invoke('SubscribeStoreCounters', numericStoreId);
+      }
+    } catch (err) {
+      console.warn('[DashboardSocket] Error invoking SubscribeStoreCounters:', err);
+    }
+
+    return () => {
+      this.unsubscribeStoreCounters(numericStoreId, callback);
+    };
+  }
+
+  async unsubscribeStoreCounters(storeId, callback) {
+    if (callback) {
+      this.counterStatusListeners.delete(callback);
+    }
+    if (storeId) {
+      const numericStoreId = Number(storeId);
+      this.activeStoreSubscriptions.delete(numericStoreId);
+      if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+        try {
+          await this.connection.invoke('UnsubscribeStoreCounters', numericStoreId);
+        } catch (err) {
+          // ignore
+        }
+      }
+    }
+  }
+
+  onCounterStatusPatch(callback) {
+    this.counterStatusListeners.add(callback);
+    return () => {
+      this.counterStatusListeners.delete(callback);
     };
   }
 
