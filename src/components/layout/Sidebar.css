@@ -1,6 +1,8 @@
 /* ---- Sidebar Nav Tooltip & Popover Menus ---- */
 .vmm-sidebar {
   overflow: visible !important;
+  z-index: 1050 !important;
+  position: relative;
 }
 
 .vmm-nav-dropdown {
@@ -8,6 +10,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.vmm-nav-dropdown:hover,
+.vmm-nav-dropdown:focus-within {
+  z-index: 10;
 }
 
 /* When the dropdown is hovered, style the icon as a clean white card with blue icon */
@@ -31,9 +38,9 @@
   min-width: 215px;
   padding: 16px 18px;
   border-radius: 14px;
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.12), 0 6px 16px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.18), 0 6px 16px -2px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(226, 232, 240, 0.85);
-  z-index: 1000;
+  z-index: 9999 !important;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: none;
 }

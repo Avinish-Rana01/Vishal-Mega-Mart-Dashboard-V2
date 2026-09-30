@@ -23,6 +23,7 @@ import VendorDiscrepancySummaryPage from './pages/Report/VendorDiscrepancySummar
 import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AppLayout from './components/layout/AppLayout';
 import { AuthProvider } from './context/AuthContext';
 import DevelopmentInProgressPage from './pages/DevelopmentInProgress/DevelopmentInProgressPage';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -34,294 +35,62 @@ export default function App() {
       <ErrorBoundary>
         <Router>
           <Routes>
+            {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
-            
-            <Route 
-              path="/dashboard-old" 
-              element={
-                <ProtectedRoute>
-                  <DashboardOldPage />
-                </ProtectedRoute>
-              } 
-            />
 
+            {/* Authenticated Layout Route - Persistent Header, Sidebar & Footer */}
             <Route 
-              path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <DashboardPage />
+                  <AppLayout />
                 </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/reports/live-stock" 
-              element={
-                <ProtectedRoute>
-                  <LiveStockReportPage />
-                </ProtectedRoute>
-              } 
-            />
+              }
+            >
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/dashboard-old" element={<DashboardOldPage />} />
 
-            <Route 
-              path="/reports/grc" 
-              element={
-                <ProtectedRoute>
-                  <GrcReportPage />
-                </ProtectedRoute>
-              } 
-            />
+              {/* Reports Module */}
+              <Route path="/reports/live-stock" element={<LiveStockReportPage />} />
+              <Route path="/reports/grc" element={<GrcReportPage />} />
+              <Route path="/reports/store-grc" element={<StoreGrcReportPage />} />
+              <Route path="/reports/cycle-count" element={<CycleCountReportPage />} />
+              <Route path="/reports/store-sale" element={<StoreSaleReportPage />} />
+              <Route path="/reports/sale" element={<TotalDposSalePage />} />
+              <Route path="/reports/void-details" element={<VoidDetailsReportPage />} />
+              <Route path="/reports/void-reconciliation" element={<VoidReconciliationReportPage />} />
+              <Route path="/reports/return-details" element={<ReturnDetailsReportPage />} />
+              <Route path="/reports/return-reconciliation" element={<ReturnReconciliationReportPage />} />
+              <Route path="/reports/dc-report" element={<DcReportPage />} />
+              <Route path="/reports/hu-report" element={<HuReportPage />} />
+              <Route path="/reports/allocated-store-report" element={<AllocatedStoreReportPage />} />
+              <Route path="/reports/encoding-store-report" element={<Navigate to="/reports/allocated-store-report" replace />} />
+              <Route path="/reports/dc-encoding-summary" element={<WHEncodingSummaryPage />} />
+              <Route path="/reports/hu-summary" element={<HuSummaryReportPage />} />
+              <Route path="/reports/tag-distribution" element={<TagInventoryDistributionPage />} />
+              <Route path="/reports/vendor-discrepancy-summary" element={<VendorDiscrepancySummaryPage />} />
+              <Route path="/reports/total-dpos-sale" element={<TotalDposSalePage />} />
+              <Route path="/reports/sales" element={<Navigate to="/reports/sale" replace />} />
+              <Route path="/reports/tag-cleaning" element={<DevelopmentInProgressPage title="Tag Cleaning" />} />
+              <Route path="/reports/stock-take" element={<DevelopmentInProgressPage title="Stock Take" />} />
 
-            <Route 
-              path="/reports/store-grc" 
-              element={
-                <ProtectedRoute>
-                  <StoreGrcReportPage />
-                </ProtectedRoute>
-              } 
-            />
+              {/* Stores Module */}
+              <Route path="/stores" element={<DevelopmentInProgressPage title="Store Reports" />} />
+              <Route path="/stores/counter-status" element={<StoreCounterStatusPage />} />
 
-            <Route 
-              path="/reports/cycle-count" 
-              element={
-                <ProtectedRoute>
-                  <CycleCountReportPage />
-                </ProtectedRoute>
-              } 
-            />
+              {/* Tags Module */}
+              <Route path="/tags" element={<TagInventoryDistributionPage />} />
+              <Route path="/tag-management/distribution" element={<TagInventoryDistributionPage />} />
 
-            <Route 
-              path="/reports/store-sale" 
-              element={
-                <ProtectedRoute>
-                  <StoreSaleReportPage />
-                </ProtectedRoute>
-              } 
-            />
+              {/* Authentication / Master Registration Sub-routes */}
+              <Route path="/auth/user-registration" element={<DevelopmentInProgressPage title="User Registration" />} />
+              <Route path="/auth/store-registration" element={<DevelopmentInProgressPage title="Store Registration" />} />
+              <Route path="/auth/warehouse-registration" element={<DevelopmentInProgressPage title="Warehouse Registration" />} />
+              <Route path="/settings" element={<DevelopmentInProgressPage title="Settings" />} />
+            </Route>
 
-            <Route 
-              path="/reports/sale" 
-              element={
-                <ProtectedRoute>
-                  <TotalDposSalePage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/void-details" 
-              element={
-                <ProtectedRoute>
-                  <VoidDetailsReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/void-reconciliation" 
-              element={
-                <ProtectedRoute>
-                  <VoidReconciliationReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/return-details" 
-              element={
-                <ProtectedRoute>
-                  <ReturnDetailsReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/return-reconciliation" 
-              element={
-                <ProtectedRoute>
-                  <ReturnReconciliationReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/dc-report" 
-              element={
-                <ProtectedRoute>
-                  <DcReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/hu-report" 
-              element={
-                <ProtectedRoute>
-                  <HuReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/allocated-store-report" 
-              element={
-                <ProtectedRoute>
-                  <AllocatedStoreReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/encoding-store-report" 
-              element={<Navigate to="/reports/allocated-store-report" replace />} 
-            />
-
-            <Route 
-              path="/reports/dc-encoding-summary" 
-              element={
-                <ProtectedRoute>
-                  <WHEncodingSummaryPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/hu-summary" 
-              element={
-                <ProtectedRoute>
-                  <HuSummaryReportPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/tag-management/distribution" 
-              element={
-                <ProtectedRoute>
-                  <TagInventoryDistributionPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/tag-distribution" 
-              element={
-                <ProtectedRoute>
-                  <TagInventoryDistributionPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/vendor-discrepancy-summary" 
-              element={
-                <ProtectedRoute>
-                  <VendorDiscrepancySummaryPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/total-dpos-sale" 
-              element={
-                <ProtectedRoute>
-                  <TotalDposSalePage />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/reports/sales" 
-              element={<Navigate to="/reports/sale" replace />} 
-            />
-
-            {/* Store Sub-routes */}
-            <Route 
-              path="/stores" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Store Reports" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/stores/counter-status" 
-              element={
-                <ProtectedRoute>
-                  <StoreCounterStatusPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            {/* Reports Sub-routes */}
-            <Route 
-              path="/reports/tag-cleaning" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Tag Cleaning" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/reports/stock-take" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Stock Take" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/tags" 
-              element={
-                <ProtectedRoute>
-                  <TagInventoryDistributionPage />
-                </ProtectedRoute>
-              } 
-            />
-
-            {/* Authentication / Admin Sub-routes */}
-            <Route 
-              path="/auth/user-registration" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="User Registration" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/auth/store-registration" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Store Registration" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/auth/warehouse-registration" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Warehouse Registration" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/settings" 
-              element={
-                <ProtectedRoute>
-                  <DevelopmentInProgressPage title="Settings" />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/" 
-              element={<Navigate to="/dashboard" replace />} 
-            />
-            
-            <Route 
-              path="*" 
-              element={<NotFoundPage />} 
-            />
+            {/* 404 Catch-All */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Router>
       </ErrorBoundary>

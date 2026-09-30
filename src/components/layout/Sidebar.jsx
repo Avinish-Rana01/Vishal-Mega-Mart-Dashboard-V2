@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Tag, Settings } from 'lucide-react';
 import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
 import './Sidebar.css';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [hoveredMenuId, setHoveredMenuId] = useState(null);
 
   // Close tooltip whenever the sidebar closes on mobile
@@ -18,11 +19,21 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const handleDashboardClick = () => {
     clearDashboardReturnPoint();
     setHoveredMenuId(null);
-    const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'smooth' });
+    if (location.pathname !== '/dashboard') {
+      navigate('/dashboard');
+    } else {
+      const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+      if (container) {
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
+
+  // Dedicated standalone report routes that live under the Reports menu
+  const standaloneReportPaths = [
+    '/reports/tag-cleaning',
+    '/reports/stock-take'
+  ];
 
   const menuConfig = [
     {
@@ -30,7 +41,16 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       title: 'Home',
       icon: LayoutDashboard,
       tooltipTitle: 'Home',
-      isActive: (pathname) => pathname.startsWith('/dashboard'),
+      defaultTo: '/dashboard',
+      // Dashboard icon stays active on /dashboard, /dashboard-old, and ALL dashboard drill-down reports
+      isActive: (pathname) => {
+        if (pathname.startsWith('/dashboard')) return true;
+        if (pathname.startsWith('/stores')) return false;
+        if (pathname.startsWith('/auth') || pathname.startsWith('/settings')) return false;
+        if (standaloneReportPaths.some(p => pathname.startsWith(p))) return false;
+        // All other reports and drill-downs belong to Dashboard
+        return pathname.startsWith('/reports') || pathname.startsWith('/tags') || pathname.startsWith('/tag-management');
+      },
       onIconClick: handleDashboardClick,
       items: [
         { label: 'Dashboard', to: '/dashboard', onClick: handleDashboardClick }
@@ -41,6 +61,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       title: 'Store',
       icon: Building2,
       tooltipTitle: 'Store',
+      defaultTo: '/stores/counter-status',
       isActive: (pathname) => pathname.startsWith('/stores'),
       items: [
         { label: 'Store Counter Status', to: '/stores/counter-status' }
@@ -51,7 +72,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       title: 'Reports',
       icon: Tag,
       tooltipTitle: 'Reports',
-      isActive: (pathname) => pathname.startsWith('/reports') || pathname.startsWith('/tags'),
+      defaultTo: '/reports/tag-cleaning',
+      isActive: (pathname) => standaloneReportPaths.some(p => pathname.startsWith(p)),
       items: [
         { label: 'Tag Cleaning', to: '/reports/tag-cleaning' },
         { label: 'Stock Take', to: '/reports/stock-take' }
@@ -62,6 +84,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       title: 'Authentication',
       icon: Settings,
       tooltipTitle: 'Authentication',
+      defaultTo: '/auth/user-registration',
       isActive: (pathname) => pathname.startsWith('/auth') || pathname.startsWith('/settings'),
       items: [
         { label: 'User Registration', to: '/auth/user-registration' },
@@ -97,7 +120,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 aria-label={menu.title}
                 style={{ cursor: 'pointer' }}
                 onClick={(e) => {
-                  if (menu.onIconClick) menu.onIconClick(e);
+                  if (menu.onIconClick) {
+                    menu.onIconClick(e);
+                  } else if (menu.defaultTo) {
+                    setHoveredMenuId(null);
+                    navigate(menu.defaultTo);
+                  }
                 }}
                 tabIndex="0"
                 role="button"

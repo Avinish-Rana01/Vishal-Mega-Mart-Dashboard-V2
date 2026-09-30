@@ -13,6 +13,7 @@ export default function SearchableDropdown({
   valueKey = 'value',
   searchPlaceholder = 'Search...',
   closeOnSelect = true,
+  showClear = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -104,7 +105,7 @@ export default function SearchableDropdown({
           {selectedOption ? getOptLabel(selectedOption) : placeholder}
         </span>
         <div className="custom-select-trigger-actions">
-          {value && (
+          {showClear && value && (
             <div 
               className="custom-select-clear-btn"
               onClick={handleClear}
@@ -124,7 +125,7 @@ export default function SearchableDropdown({
               </svg>
             </div>
           )}
-          {!value && (
+          {(!showClear || !value) && (
             <svg 
               className={`custom-select-chevron ${isOpen ? 'open' : ''}`}
               xmlns="http://www.w3.org/2000/svg" 
