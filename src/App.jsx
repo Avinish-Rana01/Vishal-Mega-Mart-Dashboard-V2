@@ -20,6 +20,7 @@ import WHEncodingSummaryPage from './pages/Report/WHEncodingSummaryPage';
 import HuSummaryReportPage from './pages/Report/HuSummaryReportPage';
 import TagInventoryDistributionPage from './pages/Report/TagInventoryDistributionPage';
 import VendorDiscrepancySummaryPage from './pages/Report/VendorDiscrepancySummaryPage';
+import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -234,6 +235,7 @@ export default function App() {
               element={<Navigate to="/reports/sale" replace />} 
             />
 
+            {/* Store Sub-routes */}
             <Route 
               path="/stores" 
               element={
@@ -242,7 +244,32 @@ export default function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/stores/counter-status" 
+              element={
+                <ProtectedRoute>
+                  <StoreCounterStatusPage />
+                </ProtectedRoute>
+              } 
+            />
 
+            {/* Reports Sub-routes */}
+            <Route 
+              path="/reports/tag-cleaning" 
+              element={
+                <ProtectedRoute>
+                  <DevelopmentInProgressPage title="Tag Cleaning" />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/reports/stock-take" 
+              element={
+                <ProtectedRoute>
+                  <DevelopmentInProgressPage title="Stock Take" />
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/tags" 
               element={
@@ -252,6 +279,31 @@ export default function App() {
               } 
             />
 
+            {/* Authentication / Admin Sub-routes */}
+            <Route 
+              path="/auth/user-registration" 
+              element={
+                <ProtectedRoute>
+                  <DevelopmentInProgressPage title="User Registration" />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/auth/store-registration" 
+              element={
+                <ProtectedRoute>
+                  <DevelopmentInProgressPage title="Store Registration" />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/auth/warehouse-registration" 
+              element={
+                <ProtectedRoute>
+                  <DevelopmentInProgressPage title="Warehouse Registration" />
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/settings" 
               element={

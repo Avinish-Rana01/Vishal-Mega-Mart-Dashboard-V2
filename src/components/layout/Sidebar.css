@@ -1,4 +1,4 @@
-/* ---- Sidebar Nav Tooltip ---- */
+/* ---- Sidebar Nav Tooltip & Popover Menus ---- */
 .vmm-sidebar {
   overflow: visible !important;
 }
@@ -10,6 +10,15 @@
   align-items: center;
 }
 
+/* When the dropdown is hovered, style the icon as a clean white card with blue icon */
+.vmm-nav-dropdown:hover .vmm-nav-item,
+.vmm-nav-item.hovered {
+  background-color: #ffffff !important;
+  color: #0284c7 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
 .vmm-nav-tooltip {
   visibility: hidden;
   opacity: 0;
@@ -19,28 +28,31 @@
   transform: translateY(-50%) translateX(8px);
   background-color: #ffffff;
   color: #1e293b;
-  min-width: 115px;
-  padding: 6px 0;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  min-width: 215px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.12), 0 6px 16px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.85);
   z-index: 1000;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
 }
 
 .vmm-nav-dropdown:hover .vmm-nav-tooltip,
-.vmm-nav-tooltip.force-show {
+.vmm-nav-tooltip.hover-visible {
   visibility: visible;
   opacity: 1;
-  transform: translateY(-50%) translateX(12px);
+  transform: translateY(-50%) translateX(14px);
+  pointer-events: auto;
 }
 
 .vmm-nav-tooltip-title {
-  margin: 0 0 3px 0;
-  padding: 3px 12px;
-  font-size: 11px;
+  margin: 0 0 10px 0;
+  padding: 0 6px 4px 6px;
+  font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: #091e42;
+  letter-spacing: -0.01em;
 }
 
 .vmm-nav-tooltip ul {
@@ -50,37 +62,48 @@
 }
 
 .vmm-nav-tooltip li {
-  padding: 0;
+  padding: 2px 0;
 }
 
 .vmm-nav-tooltip-link {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  font-size: 11px;
+  gap: 10px;
+  padding: 7px 10px;
+  font-size: 13.5px;
+  font-weight: 500;
   color: #334155;
   text-decoration: none;
-  transition: background 0.2s;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: all 0.18s ease;
 }
 
-.vmm-nav-tooltip-link:hover, .vmm-nav-tooltip-link.active {
-  background: #f8fafc;
-  color: #3b82f6;
+.vmm-nav-tooltip-link:hover, 
+.vmm-nav-tooltip-link.active {
+  background: #f1f5f9;
+  color: #0284c7;
 }
 
 .vmm-nav-tooltip-link::before {
   content: '•';
-  color: #3b82f6;
-  font-weight: bold;
+  color: #94a3b8;
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.18s ease;
 }
 
-/* Bridge the gap so hovering off the icon into the tooltip doesn't close it */
+.vmm-nav-tooltip-link:hover::before,
+.vmm-nav-tooltip-link.active::before {
+  color: #0284c7;
+}
+
+/* Invisible bridge so moving cursor from sidebar icon into tooltip doesn't lose hover */
 .vmm-nav-tooltip::after {
   content: '';
   position: absolute;
   top: 0;
-  left: -16px;
-  width: 16px;
+  left: -20px;
+  width: 20px;
   height: 100%;
 }
