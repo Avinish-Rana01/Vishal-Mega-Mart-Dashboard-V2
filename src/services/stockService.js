@@ -944,8 +944,51 @@ export const getVendorHUDiscrepancyData = async ({
       });
       return response.data;
     }
+  }
+};
+
+// ==============================================================
+// Tag Cleaning Report API
+// ==============================================================
+export const getTagCleaningReport = async ({
+  fromDate = '',
+  toDate = '',
+  searchTerm = '',
+  pageIndex = 1,
+  pageSize = 10,
+  sortColumn = 'TAG_CLEANED_DATE',
+  sortDirection = 'DESC'
+} = {}, signal) => {
+  const payload = {
+    fromDate,
+    toDate,
+    searchTerm,
+    pageIndex,
+    pageSize,
+    sortColumn,
+    sortDirection
+  };
+
+  const url = `${API_BASE}/api/TagCleaningReport/GetTagCleaningReport`;
+  try {
+    const response = await axios.post(url, payload, {
+      headers: getHeaders(),
+      signal
+    });
+    return response.data;
+  } catch (err) {
+    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
+      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
+      const fallbackUrl = `${fallbackBase}/api/TagCleaningReport/GetTagCleaningReport`;
+      const response = await axios.post(fallbackUrl, payload, {
+        headers: getHeaders(),
+        signal
+      });
+      return response.data;
+    }
     throw err;
   }
 };
+
 
 

@@ -30,7 +30,7 @@ export default function BaseDataTable({
 
   // Use external sort state if server-side sorting is enabled
   const activeSortCol = onSortChange ? externalSortCol : sortCol;
-  const activeSortDir = onSortChange ? externalSortDir : sortDir;
+  const activeSortDir = onSortChange ? (externalSortDir ? String(externalSortDir).toLowerCase() : null) : sortDir;
 
   // Track if data has ever been loaded so skeleton shimmer NEVER reappears during pagination or sorting
   const hasLoadedOnceRef = React.useRef(false);
@@ -49,7 +49,8 @@ export default function BaseDataTable({
     if (onSortChange) {
       // Server-side sorting: delegate to parent using the DB column name
       let newDir;
-      if (activeSortCol !== serverKey) {
+      const isSameCol = Boolean(activeSortCol && serverKey && activeSortCol.toLowerCase() === serverKey.toLowerCase());
+      if (!isSameCol) {
         newDir = 'asc';
       } else if (activeSortDir === 'asc') {
         newDir = 'desc';
@@ -139,7 +140,7 @@ export default function BaseDataTable({
                 {columns.map((col) => {
                   const isSortable = col.sortable !== false && ordering;
                   const effectiveSortKey = col.sortKey || col.key;
-                  const isSorted = activeSortCol === effectiveSortKey;
+                  const isSorted = Boolean(activeSortCol && effectiveSortKey && activeSortCol.toLowerCase() === effectiveSortKey.toLowerCase());
                   return (
                     <th 
                       key={col.key} 

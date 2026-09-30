@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { FileSpreadsheet, Calendar, Clock, Filter, X, Download, AlertCircle } from 'lucide-react';
 import CustomDatePicker from './CustomDatePicker';
 import './ExportOptionsModal.css';
@@ -104,7 +105,7 @@ export default function ExportOptionsModal({
     });
   };
 
-  return (
+  const modalNode = (
     <div className="vmm-export-modal-backdrop" onClick={() => !isExporting && onClose()}>
       <div className="vmm-export-modal-card" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
@@ -277,4 +278,8 @@ export default function ExportOptionsModal({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalNode, document.body)
+    : modalNode;
 }

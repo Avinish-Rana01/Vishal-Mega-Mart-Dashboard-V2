@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import CurvedCard from './CurvedCard';
 import ReportDataTableCard from './ReportDataTableCard';
 
@@ -27,7 +28,7 @@ export default function DetailsModal({
   directExport = true
 }) {
 
-  return (
+  const modalNode = (
     <div className="vmm-modal-overlay">
       <div className="vmm-modal-content" >
         
@@ -95,4 +96,8 @@ export default function DetailsModal({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalNode, document.body)
+    : modalNode;
 }

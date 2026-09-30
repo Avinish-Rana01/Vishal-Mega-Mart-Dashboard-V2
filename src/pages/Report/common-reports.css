@@ -515,6 +515,75 @@
   background-color: #94a3b8 !important;
 }
 
+/* Global Modal Styles */
+.vmm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(2, 3, 5, 0.555);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.vmm-modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 95%;
+  height: 90vh;
+  max-height: 92vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.vmm-modal-header {
+  padding: 8px 16px;
+  border-bottom: 1px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f1f5f9;
+}
+
+.vmm-modal-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vmm-modal-close {
+  background: #ef4444;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.vmm-modal-close:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+
 
 
 
