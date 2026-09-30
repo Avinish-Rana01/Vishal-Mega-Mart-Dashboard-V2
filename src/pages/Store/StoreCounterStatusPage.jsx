@@ -27,7 +27,6 @@ export default function StoreCounterStatusPage() {
   const [counters, setCounters] = useState([]);
   const [isLoadingStores, setIsLoadingStores] = useState(false);
   const [isLoadingCounters, setIsLoadingCounters] = useState(false);
-  const [lastRefreshed, setLastRefreshed] = useState(null);
   const [recentlyUpdatedIds, setRecentlyUpdatedIds] = useState(new Set());
   const [isSocketConnected, setIsSocketConnected] = useState(liveStockSocket.isConnected);
 
@@ -80,11 +79,9 @@ export default function StoreCounterStatusPage() {
       } else {
         setCounters(generateFallbackCounters(14));
       }
-      setLastRefreshed(new Date().toLocaleTimeString());
     } catch (err) {
       console.warn(`Unable to fetch counters for storeId ${storeId}, using fallback counters.`, err);
       setCounters(generateFallbackCounters(14));
-      setLastRefreshed(new Date().toLocaleTimeString());
     } finally {
       setIsLoadingCounters(false);
     }
@@ -158,8 +155,6 @@ export default function StoreCounterStatusPage() {
           return numA - numB;
         });
       });
-
-      setLastRefreshed(new Date().toLocaleTimeString());
     };
 
     const unsubscribeStatus = liveStockSocket.onStatusChange((status) => {
@@ -273,21 +268,6 @@ export default function StoreCounterStatusPage() {
               <span className="live-indicator-dot" />
               {isSocketConnected ? 'Live Updates Active' : 'Connecting...'}
             </span>
-
-            <button
-              className="counter-refresh-btn"
-              onClick={() => fetchCounters(selectedStore)}
-              disabled={isLoadingCounters}
-              title="Refresh Counter Status"
-            >
-              <RefreshCw size={13} className={isLoadingCounters ? 'animate-spin' : ''} />
-              <span>{isLoadingCounters ? 'Refreshing...' : 'Refresh'}</span>
-              {lastRefreshed && (
-                <span style={{ fontSize: '10px', color: '#94a3b8', marginLeft: '4px' }}>
-                  ({lastRefreshed})
-                </span>
-              )}
-            </button>
           </div>
         </div>
 
