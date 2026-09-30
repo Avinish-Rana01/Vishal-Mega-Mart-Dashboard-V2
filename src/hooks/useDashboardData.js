@@ -167,7 +167,7 @@ export const useLiveStock = () => {
       setData((prev) => {
         let storeFound = false;
         const updated = prev.map((row) => {
-          if (row.STORE_CODE === patch.storeCode) {
+          if (String(row.STORE_CODE || '').toUpperCase() === String(patch.storeCode || '').toUpperCase()) {
             storeFound = true;
             return {
               ...row,
@@ -291,8 +291,13 @@ export const useCycleCount = () => {
       const matchKey = patch.refNo || patch.storeCode;
 
       setData((prev) => {
-        return prev.map((row) => {
-          if ((patch.refNo && row.REF_NO === patch.refNo) || (patch.storeCode && row.STORE_CODE === patch.storeCode)) {
+        let found = false;
+        const updated = prev.map((row) => {
+          const matchRef = patch.refNo && (String(row.REF_NO) === String(patch.refNo) || String(row.Ref_ID) === String(patch.refNo));
+          const matchStore = patch.storeCode && (String(row.STORE_CODE || '').toUpperCase() === String(patch.storeCode).toUpperCase());
+          const isMatch = patch.refNo ? matchRef : matchStore;
+          if (isMatch) {
+            found = true;
             return {
               ...row,
               SCANNED_QTY: patch.newScannedQty !== undefined ? patch.newScannedQty : row.SCANNED_QTY,
@@ -306,6 +311,27 @@ export const useCycleCount = () => {
           }
           return row;
         });
+
+        if (!found && (patch.refNo || patch.storeCode)) {
+          return [
+            {
+              REF_NO: patch.refNo || '',
+              STORE_CODE: patch.storeCode || '',
+              STORE_NAME: patch.storeName || patch.storeCode || '',
+              SCANNED_QTY: patch.newScannedQty || 0,
+              SYSTEM_STOCK: patch.newSystemStock || 0,
+              NET_DIFFERENCE: patch.newNetDifference || 0,
+              SHORT_QTY: patch.newShortQty || 0,
+              EXCESS_QTY: patch.newExcessQty || 0,
+              NO_OF_ARTICLES: patch.newNoOfArticles || 0,
+              DATE: new Date().toLocaleDateString('en-CA'),
+              _lastUpdated: Date.now()
+            },
+            ...updated
+          ];
+        }
+
+        return updated;
       });
 
       if (patch.summaryDelta) {
@@ -380,8 +406,13 @@ export const useVendorDiscrepancy = () => {
       const vendorKey = patch.vendorName || patch.vendorCode;
 
       setData((prev) => {
-        return prev.map((row) => {
-          if ((patch.vendorName && row.VENDOR_NAME === patch.vendorName) || (patch.vendorCode && row.VENDOR_CODE === patch.vendorCode)) {
+        let found = false;
+        const updated = prev.map((row) => {
+          const matchName = patch.vendorName && String(row.VENDOR_NAME || '').toLowerCase() === String(patch.vendorName).toLowerCase();
+          const matchCode = patch.vendorCode && String(row.VENDOR_CODE || '').toLowerCase() === String(patch.vendorCode).toLowerCase();
+          const isMatch = patch.vendorCode ? matchCode : matchName;
+          if (isMatch) {
+            found = true;
             return {
               ...row,
               ACTUAL_QTY: patch.newActualQty !== undefined ? patch.newActualQty : row.ACTUAL_QTY,
@@ -393,6 +424,23 @@ export const useVendorDiscrepancy = () => {
           }
           return row;
         });
+
+        if (!found && (patch.vendorName || patch.vendorCode)) {
+          return [
+            {
+              VENDOR_NAME: patch.vendorName || patch.vendorCode,
+              VENDOR_CODE: patch.vendorCode || '',
+              ACTUAL_QTY: patch.newActualQty || 0,
+              SCANNED_QTY: patch.newScannedQty || 0,
+              DIFF_QTY: patch.newDifferenceQty || 0,
+              DIFF_TILL_DATE: patch.newDifferenceQtyTillDate || 0,
+              _lastUpdated: Date.now()
+            },
+            ...updated
+          ];
+        }
+
+        return updated;
       });
 
       if (patch.summaryDelta) {
@@ -471,9 +519,11 @@ export const useStoreDashboard = () => {
       if (!patch || !patch.storeCode) return;
 
       setData((prev) => {
-        return prev.map((row) => {
-          const rowStore = row.STORE || row.STORE_CODE;
-          if (rowStore === patch.storeCode) {
+        let found = false;
+        const updated = prev.map((row) => {
+          const rowStore = row.STORE || row.STORE_CODE || '';
+          if (String(rowStore).toUpperCase() === String(patch.storeCode || '').toUpperCase()) {
+            found = true;
             return {
               ...row,
               HU_RECEIVED_QTY: patch.newHuReceivedQty !== undefined ? patch.newHuReceivedQty : row.HU_RECEIVED_QTY,
@@ -487,6 +537,26 @@ export const useStoreDashboard = () => {
           }
           return row;
         });
+
+        if (!found && patch.storeCode) {
+          return [
+            {
+              STORE: patch.storeCode,
+              STORE_NAME: patch.storeName || patch.storeCode,
+              HU_RECEIVED_QTY: patch.newHuReceivedQty || 0,
+              HU_VALIDATED_QTY: patch.newHuValidatedQty || 0,
+              HU_WRONG_QTY: patch.newHuWrongQty || 0,
+              HHT_VALIDATE_QTY: patch.newHhtValidateQty || 0,
+              ENCODED_QTY: patch.newEncodedQty || 0,
+              STORE_PENDING_QTY: patch.newStorePendingQty || 0,
+              DATE: new Date().toLocaleDateString('en-CA'),
+              _lastUpdated: Date.now()
+            },
+            ...updated
+          ];
+        }
+
+        return updated;
       });
 
       if (patch.summaryDelta) {
@@ -639,8 +709,11 @@ export const useDcValidation = () => {
       if (!patch || !patch.recivingPlant) return;
 
       setData((prev) => {
-        return prev.map((row) => {
-          if (row.Reciving_Plant === patch.recivingPlant) {
+        let found = false;
+        const updated = prev.map((row) => {
+          const rowPlant = row.Reciving_Plant || row.RECIVING_PLANT || row.RecivingPlant || row.Store_Code || row.STORE_CODE || '';
+          if (String(rowPlant).toUpperCase() === String(patch.recivingPlant || '').toUpperCase()) {
+            found = true;
             return {
               ...row,
               PROCESSED_HU: patch.newProcessedHu !== undefined ? patch.newProcessedHu : row.PROCESSED_HU,
@@ -651,6 +724,22 @@ export const useDcValidation = () => {
           }
           return row;
         });
+
+        if (!found && patch.recivingPlant) {
+          return [
+            {
+              Reciving_Plant: patch.recivingPlant,
+              STORE_NAME: patch.storeName || patch.recivingPlant,
+              PROCESSED_HU: patch.newProcessedHu || 0,
+              UNPROCESSED_HU: patch.newUnprocessedHu || 0,
+              PROCESSED_ARTICLE_QTY: patch.newProcessedArticleQty || 0,
+              _lastUpdated: Date.now()
+            },
+            ...updated
+          ];
+        }
+
+        return updated;
       });
 
       if (patch.summaryDelta) {
@@ -826,8 +915,8 @@ export const useWarehouseEncoding = () => {
   const [highlightedBlock, setHighlightedBlock] = useState(null);
   const hasDataRef = useRef(false);
   
-  // Date range state (default to today)
-  const today = new Date().toISOString().split('T')[0];
+  // Date range state (default to today in local timezone)
+  const today = new Date().toLocaleDateString('en-CA');
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
   const [trigger, setTrigger] = useState(0);
