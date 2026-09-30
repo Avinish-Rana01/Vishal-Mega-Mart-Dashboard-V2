@@ -21,6 +21,7 @@ import HuSummaryReportPage from './pages/Report/HuSummaryReportPage';
 import TagInventoryDistributionPage from './pages/Report/TagInventoryDistributionPage';
 import VendorDiscrepancySummaryPage from './pages/Report/VendorDiscrepancySummaryPage';
 import TagCleaningReportPage from './pages/Report/TagCleaningReportPage';
+import StockTakeReportPage from './pages/Report/StockTakeReportPage';
 import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -73,7 +74,7 @@ export default function App() {
               <Route path="/reports/total-dpos-sale" element={<TotalDposSalePage />} />
               <Route path="/reports/sales" element={<Navigate to="/reports/sale" replace />} />
               <Route path="/reports/tag-cleaning" element={<TagCleaningReportPage />} />
-              <Route path="/reports/stock-take" element={<DevelopmentInProgressPage title="Stock Take" />} />
+              <Route path="/reports/stock-take" element={<StockTakeReportPage />} />
 
               {/* Stores Module */}
               <Route path="/stores" element={<DevelopmentInProgressPage title="Store Reports" />} />
