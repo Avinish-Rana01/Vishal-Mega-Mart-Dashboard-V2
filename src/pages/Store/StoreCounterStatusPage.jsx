@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import { getCounterStatusStores, getCounterStatusDetails } from '../../services/storeService';
-import { RefreshCw, Monitor, Layers, Wifi, WifiOff, Radio } from 'lucide-react';
+import { RefreshCw, Monitor, Layers, Wifi, WifiOff, Radio, Calendar, Clock } from 'lucide-react';
 import { liveStockSocket } from '../../services/liveStockSocket';
 import './StoreCounterStatusPage.css';
 
@@ -12,12 +12,44 @@ const FALLBACK_STORES = [
   { value: 6, text: 'HD44 - Uttam Nagar 2' }
 ];
 
+// Helper to parse date and time cleanly
+const formatSyncDateTime = (raw) => {
+  if (!raw || raw === 'N/A') return { date: '--', time: '--' };
+  const str = String(raw).trim();
+  const parts = str.split(/\s+/);
+  if (parts.length >= 2) {
+    const datePart = parts[0].replace(/\//g, '-');
+    const timePart = parts.slice(1).join(' ');
+    return { date: datePart, time: timePart };
+  }
+  const d = new Date(str);
+  if (!isNaN(d.getTime())) {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const time = d.toTimeString().split(' ')[0];
+    return { date: `${day}-${month}-${year}`, time };
+  }
+  return { date: str, time: '' };
+};
+
+// Extracts display number for the top circular badge (e.g., '1', '2', '14')
+const extractCounterNumber = (rawName, fallbackIdx) => {
+  if (!rawName) return String(fallbackIdx + 1);
+  const cleaned = String(rawName).trim();
+  const match = cleaned.match(/(?:counter\s*[-_]?\s*)?([0-9a-zA-Z]+)/i);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return cleaned || String(fallbackIdx + 1);
+};
+
 // Fallback counters to match user screenshot (14 total, 0 online, 14 offline)
 const generateFallbackCounters = (count = 14) => {
   return Array.from({ length: count }, (_, i) => ({
     cash_Counter: String(i + 1),
     status: 1,
-    lasT_UPDATED_DATE: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    lasT_UPDATED_DATE: new Date().toLocaleDateString('en-GB').replace(/\//g, '-') + ' ' + new Date().toLocaleTimeString('en-GB')
   }));
 };
 
@@ -147,7 +179,7 @@ export default function StoreCounterStatusPage() {
             newUpdatedKeys.forEach((id) => nextSet.delete(id));
             return nextSet;
           });
-        }, 2500);
+        }, 1200);
 
         return next.sort((a, b) => {
           const numA = parseInt((a.cash_Counter || a.Cash_Counter || '0').replace(/\D/g, ''), 10) || 0;
@@ -271,10 +303,28 @@ export default function StoreCounterStatusPage() {
           </div>
         </div>
 
-        {isLoadingCounters && counters.length === 0 ? (
-          <div className="counter-empty-state">
-            <RefreshCw size={28} className="animate-spin counter-empty-icon" />
-            <p>Loading counter status details...</p>
+        {isLoadingCounters ? (
+          <div className="counter-grid">
+            {Array.from({ length: counters.length > 0 ? counters.length : 14 }).map((_, idx) => (
+              <div key={idx} className="counter-status-tile skeleton-tile">
+                <div className="tile-top-banner skeleton-banner">
+                  <svg className="tile-banner-svg skeleton-banner-svg" viewBox="0 0 200 50" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M 0,0 L 200,0 L 200,30 Q 100,48 0,30 Z" fill="#e2e8f0" />
+                  </svg>
+                  <div className="tile-number-badge skeleton-badge skeleton-shimmer" />
+                </div>
+                <div className="tile-body">
+                  <div className="tile-hero-row">
+                    <div className="tile-icon-circle skeleton-circle skeleton-shimmer" />
+                  </div>
+                  <div className="tile-label-wrap">
+                    <div className="skeleton-line-title skeleton-shimmer" />
+                    <div className="skeleton-line-accent skeleton-shimmer" />
+                  </div>
+                  <div className="tile-sync-pill skeleton-pill skeleton-shimmer" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : counters.length === 0 ? (
           <div className="counter-empty-state">
@@ -286,38 +336,87 @@ export default function StoreCounterStatusPage() {
             {counters.map((counter, idx) => {
               const isOnline = Number(counter.status ?? counter.STATUS) === 0;
               const rawName = String(counter.cash_Counter || counter.Cash_Counter || `${idx + 1}`).trim();
-              const counterName = rawName.toLowerCase().startsWith('counter') ? rawName : `Counter ${rawName}`;
+              const counterNumber = extractCounterNumber(rawName, idx);
+              const counterLabel = rawName.toLowerCase().startsWith('counter') ? rawName : `Counter ${rawName}`;
               const lastUpdated = counter.lasT_UPDATED_DATE || counter.LAST_UPDATED_DATE || counter.last_Updated_Date || counter.lastUpdatedDate || 'N/A';
+              const { date, time } = formatSyncDateTime(lastUpdated);
               const isJustUpdated = recentlyUpdatedIds.has(rawName);
 
               return (
                 <div
                   key={counter.cash_Counter || counter.Cash_Counter || idx}
-                  className={`counter-card ${isOnline ? 'online' : 'offline'} ${isJustUpdated ? 'just-updated' : ''}`}
+                  className={`counter-status-tile ${isOnline ? 'online' : 'offline'} ${isJustUpdated ? 'just-updated' : ''}`}
+                  title={`${counterLabel} • ${isOnline ? 'Active / Online' : 'Inactive / Offline'} • Last Sync: ${lastUpdated}`}
                 >
-                  <div className="counter-card-header">
-                    <span className="counter-card-title">
-                      <Monitor size={15} color={isOnline ? '#16a34a' : '#ef4444'} />
-                      {counterName}
-                    </span>
-                    <span className={`counter-status-pill ${isOnline ? 'online' : 'offline'}`}>
-                      <span className={`status-dot ${isOnline ? 'online' : 'offline'}`} />
-                      {isOnline ? 'Online' : 'Offline'}
-                    </span>
+                  {/* Top Convex Curved Header Banner */}
+                  <div className={`tile-top-banner ${isOnline ? 'online' : 'offline'}`}>
+                    <svg className="tile-banner-svg" viewBox="0 0 200 50" preserveAspectRatio="none" aria-hidden="true">
+                      <path
+                        d="M 0,0 L 200,0 L 200,30 Q 100,48 0,30 Z"
+                        fill={isOnline ? '#16a34a' : '#e11d2e'}
+                      />
+                    </svg>
+
+                    {/* Circular Number Badge Overlapping Convex Curve */}
+                    <div className={`tile-number-badge ${isOnline ? 'online' : 'offline'}`}>
+                      <span>{counterNumber}</span>
+                    </div>
                   </div>
 
-                  <div className="counter-card-body">
-                    <div className="counter-info-row">
-                      <span className="counter-info-label">Status</span>
-                      <span className="counter-info-value" style={{ color: isOnline ? '#16a34a' : '#ef4444' }}>
-                        {isOnline ? 'Active / Connected' : 'Disconnected'}
-                      </span>
+                  {/* Tile Body */}
+                  <div className="tile-body">
+                    {/* Center Hero Row: 4 Decorative Dots (Left) + Circular POS Screen POD + 4 Decorative Dots (Right) */}
+                    <div className="tile-hero-row">
+                      <div className="tile-dot-matrix" aria-hidden="true">
+                        <span /><span /><span /><span />
+                      </div>
+
+                      <div className={`tile-icon-circle ${isOnline ? 'online' : 'offline'}`}>
+                        <svg
+                          className="pos-screen-svg"
+                          viewBox="0 0 36 36"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          {/* Monitor Screen Frame */}
+                          <rect x="4" y="5.5" width="28" height="17" rx="3.5" strokeWidth="2.2" />
+                          {/* Stand Neck and Base */}
+                          <line x1="18" y1="22.5" x2="18" y2="27" strokeWidth="2.4" />
+                          <line x1="12" y1="27" x2="24" y2="27" strokeWidth="2.4" />
+                          {/* Shopping Cart inside Screen */}
+                          <path d="M10 11h2.5l1.8 5.2h8l1.4-4.2H13" strokeWidth="2" />
+                          <circle cx="15.2" cy="19" r="1.3" fill="currentColor" stroke="none" />
+                          <circle cx="20.8" cy="19" r="1.3" fill="currentColor" stroke="none" />
+                        </svg>
+                      </div>
+
+                      <div className="tile-dot-matrix" aria-hidden="true">
+                        <span /><span /><span /><span />
+                      </div>
                     </div>
-                    <div className="counter-info-row">
-                      <span className="counter-info-label">Last Updated</span>
-                      <span className="counter-info-value" style={{ fontSize: '10px' }}>
-                        {lastUpdated}
-                      </span>
+
+                    {/* Primary Title Label & Rounded Accent Divider Line */}
+                    <div className="tile-label-wrap">
+                      <h4 className="tile-sync-heading">Last Sync Date/Time</h4>
+                      <div className={`tile-accent-pill ${isOnline ? 'online' : 'offline'}`} />
+                    </div>
+
+                    {/* Bottom Date/Time Capsule Pill Box */}
+                    <div className={`tile-sync-pill ${isOnline ? 'online' : 'offline'}`}>
+                      <div className="sync-item date-item">
+                        <Calendar size={11} strokeWidth={2.2} className="sync-icon" />
+                        <span className="sync-text">{date}</span>
+                      </div>
+
+                      <span className="sync-divider" />
+
+                      <div className="sync-item time-item">
+                        <Clock size={11} strokeWidth={2.2} className="sync-icon" />
+                        <span className="sync-text">{time}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

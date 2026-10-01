@@ -342,147 +342,318 @@
 /* Grid of Counter Status Cards */
 .counter-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 12px;
+  padding: 4px 0 16px 0;
 }
 
-.counter-card {
+/* Senior UI/UX Redesigned Counter Status Tile (Compact & Refined) */
+.counter-status-tile {
   background: #ffffff;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.04);
-  padding: 14px 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+  overflow: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  max-width: 175px;
+  width: 100%;
+  margin: 0 auto;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s ease;
+  user-select: none;
 }
 
-.counter-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.08);
+.counter-status-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.09), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
   border-color: #cbd5e1;
 }
 
-.counter-card.online {
-  border-left: 4px solid #22c55e;
+/* WebSocket Update Ripple Glow */
+.counter-status-tile.just-updated {
+  animation: counterUpdatedGlow 1.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.counter-card.offline {
-  border-left: 4px solid #ef4444;
-}
-
-/* 2-Second Pulse animation for updated counter cards */
-.counter-card.just-updated {
-  animation: counterUpdatedPulse 2s ease-in-out;
-}
-
-@keyframes counterUpdatedPulse {
+@keyframes counterUpdatedGlow {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
   }
-  25% {
-    transform: scale(1.025);
-    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.25);
-  }
-  50% {
-    transform: scale(1.015);
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: none;
-  }
-}
-
-.counter-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.counter-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.counter-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.counter-status-pill.online {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.counter-status-pill.offline {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.status-dot.online {
-  background-color: #22c55e;
-  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
-  animation: pulse 1.8s infinite;
-}
-
-.status-dot.offline {
-  background-color: #ef4444;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+  35% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.25), 0 6px 16px rgba(37, 99, 235, 0.18);
   }
   70% {
-    box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+    transform: scale(1.01);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    transform: scale(1);
+    box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.05);
   }
 }
 
-.counter-card-body {
+/* Top Convex Curved Header Banner */
+.tile-top-banner {
+  height: 52px;
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  justify-content: center;
+  background: transparent;
+  width: 100%;
 }
 
-.counter-info-row {
+.tile-banner-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Center Overlapping Number Badge */
+.tile-number-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+  z-index: 2;
+  transition: background-color 0.3s ease, transform 0.25s ease;
+}
+
+.tile-number-badge span {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  font-family: inherit;
+}
+
+.tile-number-badge.offline {
+  background: #e11d2e;
+}
+
+.tile-number-badge.online {
+  background: #16a34a;
+}
+
+/* Card Body Section */
+.tile-body {
+  padding: 2px 8px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #ffffff;
+}
+
+/* Hero Row: Decorative Dots + Circular Icon */
+.tile-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 10px 0 6px 0;
+}
+
+.tile-dot-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, 5px);
+  gap: 5px;
+  opacity: 0.85;
+}
+
+.tile-dot-matrix span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #dbeafe;
+}
+
+.tile-icon-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, background 0.3s ease;
+}
+
+.counter-status-tile:hover .tile-icon-circle {
+  transform: scale(1.05);
+}
+
+.tile-icon-circle.offline {
+  background: #fff1f2;
+  color: #e11d2e;
+}
+
+.tile-icon-circle.online {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.pos-screen-svg {
+  width: 27px;
+  height: 27px;
+}
+
+/* Label & Accent Divider */
+.tile-label-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.tile-sync-heading {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f2744;
+  letter-spacing: -0.15px;
+}
+
+.tile-accent-pill {
+  width: 32px;
+  height: 3px;
+  border-radius: 999px;
+  transition: background 0.3s ease;
+}
+
+.tile-accent-pill.offline {
+  background: linear-gradient(90deg, #f87171, #ea580c);
+}
+
+.tile-accent-pill.online {
+  background: linear-gradient(90deg, #4ade80, #16a34a);
+}
+
+/* Bottom Sync Date/Time Capsule Pill */
+.tile-sync-pill {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
+  padding: 5px 7px;
+  border-radius: 9px;
+  background: #f1f5fa;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: background 0.3s ease;
 }
 
-.counter-info-label {
-  color: #64748b;
-  font-weight: 500;
+.tile-sync-pill.offline {
+  color: #e11d2e;
 }
 
-.counter-info-value {
-  color: #334155;
-  font-weight: 600;
+.tile-sync-pill.online {
+  color: #16a34a;
+}
+
+.sync-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sync-icon {
+  flex-shrink: 0;
+}
+
+.sync-divider {
+  width: 1px;
+  height: 12px;
+  background: #d0d7de;
+  flex-shrink: 0;
+  margin: 0 1px;
+}
+
+/* Shimmer Skeleton Card (Matches Exact Shape & Dimensions) */
+.skeleton-tile {
+  pointer-events: none;
+  background: #ffffff;
+}
+
+.skeleton-tile .tile-top-banner {
+  background: #f1f5f9;
+}
+
+.skeleton-tile .tile-number-badge {
+  background: #e2e8f0;
+  border-color: #ffffff;
+  width: 40px;
+  height: 40px;
+}
+
+.skeleton-tile .tile-icon-circle {
+  background: #f1f5f9;
+  border-color: transparent;
+  width: 52px;
+  height: 52px;
+}
+
+.skeleton-tile .skeleton-line-title {
+  width: 80px;
+  height: 11px;
+  border-radius: 4px;
+}
+
+.skeleton-tile .skeleton-line-accent {
+  width: 32px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.skeleton-tile .tile-sync-pill {
+  height: 25px;
+  background: #f1f5fa;
+  border-color: transparent;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e2e8f0 35%,
+    #cbd5e1 50%,
+    #e2e8f0 65%,
+    #f1f5f9 100%
+  );
+  background-size: 250% 100%;
+  animation: counterShimmerAnim 0.9s ease-in-out infinite;
+}
+
+@keyframes counterShimmerAnim {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Empty & Loading States */
