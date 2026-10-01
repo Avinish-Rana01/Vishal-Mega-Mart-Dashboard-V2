@@ -1,0 +1,190 @@
+/* ==========================================================================
+   Authentication & Master Registration Styles (VMM Design System)
+   ========================================================================== */
+
+/* Password Input with show/hide toggle inside standard VMM search-field */
+.vmm-auth-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.vmm-auth-input {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.vmm-auth-input:focus {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.vmm-auth-password-wrap .vmm-auth-input {
+  padding-right: 30px;
+}
+
+.vmm-password-eye-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  transition: color 0.15s ease;
+}
+
+.vmm-password-eye-btn:hover {
+  color: #334155;
+}
+
+/* Edit Mode Banner inside the header */
+.vmm-edit-mode-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Status Pill Badges in ReportDataTableCard */
+.vmm-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.vmm-status-pill.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.vmm-status-pill.inactive {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.vmm-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Inline Action Buttons inside ReportDataTableCard */
+.vmm-table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.vmm-table-action-btn.edit {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.vmm-table-action-btn.edit:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.vmm-table-action-btn.deactivate {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.vmm-table-action-btn.deactivate:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.vmm-table-action-btn.activate {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+.vmm-table-action-btn.activate:hover {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Alert Toast / Banner */
+.vmm-auth-toast {
+  margin: 10px 10px 0 10px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: fadeIn 0.2s ease;
+}
+
+.vmm-auth-toast.success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.vmm-auth-toast.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.vmm-auth-toast-close {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.vmm-auth-toast-close:hover {
+  opacity: 1;
+}

@@ -23,6 +23,7 @@ import VendorDiscrepancySummaryPage from './pages/Report/VendorDiscrepancySummar
 import TagCleaningReportPage from './pages/Report/TagCleaningReportPage';
 import StockTakeReportPage from './pages/Report/StockTakeReportPage';
 import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
+import { UserRegistrationPage, StoreRegistrationPage, WarehouseRegistrationPage } from './pages/Authentication';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
@@ -85,9 +86,9 @@ export default function App() {
               <Route path="/tag-management/distribution" element={<TagInventoryDistributionPage />} />
 
               {/* Authentication / Master Registration Sub-routes */}
-              <Route path="/auth/user-registration" element={<DevelopmentInProgressPage title="User Registration" />} />
-              <Route path="/auth/store-registration" element={<DevelopmentInProgressPage title="Store Registration" />} />
-              <Route path="/auth/warehouse-registration" element={<DevelopmentInProgressPage title="Warehouse Registration" />} />
+              <Route path="/auth/user-registration" element={<UserRegistrationPage />} />
+              <Route path="/auth/store-registration" element={<StoreRegistrationPage />} />
+              <Route path="/auth/warehouse-registration" element={<WarehouseRegistrationPage />} />
               <Route path="/settings" element={<DevelopmentInProgressPage title="Settings" />} />
             </Route>
 

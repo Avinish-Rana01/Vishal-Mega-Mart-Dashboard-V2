@@ -34,7 +34,10 @@ const ROUTE_BREADCRUMBS = {
   '/reports/tag-distribution': 'HOME - PAGES - DASHBOARD - TAG INVENTORY DISTRIBUTION',
   '/reports/vendor-discrepancy': 'HOME - PAGES - DASHBOARD - VENDOR DISCREPANCY SUMMARY',
   '/reports/vendor-discrepancy-summary': 'HOME - PAGES - DASHBOARD - VENDOR DISCREPANCY SUMMARY',
-  '/reports/total-dpos-sale': 'HOME - PAGES - DASHBOARD - TOTAL DPOS SALE REPORT'
+  '/reports/total-dpos-sale': 'HOME - PAGES - DASHBOARD - TOTAL DPOS SALE REPORT',
+  '/auth/user-registration': 'HOME - PAGES - AUTHENTICATION - USER REGISTRATION',
+  '/auth/store-registration': 'HOME - PAGES - AUTHENTICATION - STORE REGISTRATION',
+  '/auth/warehouse-registration': 'HOME - PAGES - AUTHENTICATION - WAREHOUSE REGISTRATION'
 };
 
 function getBreadcrumb(pathname) {

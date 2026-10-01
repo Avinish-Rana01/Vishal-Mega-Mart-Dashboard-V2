@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import BaseDataTable from './BaseDataTable';
 import ExportOptionsModal from './ExportOptionsModal';
 import { useStreamingExport } from '../../hooks/useStreamingExport';
@@ -8,6 +9,7 @@ import './LiveStockDataTable.css';
 export default function ReportDataTableCard({
   columns = [],
   data = [],
+  exportData = null,
   isLoading = false,
   isRefreshing = false,
   skeletonRowsCount = 10,
@@ -203,29 +205,62 @@ export default function ReportDataTableCard({
     });
   };
 
-  // Handle Export to CSV
+  // Handle Export to Native XLSX or CSV
   const handleExportCSV = () => {
-    if (filteredData.length === 0) return;
+    const exportSource = (exportData && Array.isArray(exportData) && exportData.length > 0) ? exportData : filteredData;
+    if (!exportSource || exportSource.length === 0) return;
     
-    // Headers
-    const headers = columns.map(c => c.label).join(',');
-    
-    // Rows
-    const csvRows = filteredData.map(row => {
-      return columns.map(col => {
+    // Filter out action columns and non-data columns
+    const exportableCols = columns.filter(c => 
+      c.key !== 'actions' && 
+      c.key !== 'action' && 
+      !String(c.label || '').toUpperCase().includes('ACTION')
+    );
+
+    const fileName = exportFileName || "Report.xlsx";
+    const isCsvRequested = fileName.toLowerCase().endsWith('.csv');
+
+    // Build row objects with header labels as keys
+    const sheetData = exportSource.map(row => {
+      const rowObj = {};
+      exportableCols.forEach(col => {
         let val = row[col.key];
         if (val === null || val === undefined) val = '';
-        val = String(val).replace(/"/g, '""'); // escape quotes
+        rowObj[col.label || col.key] = val;
+      });
+      return rowObj;
+    });
+
+    if (!isCsvRequested) {
+      try {
+        const worksheet = XLSX.utils.json_to_sheet(sheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        XLSX.writeFile(workbook, fileName);
+        return;
+      } catch (err) {
+        console.error('XLSX export error, falling back to CSV:', err);
+      }
+    }
+
+    // CSV Fallback / CSV requested
+    const headers = exportableCols.map(c => `"${String(c.label || c.key).replace(/"/g, '""')}"`).join(',');
+    const csvRows = exportSource.map(row => {
+      return exportableCols.map(col => {
+        let val = row[col.key];
+        if (val === null || val === undefined) val = '';
+        val = String(val).replace(/"/g, '""');
         return `"${val}"`;
       }).join(',');
     });
 
-    const csvContent = [headers, ...csvRows].join('\n');
+    const csvContent = "\uFEFF" + [headers, ...csvRows].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", exportFileName || "Report.csv");
+    const finalCsvName = fileName.replace(/\.xlsx$/i, '.csv');
+    link.setAttribute("download", finalCsvName);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
