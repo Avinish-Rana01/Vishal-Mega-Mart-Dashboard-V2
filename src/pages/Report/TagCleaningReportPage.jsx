@@ -6,6 +6,7 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import TagCleaningDetailModal from '../../components/modals/TagCleaningDetailModal';
 import { SearchButton, ClearButton } from '../../components/common/ReportActionButton';
 import { getTagCleaningReport } from '../../services/stockService';
 import { dateRenderer } from '../../utils/dashboardColumns';
@@ -60,6 +61,28 @@ export default function TagCleaningReportPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Detail Modal state
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailModalDate, setDetailModalDate] = useState('');
+  const [detailModalRowData, setDetailModalRowData] = useState(null);
+
+  // Open detail modal for a specific row
+  const openDetailModal = (row) => {
+    const rawDate =
+      row?.TAG_CLEANED_DATE ||
+      row?.taG_CLEANED_DATE ||
+      row?.tagCleanedDate ||
+      row?.tag_CLEANED_DATE ||
+      row?.Tag_Cleaned_Date ||
+      row?.inward_DATE ||
+      row?.INWARD_DATE ||
+      row?.Date ||
+      row?.date;
+    setDetailModalDate(rawDate || '');
+    setDetailModalRowData(row);
+    setIsDetailModalOpen(true);
+  };
 
   // Fetch report data from API
   const fetchData = useCallback(async (signal) => {
@@ -185,7 +208,22 @@ export default function TagCleaningReportPage() {
           row?.TOTAL_VALIDATED_QTY ?? 
           0;
         return (
-          <span style={{ fontWeight: 700, color: '#16a34a' }}>
+          <span
+            className="vmm-clickable-cell"
+            style={{
+              fontWeight: 700,
+              color: '#16a34a',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              textDecorationStyle: 'dotted',
+              textUnderlineOffset: '3px'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              openDetailModal(row);
+            }}
+            title="Click to view store-level breakdown"
+          >
             {Number(qty).toLocaleString('en-IN')}
           </span>
         );
@@ -206,7 +244,22 @@ export default function TagCleaningReportPage() {
           row?.total_COUNT ?? 
           0;
         return (
-          <span style={{ fontWeight: 700, color: '#9333ea' }}>
+          <span
+            className="vmm-clickable-cell"
+            style={{
+              fontWeight: 700,
+              color: '#9333ea',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              textDecorationStyle: 'dotted',
+              textUnderlineOffset: '3px'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              openDetailModal(row);
+            }}
+            title="Click to view store-level breakdown"
+          >
             {Number(qty).toLocaleString('en-IN')}
           </span>
         );
@@ -306,6 +359,14 @@ export default function TagCleaningReportPage() {
           exportFileName={`Tag_Cleaning_Report_${appliedFilters.fromDate}_to_${appliedFilters.toDate}.xlsx`}
         />
       </div>
+
+      {/* Tag Cleaning Detail Modal */}
+      <TagCleaningDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        rowDate={detailModalDate}
+        rowData={detailModalRowData}
+      />
     </AppLayout>
   );
 }

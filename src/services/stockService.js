@@ -991,6 +991,48 @@ export const getTagCleaningReport = async ({
 };
 
 // ==============================================================
+// Tag Cleaning Detail Data API (GetTagCleaningData - GET)
+// ==============================================================
+export const getTagCleaningData = async ({
+  searchTerm = '',
+  pageIndex = 1,
+  pageSize = 10,
+  fromDate = '',
+  toDate = '',
+  sortColumn = 'INWARD_DATE',
+  sortDirection = 'desc'
+} = {}, signal) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append('searchTerm', searchTerm);
+  params.append('pageIndex', pageIndex);
+  params.append('pageSize', pageSize);
+  if (fromDate) params.append('fromDate', fromDate);
+  if (toDate) params.append('toDate', toDate);
+  if (sortColumn) params.append('sortColumn', sortColumn);
+  if (sortDirection) params.append('sortDirection', sortDirection);
+
+  const url = `${API_BASE}/api/TagCleaningReport/GetTagCleaningData?${params.toString()}`;
+  try {
+    const response = await axios.get(url, {
+      headers: getHeaders(),
+      signal
+    });
+    return response.data;
+  } catch (err) {
+    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
+      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
+      const fallbackUrl = `${fallbackBase}/api/TagCleaningReport/GetTagCleaningData?${params.toString()}`;
+      const response = await axios.get(fallbackUrl, {
+        headers: getHeaders(),
+        signal
+      });
+      return response.data;
+    }
+    throw err;
+  }
+};
+
+// ==============================================================
 // Stock Take Report API
 // ==============================================================
 export const getStockTakeData = async ({

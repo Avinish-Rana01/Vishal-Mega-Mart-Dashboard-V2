@@ -25,7 +25,8 @@ export default function DetailsModal({
   exportFileName = "Details.csv",
   reportName,
   exportFilters,
-  directExport = true
+  directExport = true,
+  exportData = null
 }) {
 
   const modalNode = (
@@ -73,6 +74,7 @@ export default function DetailsModal({
               <ReportDataTableCard 
                 columns={tableColumns}
                 data={tableData}
+                exportData={exportData}
                 isLoading={isLoading}
                 pageIndex={pageIndex}
                 onPageChange={onPageChange}
