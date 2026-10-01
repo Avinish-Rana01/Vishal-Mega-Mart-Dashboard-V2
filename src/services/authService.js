@@ -25,8 +25,17 @@ export const requestPasswordReset = async (userName, signal) => {
 };
 
 export const changePassword = async (userName, oldPassword, newPassword, signal) => {
-  // Placeholder for real API change password endpoint
-  // const response = await axios.post(`${API_BASE}/api/Auth/change-password`, { userName, oldPassword, newPassword }, { signal });
-  // return response.data;
-  return { success: true };
+  const response = await axios.post(`${API_BASE}/api/Auth/change-password`, {
+    userName,
+    currentPassword: oldPassword,
+    newPassword
+  }, {
+    headers: {
+      'Accept': '*/*',
+      'Content-Type': 'application/json'
+    },
+    timeout: 30000,
+    signal
+  });
+  return response.data;
 };

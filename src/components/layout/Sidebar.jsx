@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Tag, Settings } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
 import './Sidebar.css';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { hasSection, userRole } = useAuth();
   const [hoveredMenuId, setHoveredMenuId] = useState(null);
 
   // Close tooltip whenever the sidebar closes on mobile
@@ -35,64 +37,92 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     '/reports/stock-take'
   ];
 
-  const menuConfig = [
-    {
-      id: 'dashboard',
-      title: 'Home',
-      icon: LayoutDashboard,
-      tooltipTitle: 'Home',
-      defaultTo: '/dashboard',
-      // Dashboard icon stays active on /dashboard, /dashboard-old, and ALL dashboard drill-down reports
-      isActive: (pathname) => {
-        if (pathname.startsWith('/dashboard')) return true;
-        if (pathname.startsWith('/stores')) return false;
-        if (pathname.startsWith('/auth') || pathname.startsWith('/settings')) return false;
-        if (standaloneReportPaths.some(p => pathname.startsWith(p))) return false;
-        // All other reports and drill-downs belong to Dashboard
-        return pathname.startsWith('/reports') || pathname.startsWith('/tags') || pathname.startsWith('/tag-management');
-      },
-      onIconClick: handleDashboardClick,
-      items: [
-        { label: 'Dashboard', to: '/dashboard', onClick: handleDashboardClick }
-      ]
-    },
-    {
-      id: 'store',
-      title: 'Store',
-      icon: Building2,
-      tooltipTitle: 'Store',
-      defaultTo: '/stores/counter-status',
-      isActive: (pathname) => pathname.startsWith('/stores'),
-      items: [
-        { label: 'Store Counter Status', to: '/stores/counter-status' }
-      ]
-    },
-    {
-      id: 'reports',
-      title: 'Reports',
-      icon: Tag,
-      tooltipTitle: 'Reports',
-      defaultTo: '/reports/tag-cleaning',
-      isActive: (pathname) => standaloneReportPaths.some(p => pathname.startsWith(p)),
-      items: [
-        { label: 'Tag Cleaning', to: '/reports/tag-cleaning' },
-        { label: 'Stock Take', to: '/reports/stock-take' }
-      ]
-    },
-    {
-      id: 'auth',
-      title: 'Authentication',
-      icon: Settings,
-      tooltipTitle: 'Authentication',
-      defaultTo: '/auth/user-registration',
-      isActive: (pathname) => pathname.startsWith('/auth') || pathname.startsWith('/settings'),
-      items: [
-        { label: 'User Registration', to: '/auth/user-registration' },
-        { label: 'Store Registration', to: '/auth/store-registration' },
-        { label: 'Warehouse Registration', to: '/auth/warehouse-registration' }
-      ]
+  const menuConfig = useMemo(() => {
+    const list = [
+      {
+        id: 'dashboard',
+        title: 'Home',
+        icon: LayoutDashboard,
+        tooltipTitle: 'Home',
+        defaultTo: '/dashboard',
+        isActive: (pathname) => {
+          if (pathname.startsWith('/dashboard')) return true;
+          if (pathname.startsWith('/stores')) return false;
+          if (pathname.startsWith('/auth') || pathname.startsWith('/settings')) return false;
+          if (standaloneReportPaths.some(p => pathname.startsWith(p))) return false;
+          return pathname.startsWith('/reports') || pathname.startsWith('/tags') || pathname.startsWith('/tag-management');
+        },
+        onIconClick: handleDashboardClick,
+        items: [
+          { label: 'Dashboard', to: '/dashboard', onClick: handleDashboardClick }
+        ]
+      }
+    ];
+
+    // Store Module: Store Counter Status
+    const canSeeStoreCounter = hasSection('store_counter_status');
+    if (canSeeStoreCounter) {
+      list.push({
+        id: 'store',
+        title: 'Store',
+        icon: Building2,
+        tooltipTitle: 'Store',
+        defaultTo: '/stores/counter-status',
+        isActive: (pathname) => pathname.startsWith('/stores'),
+        items: [
+          { label: 'Store Counter Status', to: '/stores/counter-status' }
+        ]
+      });
     }
-  ];
+
+    // Reports Module: Tag Cleaning & Stock Take (SAP Stock Take)
+    const reportItems = [];
+    if (hasSection('tag_cleaning') || userRole === 'Super Admin' || userRole === 'Tag Admin') {
+      reportItems.push({ label: 'Tag Cleaning', to: '/reports/tag-cleaning' });
+    }
+    if (hasSection('get_sap_stock_take') || userRole === 'Super Admin' || userRole === 'Store Admin') {
+      reportItems.push({ label: 'Stock Take', to: '/reports/stock-take' });
+    }
+
+    if (reportItems.length > 0) {
+      list.push({
+        id: 'reports',
+        title: 'Reports',
+        icon: Tag,
+        tooltipTitle: 'Reports',
+        defaultTo: reportItems[0].to,
+        isActive: (pathname) => standaloneReportPaths.some(p => pathname.startsWith(p)),
+        items: reportItems
+      });
+    }
+
+    // Authentication / Master Registration Module
+    const isSuperAdmin = userRole === 'Super Admin';
+    const canManageUsers = hasSection('user_registration') || isSuperAdmin || ['Store Admin', 'Warehouse Admin', 'WH Admin'].includes(userRole);
+    const authItems = [];
+
+    if (canManageUsers) {
+      authItems.push({ label: 'User Registration', to: '/auth/user-registration' });
+    }
+    if (isSuperAdmin) {
+      authItems.push({ label: 'Store Registration', to: '/auth/store-registration' });
+      authItems.push({ label: 'Warehouse Registration', to: '/auth/warehouse-registration' });
+    }
+
+    if (authItems.length > 0) {
+      list.push({
+        id: 'auth',
+        title: 'Authentication',
+        icon: Settings,
+        tooltipTitle: 'Authentication',
+        defaultTo: authItems[0].to,
+        isActive: (pathname) => pathname.startsWith('/auth') || pathname.startsWith('/settings'),
+        items: authItems
+      });
+    }
+
+    return list;
+  }, [hasSection, userRole, location.pathname]);
 
   return (
     <aside className={`vmm-sidebar ${isOpen ? 'open' : ''}`}>

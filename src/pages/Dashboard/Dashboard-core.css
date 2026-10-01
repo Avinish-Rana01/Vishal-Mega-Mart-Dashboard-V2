@@ -188,6 +188,7 @@
 
 /* Top Header Bar */
 .vmm-top-header {
+  position: relative;
   height: 48px;
   background: #ffffff;
   display: flex;
@@ -195,7 +196,7 @@
   justify-content: space-between;
   padding: 0 19px;
   /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); */
-  z-index: 50;
+  z-index: 1000;
 }
 
 .vmm-brand-section {
@@ -293,64 +294,181 @@
 
 .vmm-user-dropdown {
   position: absolute;
-  top: 38px;
+  top: 44px;
   right: 0;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  width: 160px;
-  padding: 10px;
-  z-index: 1000;
-  animation: fadeIn 0.15s ease;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  width: 280px;
+  padding: 16px;
+  z-index: 1002;
+  animation: vmmDropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
 }
 
-@keyframes fadeIn {
+@keyframes vmmDropdownFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-8px) scale(0.97);
   }
-
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-.vmm-user-info {
-  padding-bottom: 6px;
-  margin-bottom: 6px;
+.vmm-user-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
   border-bottom: 1px solid #f1f5f9;
 }
 
-.vmm-user-name {
-  font-weight: 600;
+.vmm-user-avatar-pod {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.vmm-user-avatar-pod .vmm-status-dot {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #ffffff;
+}
+
+.vmm-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vmm-user-greeting {
   font-size: 11px;
-  color: #0f172a;
-}
-
-.vmm-user-role {
-  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: #64748b;
+  margin-bottom: 2px;
 }
 
-.vmm-dropdown-item {
+.vmm-user-fullname {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+}
+
+.vmm-user-role-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vmm-user-role-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vmm-user-role-label {
   display: flex;
   align-items: center;
   gap: 6px;
-  width: 100%;
-  padding: 6px;
-  font-size: 10px;
-  color: #dc2626;
-  background: none;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background 0.2s;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
 }
 
-.vmm-dropdown-item:hover {
+.vmm-user-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 9999px;
+}
+
+.vmm-user-role-pill .role-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.vmm-profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vmm-profile-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.vmm-profile-action-btn .btn-left-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.vmm-profile-action-btn:hover {
+  background: #f1f5f9;
+}
+
+.vmm-profile-action-btn.btn-danger .btn-left-content {
+  color: #dc2626;
+}
+
+.vmm-profile-action-btn.btn-danger:hover {
   background: #fef2f2;
+}
+
+.vmm-profile-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 0;
+  border: none;
 }
 
 /* Scrollable Dashboard Body */
