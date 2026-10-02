@@ -8,6 +8,9 @@ import * as signalR from '@microsoft/signalr';
  * - DC Encoding
  * - Tag Management
  * - Vendor Discrepancy
+ * - Cash Counter Status
+ *
+ * Dispatches real-time micro-deltas to subscribed dashboard components.
  */
 class DashboardSocketService {
   constructor() {
