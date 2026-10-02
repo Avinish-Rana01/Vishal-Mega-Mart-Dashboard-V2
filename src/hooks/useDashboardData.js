@@ -17,6 +17,11 @@ import { liveStockSocket } from '../services/liveStockSocket';
 /**
  * Generic hook for dashboard table endpoints.
  * Handles state management, debouncing, and API fetching with AbortController.
+ *
+ * @param {Function} apiFn - API service function that returns dashboard response
+ * @param {Function} filterFn - Client-side search filter predicate
+ * @param {Function} totalsMapper - Mapper function to transform API summary into totals object
+ * @param {number} [initialPageSize=100] - Default page size for initial data load
  */
 const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100) => {
   const [data, setData] = useState([]);
