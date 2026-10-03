@@ -6,6 +6,12 @@ const AuthContext = createContext();
 // Session expires after 1 hour (in milliseconds)
 const SESSION_DURATION_MS = 60 * 60 * 1000;
 
+/**
+ * Custom hook to access authentication context state and dispatchers.
+ *
+ * @throws {Error} If consumed outside of an <AuthProvider> tree.
+ * @returns {Object} The current authentication context value.
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -14,6 +20,13 @@ export const useAuth = () => {
   return context;
 };
 
+/**
+ * Authentication Context Provider that manages user session persistence,
+ * socket disconnect on logout, and role-based permissions across the application.
+ *
+ * @param {Object} props - React component props.
+ * @param {React.ReactNode} props.children - Child elements wrapped by the provider.
+ */
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
