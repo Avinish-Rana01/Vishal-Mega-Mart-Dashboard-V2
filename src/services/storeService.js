@@ -10,7 +10,11 @@ const getHeaders = () => ({
 
 /**
  * Fetch list of authorized stores for Counter Status dropdown.
- * Replaces legacy bindStore() in Counter_Status.aspx
+ * Replaces legacy bindStore() in Counter_Status.aspx.
+ * Attempts the dedicated counter-status-stores endpoint first, then falls back to Master/Execute.
+ *
+ * @param {number|string|null} [userId=null] - The user ID to query stores for, or defaults to active session user.
+ * @returns {Promise<Array<Object>>} Resolves to the array of accessible stores.
  */
 export const getCounterStatusStores = async (userId = null) => {
   const effectiveUserId = userId || getActiveUserId() || 26;
@@ -35,7 +39,11 @@ export const getCounterStatusStores = async (userId = null) => {
 
 /**
  * Fetch real-time counter status cards for a selected store.
- * Replaces legacy CallCardData(store) in Counter_Status.aspx
+ * Replaces legacy CallCardData(store) in Counter_Status.aspx.
+ * Attempts the dedicated counter-status endpoint first, then falls back to Master/Execute.
+ *
+ * @param {number|string} storeId - The ID of the store to fetch counter metrics for.
+ * @returns {Promise<Array<Object>>} Resolves to the array of counter detail records.
  */
 export const getCounterStatusDetails = async (storeId) => {
   if (!storeId) return [];
