@@ -31,7 +31,8 @@ export default function ReportDataTableCard({
   reportName = null,
   exportParams = {},
   exportFilters = {},
-  directExport = false
+  directExport = false,
+  showExport = true
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -306,46 +307,48 @@ export default function ReportDataTableCard({
       
       <div className="ls-toolbar-top">
         <div className="ls-toolbar-left">
-          {isExporting ? (
-            <div className="ls-export-progress-container" title="Exporting Excel (.xlsx)">
-              <div className="ls-export-progress-track">
-                <div 
-                  className={`ls-export-progress-bar ${progressPercent > 0 ? '' : 'indeterminate'}`} 
-                  style={{ width: `${Math.max(5, progressPercent)}%` }} 
-                />
+          {showExport && (
+            isExporting ? (
+              <div className="ls-export-progress-container" title="Exporting Excel (.xlsx)">
+                <div className="ls-export-progress-track">
+                  <div 
+                    className={`ls-export-progress-bar ${progressPercent > 0 ? '' : 'indeterminate'}`} 
+                    style={{ width: `${Math.max(5, progressPercent)}%` }} 
+                  />
+                </div>
+                <div className="ls-export-progress-label">
+                  <svg className="ls-export-spinner animate-spin" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12" />
+                  </svg>
+                  <span>
+                    {progressPercent > 0 && progressPercent < 100
+                      ? `Exporting: ${progressPercent}%`
+                      : 'Exporting Excel...'}
+                  </span>
+                  <button 
+                    type="button" 
+                    className="ls-export-cancel-btn" 
+                    onClick={cancelExport} 
+                    title="Cancel Export"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
-              <div className="ls-export-progress-label">
-                <svg className="ls-export-spinner animate-spin" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12" />
+            ) : (
+              <button 
+                className="ls-export-btn" 
+                onClick={handleExportButtonClick}
+                disabled={isLoading || isRefreshing}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }}>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-                <span>
-                  {progressPercent > 0 && progressPercent < 100
-                    ? `Exporting: ${progressPercent}%`
-                    : 'Exporting Excel...'}
-                </span>
-                <button 
-                  type="button" 
-                  className="ls-export-cancel-btn" 
-                  onClick={cancelExport} 
-                  title="Cancel Export"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button 
-              className="ls-export-btn" 
-              onClick={handleExportButtonClick}
-              disabled={isLoading || isRefreshing}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }}>
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Export Data To Excel
-            </button>
+                Export Data To Excel
+              </button>
+            )
           )}
           
           <div className="ls-entries-select">

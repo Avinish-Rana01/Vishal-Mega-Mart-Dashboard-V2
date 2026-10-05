@@ -40,17 +40,21 @@ export const computeDefaultRoute = (userData) => {
 
   const hasDash = sections.length > 0
     ? DASHBOARD_SECTIONS.some((k) => sections.includes(k))
-    : (role !== 'Tag Admin');
+    : (role !== 'Tag Admin' && role !== 'Dispatch Admin');
 
   if (hasDash) return '/dashboard';
 
   if (redirectPage) {
     const page = redirectPage.toLowerCase().replace(/_/g, '-');
+    if (page.includes('dispatch-tracking') || page.includes('dispatch_tracking')) return '/dispatch/master-upload';
+    if (page.includes('picklist')) return '/picklist/creation';
     if (page.includes('tag-cleaning') || page.includes('tag_cleaning')) return '/reports/tag-cleaning';
     if (page.includes('stock-take') || page.includes('stock_take')) return '/reports/stock-take';
     if (page.includes('counter-status') || page.includes('counter_status')) return '/stores/counter-status';
   }
 
+  if (sections.includes('dispatch_tracking')) return '/dispatch/master-upload';
+  if (sections.includes('picklist_creation')) return '/picklist/creation';
   if (sections.includes('tag_cleaning')) return '/reports/tag-cleaning';
   if (sections.includes('get_sap_stock_take')) return '/reports/stock-take';
   if (sections.includes('store_counter_status')) return '/stores/counter-status';
@@ -189,13 +193,19 @@ export const AuthProvider = ({ children }) => {
 
   const hasSection = (sectionKey) => {
     if (!sectionKey) return false;
-    // Super Admin has access to all sections
-    if (userRole === 'Super Admin') return true;
+    const role = (userRole || '').trim();
+
+    // Dispatch Tracking and Picklist Creation are strictly exclusive to Dispatch Admin (hidden from Super Admin and all others)
+    if (sectionKey === 'dispatch_tracking' || sectionKey === 'picklist_creation') {
+      return role === 'Dispatch Admin';
+    }
+
+    // Super Admin has access to all other sections
+    if (role === 'Super Admin') return true;
     if (Array.isArray(allowedSections) && allowedSections.length > 0) {
       return allowedSections.includes(sectionKey);
     }
     // Fallback based on userRole if allowedSections array is not yet present
-    const role = (userRole || '').trim();
     if (role === 'Store Admin') {
       return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status', 'get_sap_stock_take', 'user_registration'].includes(sectionKey);
     }
@@ -209,7 +219,7 @@ export const AuthProvider = ({ children }) => {
       return ['dc_validation', 'dc_encoding'].includes(sectionKey);
     }
     if (role === 'Dispatch Admin') {
-      return ['dc_validation', 'dc_encoding', 'tag_management'].includes(sectionKey);
+      return ['dispatch_tracking', 'picklist_creation'].includes(sectionKey);
     }
     if (role === 'Tag Admin') {
       return ['tag_cleaning', 'get_sap_stock_take'].includes(sectionKey);

@@ -1,0 +1,546 @@
+/* Dispatch Master Upload Clean & Modern Styling */
+.dispatch-upload-wrapper {
+  padding: 10px 10px;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+/* Card Container with Elegant Top Banner */
+.dispatch-upload-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 0 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
+}
+
+.dispatch-upload-card:hover {
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.07);
+}
+
+/* Top Gradient Header */
+.dispatch-card-header {
+  background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%);
+  color: #ffffff;
+  padding: 7px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.dispatch-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dispatch-required-hint {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.92;
+  text-transform: uppercase;
+}
+
+/* Card Body */
+.dispatch-card-body {
+  padding: 14px 18px 16px 18px;
+}
+
+.dispatch-form-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dispatch-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dispatch-file-group {
+  flex: 1;
+  min-width: 300px;
+}
+
+.dispatch-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.dispatch-star {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* Modern Segmented Pill Toggles */
+.dispatch-type-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+}
+
+.dispatch-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  height: 38px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.dispatch-type-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.dispatch-type-pill:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.dispatch-type-pill.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.dispatch-type-pill.active .dispatch-type-indicator {
+  background: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.6);
+}
+
+/* Pill File Input Box */
+.dispatch-file-box {
+  display: flex;
+  align-items: center;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 24px;
+  background: #fcfdfd;
+  height: 38px;
+  padding: 3px 6px;
+  box-sizing: border-box;
+  max-width: 620px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.dispatch-file-box:hover,
+.dispatch-file-box.dragging {
+  border-color: #0284c7;
+  background: #f0f9ff;
+}
+
+.dispatch-file-box.has-file {
+  border-style: solid;
+  border-color: #93c5fd;
+  background: #f8fafc;
+}
+
+.dispatch-native-file-input {
+  display: none;
+}
+
+.dispatch-choose-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #3371a3;
+  color: #ffffff;
+  padding: 0 14px;
+  height: 30px;
+  border-radius: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(51, 113, 163, 0.25);
+}
+
+.dispatch-choose-btn:hover {
+  background: #285b85;
+  transform: translateY(-1px);
+}
+
+.dispatch-file-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.dispatch-file-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dispatch-file-size {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.dispatch-file-placeholder {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.dispatch-btn-remove-file {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin-right: 6px;
+  transition: all 0.2s ease;
+}
+
+.dispatch-btn-remove-file:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* Same-Line Buttons Row */
+.dispatch-btn-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+/* Centered Button Row (legacy/fallback fallback) */
+.dispatch-btn-center-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.dispatch-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 22px;
+  height: 38px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+/* Upload Button: Sleek Blue Gradient */
+.dispatch-btn-upload {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+}
+
+.dispatch-btn-upload:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
+}
+
+/* Clear Button */
+.dispatch-btn-clear {
+  background: #64748b;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.2);
+}
+
+.dispatch-btn-clear:hover:not(:disabled) {
+  background: #475569;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
+}
+
+/* Download Template Button: Emerald Green */
+.dispatch-btn-download {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+}
+
+.dispatch-btn-download:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+}
+
+.dispatch-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Parsing Badge */
+.dispatch-parsing-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0284c7;
+  margin-top: 12px;
+}
+
+/* Modern Sleek Result Notification Banners */
+.dispatch-success-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1px solid #a7f3d0;
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  margin-top: 14px;
+  box-shadow: 0 4px 14px -2px rgba(16, 185, 129, 0.08);
+  animation: fadeIn 0.25s ease;
+}
+
+.dispatch-success-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.dispatch-success-icon-badge {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.dispatch-success-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dispatch-success-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #065f46;
+  letter-spacing: 0.1px;
+}
+
+.dispatch-stat-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dispatch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 2px 9px;
+  background: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 6px;
+  color: #047857;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.dispatch-chip .chip-label {
+  font-weight: 500;
+  color: #64748b;
+  font-size: 10.5px;
+}
+
+.dispatch-chip .chip-value {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dispatch-chip.chip-highlight {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+}
+
+.dispatch-chip.chip-highlight .chip-value {
+  color: #047857;
+}
+
+.dispatch-chip.chip-warning {
+  background: #fefce8;
+  border-color: #fde047;
+}
+
+.dispatch-chip.chip-warning .chip-value {
+  color: #854d0e;
+}
+
+.chip-divider {
+  color: #cbd5e1;
+  font-size: 10px;
+}
+
+.dispatch-banner-close {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: #6ee7b7;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.dispatch-banner-close:hover {
+  background: rgba(16, 185, 129, 0.15);
+  color: #065f46;
+}
+
+/* Alert Error Box */
+.dispatch-alert-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-top: 14px;
+  animation: fadeIn 0.2s ease;
+}
+
+.dispatch-alert-err {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  color: #b91c1c;
+}
+
+.dispatch-alert-info {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  margin: 12px 14px 0 14px;
+}
+
+/* Table Preview Card Wrapper */
+.dispatch-preview-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 0 3px rgba(0, 0, 0, 0.02);
+  margin-top: 12px;
+  overflow: hidden;
+  animation: fadeIn 0.25s ease;
+}
+
+.dispatch-preview-card-header {
+  background: linear-gradient(to right, #0ea5e9 0%, #2563eb 100%);
+  color: #ffffff;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.dispatch-preview-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.dispatch-preview-table-wrap {
+  padding: 8px 14px 14px 14px;
+}
+
+/* Spinning Animation */
+@keyframes vmm-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vmm-spin {
+  animation: vmm-spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

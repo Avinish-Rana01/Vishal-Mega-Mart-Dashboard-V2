@@ -23,6 +23,9 @@ import VendorDiscrepancySummaryPage from './pages/Report/VendorDiscrepancySummar
 import TagCleaningReportPage from './pages/Report/TagCleaningReportPage';
 import StockTakeReportPage from './pages/Report/StockTakeReportPage';
 import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
+import DispatchMasterUploadPage from './pages/Dispatch/DispatchMasterUploadPage';
+import DispatchReportPage from './pages/Dispatch/DispatchReportPage';
+import PicklistCreationPage from './pages/Dispatch/PicklistCreationPage';
 import { UserRegistrationPage, StoreRegistrationPage, WarehouseRegistrationPage } from './pages/Authentication';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -43,6 +46,22 @@ function DashboardRoute() {
     return <Navigate to={getDefaultRoute()} replace />;
   }
   return <DashboardPage />;
+}
+
+function DispatchRoute({ children }) {
+  const { hasSection, getDefaultRoute } = useAuth();
+  if (!hasSection('dispatch_tracking')) {
+    return <Navigate to={getDefaultRoute()} replace />;
+  }
+  return children;
+}
+
+function PicklistRoute({ children }) {
+  const { hasSection, getDefaultRoute } = useAuth();
+  if (!hasSection('picklist_creation')) {
+    return <Navigate to={getDefaultRoute()} replace />;
+  }
+  return children;
 }
 
 export default function App() {
@@ -89,6 +108,15 @@ export default function App() {
               <Route path="/reports/sales" element={<Navigate to="/reports/sale" replace />} />
               <Route path="/reports/tag-cleaning" element={<TagCleaningReportPage />} />
               <Route path="/reports/stock-take" element={<StockTakeReportPage />} />
+
+              {/* Dispatch Tracking Module - Exclusive to Dispatch Admin */}
+              <Route path="/dispatch" element={<Navigate to="/dispatch/master-upload" replace />} />
+              <Route path="/dispatch/master-upload" element={<DispatchRoute><DispatchMasterUploadPage /></DispatchRoute>} />
+              <Route path="/dispatch/view-report" element={<DispatchRoute><DispatchReportPage /></DispatchRoute>} />
+
+              {/* Picklist Creation Module - Exclusive to Dispatch Admin */}
+              <Route path="/picklist" element={<Navigate to="/picklist/creation" replace />} />
+              <Route path="/picklist/creation" element={<PicklistRoute><PicklistCreationPage /></PicklistRoute>} />
 
               {/* Stores Module */}
               <Route path="/stores" element={<DevelopmentInProgressPage title="Store Reports" />} />

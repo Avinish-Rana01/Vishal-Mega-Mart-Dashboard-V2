@@ -37,7 +37,12 @@ const ROUTE_BREADCRUMBS = {
   '/reports/total-dpos-sale': 'HOME - PAGES - DASHBOARD - TOTAL DPOS SALE REPORT',
   '/auth/user-registration': 'HOME - PAGES - AUTHENTICATION - USER REGISTRATION',
   '/auth/store-registration': 'HOME - PAGES - AUTHENTICATION - STORE REGISTRATION',
-  '/auth/warehouse-registration': 'HOME - PAGES - AUTHENTICATION - WAREHOUSE REGISTRATION'
+  '/auth/warehouse-registration': 'HOME - PAGES - AUTHENTICATION - WAREHOUSE REGISTRATION',
+  '/dispatch/master-upload': 'HOME - PAGES - DISPATCH TRACKING',
+  '/dispatch/view-report': 'HOME - PAGES - DISPATCH TRACKING - VIEW REPORT',
+  '/dispatch': 'HOME - PAGES - DISPATCH TRACKING',
+  '/picklist/creation': 'HOME - PAGES - PICKLIST CREATION',
+  '/picklist': 'HOME - PAGES - PICKLIST CREATION'
 };
 
 function getBreadcrumb(pathname) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Building2, Tag, Settings } from 'lucide-react';
+import { LayoutDashboard, Building2, Tag, Settings, Truck, ClipboardList } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
 import './Sidebar.css';
@@ -51,6 +51,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         isActive: (pathname) => {
           if (pathname.startsWith('/dashboard')) return true;
           if (pathname.startsWith('/stores')) return false;
+          if (pathname.startsWith('/dispatch')) return false;
+          if (pathname.startsWith('/picklist')) return false;
           if (pathname.startsWith('/auth') || pathname.startsWith('/settings')) return false;
           if (standaloneReportPaths.some(p => pathname.startsWith(p))) return false;
           return pathname.startsWith('/reports') || pathname.startsWith('/tags') || pathname.startsWith('/tag-management');
@@ -95,6 +97,37 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         defaultTo: reportItems[0].to,
         isActive: (pathname) => standaloneReportPaths.some(p => pathname.startsWith(p)),
         items: reportItems
+      });
+    }
+
+    // Dispatch Tracking Module: Master Upload & View Report
+    if (hasSection('dispatch_tracking')) {
+      list.push({
+        id: 'dispatch',
+        title: 'Dispatch Tracking',
+        icon: Truck,
+        tooltipTitle: 'Dispatch Tracking',
+        defaultTo: '/dispatch/master-upload',
+        isActive: (pathname) => pathname.startsWith('/dispatch'),
+        items: [
+          { label: 'Master Upload', to: '/dispatch/master-upload' },
+          { label: 'View Report', to: '/dispatch/view-report' }
+        ]
+      });
+    }
+
+    // Picklist Creation Module
+    if (hasSection('picklist_creation')) {
+      list.push({
+        id: 'picklist',
+        title: 'Picklist Creation',
+        icon: ClipboardList,
+        tooltipTitle: 'Picklist Creation',
+        defaultTo: '/picklist/creation',
+        isActive: (pathname) => pathname.startsWith('/picklist'),
+        items: [
+          { label: 'Picklist Creation', to: '/picklist/creation' }
+        ]
       });
     }
 
