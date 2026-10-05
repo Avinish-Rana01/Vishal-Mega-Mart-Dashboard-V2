@@ -24,6 +24,8 @@ export default function DispatchMasterUploadPage() {
   const [previewPageSize, setPreviewPageSize] = useState(15);
   const [previewSearchTerm, setPreviewSearchTerm] = useState('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStepText, setUploadStepText] = useState('Uploading & processing file...');
 
   const fileInputRef = useRef(null);
 
@@ -103,19 +105,56 @@ export default function DispatchMasterUploadPage() {
 
   const handleConfirmUpload = async () => {
     setIsUploading(true);
+    setUploadProgress(10);
+    setUploadStepText('Sending file to server...');
     setValidationError('');
     setUploadResult(null);
 
+    let progressTimer = null;
+
     try {
-      const result = await uploadDispatchFile(selectedFile, masterType);
-      setUploadResult(result);
-      setIsConfirmModalOpen(false);
+      const onProgress = (percent) => {
+        if (percent < 100) {
+          const scaled = Math.min(65, 10 + Math.round((percent * 55) / 100));
+          setUploadProgress(scaled);
+          setUploadStepText('Transferring workbook data...');
+        } else {
+          setUploadProgress(68);
+          setUploadStepText('Validating data & executing stored procedure...');
+          let currentSimulated = 68;
+          progressTimer = setInterval(() => {
+            currentSimulated += Math.floor(Math.random() * 4) + 2;
+            if (currentSimulated >= 94) {
+              currentSimulated = 94;
+              setUploadStepText('Finalizing records & saving...');
+              clearInterval(progressTimer);
+            } else if (currentSimulated > 82) {
+              setUploadStepText('Inserting records into database...');
+            }
+            setUploadProgress(currentSimulated);
+          }, 250);
+        }
+      };
+
+      const result = await uploadDispatchFile(selectedFile, masterType, null, onProgress);
+      if (progressTimer) clearInterval(progressTimer);
+
+      setUploadProgress(100);
+      setUploadStepText('Complete! Master data updated successfully.');
+
+      setTimeout(() => {
+        setUploadResult(result);
+        setIsConfirmModalOpen(false);
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 450);
     } catch (err) {
+      if (progressTimer) clearInterval(progressTimer);
       const msg = err.response?.data?.message || err.message || 'An error occurred during file upload.';
       setValidationError(msg);
       setIsConfirmModalOpen(false);
-    } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -414,7 +453,7 @@ export default function DispatchMasterUploadPage() {
         {/* Confirmation Modal */}
         <ConfirmUploadModal
           isOpen={isConfirmModalOpen}
-          onClose={() => setIsConfirmModalOpen(false)}
+          onClose={() => !isUploading && setIsConfirmModalOpen(false)}
           onConfirm={handleConfirmUpload}
           title="Are you sure you want to upload?"
           fileName={fileName}
@@ -423,6 +462,8 @@ export default function DispatchMasterUploadPage() {
           totalRows={previewRows.length}
           totalColumns={previewHeaders.length}
           isUploading={isUploading}
+          uploadProgress={uploadProgress}
+          uploadStepText={uploadStepText}
         />
       </div>
     </AppLayout>

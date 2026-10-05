@@ -6,7 +6,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 /**
  * Upload master file (RDC_MASTER or HU_INPUT) to backend API
  */
-export const uploadDispatchFile = async (file, status, signal) => {
+export const uploadDispatchFile = async (file, status, signal, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('status', status);
@@ -15,8 +15,14 @@ export const uploadDispatchFile = async (file, status, signal) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-    timeout: 60000,
+    timeout: 120000,
     signal,
+    onUploadProgress: (progressEvent) => {
+      if (progressEvent.total && onProgress) {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(percent);
+      }
+    }
   });
 
   return response.data;
@@ -25,7 +31,7 @@ export const uploadDispatchFile = async (file, status, signal) => {
 /**
  * Upload picklist Excel file to backend API
  */
-export const uploadPicklistFile = async (file, signal) => {
+export const uploadPicklistFile = async (file, signal, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -33,8 +39,14 @@ export const uploadPicklistFile = async (file, signal) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-    timeout: 60000,
+    timeout: 120000,
     signal,
+    onUploadProgress: (progressEvent) => {
+      if (progressEvent.total && onProgress) {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(percent);
+      }
+    }
   });
 
   return response.data;

@@ -18,7 +18,9 @@ export default function ConfirmUploadModal({
   totalRows = 0,
   totalColumns = 0,
   extraDetails = [],
-  isUploading = false
+  isUploading = false,
+  uploadProgress = 0,
+  uploadStepText = 'Uploading & processing file...'
 }) {
   // Close on ESC key
   useEffect(() => {
@@ -43,6 +45,8 @@ export default function ConfirmUploadModal({
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const currentPercent = Math.min(100, Math.max(0, Math.round(uploadProgress)));
 
   const modalNode = (
     <div className="vmm-confirm-modal-overlay" onClick={() => !isUploading && onClose()}>
@@ -153,10 +157,34 @@ export default function ConfirmUploadModal({
             ))}
           </div>
 
-          <div className="vmm-confirm-warning-note">
-            <AlertCircle size={15} />
-            <span>This will validate and insert the records into the database.</span>
-          </div>
+          {/* Progress Bar inside the Modal Box */}
+          {isUploading ? (
+            <div className="vmm-confirm-progress-section">
+              <div className="vmm-confirm-progress-header">
+                <div className="vmm-confirm-progress-label">
+                  <Loader2 size={15} className="vmm-spin text-blue-600" />
+                  <span>{uploadStepText || 'Uploading & processing file...'}</span>
+                </div>
+                <span className="vmm-confirm-progress-percentage">{currentPercent}%</span>
+              </div>
+
+              <div className="vmm-confirm-progress-track">
+                <div 
+                  className="vmm-confirm-progress-bar"
+                  style={{ width: `${Math.max(6, currentPercent)}%` }}
+                />
+              </div>
+
+              <span className="vmm-confirm-progress-subhint">
+                Please wait while the workbook is validated and saved to the database.
+              </span>
+            </div>
+          ) : (
+            <div className="vmm-confirm-warning-note">
+              <AlertCircle size={15} />
+              <span>This will validate and insert the records into the database.</span>
+            </div>
+          )}
         </div>
 
         {/* Footer Actions */}
@@ -175,17 +203,8 @@ export default function ConfirmUploadModal({
             onClick={onConfirm}
             disabled={isUploading}
           >
-            {isUploading ? (
-              <>
-                <Loader2 size={15} className="vmm-spin" />
-                <span>Uploading...</span>
-              </>
-            ) : (
-              <>
-                <UploadCloud size={15} />
-                <span>Yes, Confirm & Upload</span>
-              </>
-            )}
+            <UploadCloud size={15} />
+            <span>{isUploading ? 'Uploading...' : 'Yes, Confirm & Upload'}</span>
           </button>
         </div>
       </div>
