@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }) => {
   const [warehouseCode, setWarehouseCode] = useState(null);
   const [allowedSections, setAllowedSections] = useState([]);
   const [redirectPage, setRedirectPage] = useState(null);
+  const [requirePasswordChange, setRequirePasswordChange] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const logout = () => {
@@ -98,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     setWarehouseCode(null);
     setAllowedSections([]);
     setRedirectPage(null);
+    setRequirePasswordChange(false);
     setIsLoggedIn(false);
     sessionStorage.removeItem('vmm_user');
     sessionStorage.removeItem('vmm_login_time');
@@ -132,6 +134,9 @@ export const AuthProvider = ({ children }) => {
           const sections = parsed.allowedSections ?? parsed.AllowedSections ?? [];
           setAllowedSections(Array.isArray(sections) ? sections : []);
           setRedirectPage(parsed.redirectPage ?? parsed.RedirectPage ?? null);
+          const rawStatus = String(parsed.isLoginStatus ?? parsed.IsLoginStatus ?? '').trim();
+          const reqChange = Boolean(parsed.requirePasswordChange ?? parsed.RequirePasswordChange ?? (rawStatus === '0'));
+          setRequirePasswordChange(reqChange);
         } catch (e) {
           setLoggedInUser(storedUser);
         }
@@ -172,6 +177,8 @@ export const AuthProvider = ({ children }) => {
     const whCode = userData?.warehouseCode ?? userData?.WarehouseCode ?? null;
     const sections = userData?.allowedSections ?? userData?.AllowedSections ?? [];
     const rPage = userData?.redirectPage ?? userData?.RedirectPage ?? null;
+    const rawStatus = String(userData?.isLoginStatus ?? userData?.IsLoginStatus ?? '').trim();
+    const reqChange = Boolean(userData?.requirePasswordChange ?? userData?.RequirePasswordChange ?? (rawStatus === '0'));
 
     setLoggedInUser(username);
     if (uid) setUserId(uid);
@@ -182,13 +189,31 @@ export const AuthProvider = ({ children }) => {
     setWarehouseCode(whCode);
     setAllowedSections(Array.isArray(sections) ? sections : []);
     setRedirectPage(rPage);
+    setRequirePasswordChange(reqChange);
 
     setIsLoggedIn(true);
     const sessionPayload = typeof userData === 'object' && userData !== null
-      ? { ...userData, userRole: role, userType: role }
+      ? { ...userData, userRole: role, userType: role, requirePasswordChange: reqChange, isLoginStatus: reqChange ? '0' : '1' }
       : userData;
     sessionStorage.setItem('vmm_user', typeof sessionPayload === 'string' ? sessionPayload : JSON.stringify(sessionPayload));
     sessionStorage.setItem('vmm_login_time', Date.now().toString());
+  };
+
+  const markPasswordChanged = () => {
+    setRequirePasswordChange(false);
+    const stored = sessionStorage.getItem('vmm_user');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        parsed.requirePasswordChange = false;
+        parsed.RequirePasswordChange = false;
+        parsed.isLoginStatus = '1';
+        parsed.IsLoginStatus = '1';
+        sessionStorage.setItem('vmm_user', JSON.stringify(parsed));
+      } catch (e) {
+        // ignore
+      }
+    }
   };
 
   const hasSection = (sectionKey) => {
@@ -252,6 +277,8 @@ export const AuthProvider = ({ children }) => {
     warehouseCode,
     allowedSections,
     redirectPage,
+    requirePasswordChange,
+    markPasswordChanged,
     hasSection,
     hasDashboardAccess,
     getDefaultRoute,
