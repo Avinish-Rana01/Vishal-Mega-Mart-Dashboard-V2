@@ -1,0 +1,198 @@
+/* ==========================================================================
+   VMM Floating Toast Notification (Modern Enterprise Alert)
+   ========================================================================== */
+.vmm-auth-toast {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  z-index: 999999;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 320px;
+  max-width: 440px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 
+    0 16px 36px -6px rgba(15, 23, 42, 0.16),
+    0 6px 14px -3px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(15, 23, 42, 0.06);
+  animation: vmmToastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  overflow: hidden;
+  pointer-events: auto;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+@keyframes vmmToastSlideIn {
+  from {
+    transform: translateX(115%) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.vmm-auth-toast.success {
+  border-left: 4px solid #10b981;
+  box-shadow: 
+    0 16px 36px -6px rgba(16, 185, 129, 0.22),
+    0 6px 14px -3px rgba(16, 185, 129, 0.12),
+    0 0 0 1px #d1fae5;
+}
+
+.vmm-auth-toast.error {
+  border-left: 4px solid #ef4444;
+  box-shadow: 
+    0 16px 36px -6px rgba(239, 68, 68, 0.22),
+    0 6px 14px -3px rgba(239, 68, 68, 0.12),
+    0 0 0 1px #fee2e2;
+}
+
+.vmm-auth-toast.warning {
+  border-left: 4px solid #f59e0b;
+  box-shadow: 
+    0 16px 36px -6px rgba(245, 158, 11, 0.22),
+    0 6px 14px -3px rgba(245, 158, 11, 0.12),
+    0 0 0 1px #fef3c7;
+}
+
+.vmm-auth-toast.info {
+  border-left: 4px solid #3b82f6;
+  box-shadow: 
+    0 16px 36px -6px rgba(59, 130, 246, 0.22),
+    0 6px 14px -3px rgba(59, 130, 246, 0.12),
+    0 0 0 1px #dbeafe;
+}
+
+.vmm-auth-toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vmm-auth-toast.success .vmm-auth-toast-icon {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.vmm-auth-toast.error .vmm-auth-toast-icon {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.vmm-auth-toast.warning .vmm-auth-toast-icon {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.vmm-auth-toast.info .vmm-auth-toast-icon {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.vmm-auth-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.vmm-auth-toast-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.vmm-auth-toast.success .vmm-auth-toast-title {
+  color: #065f46;
+}
+
+.vmm-auth-toast.error .vmm-auth-toast-title {
+  color: #991b1b;
+}
+
+.vmm-auth-toast.warning .vmm-auth-toast-title {
+  color: #92400e;
+}
+
+.vmm-auth-toast.info .vmm-auth-toast-title {
+  color: #1e40af;
+}
+
+.vmm-auth-toast-message {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #4b5563;
+  word-break: break-word;
+}
+
+.vmm-auth-toast-close {
+  background: transparent;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #9ca3af;
+  flex-shrink: 0;
+  margin-top: -2px;
+  margin-right: -4px;
+  transition: all 0.15s ease;
+}
+
+.vmm-auth-toast-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1f2937;
+}
+
+/* Auto-Dismiss Progress Bar */
+.vmm-auth-toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  animation: vmmToastProgress 5s linear forwards;
+}
+
+.vmm-auth-toast.success .vmm-auth-toast-progress {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.vmm-auth-toast.error .vmm-auth-toast-progress {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.vmm-auth-toast.warning .vmm-auth-toast-progress {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.vmm-auth-toast.info .vmm-auth-toast-progress {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+@keyframes vmmToastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Eye, EyeOff, Power, CheckCircle, AlertTriangle, X } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Power } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import ToastNotification from '../../components/common/ToastNotification';
 import { SearchButton, ClearButton } from '../../components/common/ReportActionButton';
 import { 
   getUserRoles, 
@@ -485,18 +486,8 @@ export default function UserRegistrationPage() {
         onBackClick: () => navigate(-1)
       }}
     >
-      {/* Alert Notification Toast */}
-      {alert && (
-        <div className={`vmm-auth-toast ${alert.type}`}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {alert.type === 'success' ? <CheckCircle size={15} /> : <AlertTriangle size={15} />}
-            <span>{alert.message}</span>
-          </div>
-          <button type="button" className="vmm-auth-toast-close" onClick={() => setAlert(null)}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
+      {/* Floating Alert Notification Toast */}
+      <ToastNotification alert={alert} onClose={() => setAlert(null)} />
 
       {/* Top Search / Form Card (VMM Standard Design) */}
       <div className="report-search-card">
