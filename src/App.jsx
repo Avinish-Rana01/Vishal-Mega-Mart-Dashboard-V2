@@ -27,10 +27,23 @@ import { UserRegistrationPage, StoreRegistrationPage, WarehouseRegistrationPage 
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import DevelopmentInProgressPage from './pages/DevelopmentInProgress/DevelopmentInProgressPage';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import './App.css';
+
+function HomeRedirect() {
+  const { getDefaultRoute } = useAuth();
+  return <Navigate to={getDefaultRoute()} replace />;
+}
+
+function DashboardRoute() {
+  const { hasDashboardAccess, getDefaultRoute } = useAuth();
+  if (!hasDashboardAccess) {
+    return <Navigate to={getDefaultRoute()} replace />;
+  }
+  return <DashboardPage />;
+}
 
 export default function App() {
   return (
@@ -49,8 +62,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/" element={<HomeRedirect />} />
+              <Route path="/dashboard" element={<DashboardRoute />} />
               <Route path="/dashboard-old" element={<DashboardOldPage />} />
 
               {/* Reports Module */}

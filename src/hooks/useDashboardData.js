@@ -168,6 +168,28 @@ export const useLiveStock = () => {
     const unsubPatch = liveStockSocket.onPatch((patch) => {
       if (!patch || !patch.storeCode) return;
 
+      if (patch.isRemoved) {
+        setData((prev) => prev.filter((row) => {
+          const rowStore = row.STORE_CODE || row.STORE || '';
+          return String(rowStore).toUpperCase() !== String(patch.storeCode).toUpperCase();
+        }));
+        if (patch.summaryDelta) {
+          setTotals((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              RFID_STOCK: patch.summaryDelta.newTotalRfid !== undefined 
+                ? patch.summaryDelta.newTotalRfid.toLocaleString('en-IN') 
+                : prev.RFID_STOCK,
+              DIFFERENCE: patch.summaryDelta.newTotalDiff !== undefined 
+                ? patch.summaryDelta.newTotalDiff.toLocaleString('en-IN') 
+                : prev.DIFFERENCE
+            };
+          });
+        }
+        return;
+      }
+
       // 1. In-place row update using immutable .map()
       setData((prev) => {
         let storeFound = false;
@@ -523,6 +545,25 @@ export const useStoreDashboard = () => {
     const unsub = liveStockSocket.onStoreValidationPatch((patch) => {
       if (!patch || !patch.storeCode) return;
 
+      if (patch.isRemoved) {
+        setData((prev) => prev.filter((row) => {
+          const rowStore = row.STORE || row.STORE_CODE || '';
+          return String(rowStore).toUpperCase() !== String(patch.storeCode).toUpperCase();
+        }));
+        if (patch.summaryDelta) {
+          setTotals((prev) => prev ? {
+            ...prev,
+            HU_RECEIVED_QTY: patch.summaryDelta.totalHuReceived?.toLocaleString('en-IN') ?? prev.HU_RECEIVED_QTY,
+            HU_VALIDATED_QTY: patch.summaryDelta.totalHuValidated?.toLocaleString('en-IN') ?? prev.HU_VALIDATED_QTY,
+            HU_WRONG_QTY: patch.summaryDelta.totalHuWrong?.toLocaleString('en-IN') ?? prev.HU_WRONG_QTY,
+            HHT_VALIDATE_QTY: patch.summaryDelta.totalHhtValidate?.toLocaleString('en-IN') ?? prev.HHT_VALIDATE_QTY,
+            ENCODED_QTY: patch.summaryDelta.totalEncoded?.toLocaleString('en-IN') ?? prev.ENCODED_QTY,
+            STORE_PENDING_QTY: patch.summaryDelta.totalPending?.toLocaleString('en-IN') ?? prev.STORE_PENDING_QTY
+          } : prev);
+        }
+        return;
+      }
+
       setData((prev) => {
         let found = false;
         const updated = prev.map((row) => {
@@ -712,6 +753,23 @@ export const useDcValidation = () => {
 
     const unsub = liveStockSocket.onDcValidationPatch((patch) => {
       if (!patch || !patch.recivingPlant) return;
+
+      if (patch.isRemoved) {
+        setData((prev) => prev.filter((row) => {
+          const rowPlant = row.Reciving_Plant || row.RECIVING_PLANT || row.RecivingPlant || row.Store_Code || row.STORE_CODE || '';
+          return String(rowPlant).toUpperCase() !== String(patch.recivingPlant).toUpperCase();
+        }));
+        if (patch.summaryDelta) {
+          setTotals((prev) => prev ? {
+            ...prev,
+            recordCount: patch.summaryDelta.recordCount ?? prev.recordCount,
+            PROCESSED_HU: patch.summaryDelta.totalProcessedHu ?? prev.PROCESSED_HU,
+            UNPROCESSED_HU: patch.summaryDelta.totalUnprocessedHu ?? prev.UNPROCESSED_HU,
+            PROCESSED_ARTICLE_QTY: patch.summaryDelta.totalProcessedArticleQty ?? prev.PROCESSED_ARTICLE_QTY
+          } : prev);
+        }
+        return;
+      }
 
       setData((prev) => {
         let found = false;

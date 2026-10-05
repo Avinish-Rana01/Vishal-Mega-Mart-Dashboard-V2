@@ -20,6 +20,45 @@ export const useAuth = () => {
   return context;
 };
 
+export const DASHBOARD_SECTIONS = [
+  'live_stock', 'cycle_count', 'store_validation', 'sale',
+  'void', 'return', 'dc_validation', 'dc_encoding',
+  'tag_management', 'vendor_discrepancy'
+];
+
+/**
+ * Computes the landing default route for a user based on their allowed sections and redirect page.
+ * Completely dynamic and section-driven.
+ */
+export const computeDefaultRoute = (userData) => {
+  if (!userData) return '/dashboard';
+  const role = userData.userRole ?? userData.UserRole ?? userData.userType ?? userData.UserType;
+  if (role === 'Super Admin') return '/dashboard';
+
+  const sections = userData.allowedSections ?? userData.AllowedSections ?? [];
+  const redirectPage = userData.redirectPage ?? userData.RedirectPage;
+
+  const hasDash = sections.length > 0
+    ? DASHBOARD_SECTIONS.some((k) => sections.includes(k))
+    : (role !== 'Tag Admin');
+
+  if (hasDash) return '/dashboard';
+
+  if (redirectPage) {
+    const page = redirectPage.toLowerCase().replace(/_/g, '-');
+    if (page.includes('tag-cleaning') || page.includes('tag_cleaning')) return '/reports/tag-cleaning';
+    if (page.includes('stock-take') || page.includes('stock_take')) return '/reports/stock-take';
+    if (page.includes('counter-status') || page.includes('counter_status')) return '/stores/counter-status';
+  }
+
+  if (sections.includes('tag_cleaning')) return '/reports/tag-cleaning';
+  if (sections.includes('get_sap_stock_take')) return '/reports/stock-take';
+  if (sections.includes('store_counter_status')) return '/stores/counter-status';
+  if (sections.includes('user_registration')) return '/auth/user-registration';
+
+  return '/dashboard';
+};
+
 /**
  * Authentication Context Provider that manages user session persistence,
  * socket disconnect on logout, and role-based permissions across the application.
@@ -37,6 +76,7 @@ export const AuthProvider = ({ children }) => {
   const [warehouseName, setWarehouseName] = useState(null);
   const [warehouseCode, setWarehouseCode] = useState(null);
   const [allowedSections, setAllowedSections] = useState([]);
+  const [redirectPage, setRedirectPage] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const logout = () => {
@@ -53,6 +93,7 @@ export const AuthProvider = ({ children }) => {
     setWarehouseName(null);
     setWarehouseCode(null);
     setAllowedSections([]);
+    setRedirectPage(null);
     setIsLoggedIn(false);
     sessionStorage.removeItem('vmm_user');
     sessionStorage.removeItem('vmm_login_time');
@@ -86,6 +127,7 @@ export const AuthProvider = ({ children }) => {
           setWarehouseCode(parsed.warehouseCode ?? parsed.WarehouseCode ?? null);
           const sections = parsed.allowedSections ?? parsed.AllowedSections ?? [];
           setAllowedSections(Array.isArray(sections) ? sections : []);
+          setRedirectPage(parsed.redirectPage ?? parsed.RedirectPage ?? null);
         } catch (e) {
           setLoggedInUser(storedUser);
         }
@@ -125,6 +167,7 @@ export const AuthProvider = ({ children }) => {
     const whName = userData?.warehouseName ?? userData?.WarehouseName ?? null;
     const whCode = userData?.warehouseCode ?? userData?.WarehouseCode ?? null;
     const sections = userData?.allowedSections ?? userData?.AllowedSections ?? [];
+    const rPage = userData?.redirectPage ?? userData?.RedirectPage ?? null;
 
     setLoggedInUser(username);
     if (uid) setUserId(uid);
@@ -134,6 +177,7 @@ export const AuthProvider = ({ children }) => {
     setWarehouseName(whName);
     setWarehouseCode(whCode);
     setAllowedSections(Array.isArray(sections) ? sections : []);
+    setRedirectPage(rPage);
 
     setIsLoggedIn(true);
     const sessionPayload = typeof userData === 'object' && userData !== null
@@ -168,10 +212,18 @@ export const AuthProvider = ({ children }) => {
       return ['dc_validation', 'dc_encoding', 'tag_management'].includes(sectionKey);
     }
     if (role === 'Tag Admin') {
-      return ['tag_management', 'cycle_count', 'tag_cleaning'].includes(sectionKey);
+      return ['tag_cleaning', 'get_sap_stock_take'].includes(sectionKey);
     }
     return false;
   };
+
+  const hasDashboardAccess = userRole === 'Super Admin' || DASHBOARD_SECTIONS.some((k) => hasSection(k));
+
+  const getDefaultRoute = () => computeDefaultRoute({
+    userRole,
+    allowedSections,
+    redirectPage
+  });
 
   if (loading) {
     // Optionally return a loader here while checking auth status
@@ -189,7 +241,10 @@ export const AuthProvider = ({ children }) => {
     warehouseName,
     warehouseCode,
     allowedSections,
+    redirectPage,
     hasSection,
+    hasDashboardAccess,
+    getDefaultRoute,
     login,
     logout
   };

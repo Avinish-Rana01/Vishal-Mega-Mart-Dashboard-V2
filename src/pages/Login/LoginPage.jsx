@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, computeDefaultRoute } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
 import { loginUser, requestPasswordReset, changePassword } from '../../services/authService';
 import { Eye, EyeOff, ShieldCheck, ArrowLeft, Key } from 'lucide-react';
@@ -31,15 +31,13 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoggedIn } = useAuth();
-
-  const from = location.state?.from?.pathname || '/dashboard';
+  const { login, isLoggedIn, getDefaultRoute } = useAuth();
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate('/dashboard', { replace: true });
+      navigate(getDefaultRoute(), { replace: true });
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, getDefaultRoute, navigate]);
 
   const handleFocus = (field) => {
     setErrors((prev) => ({ ...prev, [field]: '' }));
@@ -59,11 +57,11 @@ export default function LoginPage() {
 
     setIsLoading(true);
     setErrors({});
-    
     try {
       const response = await loginUser(username, password);
       login(response);
-      navigate(from, { replace: true });
+      const targetRoute = computeDefaultRoute(response);
+      navigate(targetRoute, { replace: true });
     } catch (err) {
       console.error('Login failed', err);
       setErrors({ form: 'Invalid username or password. Please try again.' });

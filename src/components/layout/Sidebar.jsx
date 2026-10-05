@@ -8,7 +8,7 @@ import './Sidebar.css';
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { hasSection, userRole } = useAuth();
+  const { hasSection, hasDashboardAccess, getDefaultRoute } = useAuth();
   const [hoveredMenuId, setHoveredMenuId] = useState(null);
 
   // Close tooltip whenever the sidebar closes on mobile
@@ -38,8 +38,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   ];
 
   const menuConfig = useMemo(() => {
-    const list = [
-      {
+    const list = [];
+
+    // Dashboard Module: dynamically shown only if user has access to at least 1 dashboard section
+    if (hasDashboardAccess) {
+      list.push({
         id: 'dashboard',
         title: 'Home',
         icon: LayoutDashboard,
@@ -56,12 +59,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         items: [
           { label: 'Dashboard', to: '/dashboard', onClick: handleDashboardClick }
         ]
-      }
-    ];
+      });
+    }
 
-    // Store Module: Store Counter Status
-    const canSeeStoreCounter = hasSection('store_counter_status');
-    if (canSeeStoreCounter) {
+    // Store Module: dynamically shown if user has store counter status permission
+    if (hasSection('store_counter_status')) {
       list.push({
         id: 'store',
         title: 'Store',
@@ -75,12 +77,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       });
     }
 
-    // Reports Module: Tag Cleaning & Stock Take (SAP Stock Take)
+    // Reports Module: dynamically populated based on section permissions
     const reportItems = [];
-    if (hasSection('tag_cleaning') || userRole === 'Super Admin' || userRole === 'Tag Admin') {
+    if (hasSection('tag_cleaning')) {
       reportItems.push({ label: 'Tag Cleaning', to: '/reports/tag-cleaning' });
     }
-    if (hasSection('get_sap_stock_take') || userRole === 'Super Admin' || userRole === 'Store Admin') {
+    if (hasSection('get_sap_stock_take')) {
       reportItems.push({ label: 'Stock Take', to: '/reports/stock-take' });
     }
 
@@ -96,16 +98,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       });
     }
 
-    // Authentication / Master Registration Module
-    const isSuperAdmin = userRole === 'Super Admin';
-    const canManageUsers = hasSection('user_registration') || isSuperAdmin || ['Store Admin', 'Warehouse Admin', 'WH Admin'].includes(userRole);
+    // Authentication / Master Registration Module: dynamically shown based on registration permissions
     const authItems = [];
-
-    if (canManageUsers) {
+    if (hasSection('user_registration')) {
       authItems.push({ label: 'User Registration', to: '/auth/user-registration' });
     }
-    if (isSuperAdmin) {
+    if (hasSection('store_registration')) {
       authItems.push({ label: 'Store Registration', to: '/auth/store-registration' });
+    }
+    if (hasSection('warehouse_registration')) {
       authItems.push({ label: 'Warehouse Registration', to: '/auth/warehouse-registration' });
     }
 
@@ -122,12 +123,16 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
 
     return list;
-  }, [hasSection, userRole, location.pathname]);
+  }, [hasSection, hasDashboardAccess, location.pathname]);
 
   return (
     <aside className={`vmm-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="vmm-sidebar-logo">
-        <Link to="/dashboard" onClick={handleDashboardClick} aria-label="Vishal Mega Mart Home">
+        <Link 
+          to={getDefaultRoute()} 
+          onClick={hasDashboardAccess ? handleDashboardClick : undefined} 
+          aria-label="Vishal Mega Mart Home"
+        >
           <img src="/assets/images/vishal_mega_mart_icon.png" alt="VMM Icon" />
         </Link>
       </div>
