@@ -793,7 +793,7 @@ export const getWHEncodingDetails = async ({
   if (sortColumn) params.append('SortColumn', sortColumn);
   if (sortDirection) params.append('SortDirection', sortDirection);
 
-  const response = await axios.get(`${API_BASE}/GetWHEncodingDetails?${params.toString()}`, {
+  const response = await axios.get(`${API_BASE}/api/dc-encoding/details?${params.toString()}`, {
     headers: getHeaders(),
     signal
   });
@@ -826,7 +826,7 @@ export const getWHEncodingUsers = async ({
   if (reqFromDate) params.append('FromDate', reqFromDate);
   if (toDate) params.append('ToDate', toDate);
 
-  const response = await axios.get(`${API_BASE}/SearchUsername?${params.toString()}`, {
+  const response = await axios.get(`${API_BASE}/api/dc-encoding/users?${params.toString()}`, {
     headers: getHeaders(),
     signal
   });
@@ -882,25 +882,12 @@ export const getTagDetails = async ({
   if (sortColumn) params.append('SortColumn', sortColumn);
   if (sortDirection) params.append('SortDirection', sortDirection);
 
-  const url = `${API_BASE}/api/Stock/GetTagDetails?${params.toString()}`;
-  try {
-    const response = await axios.get(url, {
-      headers: getHeaders(),
-      signal
-    });
-    return response.data;
-  } catch (err) {
-    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
-      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
-      const fallbackUrl = `${fallbackBase}/api/Stock/GetTagDetails?${params.toString()}`;
-      const response = await axios.get(fallbackUrl, {
-        headers: getHeaders(),
-        signal
-      });
-      return response.data;
-    }
-    throw err;
-  }
+  const url = `${API_BASE}/api/Stock/tag-details?${params.toString()}`;
+  const response = await axios.get(url, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
 };
 
 // ==============================================================
@@ -928,23 +915,11 @@ export const getVendorHUDiscrepancyData = async ({
   if (sortDirection) params.append('SortDirection', sortDirection);
 
   const url = `${API_BASE}/api/HUDiscrepancy/GetVendorHUDiscrepancyData?${params.toString()}`;
-  try {
-    const response = await axios.get(url, {
-      headers: getHeaders(),
-      signal
-    });
-    return response.data;
-  } catch (err) {
-    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
-      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
-      const fallbackUrl = `${fallbackBase}/api/HUDiscrepancy/GetVendorHUDiscrepancyData?${params.toString()}`;
-      const response = await axios.get(fallbackUrl, {
-        headers: getHeaders(),
-        signal
-      });
-      return response.data;
-    }
-  }
+  const response = await axios.get(url, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
 };
 
 // ==============================================================
@@ -970,24 +945,11 @@ export const getTagCleaningReport = async ({
   };
 
   const url = `${API_BASE}/api/TagCleaningReport/GetTagCleaningReport`;
-  try {
-    const response = await axios.post(url, payload, {
-      headers: getHeaders(),
-      signal
-    });
-    return response.data;
-  } catch (err) {
-    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
-      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
-      const fallbackUrl = `${fallbackBase}/api/TagCleaningReport/GetTagCleaningReport`;
-      const response = await axios.post(fallbackUrl, payload, {
-        headers: getHeaders(),
-        signal
-      });
-      return response.data;
-    }
-    throw err;
-  }
+  const response = await axios.post(url, payload, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
 };
 
 // ==============================================================
@@ -1012,24 +974,11 @@ export const getTagCleaningData = async ({
   if (sortDirection) params.append('sortDirection', sortDirection);
 
   const url = `${API_BASE}/api/TagCleaningReport/GetTagCleaningData?${params.toString()}`;
-  try {
-    const response = await axios.get(url, {
-      headers: getHeaders(),
-      signal
-    });
-    return response.data;
-  } catch (err) {
-    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
-      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
-      const fallbackUrl = `${fallbackBase}/api/TagCleaningReport/GetTagCleaningData?${params.toString()}`;
-      const response = await axios.get(fallbackUrl, {
-        headers: getHeaders(),
-        signal
-      });
-      return response.data;
-    }
-    throw err;
-  }
+  const response = await axios.get(url, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
 };
 
 // ==============================================================
@@ -1056,24 +1005,11 @@ export const getStockTakeData = async ({
   if (sortDirection) params.append('sortDirection', sortDirection);
 
   const url = `${API_BASE}/api/StockTake/GetStockTakeData?${params.toString()}`;
-  try {
-    const response = await axios.get(url, {
-      headers: getHeaders(),
-      signal
-    });
-    return response.data;
-  } catch (err) {
-    if (err?.response?.status === 404 && API_BASE && !API_BASE.includes(':5000')) {
-      const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
-      const fallbackUrl = `${fallbackBase}/api/StockTake/GetStockTakeData?${params.toString()}`;
-      const response = await axios.get(fallbackUrl, {
-        headers: getHeaders(),
-        signal
-      });
-      return response.data;
-    }
-    throw err;
-  }
+  const response = await axios.get(url, {
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
 };
 
 

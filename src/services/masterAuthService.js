@@ -33,25 +33,10 @@ export const executeMaster = async (status, payload = {}) => {
     ...payload
   };
 
-  try {
-    const response = await axios.post(`${API_BASE}/api/Master/Execute`, requestBody, {
-      headers: getHeaders()
-    });
-    return response.data;
-  } catch (err) {
-    if (API_BASE && !API_BASE.includes(':5000')) {
-      try {
-        const fallbackBase = API_BASE.replace(/:\d+$/, ':5000');
-        const fallbackResponse = await axios.post(`${fallbackBase}/api/Master/Execute`, requestBody, {
-          headers: getHeaders()
-        });
-        return fallbackResponse.data;
-      } catch (fallbackErr) {
-        // Fall back to original error
-      }
-    }
-    throw err;
-  }
+  const response = await axios.post(`${API_BASE}/api/Master/Execute`, requestBody, {
+    headers: getHeaders()
+  });
+  return response.data;
 };
 
 /**
