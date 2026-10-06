@@ -865,10 +865,12 @@ export const useTagCharts = () => {
         const locTotal = locData.summary?.recordCount || 0;
         const storeVal = locData.summary?.storeCount || 0;
         const whVal = locData.summary?.warehouseCount || 0;
+        const newTagsVal = locData.summary?.newTags ?? locData.summary?.NewTags ?? 0;
         setLocationTotal(locTotal);
         setLocationData([
           { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },
-          { name: 'Inventory at Warehouse', value: whVal, displayValue: whVal.toLocaleString('en-IN'), percent: ((whVal / (locTotal || 1)) * 100).toFixed(2), color: '#2dd4bf' }
+          { name: 'Inventory at Warehouse', value: whVal, displayValue: whVal.toLocaleString('en-IN'), percent: ((whVal / (locTotal || 1)) * 100).toFixed(2), color: '#2dd4bf' },
+          { name: 'New Tags', value: newTagsVal, displayValue: newTagsVal.toLocaleString('en-IN'), percent: ((newTagsVal / (locTotal || 1)) * 100).toFixed(2), color: '#FFB74D' }
         ]);
 
         const cycTotal = cycData.summary?.recordCount || 0;
@@ -927,15 +929,20 @@ export const useTagCharts = () => {
 
     const unsub = liveStockSocket.onTagManagementPatch((patch) => {
       if (!patch) return;
-      const storeVal = patch.storeCount || 0;
-      const whVal = patch.warehouseCount || 0;
-      const locTotal = patch.recordCount || (storeVal + whVal);
+      const storeVal = patch.storeCount ?? patch.StoreCount ?? 0;
+      const whVal = patch.warehouseCount ?? patch.WarehouseCount ?? 0;
+      const patchNewTags = patch.newTags ?? patch.NewTags;
 
-      setLocationTotal(locTotal);
-      setLocationData([
-        { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },
-        { name: 'Inventory at Warehouse', value: whVal, displayValue: whVal.toLocaleString('en-IN'), percent: ((whVal / (locTotal || 1)) * 100).toFixed(2), color: '#2dd4bf' }
-      ]);
+      setLocationData((prev) => {
+        const effectiveNewTags = patchNewTags !== undefined ? patchNewTags : (prev.find(i => i.name === 'New Tags')?.value || 0);
+        const locTotal = patch.recordCount || patch.RecordCount || (storeVal + whVal + effectiveNewTags);
+        setLocationTotal(locTotal);
+        return [
+          { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },
+          { name: 'Inventory at Warehouse', value: whVal, displayValue: whVal.toLocaleString('en-IN'), percent: ((whVal / (locTotal || 1)) * 100).toFixed(2), color: '#2dd4bf' },
+          { name: 'New Tags', value: effectiveNewTags, displayValue: effectiveNewTags.toLocaleString('en-IN'), percent: ((effectiveNewTags / (locTotal || 1)) * 100).toFixed(2), color: '#FFB74D' }
+        ];
+      });
 
       if (patch.avgRecycle) setAvgRecycle(patch.avgRecycle);
 
