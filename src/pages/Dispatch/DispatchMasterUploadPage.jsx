@@ -12,6 +12,7 @@ export default function DispatchMasterUploadPage() {
   const [masterType, setMasterType] = useState('HU_INPUT'); // 'RDC_MASTER' or 'HU_INPUT'
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState('No file chosen');
+  const [previewFileName, setPreviewFileName] = useState('');
   const [previewHeaders, setPreviewHeaders] = useState([]);
   const [previewRows, setPreviewRows] = useState([]);
   const [isParsing, setIsParsing] = useState(false);
@@ -49,6 +50,7 @@ export default function DispatchMasterUploadPage() {
 
     setSelectedFile(file);
     setFileName(file.name);
+    setPreviewFileName(file.name);
     setValidationError('');
     setUploadResult(null);
     setIsParsing(true);
@@ -81,6 +83,7 @@ export default function DispatchMasterUploadPage() {
   const handleClear = () => {
     setSelectedFile(null);
     setFileName('No file chosen');
+    setPreviewFileName('');
     setPreviewHeaders([]);
     setPreviewRows([]);
     setValidationError('');
@@ -147,6 +150,12 @@ export default function DispatchMasterUploadPage() {
         setIsConfirmModalOpen(false);
         setIsUploading(false);
         setUploadProgress(0);
+        // Clear file input so it cannot be uploaded again accidentally
+        setSelectedFile(null);
+        setFileName('No file chosen');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }, 450);
     } catch (err) {
       if (progressTimer) clearInterval(progressTimer);
@@ -405,12 +414,12 @@ export default function DispatchMasterUploadPage() {
         </div>
 
         {/* Preview Table Card (Renders immediately when file headers are detected) */}
-        {selectedFile && previewHeaders.length > 0 && (
+        {previewHeaders.length > 0 && (
           <div className="dispatch-preview-card">
             <div className="dispatch-preview-card-header">
               <div className="dispatch-card-header-left">
                 <FileSpreadsheet size={15} />
-                <span>EXCEL PREVIEW: {fileName}</span>
+                <span>EXCEL PREVIEW: {previewFileName || fileName}</span>
               </div>
               <span className="dispatch-preview-badge">
                 {previewRows.length > 0 ? `${previewRows.length} Total Data Rows` : 'Header Detected (0 Data Rows)'}

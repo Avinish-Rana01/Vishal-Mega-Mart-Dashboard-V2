@@ -1,5 +1,18 @@
-import React, { useState } from 'react';
-import { ShieldAlert, KeyRound, Eye, EyeOff, Check, AlertCircle, LogOut } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { 
+  ShieldCheck, 
+  Shield, 
+  Lock, 
+  KeyRound, 
+  Eye, 
+  EyeOff, 
+  Check, 
+  CheckCircle2, 
+  FileText, 
+  AlertCircle, 
+  LogOut, 
+  ArrowRight
+} from 'lucide-react';
 import { changePassword } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import './MandatoryPasswordChange.css';
@@ -19,6 +32,27 @@ export default function MandatoryPasswordChange({ userName }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Live validation rules
+  const hasMinLength = newPassword.length >= 3;
+  const isDifferent = Boolean(newPassword && currentPassword && newPassword !== currentPassword);
+  const isMatching = Boolean(newPassword && confirmPassword && newPassword === confirmPassword);
+
+  // Strength score: 0 to 3
+  const strengthScore = useMemo(() => {
+    if (!newPassword) return 0;
+    if (newPassword.length < 3) return 1;
+    if (newPassword.length >= 8 && /[0-9]/.test(newPassword) && /[a-zA-Z]/.test(newPassword)) return 3;
+    if (newPassword.length >= 6) return 2;
+    return 1;
+  }, [newPassword]);
+
+  const strengthLabel = useMemo(() => {
+    if (!newPassword) return 'Create a strong password';
+    if (strengthScore === 1) return 'Weak password';
+    if (strengthScore === 2) return 'Good password';
+    return 'Strong password';
+  }, [newPassword, strengthScore]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -28,7 +62,7 @@ export default function MandatoryPasswordChange({ userName }) {
       setErrorMsg('Please enter your initial temporary password.');
       return;
     }
-    if (!newPassword || newPassword.length < 3) {
+    if (!hasMinLength) {
       setErrorMsg('New password must be at least 3 characters long.');
       return;
     }
@@ -36,7 +70,7 @@ export default function MandatoryPasswordChange({ userName }) {
       setErrorMsg('New password cannot be identical to the temporary password.');
       return;
     }
-    if (newPassword !== confirmPassword) {
+    if (!isMatching) {
       setErrorMsg('New passwords do not match. Please re-enter.');
       return;
     }
@@ -62,129 +96,234 @@ export default function MandatoryPasswordChange({ userName }) {
   };
 
   return (
-    <div className="vmm-mandatory-pw-page">
-      <div className="vmm-mandatory-pw-card">
-        {/* Header */}
-        <div className="vmm-mandatory-pw-header">
-          <img 
-            src="/assets/images/vishal_mega_mart.png" 
-            alt="Vishal Mega Mart" 
-            className="vmm-mandatory-logo" 
-          />
-          <div className="vmm-mandatory-icon-pod">
-            <ShieldAlert size={28} strokeWidth={2.2} />
+    <div className="vmm-pw-viewport">
+      <div className="vmm-pw-card-box">
+        {/* ================= LEFT COLUMN: HERO STORE & SECURITY ================= */}
+        <div className="vmm-pw-hero-column">
+          {/* Background image overlay */}
+          <div className="vmm-pw-hero-bg-image" />
+          <div className="vmm-pw-hero-bg-overlay" />
+
+          <div className="vmm-pw-hero-content">
+            {/* Top Row: Logo & Security Gateway Badge */}
+            <div className="vmm-pw-hero-top">
+              <div className="vmm-pw-logo-plate">
+                <img 
+                  src="/assets/images/vishal_mega_mart.png" 
+                  alt="Vishal Mega Mart" 
+                  className="vmm-pw-hero-logo" 
+                />
+              </div>
+
+              <div className="vmm-pw-gateway-badge">
+                <ShieldCheck size={14} className="vmm-gw-icon" />
+                <span>SECURITY GATEWAY</span>
+              </div>
+            </div>
+
+            {/* Center Body Pod */}
+            <div className="vmm-pw-hero-center-body">
+              {/* Glowing Center Shield Icon */}
+              <div className="vmm-pw-shield-display">
+                <div className="vmm-pw-shield-ring">
+                  <div className="vmm-pw-shield-core">
+                    <Shield size={38} className="vmm-shield-svg" strokeWidth={2.2} />
+                    <Lock size={18} className="vmm-lock-inset" strokeWidth={2.4} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Title & User Welcome */}
+              <div className="vmm-pw-hero-heading-block">
+                <h2 className="vmm-pw-hero-title">
+                  Mandatory<br />
+                  <span className="vmm-pw-highlight-text">Password Setup</span>
+                </h2>
+                <p className="vmm-pw-hero-text">
+                  Welcome, <strong>{userName}</strong>. For account protection, you must replace your temporary credentials before accessing the system.
+                </p>
+              </div>
+
+              {/* Security Requirements Checklist Card */}
+              <div className="vmm-pw-requirements-panel">
+                <div className="vmm-pw-req-header">
+                  <ShieldCheck size={14} className="vmm-req-header-icon" />
+                  <span>SECURITY REQUIREMENTS</span>
+                </div>
+
+                <div className="vmm-pw-req-list">
+                  <div className={`vmm-pw-req-item ${hasMinLength ? 'met' : ''}`}>
+                    <CheckCircle2 size={14} className="vmm-req-check-icon" />
+                    <span>At least 3 characters</span>
+                  </div>
+
+                  <div className={`vmm-pw-req-item ${isDifferent ? 'met' : ''}`}>
+                    <FileText size={14} className="vmm-req-check-icon" />
+                    <span>Different from temporary password</span>
+                  </div>
+
+                  <div className={`vmm-pw-req-item ${isMatching ? 'met' : ''}`}>
+                    <ShieldCheck size={14} className="vmm-req-check-icon" />
+                    <span>Confirm password matches</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Encryption Badge */}
+            <div className="vmm-pw-hero-footer">
+              <span className="vmm-pw-lock-emoji">🔒</span>
+              <span>256-bit Encrypted Session</span>
+            </div>
           </div>
-          <h2>Mandatory Password Change</h2>
-          <p>
-            Welcome, <strong>{userName}</strong>! For account security, you must replace your initial default password before accessing the system.
-          </p>
         </div>
 
-        {/* Form Body */}
-        <div className="vmm-mandatory-pw-body">
-          {errorMsg && (
-            <div className="vmm-mandatory-alert error">
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMsg}</span>
+        {/* ================= RIGHT COLUMN: CRISP WHITE FORM ================= */}
+        <div className="vmm-pw-form-column">
+          <div className="vmm-pw-form-inner">
+            {/* Step Breadcrumb Header */}
+            <div className="vmm-pw-form-meta">
+              <span className="vmm-pw-step-tag">ACCOUNT SECURITY</span>
+              <span className="vmm-pw-step-sep">/</span>
+              <span className="vmm-pw-step-num">STEP 01</span>
             </div>
-          )}
 
-          {successMsg && (
-            <div className="vmm-mandatory-alert success">
-              <Check size={18} style={{ flexShrink: 0 }} />
-              <span>{successMsg}</span>
-            </div>
-          )}
+            <h1 className="vmm-pw-form-title">Set new credentials</h1>
+            <p className="vmm-pw-form-subtitle">
+              Replace your temporary password to securely access the system.
+            </p>
 
-          <form onSubmit={handleSubmit}>
-            <div className="vmm-mandatory-form-group">
-              <label className="vmm-mandatory-label">Current / Temporary Password</label>
-              <div className="vmm-mandatory-input-box">
-                <input
-                  type={showCurrent ? "text" : "password"}
-                  className="vmm-mandatory-input"
-                  placeholder="Enter current password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  disabled={isLoading}
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  className="vmm-mandatory-toggle-icon"
-                  onClick={() => setShowCurrent(!showCurrent)}
-                  tabIndex={-1}
-                >
-                  {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+            {/* Error / Success Banners */}
+            {errorMsg && (
+              <div className="vmm-pw-toast error">
+                <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                <span>{errorMsg}</span>
               </div>
-            </div>
+            )}
 
-            <div className="vmm-mandatory-form-group">
-              <label className="vmm-mandatory-label">New Password</label>
-              <div className="vmm-mandatory-input-box">
-                <input
-                  type={showNew ? "text" : "password"}
-                  className="vmm-mandatory-input"
-                  placeholder="Create new secure password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="vmm-mandatory-toggle-icon"
-                  onClick={() => setShowNew(!showNew)}
-                  tabIndex={-1}
-                >
-                  {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+            {successMsg && (
+              <div className="vmm-pw-toast success">
+                <Check size={15} style={{ flexShrink: 0 }} />
+                <span>{successMsg}</span>
               </div>
-              <div className="vmm-mandatory-hint">Must be at least 3 characters long.</div>
-            </div>
+            )}
 
-            <div className="vmm-mandatory-form-group">
-              <label className="vmm-mandatory-label">Confirm New Password</label>
-              <div className="vmm-mandatory-input-box">
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  className="vmm-mandatory-input"
-                  placeholder="Re-enter new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="vmm-mandatory-toggle-icon"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  tabIndex={-1}
-                >
-                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+            <form onSubmit={handleSubmit} className="vmm-pw-input-form" autoComplete="off">
+              {/* Field 1: Temporary / Current Password */}
+              <div className="vmm-pw-input-group">
+                <label className="vmm-pw-input-label">Temporary / current password</label>
+                <div className="vmm-pw-box">
+                  <Lock size={16} className="vmm-pw-box-icon" />
+                  <input
+                    type={showCurrent ? "text" : "password"}
+                    className="vmm-pw-text-field"
+                    placeholder="Enter temporary password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className="vmm-pw-box-eye"
+                    onClick={() => setShowCurrent(!showCurrent)}
+                    tabIndex={-1}
+                    title={showCurrent ? "Hide password" : "Show password"}
+                  >
+                    {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div className="vmm-pw-field-hint">Use the password provided to you.</div>
               </div>
+
+              {/* Field 2: New Secure Password */}
+              <div className="vmm-pw-input-group">
+                <label className="vmm-pw-input-label">New secure password</label>
+                <div className="vmm-pw-box">
+                  <Lock size={16} className="vmm-pw-box-icon" />
+                  <input
+                    type={showNew ? "text" : "password"}
+                    className="vmm-pw-text-field"
+                    placeholder="Create new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    className="vmm-pw-box-eye"
+                    onClick={() => setShowNew(!showNew)}
+                    tabIndex={-1}
+                    title={showNew ? "Hide password" : "Show password"}
+                  >
+                    {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+
+                {/* Password Strength Indicator */}
+                <div className="vmm-pw-strength-row">
+                  <div className="vmm-pw-strength-bars">
+                    <div className={`vmm-pw-bar-segment ${strengthScore >= 1 ? 'active' : ''}`} />
+                    <div className={`vmm-pw-bar-segment ${strengthScore >= 2 ? 'active' : ''}`} />
+                    <div className={`vmm-pw-bar-segment ${strengthScore >= 3 ? 'active' : ''}`} />
+                  </div>
+                  <span className="vmm-pw-strength-text">{strengthLabel}</span>
+                </div>
+
+                <div className="vmm-pw-field-hint">
+                  Use at least 3 characters and avoid using your temporary password.
+                </div>
+              </div>
+
+              {/* Field 3: Confirm New Password */}
+              <div className="vmm-pw-input-group">
+                <label className="vmm-pw-input-label">Confirm new password</label>
+                <div className="vmm-pw-box">
+                  <Lock size={16} className="vmm-pw-box-icon" />
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    className="vmm-pw-text-field"
+                    placeholder="Re-type new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    className="vmm-pw-box-eye"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    tabIndex={-1}
+                    title={showConfirm ? "Hide password" : "Show password"}
+                  >
+                    {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div className="vmm-pw-field-hint">Both passwords must match.</div>
+              </div>
+
+              {/* Primary Action Button */}
+              <button
+                type="submit"
+                className="vmm-pw-action-btn"
+                disabled={isLoading || !currentPassword || !hasMinLength || !isDifferent || !isMatching}
+              >
+                <span>{isLoading ? 'Updating credentials...' : 'Save password & enter system'}</span>
+                <ArrowRight size={16} className="vmm-pw-arrow-glyph" />
+              </button>
+            </form>
+
+            {/* Sign Out Cancel Link */}
+            <div className="vmm-pw-cancel-wrapper">
+              <button
+                type="button"
+                className="vmm-pw-cancel-link"
+                onClick={logout}
+                disabled={isLoading}
+              >
+                <LogOut size={14} />
+                <span>Sign out & cancel</span>
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="vmm-mandatory-submit-btn"
-              disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}
-            >
-              <KeyRound size={18} />
-              <span>{isLoading ? 'Updating Credentials...' : 'Save Password & Enter System'}</span>
-            </button>
-          </form>
-
-          <div className="vmm-mandatory-logout-row">
-            <button
-              type="button"
-              className="vmm-mandatory-logout-btn"
-              onClick={logout}
-              disabled={isLoading}
-            >
-              <LogOut size={14} />
-              <span>Sign Out and Cancel</span>
-            </button>
           </div>
         </div>
       </div>
