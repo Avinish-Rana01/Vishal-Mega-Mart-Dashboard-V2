@@ -6,7 +6,6 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import { getTagDetails } from '../../services/stockService';
 import * as Icons from 'lucide-react';
 import './common-reports.css';
-import './TagInventoryDistribution.css';
 
 // Helper to get formatted today date
 const getTodayDate = () => {

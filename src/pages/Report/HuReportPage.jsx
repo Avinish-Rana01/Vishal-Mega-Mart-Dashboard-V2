@@ -8,7 +8,6 @@ import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import './common-reports.css';
-import './HuReport.css';
 import { getHuDetails, searchValidationHuNumbers } from '../../services/stockService';
 import { dateRenderer } from '../../utils/dashboardColumns';
 import * as Icons from 'lucide-react';

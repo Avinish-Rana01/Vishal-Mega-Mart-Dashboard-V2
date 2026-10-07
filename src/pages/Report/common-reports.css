@@ -193,42 +193,104 @@
   height: 30px; 
 }
 
-.btn-search {
-  background: #3575ad;
-  color: white;
+/* ========================================================
+   UNIFIED REPORT BUTTON SYSTEM
+   Single control point for Search, Clear, and Navigation
+   ======================================================== */
+.btn-search,
+.store-sale-btn-search,
+.sales-btn-search,
+.report-search-center-actions .btn-search {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #ffffff;
   border: none;
   padding: 0 20px;
   height: 30px;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 11px;
-  width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  white-space: nowrap;
 }
 
-.btn-search:hover {
-  background: #5199dd;
-  transition: all 0.3s ease;
-  transform: translateY(-2px);
+.btn-search:hover,
+.store-sale-btn-search:hover,
+.sales-btn-search:hover,
+.report-search-center-actions .btn-search:hover {
+  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+  transform: translateY(-1px);
 }
 
-.btn-clear {
-  background: #9ca3af;
-  color: white;
-  border: none;
-  padding: 0 20px;
+.btn-clear,
+.store-sale-btn-clear,
+.sales-btn-reset,
+.report-search-center-actions .btn-clear {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 0 18px;
   height: 30px;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 11px;
-  width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  white-space: nowrap;
 }
 
-.btn-clear:hover {
-  background: #818589;
-  transition: all 0.3s ease;
-  transform: translateY(-2px);
+.btn-clear:hover,
+.store-sale-btn-clear:hover,
+.sales-btn-reset:hover,
+.report-search-center-actions .btn-clear:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-back-summary,
+.btn-back-dc,
+.report-search-center-actions .btn-back-dc {
+  background: linear-gradient(135deg, #475569, #334155);
+  color: #ffffff;
+  border: none;
+  padding: 0 18px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(51, 65, 85, 0.2);
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn-back-summary:hover,
+.btn-back-dc:hover,
+.report-search-center-actions .btn-back-dc:hover {
+  background: linear-gradient(135deg, #334155, #1e293b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(51, 65, 85, 0.3);
 }
 
 .report-stats-header {
@@ -581,6 +643,411 @@
 .vmm-modal-close:hover {
   background: #dc2626;
   transform: scale(1.05);
+}
+
+/* ========================================================
+   STORE GRC & STORE SALE SPECIALIZED OVERRIDES
+   ======================================================== */
+.grc-report-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 4px;
+  margin: 0 12px 4px 12px;
+}
+
+@media (max-width: 1200px) {
+  .grc-report-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .grc-report-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .grc-report-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.report-search-body-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr auto !important;
+  gap: 16px !important;
+  padding: 14px 19px !important;
+  align-items: flex-start;
+}
+
+.report-search-body-grid .search-field {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: none !important;
+}
+
+.report-search-body-grid .search-field label {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #475569;
+}
+
+.store-sale-search-actions {
+  grid-column: 1 / -1;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 11px !important;
+  margin-top: 8px !important;
+  height: auto !important;
+}
+
+@media (max-width: 768px) {
+  .report-search-body-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ========================================================
+   ALLOCATED STORE REPORT SPECIALIZED OVERRIDES
+   ======================================================== */
+.allocated-store-report-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.report-search-center-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 13px 16px;
+}
+
+.allocated-date-badge-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 16px 6px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: 0.5px;
+}
+
+.allocated-curved-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0 12px 4px 12px;
+}
+
+@media (max-width: 900px) {
+  .allocated-curved-cards {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* ========================================================
+   DC & HU VALIDATION REPORT SPECIALIZED OVERRIDES
+   ======================================================== */
+.dc-report-page-container,
+.hu-report-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.dc-card-icon,
+.hu-card-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.dc-card-icon.pink, .hu-card-icon.pink { background: #fce7f3; }
+.dc-card-icon.green, .hu-card-icon.green { background: #d1fae5; }
+.dc-card-icon.purple, .hu-card-icon.purple { background: #ede9fe; }
+.hu-card-icon.blue { background: #dbeafe; }
+.hu-card-icon.orange { background: #ffedd5; }
+
+.curve-card:hover .dc-card-icon,
+.curve-card:hover .hu-card-icon {
+  transform: scale(1.1);
+}
+
+.dc-drilldown-link,
+.hu-drilldown-link {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  cursor: pointer !important;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.dc-drilldown-link:hover,
+.hu-drilldown-link:hover {
+  color: #15803d !important;
+  text-decoration-thickness: 2px !important;
+}
+
+.hu-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.hu-status-badge.pass {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.hu-status-badge.fail {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ========================================================
+   WAREHOUSE ENCODING SUMMARY SPECIALIZED OVERRIDES
+   ======================================================== */
+.wh-encoding-page .report-curved-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.wh-encoding-page .report-curved-cards .ds-kpi-item {
+  min-width: 0;
+}
+
+.wh-error-cell,
+.wh-error-cell .vmm-link-num {
+  font-weight: 700;
+  color: #ef4444 !important;
+}
+
+.wh-error-cell:hover,
+.wh-error-cell .vmm-link-num:hover {
+  color: #dc2626 !important;
+}
+
+.wh-error-cell--zero,
+.wh-error-cell--zero .vmm-link-num {
+  color: #16a34a;
+}
+
+.wh-total-cell {
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.wh-export-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.wh-encoding-page .report-table-wrapper td,
+.wh-encoding-page .report-table-wrapper td *,
+.wh-encoding-page .report-table-wrapper .vmm-link-num {
+  text-decoration: none !important;
+  cursor: default;
+}
+
+.wh-encoding-page .vmm-table th,
+.wh-encoding-page .vmm-th {
+  padding: 6px 3px !important;
+  font-size: 10px !important;
+}
+
+.wh-encoding-page .vmm-table td {
+  padding: 5px 3px !important;
+  font-size: 10px !important;
+}
+
+.wh-encoding-page th.wh-col-total-count {
+  background-color: #f0fdf4 !important;
+  color: #15803d !important;
+  border-left: 2px solid #86efac !important;
+  font-weight: 700 !important;
+}
+
+.wh-encoding-page td.wh-col-total-count {
+  background-color: rgba(240, 253, 244, 0.6) !important;
+  border-left: 2px solid #86efac !important;
+}
+
+.wh-badge-count {
+  display: inline-block;
+  padding: 2px 7px;
+  background-color: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 10.5px;
+  border-radius: 6px;
+}
+
+/* ========================================================
+   TAG INVENTORY DISTRIBUTION SPECIALIZED OVERRIDES
+   ======================================================== */
+.report-page-container.tag-dist-page {
+  padding: 12px 16px 28px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 65px);
+  box-sizing: border-box;
+}
+
+.tag-dist-page .report-curved-cards {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  width: 100%;
+}
+
+.tag-dist-page .report-curved-cards .ds-kpi-item {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .tag-dist-page .report-curved-cards {
+    flex-direction: column;
+  }
+}
+
+.tag-kpi-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+
+.tag-kpi-pill--red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+.tag-kpi-pill--purple { background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%); }
+.tag-kpi-pill--green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+
+.tag-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: inline-block;
+}
+
+.tag-section-divider {
+  width: 100%;
+  height: 1px;
+  border-bottom: 1.5px dotted #cbd5e1;
+  margin: 0;
+}
+
+.tag-store-inventory-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  padding: 16px 20px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.tag-store-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ========================================================
+   SALES & TOTAL DPOS REPORT SPECIALIZED OVERRIDES
+   ======================================================== */
+.sales-report-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.sales-filter-card {
+  background: #ffffff;
+  margin: 12px;
+  border-radius: 11px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0,0,0,0.02);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  position: relative;
+  z-index: 100 !important;
+}
+
+.sales-filter-header {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: #ffffff;
+  padding: 5px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: right;
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+}
+
+.sales-filter-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 13px;
+  padding: 13px 16px;
+  align-items: flex-end;
+}
+
+.sales-filter-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.sales-filter-field label {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #475569;
+}
+
+.sales-filter-field label span {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.sales-actions-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 30px;
 }
 
 

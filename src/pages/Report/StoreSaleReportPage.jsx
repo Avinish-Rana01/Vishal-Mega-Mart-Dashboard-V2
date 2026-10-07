@@ -10,7 +10,6 @@ import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getReportStores, getStoreSaleReport } from '../../services/stockService';
 import './common-reports.css';
-import './StoreSaleReport.css';
 
 const DEFAULT_STORES = [
   { value: 'HD44', text: 'HD44 - Uttam Nagar 2' },

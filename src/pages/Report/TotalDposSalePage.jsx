@@ -15,7 +15,6 @@ import {
   searchSaleArticles, 
   searchSaleEans 
 } from '../../services/stockService';
-import './SalesReport.css';
 import './common-reports.css';
 
 const COLUMN_TYPES = [

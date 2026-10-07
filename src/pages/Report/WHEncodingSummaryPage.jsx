@@ -12,7 +12,6 @@ import { dateRenderer, numRenderer, numRendererRed } from '../../utils/dashboard
 import EpcRangeBreakdown, { DEFAULT_EPC_RANGES as EPC_RANGES } from '../../components/common/EpcRangeBreakdown';
 import * as Icons from 'lucide-react';
 import './common-reports.css';
-import './WHEncodingSummary.css';
 
 // ---- Helper: date string generator ----
 const getTodayDate = () => new Date().toISOString().split('T')[0];
