@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Shirt, Layers, ScanLine, TrendingUp, TrendingDown, ArrowDownSquare } from 'lucide-react';
 import DetailsModal from '../common/DetailsModal';
 import { getCycleCountDetails } from '../../services/stockService';
@@ -84,8 +85,6 @@ function ProductImageCell({ articleCode, onExpand }) {
 }
 
 export default function CycleCountModal({ modalData, onClose }) {
-  if (!modalData) return null;
-
   const [expandedImage, setExpandedImage] = useState(null);
 
   // Close image lightbox on Escape key without closing modal
@@ -171,6 +170,7 @@ export default function CycleCountModal({ modalData, onClose }) {
   }), [storeCode, refNo, fromDate, toDate, sortColumn, sortDirection]);
 
   const fetchDetails = useCallback(async (signal) => {
+    if (!modalData) return;
     setIsLoading(true);
     try {
       const result = await getCycleCountDetails(
@@ -199,13 +199,16 @@ export default function CycleCountModal({ modalData, onClose }) {
         setIsLoading(false);
       }
     }
-  }, [pageIndex, pageSize, searchTerm, storeCode, fromDate, toDate, refNo, sortColumn, sortDirection]);
+  }, [modalData, pageIndex, pageSize, searchTerm, storeCode, fromDate, toDate, refNo, sortColumn, sortDirection]);
 
   useEffect(() => {
+    if (!modalData) return;
     const controller = new AbortController();
     fetchDetails(controller.signal);
     return () => controller.abort();
-  }, [fetchDetails]);
+  }, [fetchDetails, modalData]);
+
+  if (!modalData) return null;
 
   const metaInfo = [
     { label: 'STORE', value: formatValue(storeCode), valueColor: '#004cff' },
@@ -269,8 +272,8 @@ export default function CycleCountModal({ modalData, onClose }) {
         exportFileName={`Cycle_Count_Audit_${storeCode || 'ALL'}_${refNo || 'Report'}.xlsx`}
       />
 
-      {/* Expanded Image Lightbox Overlay */}
-      {expandedImage && (
+      {/* Expanded Image Lightbox Overlay (Portaled to document.body with higher z-index) */}
+      {expandedImage && typeof document !== 'undefined' && createPortal(
         <div
           role="dialog"
           aria-modal="true"
@@ -283,12 +286,13 @@ export default function CycleCountModal({ modalData, onClose }) {
             bottom: 0,
             width: '100vw',
             height: '100vh',
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(5px)',
+            WebkitBackdropFilter: 'blur(5px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 10005,
+            zIndex: 1000000,
             animation: 'fadeIn 0.2s ease-out',
             padding: '20px'
           }}
@@ -302,7 +306,7 @@ export default function CycleCountModal({ modalData, onClose }) {
               backgroundColor: '#ffffff',
               padding: '16px',
               borderRadius: '16px',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -348,7 +352,8 @@ export default function CycleCountModal({ modalData, onClose }) {
               }}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

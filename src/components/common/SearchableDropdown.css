@@ -27,6 +27,12 @@
   cursor: pointer;
 }
 
+.custom-select-trigger.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
 .custom-select-trigger span {
   font-size: 10px;
   white-space: nowrap;

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Cell, LabelList
+  Tooltip, Legend, ResponsiveContainer, LabelList
 } from 'recharts';
 import { useIsInViewport } from '../../hooks/useIsInViewport';
 
@@ -37,9 +37,21 @@ export default function GroupedBarChart({
   xAxisTickFormatter,
   onAxisClick,
   xAxisFontSize = 11,
+  xAxisAngle = 0,
   isAnimationActive = true,
   minPointSize = 4
 }) {
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const effectiveAngle = xAxisAngle || (isMobile ? -45 : 0);
+
   if (!data || data.length === 0) {
     if (!emptyText) {
       // Allow rendering the empty chart grid/axes with nothing on it
@@ -61,24 +73,24 @@ export default function GroupedBarChart({
     }
   }
 
-  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
-  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
-
-  React.useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 767);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data || []} margin={margin ? { ...margin, bottom: isMobile ? Math.max(margin.bottom || 0, 50) : margin.bottom } : { top: 30, right: 0, left: -20, bottom: isMobile ? 50 : 0 }} barGap={barGap} barCategoryGap={barCategoryGap}>
+          <BarChart 
+            data={data || []} 
+            margin={
+              margin 
+                ? { ...margin, bottom: effectiveAngle !== 0 ? Math.max(margin.bottom || 0, 45) : margin.bottom } 
+                : { top: 30, right: 0, left: -20, bottom: effectiveAngle !== 0 ? 45 : 0 }
+            } 
+            barGap={barGap} 
+            barCategoryGap={barCategoryGap}
+          >
             <defs>
               <pattern id="gchart-stripe" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
                 <rect width="10" height="10" fill="#f8fafc" />
-                <line x1="0" y="0" x2="0" y2="10" stroke="#cbd5e1" strokeWidth="4" />
+                <line x1="0" y1="0" x2="0" y2="10" stroke="#cbd5e1" strokeWidth="4" />
               </pattern>
             </defs>
 
@@ -99,13 +111,17 @@ export default function GroupedBarChart({
                         style={{ cursor: 'pointer' }}
                         onClick={() => onAxisClick(payload.value)}
                       >
+                        <title>{payload.value}</title>
                         <text
-                          x={0} y={0} dy={16}
-                          textAnchor={isMobile ? 'end' : 'middle'}
+                          x={0} 
+                          y={0} 
+                          dy={effectiveAngle !== 0 ? 12 : 16}
+                          dx={effectiveAngle !== 0 ? -4 : 0}
+                          textAnchor={effectiveAngle !== 0 ? 'end' : 'middle'}
                           fill="#2563eb"
                           fontSize={xAxisFontSize}
                           fontWeight="600"
-                          transform={isMobile ? 'rotate(-45)' : ''}
+                          transform={effectiveAngle !== 0 ? `rotate(${effectiveAngle})` : ''}
                         >
                           {textVal}
                           <tspan dx={2} dy={-2} fontSize={Math.max(xAxisFontSize - 2, 9)} fill="#2563eb">↗</tspan>
@@ -113,7 +129,13 @@ export default function GroupedBarChart({
                       </g>
                     );
                   }
-                : { fontSize: xAxisFontSize, fill: '#94a3b8', angle: isMobile ? -45 : 0, textAnchor: isMobile ? 'end' : 'middle', dy: isMobile ? 10 : 0 }
+                : { 
+                    fontSize: xAxisFontSize, 
+                    fill: '#94a3b8', 
+                    angle: effectiveAngle, 
+                    textAnchor: effectiveAngle !== 0 ? 'end' : 'middle', 
+                    dy: effectiveAngle !== 0 ? 10 : 0 
+                  }
               }
               axisLine={false}
               tickLine={false}

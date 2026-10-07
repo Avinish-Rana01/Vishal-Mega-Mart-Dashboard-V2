@@ -14,6 +14,7 @@ export default function SearchableDropdown({
   searchPlaceholder = 'Search...',
   closeOnSelect = true,
   showClear = true,
+  disabled = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,6 +60,7 @@ export default function SearchableDropdown({
 
   const handleClear = (e) => {
     e.stopPropagation();
+    if (disabled) return;
     onChange('', null);
     setSearchTerm('');
     if (isAsync && onSearchChange) {
@@ -85,16 +87,19 @@ export default function SearchableDropdown({
   }, [isOpen]);
 
   return (
-    <div className={`custom-select-container ${isOpen ? 'open' : ''}`} ref={dropdownRef}>
+    <div className={`custom-select-container ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`} ref={dropdownRef}>
       <div 
-        className={`custom-select-trigger ${isOpen ? 'open' : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
+        className={`custom-select-trigger ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`}
+        onClick={() => {
+          if (!disabled) setIsOpen(!isOpen);
+        }}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls="searchable-dropdown-list"
-        tabIndex={0}
+        tabIndex={disabled ? -1 : 0}
         onKeyDown={(e) => {
+          if (disabled) return;
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             setIsOpen(!isOpen);

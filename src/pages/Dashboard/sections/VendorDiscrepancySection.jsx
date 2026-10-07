@@ -12,13 +12,27 @@ import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import '../../../components/charts/DashboardSection.css';
-import WorkInProgress from '../../../components/common/WorkInProgress';
 import * as Icons from 'lucide-react';
 import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 
+// Helper to safely parse numbers with commas, strings, or % signs without producing NaN
+const parseNum = (val) => {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === 'number') return Number.isNaN(val) ? 0 : val;
+  const n = parseFloat(String(val).replace(/,/g, '').replace(/%/g, '').trim());
+  return Number.isNaN(n) ? 0 : n;
+};
+
+// Helper to truncate long vendor names with ellipsis on chart axis
+const formatVendorTick = (name) => {
+  if (!name) return '';
+  const trimmed = String(name).trim();
+  return trimmed.length > 20 ? `${trimmed.substring(0, 18)}...` : trimmed;
+};
+
 export default function VendorDiscrepancySection() {
   const navigate = useNavigate();
-  const { data, totals, isLoading, isRefreshing, error, highlightedVendor, connectionStatus } = useVendorDiscrepancy();
+  const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy();
   const [chartView, setChartView] = useState('volume');
   const [sortBy, setSortBy] = useState('EXPECTED_DESC');
 
@@ -26,17 +40,26 @@ export default function VendorDiscrepancySection() {
   const { barData, composedData, totalExpectedRaw, totalScannedRaw, discrepancyPercent } = useMemo(() => {
     if (!data || !totals) return { barData: [], composedData: [], totalExpectedRaw: 0, totalScannedRaw: 0, discrepancyPercent: '0%' };
 
-    // 1. Sort and Extract Top 10
+    // 1. Robust sort with tie-breakers and NaN prevention
     const sortedData = [...data].sort((a, b) => {
       switch (sortBy) {
-        case 'EXPECTED_DESC':
-          return Number(b.ACTUAL_QTY || 0) - Number(a.ACTUAL_QTY || 0);
-        case 'DIFF_QTY_DESC':
-          return Math.abs(Number(b.DIFF_QTY || 0)) - Math.abs(Number(a.DIFF_QTY || 0));
-        case 'DIFF_PER_DESC':
-          return Number(b.DIFF_PER || 0) - Number(a.DIFF_PER || 0);
+        case 'EXPECTED_DESC': {
+          const diff = parseNum(b.ACTUAL_QTY) - parseNum(a.ACTUAL_QTY);
+          if (diff !== 0) return diff;
+          return Math.abs(parseNum(b.DIFF_QTY)) - Math.abs(parseNum(a.DIFF_QTY));
+        }
+        case 'DIFF_QTY_DESC': {
+          const diff = Math.abs(parseNum(b.DIFF_QTY)) - Math.abs(parseNum(a.DIFF_QTY));
+          if (diff !== 0) return diff;
+          return parseNum(b.ACTUAL_QTY) - parseNum(a.ACTUAL_QTY);
+        }
+        case 'DIFF_PER_DESC': {
+          const diff = parseNum(b.DIFF_PER) - parseNum(a.DIFF_PER);
+          if (diff !== 0) return diff;
+          return Math.abs(parseNum(b.DIFF_QTY)) - Math.abs(parseNum(a.DIFF_QTY));
+        }
         default:
-          return Number(b.ACTUAL_QTY || 0) - Number(a.ACTUAL_QTY || 0);
+          return parseNum(b.ACTUAL_QTY) - parseNum(a.ACTUAL_QTY);
       }
     });
 
@@ -300,8 +323,8 @@ export default function VendorDiscrepancySection() {
                   height={220}
                   hideLegend={true}
                   showValues={true}
-                  margin={{ top: 30, right: 0, left: -20, bottom: 10 }}
-                  xAxisTickFormatter={(val) => val}
+                  margin={{ top: 30, right: 10, left: -20, bottom: 15 }}
+                  xAxisTickFormatter={formatVendorTick}
                   onBarClick={handleVendorClick}
                   onAxisClick={handleVendorClick}
                   customTooltip={({ active, payload, label }) => {
@@ -339,6 +362,7 @@ export default function VendorDiscrepancySection() {
                   height={220}
                   hideLegend={true}
                   showValues={true}
+                  xAxisTickFormatter={formatVendorTick}
                   onBarClick={handleVendorClick}
                   onAxisClick={handleVendorClick}
                   tooltipFormatter={(val, name) => name === 'Discrepancy Qty' ? `-${val}` : `${val}%`}

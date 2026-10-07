@@ -37,6 +37,7 @@ const ROUTE_BREADCRUMBS = {
   '/reports/total-dpos-sale': 'HOME - PAGES - DASHBOARD - TOTAL DPOS SALE REPORT',
   '/auth/user-registration': 'HOME - PAGES - AUTHENTICATION - USER REGISTRATION',
   '/auth/store-registration': 'HOME - PAGES - AUTHENTICATION - STORE REGISTRATION',
+  '/auth/floor-registration': 'HOME - PAGES - MASTERS - FLOOR MASTER',
   '/auth/warehouse-registration': 'HOME - PAGES - AUTHENTICATION - WAREHOUSE REGISTRATION',
   '/dispatch/master-upload': 'HOME - PAGES - DISPATCH TRACKING',
   '/dispatch/view-report': 'HOME - PAGES - DISPATCH TRACKING - VIEW REPORT',
@@ -64,13 +65,6 @@ export default function AppLayout({ children, headerProps = {}, mainClassName = 
   const isInsideLayout = useContext(AppLayoutContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-
-  // If already nested within a parent AppLayout, unroll to avoid duplicate layout shells
-  if (isInsideLayout) {
-    return children ? (
-      <div className={mainClassName}>{children}</div>
-    ) : null;
-  }
 
   // Auto-close sidebar on route change
   useEffect(() => {
@@ -125,6 +119,13 @@ export default function AppLayout({ children, headerProps = {}, mainClassName = 
       document.body.style.overflow = '';
     };
   }, [isSidebarOpen]);
+
+  // If already nested within a parent AppLayout, unroll to avoid duplicate layout shells
+  if (isInsideLayout) {
+    return children ? (
+      <div className={mainClassName}>{children}</div>
+    ) : null;
+  }
 
   // Dynamically resolve breadcrumb and back button state from URL path
   const resolvedBreadcrumb = headerProps.breadcrumb || getBreadcrumb(location.pathname);

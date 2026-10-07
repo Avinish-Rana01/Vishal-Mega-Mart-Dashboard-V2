@@ -212,4 +212,46 @@ export const toggleWarehouseStatus = async (whId) => {
   });
 };
 
+/**
+ * 16. Fetch the full Floor Master directory
+ */
+export const getFloorMasterList = async () => {
+  const res = await executeMaster('SP_Bind_FloorMaster');
+  return res?.data || [];
+};
+
+/**
+ * 17. Create a new store floor
+ */
+export const createFloorMaster = async ({ storeId, floorName }) => {
+  const entryBy = getActiveUserId() || 26;
+  return await executeMaster('Insert_tbl_Store_Floor_Mst', {
+    store_ID: Number(storeId),
+    store_Floor: floorName?.trim(),
+    entry_By: Number(entryBy)
+  });
+};
+
+/**
+ * 18. Update existing floor details
+ */
+export const updateFloorMaster = async ({ floorId, storeId, floorName }) => {
+  const modifyBy = getActiveUserId() || 26;
+  return await executeMaster('Update_tbl_Store_Floor_Mst', {
+    store_Floor_ID: Number(floorId),
+    store_ID: Number(storeId),
+    store_Floor: floorName?.trim(),
+    modify_By: Number(modifyBy)
+  });
+};
+
+/**
+ * 19. Toggle floor operational status (Active <-> In-Active)
+ */
+export const toggleFloorStatus = async (floorId) => {
+  return await executeMaster('Delete_tbl_Store_Floor_Mst', {
+    store_Floor_ID: Number(floorId)
+  });
+};
+
 

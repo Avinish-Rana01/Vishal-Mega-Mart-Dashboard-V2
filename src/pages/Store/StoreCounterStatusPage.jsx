@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
 import { getCounterStatusStores, getCounterStatusDetails } from '../../services/storeService';
-import { RefreshCw, Monitor, Layers, Wifi, WifiOff, Radio, Calendar, Clock } from 'lucide-react';
+import { Monitor, Layers, Wifi, WifiOff, Calendar, Clock } from 'lucide-react';
 import { liveStockSocket } from '../../services/liveStockSocket';
 import './StoreCounterStatusPage.css';
 
@@ -42,15 +42,6 @@ const extractCounterNumber = (rawName, fallbackIdx) => {
     return match[1];
   }
   return cleaned || String(fallbackIdx + 1);
-};
-
-// Fallback counters to match user screenshot (14 total, 0 online, 14 offline)
-const generateFallbackCounters = (count = 14) => {
-  return Array.from({ length: count }, (_, i) => ({
-    cash_Counter: String(i + 1),
-    status: 1,
-    lasT_UPDATED_DATE: new Date().toLocaleDateString('en-GB').replace(/\//g, '-') + ' ' + new Date().toLocaleTimeString('en-GB')
-  }));
 };
 
 export default function StoreCounterStatusPage() {
@@ -109,11 +100,11 @@ export default function StoreCounterStatusPage() {
         });
         setCounters(sorted);
       } else {
-        setCounters(generateFallbackCounters(14));
+        setCounters([]);
       }
     } catch (err) {
-      console.warn(`Unable to fetch counters for storeId ${storeId}, using fallback counters.`, err);
-      setCounters(generateFallbackCounters(14));
+      console.warn(`Unable to fetch counters for storeId ${storeId}.`, err);
+      setCounters([]);
     } finally {
       setIsLoadingCounters(false);
     }
@@ -305,7 +296,7 @@ export default function StoreCounterStatusPage() {
 
         {isLoadingCounters ? (
           <div className="counter-grid">
-            {Array.from({ length: counters.length > 0 ? counters.length : 14 }).map((_, idx) => (
+            {Array.from({ length: counters.length > 0 ? counters.length : 8 }).map((_, idx) => (
               <div key={idx} className="counter-status-tile skeleton-tile">
                 <div className="tile-top-banner skeleton-banner">
                   <svg className="tile-banner-svg skeleton-banner-svg" viewBox="0 0 200 50" preserveAspectRatio="none" aria-hidden="true">
@@ -329,7 +320,7 @@ export default function StoreCounterStatusPage() {
         ) : counters.length === 0 ? (
           <div className="counter-empty-state">
             <Monitor size={36} className="counter-empty-icon" />
-            <p>No cash counters found for {selectedStoreName}.</p>
+            <p>No active counters registered for {selectedStoreName}.</p>
           </div>
         ) : (
           <div className="counter-grid">

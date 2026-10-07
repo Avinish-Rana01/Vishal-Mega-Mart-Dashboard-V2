@@ -400,7 +400,7 @@ const vendorTotals = (summary) => ({
 });
 
 export const useVendorDiscrepancy = () => {
-  const baseFetch = useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals);
+  const baseFetch = useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals, 500);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedVendor, setHighlightedVendor] = useState(null);

@@ -139,6 +139,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     if (hasSection('store_registration')) {
       authItems.push({ label: 'Store Registration', to: '/auth/store-registration' });
     }
+    if (hasSection('floor_registration') || hasSection('store_registration')) {
+      authItems.push({ label: 'Floor Registration', to: '/auth/floor-registration' });
+    }
     if (hasSection('warehouse_registration')) {
       authItems.push({ label: 'Warehouse Registration', to: '/auth/warehouse-registration' });
     }

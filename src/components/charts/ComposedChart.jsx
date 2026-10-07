@@ -37,7 +37,8 @@ export default function ComposedChart({
   showValues = false,
   onBarClick,
   onAxisClick,
-  xAxisTickFormatter
+  xAxisTickFormatter,
+  xAxisAngle = 0
 }) {
   if (!data || data.length === 0) {
     return (
@@ -96,7 +97,7 @@ export default function ComposedChart({
       <ResponsiveContainer width="100%" height="100%">
         <RechartsComposedChart
           data={data}
-          margin={{ top: 20, right: 10, left: -20, bottom: 10 }}
+          margin={{ top: 20, right: 10, left: -20, bottom: xAxisAngle !== 0 ? 45 : 10 }}
         >
           {showGrid && <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />}
           
@@ -115,12 +116,17 @@ export default function ComposedChart({
                       style={{ cursor: 'pointer' }}
                       onClick={() => onAxisClick(payload.value)}
                     >
+                      <title>{payload.value}</title>
                       <text
-                        x={0} y={0} dy={16}
-                        textAnchor="middle"
+                        x={0} 
+                        y={0} 
+                        dy={xAxisAngle !== 0 ? 12 : 16}
+                        dx={xAxisAngle !== 0 ? -4 : 0}
+                        textAnchor={xAxisAngle !== 0 ? 'end' : 'middle'}
                         fill="#2563eb"
                         fontSize={11}
                         fontWeight="600"
+                        transform={xAxisAngle !== 0 ? `rotate(${xAxisAngle})` : ''}
                       >
                         {textVal}
                         <tspan dx={2} dy={-2} fontSize={9} fill="#2563eb">↗</tspan>
@@ -128,7 +134,13 @@ export default function ComposedChart({
                     </g>
                   );
                 }
-              : { fill: '#64748b', fontSize: 11, dy: 10 }
+              : { 
+                  fill: '#64748b', 
+                  fontSize: 11, 
+                  angle: xAxisAngle || 0, 
+                  textAnchor: xAxisAngle !== 0 ? 'end' : 'middle', 
+                  dy: xAxisAngle !== 0 ? 10 : 10 
+                }
             }
             interval={0}
           />

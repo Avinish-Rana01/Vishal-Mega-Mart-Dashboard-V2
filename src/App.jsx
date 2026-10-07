@@ -26,12 +26,11 @@ import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
 import DispatchMasterUploadPage from './pages/Dispatch/DispatchMasterUploadPage';
 import DispatchReportPage from './pages/Dispatch/DispatchReportPage';
 import PicklistCreationPage from './pages/Dispatch/PicklistCreationPage';
-import { UserRegistrationPage, StoreRegistrationPage, WarehouseRegistrationPage } from './pages/Authentication';
+import { UserRegistrationPage, StoreRegistrationPage, FloorRegistrationPage, WarehouseRegistrationPage } from './pages/Authentication';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import DevelopmentInProgressPage from './pages/DevelopmentInProgress/DevelopmentInProgressPage';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import './App.css';
 
@@ -119,7 +118,6 @@ export default function App() {
               <Route path="/picklist/creation" element={<PicklistRoute><PicklistCreationPage /></PicklistRoute>} />
 
               {/* Stores Module */}
-              <Route path="/stores" element={<DevelopmentInProgressPage title="Store Reports" />} />
               <Route path="/stores/counter-status" element={<StoreCounterStatusPage />} />
 
               {/* Tags Module */}
@@ -129,8 +127,8 @@ export default function App() {
               {/* Authentication / Master Registration Sub-routes */}
               <Route path="/auth/user-registration" element={<UserRegistrationPage />} />
               <Route path="/auth/store-registration" element={<StoreRegistrationPage />} />
+              <Route path="/auth/floor-registration" element={<FloorRegistrationPage />} />
               <Route path="/auth/warehouse-registration" element={<WarehouseRegistrationPage />} />
-              <Route path="/settings" element={<DevelopmentInProgressPage title="Settings" />} />
             </Route>
 
             {/* 404 Catch-All */}

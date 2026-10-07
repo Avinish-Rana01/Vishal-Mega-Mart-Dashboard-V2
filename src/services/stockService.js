@@ -30,7 +30,7 @@ const getHeaders = () => ({
           }
         }
       }
-    } catch (e) {
+    } catch {
       // fallback if parse fails
     }
     return 1;
@@ -58,7 +58,7 @@ export const getCycleCount = async (searchQuery = '', pageIndex = 1, pageSize = 
   return response.data;
 };
 
-export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
+export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = 1, pageSize = 500, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=DIFF_TILL_DATE&sortDirection=asc&userId=${getActiveUserId()}`, {
     headers: getHeaders(),
