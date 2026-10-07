@@ -12,7 +12,6 @@ import {
   updateWarehouseMaster,
   toggleWarehouseStatus
 } from '../../services/masterAuthService';
-import '../Report/LiveStockReport.css';
 import '../Report/common-reports.css';
 import './Authentication.css';
 
