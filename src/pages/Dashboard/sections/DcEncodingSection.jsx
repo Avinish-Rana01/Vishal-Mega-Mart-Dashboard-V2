@@ -14,6 +14,7 @@ import ChartLegend from '../../../components/common/ChartLegend';
 import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
+import './CycleCountShared.css'; // For cc-container, cc-kpi-row, etc.
 import * as Icons from 'lucide-react';
 
 
@@ -83,38 +84,40 @@ export default function DcEncodingSection() {
       );
     }
     return (
-      <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 25, right: 10, left: -15, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }}
-              axisLine={{ stroke: '#e2e8f0' }}
-              tickLine={false}
-              interval={0}
-            />
-            <YAxis
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}
-            />
-            <Tooltip
-              cursor={{ fill: 'rgba(241,245,249,0.7)' }}
-              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
-              formatter={(value) => value.toLocaleString('en-IN')}
-            />
-            <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={24} isAnimationActive={false}>
-              <LabelList
-                dataKey="Encoded"
-                position="top"
-                style={{ fontSize: '11px', fontWeight: 600, fill: '#64748b' }}
-                formatter={(val) => val > 0 ? val.toLocaleString('en-IN') : ''}
+      <div className="dc-chart-scrollable-box">
+        <div className="dc-chart-inner-canvas">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 25, right: 15, left: -15, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }}
+                axisLine={{ stroke: '#e2e8f0' }}
+                tickLine={false}
+                interval={0}
               />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+              <YAxis
+                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}
+              />
+              <Tooltip
+                cursor={{ fill: 'rgba(241,245,249,0.7)' }}
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+                formatter={(value) => value.toLocaleString('en-IN')}
+              />
+              <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={20} isAnimationActive={false}>
+                <LabelList
+                  dataKey="Encoded"
+                  position="top"
+                  style={{ fontSize: '11px', fontWeight: 600, fill: '#64748b' }}
+                  formatter={(val) => val > 0 ? val.toLocaleString('en-IN') : ''}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     );
   }, [chartData]);
@@ -147,15 +150,19 @@ export default function DcEncodingSection() {
         } 
       />
 
-      <div className="ds-kpi-row">
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard2 title="Tags Encoded" value={<LiveTickerValue value={totalEncoded || 0} />} icon={<Icons.Tag />} />
         <KpiCard2 title="Peak Encoding Hour" value={peakHour} icon={<Icons.Clock />} />
-        <KpiCard2 title="Peak Hour Volume" value={totalEncoded > 0 ? `${peakCount.toLocaleString('en-IN')} (${((peakCount / totalEncoded) * 100).toFixed(1)}%)` : '0 (0%)'} icon={<Icons.Activity />} />
+        <KpiCard2 
+          title="Peak Hour Volume" 
+          value={<LiveTickerValue value={peakCount || 0} />} 
+          icon={<Icons.Activity />} 
+        />
         <KpiCard2 title="Average Encoding / Hour" value={<LiveTickerValue value={Number(avgPerHour) || 0} />} icon={<Icons.TrendingUp />} />
       </div>
 
-      {/* 2. Side-by-side Charts Row (70% Hourly Activity + 30% Target Progress) */}
-      <div className="ds-charts-row" style={{ gridTemplateColumns: '7fr 3fr', height: '320px' }}>
+      {/* 2. Side-by-side Charts Row (Desktop: 70/30, Mobile: Stacked) */}
+      <div className="dc-encoding-charts-row">
         {/* Left (70%): Hourly Encoding Activity Bar Graph */}
         <div className="ds-card ds-card--main" style={{ display: 'flex', flexDirection: 'column' }}>
           <ChartToolbar

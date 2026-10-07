@@ -1,5 +1,5 @@
-/* Store Sale Report Scoped Styles */
-@import './LiveStockReport.css';
+/* Store Sale Report Scoped Styles (inherits base styles from common-reports.css) */
+@import './common-reports.css';
 
 /* Filter Card Margins & 3-Column Grid */
 .report-search-card {

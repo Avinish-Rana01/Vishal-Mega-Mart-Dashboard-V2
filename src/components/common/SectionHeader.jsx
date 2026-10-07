@@ -8,29 +8,26 @@ import React from 'react';
  */
 export default function SectionHeader({ title, subtitle, icon, rightContent }) {
   return (
-    <div className="ds-header" style={{ padding: '4px 0 20px 0', width: '100%', boxSizing: 'border-box', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', gap: '8px' }}>
-      <div className="ds-header-text" style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+    <div className="ds-header" style={{ padding: '4px 0 16px 0', width: '100%', boxSizing: 'border-box', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px 12px' }}>
+      <div className="ds-header-text" style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: '1 1 auto' }}>
         {icon && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             {icon}
           </div>
         )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: 0 }}>
           <h1 className="ds-section-title" style={{ 
             fontWeight: '700', 
             color: '#0f172a', 
             margin: 0, 
             textTransform: 'uppercase', 
             letterSpacing: '0.03em',
-            lineHeight: 1.1,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            lineHeight: 1.2
           }}>
             {title}
           </h1>
           {subtitle && (
-            <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500', lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '500', lineHeight: 1.3 }}>
               {subtitle}
             </span>
           )}
@@ -38,7 +35,7 @@ export default function SectionHeader({ title, subtitle, icon, rightContent }) {
       </div>
 
       {rightContent && (
-        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 'auto' }}>
           {rightContent}
         </div>
       )}

@@ -12,6 +12,7 @@ import SectionHeader, { DateBadge } from '../../../components/common/SectionHead
 import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 
 import '../../../components/charts/DashboardSection.css';
+import './CycleCountShared.css'; // For cc-container, cc-kpi-row, etc.
 
 // SVG Icons
 const Icons = {
@@ -90,7 +91,7 @@ export default function TagManagementSection() {
       />
 
       {/* 1. KPI Row */}
-      <div className="ds-kpi-row">
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard2
           title="Total Tags"
           value={<LiveTickerValue value={locationTotal || 0} />}

@@ -9,7 +9,6 @@ import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import DetailsModal from '../../components/common/DetailsModal';
 import { SearchButton, ClearButton } from '../../components/common/ReportActionButton';
 import { getDispatchReport, getDispatchReportDetails } from '../../services/dispatchService';
-import '../Report/LiveStockReport.css';
 import '../Report/common-reports.css';
 
 export default function DispatchReportPage() {

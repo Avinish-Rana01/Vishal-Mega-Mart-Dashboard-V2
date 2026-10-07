@@ -10,7 +10,6 @@ import TagCleaningDetailModal from '../../components/modals/TagCleaningDetailMod
 import { SearchButton, ClearButton } from '../../components/common/ReportActionButton';
 import { getTagCleaningReport } from '../../services/stockService';
 import { dateRenderer } from '../../utils/dashboardColumns';
-import './LiveStockReport.css';
 import './common-reports.css';
 
 export default function TagCleaningReportPage() {

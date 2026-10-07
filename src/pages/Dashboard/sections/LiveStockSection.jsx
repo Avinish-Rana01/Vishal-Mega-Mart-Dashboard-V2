@@ -16,6 +16,7 @@ import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/Liv
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import '../../../components/charts/DashboardSection.css';
 import './common.css';
+import './CycleCountShared.css'; // For cc-container, cc-kpi-row, cc-split-layout, etc.
 import './LiveStockSection.css';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import '../Dashboard.css';
@@ -371,9 +372,8 @@ export default function LiveStockSection() {
         }
       />
 
-      <div className="ls-grid2">
-
-        {/* ROW 1: 5 KPI Cards */}
+      {/* ── KPI Row ─────────────────────────────────────────────────────── */}
+      <div className="cc-kpi-row">
         <KpiCard2
           title="Total Stores"
           value={<LiveTickerValue value={data ? data.length : 0} />}
@@ -419,19 +419,10 @@ export default function LiveStockSection() {
           badgeVariant="info"
           icon={<Target />}
         />
-      {/* we will work on this in future for every section 
-      <div style={{ gridColumn: '1 / -1' }}>
-        <ActionAlertBar 
-          below80Count={5}
-          highVarianceCount={3}
-          pendingCount={2}
-          above95Count={7}
-          // onViewAll={() => console.log('View All Alerts clicked')}
-        />
-      </div> */}
+      </div>
 
       {/* ROW 2 & 3 Flex Container */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', gridColumn: '1 / -1', width: '100%' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', width: '100%' }}>
           {/* ROW 2: Store Performance Bar Chart (60% width, positioned right) */}
           <div className="ls-card" style={{ flex: '1.5 1 500px', order: 2, minWidth: 0, margin: 0 }}>
           <ChartToolbar
@@ -555,7 +546,7 @@ export default function LiveStockSection() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart (40% width, positioned left) */}
-        <div className="ls-card" style={{ flex: '1 1 400px', padding: '4px 4px', order: 1, minWidth: 0,padding: '10px', margin: 0 }}>
+        <div className="ls-card" style={{ flex: '1 1 400px', padding: '10px', order: 1, minWidth: 0, margin: 0 }}>
           <div className="ls-toolbar-header">
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
               COVERAGE DISTRIBUTION SUMMARY
@@ -615,7 +606,6 @@ export default function LiveStockSection() {
         </div>
 
         </div> {/* End Side-by-Side Wrapper */}
-      </div>
     </div>
   );
 }

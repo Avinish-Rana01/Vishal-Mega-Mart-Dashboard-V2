@@ -3,7 +3,6 @@ import {
   ShieldCheck, 
   Shield, 
   Lock, 
-  KeyRound, 
   Eye, 
   EyeOff, 
   Check, 
@@ -95,6 +94,33 @@ export default function MandatoryPasswordChange({ userName }) {
     }
   };
 
+  // Reusable security requirements checklist
+  const renderRequirementsPanel = (extraClass = '') => (
+    <div className={`vmm-pw-requirements-panel ${extraClass}`}>
+      <div className="vmm-pw-req-header">
+        <ShieldCheck size={14} className="vmm-req-header-icon" />
+        <span>SECURITY REQUIREMENTS</span>
+      </div>
+
+      <div className="vmm-pw-req-list">
+        <div className={`vmm-pw-req-item ${hasMinLength ? 'met' : ''}`}>
+          <CheckCircle2 size={14} className="vmm-req-check-icon" />
+          <span>At least 3 characters</span>
+        </div>
+
+        <div className={`vmm-pw-req-item ${isDifferent ? 'met' : ''}`}>
+          <FileText size={14} className="vmm-req-check-icon" />
+          <span>Different from temporary password</span>
+        </div>
+
+        <div className={`vmm-pw-req-item ${isMatching ? 'met' : ''}`}>
+          <ShieldCheck size={14} className="vmm-req-check-icon" />
+          <span>Confirm password matches</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="vmm-pw-viewport">
       <div className="vmm-pw-card-box">
@@ -144,30 +170,8 @@ export default function MandatoryPasswordChange({ userName }) {
                 </p>
               </div>
 
-              {/* Security Requirements Checklist Card */}
-              <div className="vmm-pw-requirements-panel">
-                <div className="vmm-pw-req-header">
-                  <ShieldCheck size={14} className="vmm-req-header-icon" />
-                  <span>SECURITY REQUIREMENTS</span>
-                </div>
-
-                <div className="vmm-pw-req-list">
-                  <div className={`vmm-pw-req-item ${hasMinLength ? 'met' : ''}`}>
-                    <CheckCircle2 size={14} className="vmm-req-check-icon" />
-                    <span>At least 3 characters</span>
-                  </div>
-
-                  <div className={`vmm-pw-req-item ${isDifferent ? 'met' : ''}`}>
-                    <FileText size={14} className="vmm-req-check-icon" />
-                    <span>Different from temporary password</span>
-                  </div>
-
-                  <div className={`vmm-pw-req-item ${isMatching ? 'met' : ''}`}>
-                    <ShieldCheck size={14} className="vmm-req-check-icon" />
-                    <span>Confirm password matches</span>
-                  </div>
-                </div>
-              </div>
+              {/* Security Requirements Checklist Card (Desktop) */}
+              {renderRequirementsPanel('vmm-pw-req-desktop')}
             </div>
 
             {/* Footer Encryption Badge */}
@@ -208,6 +212,9 @@ export default function MandatoryPasswordChange({ userName }) {
               </div>
             )}
 
+            {/* Security Requirements Checklist Card (Mobile) */}
+            {renderRequirementsPanel('vmm-pw-req-mobile')}
+
             <form onSubmit={handleSubmit} className="vmm-pw-input-form" autoComplete="off">
               {/* Field 1: Temporary / Current Password */}
               <div className="vmm-pw-input-group">
@@ -221,7 +228,6 @@ export default function MandatoryPasswordChange({ userName }) {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     disabled={isLoading}
-                    autoFocus
                   />
                   <button
                     type="button"

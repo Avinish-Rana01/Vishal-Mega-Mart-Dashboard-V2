@@ -267,7 +267,7 @@ export default function ReturnDashboardSection() {
       />
 
       {/* 1. KPI Row */}
-      <div className="ds-kpi-row">
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         {/* <CurvedCard
           title="Total Return Qty"
           value={totals?.RETURN_QTY || '0'}

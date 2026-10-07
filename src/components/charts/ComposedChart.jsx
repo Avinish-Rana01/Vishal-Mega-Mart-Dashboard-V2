@@ -38,8 +38,21 @@ export default function ComposedChart({
   onBarClick,
   onAxisClick,
   xAxisTickFormatter,
-  xAxisAngle = 0
+  xAxisAngle = 0,
+  margin
 }) {
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const effectiveAngle = (xAxisAngle !== undefined && xAxisAngle !== 0)
+    ? xAxisAngle
+    : (isMobile ? -35 : 0);
+
   if (!data || data.length === 0) {
     return (
       <div style={{
@@ -97,7 +110,11 @@ export default function ComposedChart({
       <ResponsiveContainer width="100%" height="100%">
         <RechartsComposedChart
           data={data}
-          margin={{ top: 20, right: 10, left: -20, bottom: xAxisAngle !== 0 ? 45 : 10 }}
+          margin={
+            margin
+              ? { ...margin, bottom: effectiveAngle !== 0 ? Math.max(margin.bottom || 0, 75) : (margin.bottom || 10) }
+              : { top: 20, right: 10, left: -20, bottom: effectiveAngle !== 0 ? 75 : 10 }
+          }
         >
           {showGrid && <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />}
           
@@ -120,13 +137,13 @@ export default function ComposedChart({
                       <text
                         x={0} 
                         y={0} 
-                        dy={xAxisAngle !== 0 ? 12 : 16}
-                        dx={xAxisAngle !== 0 ? -4 : 0}
-                        textAnchor={xAxisAngle !== 0 ? 'end' : 'middle'}
+                        dy={effectiveAngle !== 0 ? 12 : 16}
+                        dx={effectiveAngle !== 0 ? -4 : 0}
+                        textAnchor={effectiveAngle !== 0 ? 'end' : 'middle'}
                         fill="#2563eb"
                         fontSize={11}
                         fontWeight="600"
-                        transform={xAxisAngle !== 0 ? `rotate(${xAxisAngle})` : ''}
+                        transform={effectiveAngle !== 0 ? `rotate(${effectiveAngle})` : ''}
                       >
                         {textVal}
                         <tspan dx={2} dy={-2} fontSize={9} fill="#2563eb">↗</tspan>
@@ -137,9 +154,9 @@ export default function ComposedChart({
               : { 
                   fill: '#64748b', 
                   fontSize: 11, 
-                  angle: xAxisAngle || 0, 
-                  textAnchor: xAxisAngle !== 0 ? 'end' : 'middle', 
-                  dy: xAxisAngle !== 0 ? 10 : 10 
+                  angle: effectiveAngle, 
+                  textAnchor: effectiveAngle !== 0 ? 'end' : 'middle', 
+                  dy: effectiveAngle !== 0 ? 10 : 0 
                 }
             }
             interval={0}

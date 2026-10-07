@@ -12,6 +12,7 @@ import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import '../../../components/charts/DashboardSection.css';
+import './CycleCountShared.css'; // For cc-container, cc-kpi-row, etc.
 import * as Icons from 'lucide-react';
 import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 
@@ -27,7 +28,7 @@ const parseNum = (val) => {
 const formatVendorTick = (name) => {
   if (!name) return '';
   const trimmed = String(name).trim();
-  return trimmed.length > 20 ? `${trimmed.substring(0, 18)}...` : trimmed;
+  return trimmed.length > 22 ? `${trimmed.substring(0, 20)}...` : trimmed;
 };
 
 export default function VendorDiscrepancySection() {
@@ -193,7 +194,7 @@ export default function VendorDiscrepancySection() {
       />
 
       {/* 1. KPI Row */}
-      <div className="ds-kpi-row">
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard2
           title="Total Expected Qty"
           value={<LiveTickerValue value={totals?.ACTUAL_QTY || 0} />}
@@ -312,7 +313,7 @@ export default function VendorDiscrepancySection() {
 
           {/* Scrollable Chart Area */}
           <div className="vmm-chart-scroll-container">
-            <div style={{ width: '200%', height: '220px' }}>
+            <div style={{ width: '200%', height: '240px' }}>
               {chartView === 'volume' ? (
                 <GroupedBarChart
                   data={barData}
@@ -320,7 +321,7 @@ export default function VendorDiscrepancySection() {
                     { dataKey: 'Expected', color: '#3b82f6', label: 'Expected Qty' },
                     { dataKey: 'Scanned', color: '#10b981', label: 'Actual Qty' }
                   ]}
-                  height={220}
+                  height={240}
                   hideLegend={true}
                   showValues={true}
                   margin={{ top: 30, right: 10, left: -20, bottom: 15 }}
@@ -359,9 +360,10 @@ export default function VendorDiscrepancySection() {
                   lines={[
                     { dataKey: 'DIFF_PER', color: '#f59e0b', label: 'Discrepancy %', yAxisId: 'right' }
                   ]}
-                  height={220}
+                  height={240}
                   hideLegend={true}
                   showValues={true}
+                  margin={{ top: 25, right: 15, left: -20, bottom: 15 }}
                   xAxisTickFormatter={formatVendorTick}
                   onBarClick={handleVendorClick}
                   onAxisClick={handleVendorClick}

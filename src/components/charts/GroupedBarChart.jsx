@@ -50,7 +50,9 @@ export default function GroupedBarChart({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const effectiveAngle = xAxisAngle || (isMobile ? -45 : 0);
+  const effectiveAngle = (xAxisAngle !== undefined && xAxisAngle !== 0)
+    ? xAxisAngle
+    : (isMobile ? -35 : 0);
 
   if (!data || data.length === 0) {
     if (!emptyText) {
@@ -81,8 +83,8 @@ export default function GroupedBarChart({
             data={data || []} 
             margin={
               margin 
-                ? { ...margin, bottom: effectiveAngle !== 0 ? Math.max(margin.bottom || 0, 45) : margin.bottom } 
-                : { top: 30, right: 0, left: -20, bottom: effectiveAngle !== 0 ? 45 : 0 }
+                ? { ...margin, bottom: effectiveAngle !== 0 ? Math.max(margin.bottom || 0, 75) : margin.bottom } 
+                : { top: 30, right: 0, left: -20, bottom: effectiveAngle !== 0 ? 75 : 0 }
             } 
             barGap={barGap} 
             barCategoryGap={barCategoryGap}

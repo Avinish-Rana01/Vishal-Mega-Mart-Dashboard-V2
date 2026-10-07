@@ -11,7 +11,7 @@ import { ClearButton, BackButton } from '../../components/common/ReportActionBut
 import ViewDetailsButton from '../../components/common/ViewDetailsButton';
 import { getReportStores, searchGrcHuNumbers, getGrcDetails } from '../../services/stockService';
 import GrcDetailsModal from '../../components/modals/GrcDetailsModal';
-import './GrcReport.css';
+import './common-reports.css';
 
 export default function GrcReportPage() {
   const location = useLocation();

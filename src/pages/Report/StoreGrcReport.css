@@ -1,5 +1,5 @@
-/* Inherit base styles from LiveStockReport.css but override the cards grid */
-@import './LiveStockReport.css';
+/* Store GRC Report Scoped Styles (inherits base styles from common-reports.css) */
+@import './common-reports.css';
 
 .grc-report-cards {
   display: grid;

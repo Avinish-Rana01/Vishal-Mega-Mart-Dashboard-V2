@@ -16,7 +16,6 @@ import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { SearchButton, ClearButton } from '../../components/common/ReportActionButton';
 import { getStockTakeData, getBindStores } from '../../services/stockService';
-import './LiveStockReport.css';
 import './common-reports.css';
 
 export default function StockTakeReportPage() {

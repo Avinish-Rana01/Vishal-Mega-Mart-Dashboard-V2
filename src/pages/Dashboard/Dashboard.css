@@ -27,6 +27,21 @@
   gap: 11px;
   min-width: 0;
 }
+
+@media (max-width: 1024px) {
+  .ls-grid2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .ls-grid2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .ls-grid2 > *:last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
+  }
+}
 /* Ensure any copied section cards take up full width in V2 */
 .vmm-dashboard-stack > * {
   width: 100%;

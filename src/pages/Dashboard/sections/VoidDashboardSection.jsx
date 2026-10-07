@@ -17,6 +17,7 @@ import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
+import './CycleCountShared.css'; // For cc-container, cc-kpi-row, etc.
 
 // SVG Icons
 const Icons = {
@@ -259,7 +260,7 @@ export default function VoidDashboardSection() {
       />
 
       {/* 1. KPI Row */}
-      <div className="ds-kpi-row">
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard2
           title="Total Void Qty"
           value={totals?.VOID_QTY || '0'}

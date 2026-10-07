@@ -8,6 +8,7 @@ import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { getReportStores, getStoreGrcReport } from '../../services/stockService';
+import './common-reports.css';
 import './StoreGrcReport.css';
 
 export default function StoreGrcReportPage() {
