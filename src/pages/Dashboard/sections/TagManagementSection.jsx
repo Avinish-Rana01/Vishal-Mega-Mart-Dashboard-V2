@@ -10,6 +10,7 @@ import DonutChart from '../../../components/charts/DonutChart';
 import StoreRankList from '../../../components/charts/StoreRankList';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
+import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 
 import '../../../components/charts/DashboardSection.css';
 import './CycleCountShared.css'; // For cc-container, cc-kpi-row, etc.
@@ -129,7 +130,7 @@ export default function TagManagementSection() {
 
           <div className="ds-donut-layout">
             {/* Donut Chart */}
-            <div className="ds-donut-chart-box">
+            <div className="ds-donut-chart-box" style={{ overflow: 'hidden', position: 'relative', zIndex: 1 }}>
               <DonutChart
                 segments={locationData}
                 centerText={locationTotal.toLocaleString('en-IN')}
@@ -164,24 +165,43 @@ export default function TagManagementSection() {
 
         {/* Right: Grouped Bar Chart for Cycle Count */}
         <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="ds-card-title--flex" style={{ marginBottom: '1px' }}>
+          <div className="ds-card-title--flex" style={{ position: 'relative', zIndex: 30, marginBottom: '1px' }}>
             <h3 className="ds-card-title" style={{ margin: 0 }}>Tag Recycling Distribution</h3>
             <NeuromorphicButton 
               value="View Summary" 
               icon={<ArrowUpRight size={12} />} 
-              onClick={() => navigate('/tag-management/distribution')}
-              style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
+              onClick={(e) => {
+                if (e) e.stopPropagation();
+                saveDashboardReturnPoint('tag_management');
+                navigate('/tag-management/distribution');
+              }}
+              style={{ 
+                height: '28px', 
+                minHeight: '28px', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                margin: 0,
+                position: 'relative',
+                zIndex: 40,
+                cursor: 'pointer',
+                touchAction: 'manipulation',
+                pointerEvents: 'auto'
+              }}
             />
           </div>
 
           <div className="ds-donut-layout">
             {/* Semi Donut Chart */}
-            <div className="ds-donut-chart-box">
+            <div className="ds-donut-chart-box" style={{ overflow: 'hidden', position: 'relative', zIndex: 1 }}>
               <DonutChart
                 segments={cycleData}
                 centerText={cycleTotal.toLocaleString('en-IN')}
                 centerSubtext="Total Tag Count"
-                height={220}
+                height={175}
+                cy="80%"
+                centerTop="74%"
+                innerRadius="65%"
+                outerRadius="92%"
                 showLegend={false}
                 halfCircle={true}
               />

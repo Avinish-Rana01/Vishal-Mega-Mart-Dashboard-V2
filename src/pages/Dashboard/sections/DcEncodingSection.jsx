@@ -201,7 +201,7 @@ export default function DcEncodingSection() {
         </div>
 
         {/* Right (30%): Encoding Target Progress Semicircle */}
-        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%' }}>
+        <div className="ds-card dc-target-progress-card" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%' }}>
           <ChartToolbar
             leftContent={
               <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: 'clamp(12px, 3.2vw, 15px)' }}>
@@ -209,7 +209,7 @@ export default function DcEncodingSection() {
               </h3>
             }
           />
-          <div style={{ flex: 1, minHeight: 0, minWidth: 0, maxWidth: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          <div className="dc-donut-wrapper" style={{ flex: 1, minHeight: 0, minWidth: 0, maxWidth: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             {(() => {
               const TARGET_ENCODING = 5000;
               const percent = totalEncoded > 0 ? Math.min((totalEncoded / TARGET_ENCODING) * 100, 100).toFixed(0) : 0;
@@ -223,7 +223,7 @@ export default function DcEncodingSection() {
                   ]}
                   centerText={`${percent}%`}
                   centerSubtext={
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', marginTop: '1px' }}>
                       <span style={{ fontSize: '15px', fontWeight: 700, color: '#1e293b' }}>
                         {`${totalEncoded.toLocaleString('en-IN')} / ${TARGET_ENCODING.toLocaleString('en-IN')}`}
                       </span>
@@ -232,11 +232,11 @@ export default function DcEncodingSection() {
                       </span>
                     </div>
                   }
-                  height={220}
-                  innerRadius="64%"
-                  outerRadius="88%"
-                  cy="78%"
-                  centerTop="73%"
+                  height={175}
+                  innerRadius="65%"
+                  outerRadius="92%"
+                  cy="80%"
+                  centerTop="74%"
                   showLegend={false}
                   halfCircle={true}
                   tooltipFormatter={(value, name) => 

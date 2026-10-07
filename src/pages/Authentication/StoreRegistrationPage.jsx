@@ -404,7 +404,7 @@ export default function StoreRegistrationPage() {
       </div>
 
       {/* Standard VMM ReportDataTableCard */}
-      <div style={{ margin: '6px 10px 10px 10px' }}>
+      <div>
         <ReportDataTableCard
           columns={columns}
           data={paginatedData}

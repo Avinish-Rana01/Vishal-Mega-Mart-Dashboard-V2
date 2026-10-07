@@ -25,6 +25,9 @@
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
 }
 
 .vmm-neuro-btn:hover {
@@ -51,9 +54,11 @@
 
 .vmm-neuro-btn__value {
   display: inline-block;
+  pointer-events: none;
 }
 
 .vmm-neuro-btn__icon {
   display: inline-flex;
   align-items: center;
+  pointer-events: none;
 }

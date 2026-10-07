@@ -67,15 +67,29 @@
     height: auto !important;
     width: 100% !important;
     max-width: 100% !important;
+    gap: 8px !important;
   }
 
   .dc-encoding-charts-row > .ds-card {
     height: 320px;
-    margin-bottom: 8px;
+    margin-bottom: 0px;
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
     overflow: hidden !important;
+  }
+
+  /* Target Progress card: compact height on mobile to eliminate dead space */
+  .dc-encoding-charts-row > .ds-card.dc-target-progress-card {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 8px 10px 10px 10px !important;
+  }
+
+  .dc-target-progress-card .dc-donut-wrapper {
+    height: 175px !important;
+    flex: none !important;
+    width: 100% !important;
   }
 }
 
@@ -83,11 +97,29 @@
   .dc-encoding-charts-row .ds-card-title {
     font-size: 13px !important;
   }
+
+  .dc-encoding-charts-row > .ds-card.dc-target-progress-card {
+    height: auto !important;
+    padding: 8px 8px 8px 8px !important;
+  }
+
+  .dc-target-progress-card .dc-donut-wrapper {
+    height: 170px !important;
+  }
 }
 
 @media (max-width: 480px) {
   .dc-encoding-charts-row > .ds-card {
     height: 310px;
     padding: 8px 6px !important;
+  }
+
+  .dc-encoding-charts-row > .ds-card.dc-target-progress-card {
+    height: auto !important;
+    padding: 8px 6px 6px 6px !important;
+  }
+
+  .dc-target-progress-card .dc-donut-wrapper {
+    height: 165px !important;
   }
 }
