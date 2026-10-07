@@ -4,6 +4,7 @@ import { User, LogOut, Menu, KeyRound, Shield, Store, ChevronRight } from 'lucid
 import { useAuth } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
 import ChangePasswordModal from '../modals/ChangePasswordModal';
+import './Header.css';
 
 export default function Header({ 
   breadcrumb = 'HOME - PAGES - DASHBOARD',
@@ -95,26 +96,27 @@ export default function Header({
   return (
     <header className="vmm-top-header" style={{ position: 'relative', zIndex: 1000 }}>
       <div className="vmm-brand-section">
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {onMenuClick && (
-            <button 
-              className="vmm-mobile-menu-btn" 
-              onClick={onMenuClick}
-              title="Open Menu"
-              style={{ 
-                background: 'transparent', 
-                border: 'none', 
-                color: '#1e3a8a', 
-                cursor: 'pointer',
-                marginRight: '12px',
-                padding: 0,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <Menu size={26} strokeWidth={2.5} />
-            </button>
-          )}
+        {onMenuClick && (
+          <button 
+            className="vmm-mobile-menu-btn" 
+            onClick={onMenuClick}
+            title="Open Menu"
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              color: '#1e3a8a', 
+              cursor: 'pointer',
+              marginRight: '10px',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              flexShrink: 0
+            }}
+          >
+            <Menu size={24} strokeWidth={2.5} />
+          </button>
+        )}
+        <div className="vmm-brand-text">
           <h1 className="vmm-brand-title" style={{
             background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
             WebkitBackgroundClip: 'text',
@@ -123,8 +125,10 @@ export default function Header({
           }}>
             {APP_INFO.TITLE}
           </h1>
+          <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
+            {breadcrumb}
+          </div>
         </div>
-        <div className="vmm-breadcrumbs">{breadcrumb}</div>
       </div>
 
       <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>

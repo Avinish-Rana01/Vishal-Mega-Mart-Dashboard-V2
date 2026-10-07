@@ -127,12 +127,14 @@
 .ds-card {
   background: #ffffff;
   border-radius: 16px;
-  padding:8px 8px 6px 8px        ;
+  padding: 8px 8px 6px 8px;
   /* box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); */
-  border: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
   border: 1px solid #e2e8f0;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .ds-card-title {
@@ -237,7 +239,7 @@
 
 @media (max-width: 767px) {
   .ds-kpi-row, .cc-kpi-row, .ds-charts-row--kpi {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
   
   /* Automatically stretch the last KPI card if there are an odd number of cards */

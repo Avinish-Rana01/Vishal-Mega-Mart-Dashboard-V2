@@ -500,3 +500,167 @@
   color: #94a3b8;
   font-size: 12px;
 }
+
+/* ========================================================
+   RESPONSIVE DESIGN FOR MOBILE & TABLETS (LiveStockDataTable)
+   ======================================================== */
+@media (max-width: 768px) {
+  .ls-table-wrapper {
+    padding: 12px 10px !important;
+    margin: 4px 8px 30px 8px !important;
+    border-radius: 10px !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .ls-toolbar-top {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+    width: 100% !important;
+  }
+
+  .ls-toolbar-left {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .ls-export-btn {
+    padding: 7px 12px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  .ls-entries-select {
+    font-size: 11.5px !important;
+    gap: 5px !important;
+  }
+
+  .ls-entries-select .custom-select-trigger {
+    padding: 4px 8px !important;
+    min-width: 50px !important;
+    font-size: 11.5px !important;
+  }
+
+  .ls-search-box {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .ls-search-box span {
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    white-space: nowrap !important;
+  }
+
+  .ls-search-box input {
+    width: 100% !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    height: 32px !important;
+    font-size: 12px !important;
+    padding: 5px 10px !important;
+    border-radius: 6px !important;
+  }
+
+  .vmm-table-container {
+    margin: 6px 0 8px 0 !important;
+    border-radius: 6px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .vmm-table th,
+  .vmm-th {
+    padding: 7px 6px !important;
+    font-size: 10.5px !important;
+    white-space: nowrap !important;
+  }
+
+  .vmm-table td {
+    padding: 6px 6px !important;
+    font-size: 10.5px !important;
+    white-space: nowrap !important;
+  }
+
+  .ls-toolbar-bottom {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+    padding-top: 6px !important;
+    border-top: 1px solid #f1f5f9 !important;
+    width: 100% !important;
+  }
+
+  .ls-pagination-info {
+    text-align: center !important;
+    width: 100% !important;
+    font-size: 11px !important;
+    color: #64748b !important;
+    white-space: normal !important;
+  }
+
+  .ls-pagination-controls {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 3px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 2px 0 !important;
+  }
+
+  .ls-page-btn {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    border-radius: 5px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ls-toolbar-left {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+  }
+
+  .ls-export-btn {
+    flex: 1 !important;
+    font-size: 10.5px !important;
+    padding: 6px 8px !important;
+    text-align: center !important;
+  }
+
+  .ls-page-btn {
+    padding: 3px 6px !important;
+    font-size: 10.5px !important;
+    min-width: 24px !important;
+    height: 26px !important;
+  }
+
+  .vmm-table th,
+  .vmm-th,
+  .vmm-table td {
+    font-size: 10px !important;
+    padding: 6px 4px !important;
+  }
+}

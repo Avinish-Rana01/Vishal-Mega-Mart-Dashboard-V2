@@ -12,14 +12,15 @@
   flex-direction: column;
   /* gap: 24px; */
   width: 100%;
-  /* max-width: 1600px; */
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   margin: 0 auto;
   /* margin: 20px; */
   border: solid rgb(232, 232, 232) 2px;
   padding: 11px;
   border-radius: 14px;
   background-color: #ffffff;
-  
 }
 .ls-grid2 {
   display: grid;
@@ -35,6 +36,15 @@
 }
 
 @media (max-width: 767px) {
+  .vmm-dashboard-body-v2 {
+    padding: 8px 6px;
+  }
+
+  .vmm-dashboard-stack {
+    padding: 8px;
+    border-radius: 12px;
+  }
+
   .ls-grid2 {
     grid-template-columns: repeat(2, 1fr) !important;
   }
@@ -45,5 +55,8 @@
 /* Ensure any copied section cards take up full width in V2 */
 .vmm-dashboard-stack > * {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 

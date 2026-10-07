@@ -83,15 +83,23 @@ export default function DcEncodingSection() {
         />
       );
     }
+    const dynamicCanvasWidth = Math.max(chartData.length * 60, 680);
     return (
       <div className="dc-chart-scrollable-box">
-        <div className="dc-chart-inner-canvas">
+        <div
+          className="dc-chart-inner-canvas"
+          style={{
+            minWidth: `max(100%, ${dynamicCanvasWidth}px)`,
+            width: '100%',
+            height: '100%'
+          }}
+        >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 25, right: 15, left: -15, bottom: 5 }}>
+            <BarChart data={chartData} margin={{ top: 25, right: 20, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis
                 dataKey="name"
-                tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }}
+                tick={{ fontSize: 10.5, fill: '#64748b', fontWeight: 600 }}
                 axisLine={{ stroke: '#e2e8f0' }}
                 tickLine={false}
                 interval={0}
@@ -107,7 +115,7 @@ export default function DcEncodingSection() {
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
                 formatter={(value) => value.toLocaleString('en-IN')}
               />
-              <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={20} isAnimationActive={false}>
+              <Bar dataKey="Encoded" name="Tags Encoded" fill="#3b82f6" radius={12} barSize={22} isAnimationActive={false}>
                 <LabelList
                   dataKey="Encoded"
                   position="top"
@@ -164,11 +172,11 @@ export default function DcEncodingSection() {
       {/* 2. Side-by-side Charts Row (Desktop: 70/30, Mobile: Stacked) */}
       <div className="dc-encoding-charts-row">
         {/* Left (70%): Hourly Encoding Activity Bar Graph */}
-        <div className="ds-card ds-card--main" style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="ds-card ds-card--main" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%' }}>
           <ChartToolbar
             leftContent={
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
+                <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: 'clamp(12px, 3.2vw, 15px)' }}>
                   Hourly Encoding Activity
                 </h3>
               </div>
@@ -187,21 +195,21 @@ export default function DcEncodingSection() {
             { color: '#3b82f6', label: 'Tags Encoded' }
           ]} />
 
-          <div style={{ flex: 1, minHeight: 0, width: '100%', height: '100%', position: 'relative' }} ref={chartRef}>
+          <div style={{ flex: 1, minHeight: 0, minWidth: 0, maxWidth: '100%', width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }} ref={chartRef}>
             {chartVisible && memoizedChart}
           </div>
         </div>
 
         {/* Right (30%): Encoding Target Progress Semicircle */}
-        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%' }}>
           <ChartToolbar
             leftContent={
-              <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>
+              <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: 'clamp(12px, 3.2vw, 15px)' }}>
                 Encoding Target Progress
               </h3>
             }
           />
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ flex: 1, minHeight: 0, minWidth: 0, maxWidth: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             {(() => {
               const TARGET_ENCODING = 5000;
               const percent = totalEncoded > 0 ? Math.min((totalEncoded / TARGET_ENCODING) * 100, 100).toFixed(0) : 0;

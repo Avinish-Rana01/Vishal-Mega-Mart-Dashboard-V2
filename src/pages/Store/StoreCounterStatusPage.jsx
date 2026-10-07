@@ -220,7 +220,7 @@ export default function StoreCounterStatusPage() {
           <span>NOTE : FIELDS MARKED WITH (*) ARE REQUIRED</span>
         </div>
 
-        <div className="report-search-body">
+        <div className="report-search-body counter-status-body">
           {/* Store Selection */}
           <div className="counter-status-field">
             <label>
