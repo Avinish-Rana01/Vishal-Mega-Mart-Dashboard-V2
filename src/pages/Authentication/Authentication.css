@@ -13,22 +13,35 @@
 .vmm-auth-input {
   width: 100%;
   height: 30px;
-  padding: 0 10px;
-  border: 1px solid #cbd5e1;
+  padding: 0 12px;
+  border: 1px solid transparent;
   border-radius: 10px;
-  background: #f8fafc;
-  font-size: 11px;
-  font-weight: 600;
+  background: #f1f5f9;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
   color: #334155;
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
+.vmm-auth-input:hover {
+  background: #e2e8f0;
+}
+
+.vmm-auth-input::placeholder {
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 1;
+}
+
 .vmm-auth-input:focus {
   border-color: #3b82f6;
   background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
 .vmm-auth-password-wrap .vmm-auth-input {
@@ -51,6 +64,31 @@
   transition: color 0.15s ease;
 }
 
+/* Borderless filled style for SearchableDropdown triggers in Authentication forms */
+.report-search-card .custom-select-trigger {
+  border: 1px solid transparent;
+  background: #f1f5f9;
+  transition: all 0.2s ease;
+}
+
+.report-search-card .custom-select-trigger:hover {
+  background: #e2e8f0;
+}
+
+.report-search-card .custom-select-trigger.open,
+.report-search-card .custom-select-trigger:focus {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.report-search-card .custom-select-trigger.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: #e2e8f0;
+  border-color: transparent;
+}
+
 .vmm-password-eye-btn:hover {
   color: #334155;
 }
@@ -71,35 +109,156 @@
   letter-spacing: 0.5px;
 }
 
-/* Status Pill Badges in ReportDataTableCard */
+/* Premium Glassmorphic Status Pill with Live Radar Pulse */
 .vmm-status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
+  justify-content: center;
+  gap: 6px;
+  padding: 3px 10px;
+  width: 82px;
+  min-width: 82px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
   letter-spacing: 0.3px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  box-sizing: border-box;
 }
 
 .vmm-status-pill.active {
-  background: #dcfce7;
-  color: #15803d;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.04) 100%);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.vmm-status-pill.active:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0.08) 100%);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.22);
+  transform: translateY(-1px);
 }
 
 .vmm-status-pill.inactive {
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #64748b;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .vmm-status-dot {
-  width: 5px;
-  height: 5px;
+  position: relative;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: currentColor;
+  flex-shrink: 0;
+}
+
+.vmm-status-pill.active .vmm-status-dot {
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+}
+
+.vmm-status-pill.active .vmm-status-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid #10B981;
+  transform: translate(-50%, -50%);
+  animation: vmmPulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes vmmPulse {
+  0% {
+    width: 6px;
+    height: 6px;
+    opacity: 0.9;
+  }
+  70% {
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+  }
+  100% {
+    width: 18px;
+    height: 18px;
+    opacity: 0;
+  }
+}
+
+/* Email Required Verified Checkmark Badge */
+.vmm-email-check-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10B981;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
+  transition: transform 0.15s ease;
+}
+
+.vmm-email-check-badge:hover {
+  transform: scale(1.1);
+}
+
+/* iOS Toggle Switch for Status in ReportDataTableCard */
+.vmm-ios-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  background-color: #cbd5e1;
+  transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.vmm-ios-toggle:hover {
+  transform: scale(1.05);
+}
+
+.vmm-ios-toggle:focus-visible {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #10B981;
+}
+
+.vmm-ios-toggle.active {
+  background-color: #10B981;
+}
+
+.vmm-ios-toggle.inactive {
+  background-color: #cbd5e1;
+}
+
+.vmm-ios-toggle-knob {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28), 0 0 1px rgba(0, 0, 0, 0.15);
+  transform: translateX(0);
+  transition: transform 0.22s cubic-bezier(0.3, 1.05, 0.4, 1.05);
+}
+
+.vmm-ios-toggle.active .vmm-ios-toggle-knob {
+  transform: translateX(16px);
 }
 
 /* Inline Action Buttons inside ReportDataTableCard */
@@ -127,6 +286,33 @@
 .vmm-table-action-btn.edit:hover {
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+/* Sleek Icon-only Edit button to pair seamlessly with iOS toggle */
+.vmm-table-action-btn.edit-icon {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.vmm-table-action-btn.edit-icon:hover {
+  background: #eff6ff;
+  color: #3B82F6;
+  border-color: #3B82F6;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+}
+
+.vmm-table-action-btn.edit-icon:active {
+  transform: scale(0.95);
 }
 
 .vmm-table-action-btn.deactivate {
@@ -321,4 +507,10 @@
   justify-content: center;
   align-items: center;
 }
+
+.report-search-row:has(.custom-select-container.open) {
+  position: relative;
+  z-index: 50;
+}
+
 

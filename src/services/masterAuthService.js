@@ -270,4 +270,59 @@ export const toggleFloorStatus = async (floorId) => {
   });
 };
 
+/**
+ * 20. Fetch dropdown options for Store Registration (State, City, Store Manager, Area Manager, ZFM, LP)
+ */
+export const getStoreFormDropdownOptions = async () => {
+  try {
+    // 1. Try dedicated GET endpoint if available
+    const getRes = await axios.get(`${API_BASE}/api/Master/StoreDropdowns`, {
+      headers: getHeaders()
+    }).catch(() => null);
+
+    if (getRes?.data?.success && getRes.data.data) {
+      return getRes.data.data;
+    }
+
+    // 2. Fallback to universal executeMaster SP_DDL_Store_Dropdowns_JSON
+    const res = await executeMaster('SP_DDL_Store_Dropdowns_JSON');
+    const firstRow = res?.data?.[0];
+    if (firstRow) {
+      const parseJson = (val) => {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        try { return JSON.parse(val); } catch (e) { return []; }
+      };
+
+      const states = parseJson(firstRow.States ?? firstRow.states).map(x => x?.State ?? x?.state).filter(Boolean);
+      const cities = parseJson(firstRow.Cities ?? firstRow.cities).map(x => ({ state: x?.State ?? x?.state, city: x?.City ?? x?.city }));
+      const areaManagers = parseJson(firstRow.AreaManagers ?? firstRow.areaManagers).map(x => x?.Area_Manager ?? x?.area_Manager).filter(Boolean);
+      const zfms = parseJson(firstRow.ZFMs ?? firstRow.zfms).map(x => x?.ZFM ?? x?.zfm).filter(Boolean);
+      const lps = parseJson(firstRow.LPs ?? firstRow.lps).map(x => x?.LP ?? x?.lp).filter(Boolean);
+      const storeManagers = parseJson(firstRow.StoreManagers ?? firstRow.storeManagers).map(x => x?.Store_Manager ?? x?.store_Manager).filter(Boolean);
+
+      return {
+        states,
+        cities,
+        areaManagers,
+        zfms,
+        lps,
+        storeManagers
+      };
+    }
+  } catch (err) {
+    console.error('Error fetching store form dropdowns:', err);
+  }
+
+  return {
+    states: [],
+    cities: [],
+    areaManagers: [],
+    zfms: [],
+    lps: [],
+    storeManagers: []
+  };
+};
+
+
 

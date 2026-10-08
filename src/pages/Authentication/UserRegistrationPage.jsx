@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Eye, EyeOff, Power, Crown, UserPlus } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Power, Crown, UserPlus, Check } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -510,12 +510,14 @@ export default function UserRegistrationPage() {
       key: 'Is_Email_Required',
       label: 'EMAIL REQ.',
       align: 'center',
+      width: '95px',
       sortable: true,
       render: (val, row) => {
-        const isReq = Boolean(val ?? row?.Is_Email_Required ?? row?.is_Email_Required ?? row?.isEmailRequired);
+        const rawVal = val ?? row?.Is_Email_Required ?? row?.is_Email_Required ?? row?.isEmailRequired;
+        const isReq = rawVal === true || rawVal === 1 || String(rawVal).toLowerCase() === 'true' || String(rawVal).toLowerCase() === 'yes';
         return isReq ? (
-          <span className="vmm-status-pill active" style={{ fontSize: '10px', padding: '1px 6px' }}>
-            Yes
+          <span className="vmm-email-check-badge" title="Email Required" aria-label="Email Required">
+            <Check size={12} strokeWidth={3} />
           </span>
         ) : (
           <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>No</span>
@@ -526,6 +528,7 @@ export default function UserRegistrationPage() {
       key: 'Status',
       label: 'STATUS',
       align: 'center',
+      width: '110px',
       sortable: true,
       render: (val, row) => {
         const statusStr = String(val ?? row?.Status ?? row?.status ?? 'Active');
@@ -533,7 +536,7 @@ export default function UserRegistrationPage() {
         return (
           <span className={`vmm-status-pill ${isActive ? 'active' : 'inactive'}`}>
             <span className="vmm-status-dot" />
-            {isActive ? 'Active' : 'In-Active'}
+            {isActive ? 'Active' : 'Inactive'}
           </span>
         );
       }
@@ -542,27 +545,32 @@ export default function UserRegistrationPage() {
       key: 'actions',
       label: 'ACTIONS',
       align: 'center',
+      width: '100px',
       sortable: false,
       render: (_, row) => {
         const statusStr = String(row?.Status ?? row?.status ?? 'Active');
         const isActive = statusStr.toLowerCase().includes('active') && !statusStr.toLowerCase().includes('in');
         return (
-          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
             <button
               type="button"
-              className="vmm-table-action-btn edit"
+              className="vmm-table-action-btn edit-icon"
               onClick={(e) => { e.stopPropagation(); handleEditClick(row); }}
               title="Edit User"
+              aria-label="Edit User"
             >
-              <Edit2 size={12} /> Edit
+              <Edit2 size={13} />
             </button>
             <button
               type="button"
-              className={`vmm-table-action-btn ${isActive ? 'deactivate' : 'activate'}`}
+              role="switch"
+              aria-checked={isActive}
+              className={`vmm-ios-toggle ${isActive ? 'active' : 'inactive'}`}
               onClick={(e) => { e.stopPropagation(); handleToggleStatus(row); }}
               title={isActive ? 'Deactivate User' : 'Activate User'}
+              aria-label={isActive ? 'Deactivate User' : 'Activate User'}
             >
-              <Power size={12} /> {isActive ? 'Deactivate' : 'Activate'}
+              <span className="vmm-ios-toggle-knob" />
             </button>
           </div>
         );
@@ -600,7 +608,9 @@ export default function UserRegistrationPage() {
       <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
         <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
-            {isEditing ? `EDITING USER ${editingUserId}` : 'USER REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing 
+              ? `EDITING USER ${editingUserId} - PRESS ESC TO EXIT EDIT MODE` 
+              : 'USER REGISTRATION - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED'}
           </span>
         </div>
 

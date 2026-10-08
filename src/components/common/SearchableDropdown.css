@@ -71,15 +71,6 @@
   transform: rotate(180deg);
 }
 
-.custom-select-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1099;
-}
-
 .custom-select-menu {
   position: absolute;
   top: 100%;

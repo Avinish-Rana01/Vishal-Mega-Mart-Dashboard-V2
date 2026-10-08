@@ -6,11 +6,13 @@ import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import ToastNotification from '../../components/common/ToastNotification';
 import { SearchButton, ClearButton } from '../../components/common/ReportActionButton';
+import SearchableDropdown from '../../components/common/SearchableDropdown';
 import {
   getStoreMasterList,
   createStoreMaster,
   updateStoreMaster,
-  toggleStoreStatus
+  toggleStoreStatus,
+  getStoreFormDropdownOptions
 } from '../../services/masterAuthService';
 import '../Report/common-reports.css';
 import './Authentication.css';
@@ -30,6 +32,16 @@ export default function StoreRegistrationPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingStoreId, setEditingStoreId] = useState(null);
   const [editTriggerAnim, setEditTriggerAnim] = useState(false);
+
+  // Dropdown Options for Form
+  const [dropdownOptions, setDropdownOptions] = useState({
+    states: [],
+    cities: [],
+    storeManagers: [],
+    areaManagers: [],
+    zfms: [],
+    lps: []
+  });
 
   // Table Data & Loading State
   const [stores, setStores] = useState([]);
@@ -82,9 +94,58 @@ export default function StoreRegistrationPage() {
     }
   }, []);
 
+  // Fetch dropdown options from DB
+  const fetchDropdowns = useCallback(async () => {
+    try {
+      const data = await getStoreFormDropdownOptions();
+      if (data) {
+        setDropdownOptions({
+          states: (data.states || []).map(s => ({ value: s, text: s })),
+          cities: data.cities || [],
+          storeManagers: (data.storeManagers || []).map(sm => ({ value: sm, text: sm })),
+          areaManagers: (data.areaManagers || []).map(am => ({ value: am, text: am })),
+          zfms: (data.zfms || []).map(z => ({ value: z, text: z })),
+          lps: (data.lps || []).map(l => ({ value: l, text: l }))
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching store dropdown options:', err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchStores();
-  }, [fetchStores]);
+    fetchDropdowns();
+  }, [fetchStores, fetchDropdowns]);
+
+  // Available cities based on selected state (cascading filter)
+  const availableCities = useMemo(() => {
+    if (!dropdownOptions.cities || dropdownOptions.cities.length === 0) return [];
+    
+    let filtered = dropdownOptions.cities;
+    if (state) {
+      filtered = filtered.filter(item => 
+        String(item.state || '').trim().toLowerCase() === String(state).trim().toLowerCase()
+      );
+    }
+    
+    const uniqueCities = Array.from(new Set(filtered.map(item => item.city).filter(Boolean)));
+    return uniqueCities.sort().map(c => ({ value: c, text: c }));
+  }, [dropdownOptions.cities, state]);
+
+  // Handle cascading state selection
+  const handleStateChange = (selectedState) => {
+    setState(selectedState || '');
+    if (selectedState && city) {
+      const cityMatches = (dropdownOptions.cities || []).some(
+        item => String(item.state || '').trim().toLowerCase() === String(selectedState).trim().toLowerCase() &&
+                String(item.city || '').trim().toLowerCase() === String(city).trim().toLowerCase()
+      );
+      if (!cityMatches) {
+        setCity('');
+      }
+    }
+  };
 
   // Keyboard shortcut: Escape cancels edit mode
   useEffect(() => {
@@ -204,6 +265,7 @@ export default function StoreRegistrationPage() {
         });
         resetForm();
         fetchStores();
+        fetchDropdowns();
       } else {
         setAlert({
           type: 'error',
@@ -433,6 +495,7 @@ export default function StoreRegistrationPage() {
       key: 'Status',
       label: 'STATUS',
       align: 'center',
+      width: '110px',
       sortable: true,
       render: (val, row) => {
         const statusStr = String(val ?? row?.Status ?? row?.status ?? 'Active');
@@ -440,7 +503,7 @@ export default function StoreRegistrationPage() {
         return (
           <span className={`vmm-status-pill ${isActive ? 'active' : 'inactive'}`}>
             <span className="vmm-status-dot" />
-            {isActive ? 'Active' : 'In-Active'}
+            {isActive ? 'Active' : 'Inactive'}
           </span>
         );
       }
@@ -449,27 +512,32 @@ export default function StoreRegistrationPage() {
       key: 'actions',
       label: 'ACTIONS',
       align: 'center',
+      width: '100px',
       sortable: false,
       render: (_, row) => {
         const statusStr = String(row?.Status ?? row?.status ?? 'Active');
         const isActive = statusStr.toLowerCase().includes('active') && !statusStr.toLowerCase().includes('in');
         return (
-          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
             <button
               type="button"
-              className="vmm-table-action-btn edit"
+              className="vmm-table-action-btn edit-icon"
               onClick={(e) => { e.stopPropagation(); handleEditClick(row); }}
               title="Edit Store"
+              aria-label="Edit Store"
             >
-              <Edit2 size={12} /> Edit
+              <Edit2 size={13} />
             </button>
             <button
               type="button"
-              className={`vmm-table-action-btn ${isActive ? 'deactivate' : 'activate'}`}
+              role="switch"
+              aria-checked={isActive}
+              className={`vmm-ios-toggle ${isActive ? 'active' : 'inactive'}`}
               onClick={(e) => { e.stopPropagation(); handleToggleStatus(row); }}
               title={isActive ? 'Deactivate Store' : 'Activate Store'}
+              aria-label={isActive ? 'Deactivate Store' : 'Activate Store'}
             >
-              <Power size={12} /> {isActive ? 'Deactivate' : 'Activate'}
+              <span className="vmm-ios-toggle-knob" />
             </button>
           </div>
         );
@@ -507,7 +575,9 @@ export default function StoreRegistrationPage() {
       <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
         <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
-            {isEditing ? `EDITING STORE ${editingStoreId}` : 'STORE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing 
+              ? `EDITING STORE ${editingStoreId} - PRESS ESC TO EXIT EDIT MODE` 
+              : 'STORE REGISTRATION - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED'}
           </span>
         </div>
 
@@ -520,7 +590,7 @@ export default function StoreRegistrationPage() {
                 <input
                   type="text"
                   className="vmm-auth-input"
-                  placeholder="Enter store code (e.g. HD55)"
+                  placeholder="Enter Store Code (e.g. HD55)"
                   value={storeCode}
                   onChange={(e) => setStoreCode(e.target.value)}
                   disabled={isSubmitting}
@@ -533,7 +603,7 @@ export default function StoreRegistrationPage() {
                 <input
                   type="text"
                   className="vmm-auth-input"
-                  placeholder="Enter store name (e.g. HD55 - Dwarka)"
+                  placeholder="Enter Store Name (e.g. HD55 - Dwarka)"
                   value={storeName}
                   onChange={(e) => setStoreName(e.target.value)}
                   disabled={isSubmitting}
@@ -543,27 +613,25 @@ export default function StoreRegistrationPage() {
 
               <div className="search-field">
                 <label>State *</label>
-                <input
-                  type="text"
-                  className="vmm-auth-input"
-                  placeholder="Enter state (e.g. Delhi, Haryana)"
+                <SearchableDropdown
                   value={state}
-                  onChange={(e) => setState(e.target.value)}
+                  onChange={handleStateChange}
+                  options={dropdownOptions.states}
+                  placeholder="Select State"
+                  searchPlaceholder="Search State..."
                   disabled={isSubmitting}
-                  autoComplete="off"
                 />
               </div>
 
               <div className="search-field">
                 <label>City *</label>
-                <input
-                  type="text"
-                  className="vmm-auth-input"
-                  placeholder="Enter city (e.g. Delhi, Gurgaon)"
+                <SearchableDropdown
                   value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  onChange={(val) => setCity(val)}
+                  options={availableCities}
+                  placeholder="Select City"
+                  searchPlaceholder="Search City..."
                   disabled={isSubmitting}
-                  autoComplete="off"
                 />
               </div>
             </div>
@@ -572,53 +640,49 @@ export default function StoreRegistrationPage() {
             <div className="report-search-row">
               <div className="search-field">
                 <label>Store Manager *</label>
-                <input
-                  type="text"
-                  className="vmm-auth-input"
-                  placeholder="Enter SM name or email"
+                <SearchableDropdown
                   value={storeManager}
-                  onChange={(e) => setStoreManager(e.target.value)}
+                  onChange={(val) => setStoreManager(val)}
+                  options={dropdownOptions.storeManagers}
+                  placeholder="Select Store Manager"
+                  searchPlaceholder="Search Store Manager..."
                   disabled={isSubmitting}
-                  autoComplete="off"
                 />
               </div>
 
               <div className="search-field">
                 <label>Area Manager *</label>
-                <input
-                  type="text"
-                  className="vmm-auth-input"
-                  placeholder="Enter Area Manager"
+                <SearchableDropdown
                   value={areaManager}
-                  onChange={(e) => setAreaManager(e.target.value)}
+                  onChange={(val) => setAreaManager(val)}
+                  options={dropdownOptions.areaManagers}
+                  placeholder="Select Area Manager"
+                  searchPlaceholder="Search Area Manager..."
                   disabled={isSubmitting}
-                  autoComplete="off"
                 />
               </div>
 
               <div className="search-field">
                 <label>ZFM *</label>
-                <input
-                  type="text"
-                  className="vmm-auth-input"
-                  placeholder="Enter ZFM"
+                <SearchableDropdown
                   value={zfm}
-                  onChange={(e) => setZfm(e.target.value)}
+                  onChange={(val) => setZfm(val)}
+                  options={dropdownOptions.zfms}
+                  placeholder="Select ZFM"
+                  searchPlaceholder="Search ZFM..."
                   disabled={isSubmitting}
-                  autoComplete="off"
                 />
               </div>
 
               <div className="search-field">
                 <label>LP *</label>
-                <input
-                  type="text"
-                  className="vmm-auth-input"
-                  placeholder="Enter LP"
+                <SearchableDropdown
                   value={lp}
-                  onChange={(e) => setLp(e.target.value)}
+                  onChange={(val) => setLp(val)}
+                  options={dropdownOptions.lps}
+                  placeholder="Select LP"
+                  searchPlaceholder="Search LP..."
                   disabled={isSubmitting}
-                  autoComplete="off"
                 />
               </div>
             </div>

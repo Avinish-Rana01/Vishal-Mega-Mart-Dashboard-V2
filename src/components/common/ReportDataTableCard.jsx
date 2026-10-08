@@ -271,7 +271,20 @@ export default function ReportDataTableCard({
   };
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const pageSizeDropdownRef = useRef(null);
   const pageSizeOptions = [10, 25, 50, 100];
+
+  // Close pageSize dropdown on click outside without blocking other clicks
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (pageSizeDropdownRef.current && !pageSizeDropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
   const effectiveTotal = onSearch ? totalRecords : (internalSearch.trim() ? filteredData.length : totalRecords);
   const totalPages = Math.max(1, Math.ceil(effectiveTotal / pageSize));
@@ -356,7 +369,7 @@ export default function ReportDataTableCard({
           <div className="ls-entries-select">
             <span>Show</span>
             
-            <div className="custom-select-container" style={{ position: 'relative' }}>
+            <div className="custom-select-container" ref={pageSizeDropdownRef} style={{ position: 'relative' }}>
               <div 
                 className={`custom-select-trigger ${isDropdownOpen ? 'open' : ''}`}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -368,13 +381,7 @@ export default function ReportDataTableCard({
               </div>
               
               {isDropdownOpen && (
-                <>
-                  <div 
-                    className="custom-select-backdrop" 
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} 
-                    onClick={() => setIsDropdownOpen(false)}
-                  />
-                  <div className="custom-select-menu">
+                <div className="custom-select-menu">
                     {pageSizeOptions.map(option => (
                       <div 
                         key={option} 
@@ -393,7 +400,6 @@ export default function ReportDataTableCard({
                       </div>
                     ))}
                   </div>
-                </>
               )}
             </div>
 

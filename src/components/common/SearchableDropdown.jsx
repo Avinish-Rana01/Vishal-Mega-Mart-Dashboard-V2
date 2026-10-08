@@ -79,11 +79,26 @@ export default function SearchableDropdown({
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
+        e.stopPropagation();
         setIsOpen(false);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
+  // Handle click outside to close dropdown immediately without swallowing clicks on neighboring elements
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
   return (
@@ -150,13 +165,7 @@ export default function SearchableDropdown({
       </div>
       
       {isOpen && (
-        <>
-          <div 
-            className="custom-select-backdrop" 
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="custom-select-menu">
+        <div className="custom-select-menu">
             {/* Search Input Box inside Dropdown */}
             <div className="custom-select-search-wrapper">
               <input
@@ -221,7 +230,6 @@ export default function SearchableDropdown({
               )}
             </div>
           </div>
-        </>
       )}
     </div>
   );

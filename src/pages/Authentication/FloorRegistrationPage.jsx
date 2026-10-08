@@ -323,6 +323,7 @@ export default function FloorRegistrationPage() {
       key: 'Status',
       label: 'FLOOR STATUS',
       align: 'center',
+      width: '110px',
       sortable: true,
       render: (val, row) => {
         const statusStr = String(val ?? row?.Status ?? row?.status ?? 'Active');
@@ -330,7 +331,7 @@ export default function FloorRegistrationPage() {
         return (
           <span className={`vmm-status-pill ${isActive ? 'active' : 'inactive'}`}>
             <span className="vmm-status-dot" />
-            {isActive ? 'Active' : 'In-Active'}
+            {isActive ? 'Active' : 'Inactive'}
           </span>
         );
       }
@@ -339,27 +340,32 @@ export default function FloorRegistrationPage() {
       key: 'actions',
       label: 'ACTION',
       align: 'center',
+      width: '100px',
       sortable: false,
       render: (_, row) => {
         const statusStr = String(row?.Status ?? row?.status ?? 'Active');
         const isActive = statusStr.toLowerCase().includes('active') && !statusStr.toLowerCase().includes('in');
         return (
-          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
             <button
               type="button"
-              className="vmm-table-action-btn edit"
+              className="vmm-table-action-btn edit-icon"
               onClick={(e) => { e.stopPropagation(); handleEditClick(row); }}
               title="Edit Floor"
+              aria-label="Edit Floor"
             >
-              <Edit2 size={12} /> Edit
+              <Edit2 size={13} />
             </button>
             <button
               type="button"
-              className={`vmm-table-action-btn ${isActive ? 'deactivate' : 'activate'}`}
+              role="switch"
+              aria-checked={isActive}
+              className={`vmm-ios-toggle ${isActive ? 'active' : 'inactive'}`}
               onClick={(e) => { e.stopPropagation(); handleToggleStatus(row); }}
               title={isActive ? 'Mark Inactive' : 'Mark Active'}
+              aria-label={isActive ? 'Mark Inactive' : 'Mark Active'}
             >
-              <Power size={12} /> {isActive ? 'Inactive' : 'Active'}
+              <span className="vmm-ios-toggle-knob" />
             </button>
           </div>
         );
@@ -397,7 +403,9 @@ export default function FloorRegistrationPage() {
       <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
         <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
-            {isEditing ? `EDITING FLOOR ${editingFloorId}` : 'FLOOR MASTER'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing 
+              ? `EDITING FLOOR ${editingFloorId} - PRESS ESC TO EXIT EDIT MODE` 
+              : 'FLOOR MASTER - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED'}
           </span>
         </div>
 
