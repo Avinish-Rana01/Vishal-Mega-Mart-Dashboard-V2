@@ -270,6 +270,16 @@
 .report-search-card.vmm-edit-shake-anim .search-field:nth-child(5) { animation-delay: 0.14s; }
 .report-search-card.vmm-edit-shake-anim .search-field:nth-child(6) { animation-delay: 0.17s; }
 
+/* Multi-row stacked form animations */
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(1) .search-field:nth-child(1) { animation-delay: 0.02s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(1) .search-field:nth-child(2) { animation-delay: 0.04s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(1) .search-field:nth-child(3) { animation-delay: 0.06s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(1) .search-field:nth-child(4) { animation-delay: 0.08s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(2) .search-field:nth-child(1) { animation-delay: 0.10s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(2) .search-field:nth-child(2) { animation-delay: 0.12s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(2) .search-field:nth-child(3) { animation-delay: 0.14s; }
+.report-search-card.vmm-edit-shake-anim .report-search-row:nth-child(2) .search-field:nth-child(4) { animation-delay: 0.16s; }
+
 @keyframes vmmFieldShake {
   0% { transform: translateX(0); }
   20% { transform: translateX(-4px); }
@@ -283,5 +293,32 @@
 .report-search-header.vmm-edit-mode-header {
   background: linear-gradient(to right, #34d399 0%, #10B981 35%, #047857 80%, #064e3b 100%) !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* Multi-Row Form Layout for Store Registration */
+.report-search-body--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 15px 10px 15px;
+}
+
+.report-search-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+.report-search-row--actions-center {
+  justify-content: center !important;
+  align-items: center !important;
+  margin-top: 4px;
+}
+
+.report-search-row--actions-center .search-buttons {
+  margin-top: 0 !important;
+  justify-content: center;
+  align-items: center;
 }
 

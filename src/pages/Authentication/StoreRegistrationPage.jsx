@@ -21,10 +21,15 @@ export default function StoreRegistrationPage() {
   // Form State
   const [storeCode, setStoreCode] = useState('');
   const [storeName, setStoreName] = useState('');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
+  const [storeManager, setStoreManager] = useState('');
+  const [areaManager, setAreaManager] = useState('');
+  const [zfm, setZfm] = useState('');
+  const [lp, setLp] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingStoreId, setEditingStoreId] = useState(null);
   const [editTriggerAnim, setEditTriggerAnim] = useState(false);
-  const storeCodeInputRef = useRef(null);
 
   // Table Data & Loading State
   const [stores, setStores] = useState([]);
@@ -96,6 +101,12 @@ export default function StoreRegistrationPage() {
   const resetForm = () => {
     setStoreCode('');
     setStoreName('');
+    setState('');
+    setCity('');
+    setStoreManager('');
+    setAreaManager('');
+    setZfm('');
+    setLp('');
     setIsEditing(false);
     setEditingStoreId(null);
     setEditTriggerAnim(false);
@@ -107,6 +118,12 @@ export default function StoreRegistrationPage() {
     setEditingStoreId(store.Store_ID ?? store.store_ID ?? store.id);
     setStoreCode(store.Store_Code ?? store.store_Code ?? '');
     setStoreName(store.Store_Name ?? store.store_Name ?? '');
+    setState(store.State ?? store.state ?? '');
+    setCity(store.City ?? store.city ?? '');
+    setStoreManager(store.Store_Manager ?? store.store_Manager ?? '');
+    setAreaManager(store.Area_Manager ?? store.area_Manager ?? '');
+    setZfm(store.ZFM ?? store.zfm ?? '');
+    setLp(store.LP ?? store.lp ?? '');
 
     // Trigger field entrance shake
     setEditTriggerAnim(true);
@@ -127,6 +144,30 @@ export default function StoreRegistrationPage() {
       setAlert({ type: 'error', message: 'Store Name is required.' });
       return;
     }
+    if (!state.trim()) {
+      setAlert({ type: 'error', message: 'State is required.' });
+      return;
+    }
+    if (!city.trim()) {
+      setAlert({ type: 'error', message: 'City is required.' });
+      return;
+    }
+    if (!storeManager.trim()) {
+      setAlert({ type: 'error', message: 'Store Manager is required.' });
+      return;
+    }
+    if (!areaManager.trim()) {
+      setAlert({ type: 'error', message: 'Area Manager is required.' });
+      return;
+    }
+    if (!zfm.trim()) {
+      setAlert({ type: 'error', message: 'ZFM is required.' });
+      return;
+    }
+    if (!lp.trim()) {
+      setAlert({ type: 'error', message: 'LP is required.' });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -135,12 +176,24 @@ export default function StoreRegistrationPage() {
         res = await updateStoreMaster({
           storeId: editingStoreId,
           storeCode: storeCode.trim(),
-          storeName: storeName.trim()
+          storeName: storeName.trim(),
+          state: state.trim(),
+          city: city.trim(),
+          storeManager: storeManager.trim(),
+          areaManager: areaManager.trim(),
+          zfm: zfm.trim(),
+          lp: lp.trim()
         });
       } else {
         res = await createStoreMaster({
           storeCode: storeCode.trim(),
-          storeName: storeName.trim()
+          storeName: storeName.trim(),
+          state: state.trim(),
+          city: city.trim(),
+          storeManager: storeManager.trim(),
+          areaManager: areaManager.trim(),
+          zfm: zfm.trim(),
+          lp: lp.trim()
         });
       }
 
@@ -220,8 +273,25 @@ export default function StoreRegistrationPage() {
         const code = String(s.Store_Code ?? s.store_Code ?? '').toLowerCase();
         const name = String(s.Store_Name ?? s.store_Name ?? '').toLowerCase();
         const id = String(s.Store_ID ?? s.store_ID ?? '');
+        const stateVal = String(s.State ?? s.state ?? '').toLowerCase();
+        const cityVal = String(s.City ?? s.city ?? '').toLowerCase();
+        const smVal = String(s.Store_Manager ?? s.store_Manager ?? '').toLowerCase();
+        const amVal = String(s.Area_Manager ?? s.area_Manager ?? '').toLowerCase();
+        const zfmVal = String(s.ZFM ?? s.zfm ?? '').toLowerCase();
+        const lpVal = String(s.LP ?? s.lp ?? '').toLowerCase();
         const status = String(s.Status ?? s.status ?? '').toLowerCase();
-        return code.includes(term) || name.includes(term) || id.includes(term) || status.includes(term);
+        return (
+          code.includes(term) ||
+          name.includes(term) ||
+          id.includes(term) ||
+          stateVal.includes(term) ||
+          cityVal.includes(term) ||
+          smVal.includes(term) ||
+          amVal.includes(term) ||
+          zfmVal.includes(term) ||
+          lpVal.includes(term) ||
+          status.includes(term)
+        );
       });
     }
 
@@ -253,10 +323,16 @@ export default function StoreRegistrationPage() {
   // Clean formatted data for Excel Export (N/A for missing cells)
   const exportFormattedStores = useMemo(() => {
     return sortedAndFilteredStores.map(s => ({
-      Store_ID: s.Store_ID ?? 'N/A',
-      Store_Code: s.Store_Code || 'N/A',
-      Store_Name: s.Store_Name || 'N/A',
-      Status: s.Status || 'Active'
+      Store_ID: s.Store_ID ?? s.store_ID ?? 'N/A',
+      Store_Code: s.Store_Code ?? s.store_Code ?? 'N/A',
+      Store_Name: s.Store_Name ?? s.store_Name ?? 'N/A',
+      State: s.State ?? s.state ?? 'N/A',
+      City: s.City ?? s.city ?? 'N/A',
+      Store_Manager: s.Store_Manager ?? s.store_Manager ?? 'N/A',
+      Area_Manager: s.Area_Manager ?? s.area_Manager ?? 'N/A',
+      ZFM: s.ZFM ?? s.zfm ?? 'N/A',
+      LP: s.LP ?? s.lp ?? 'N/A',
+      Status: s.Status ?? s.status ?? 'Active'
     }));
   }, [sortedAndFilteredStores]);
 
@@ -290,6 +366,66 @@ export default function StoreRegistrationPage() {
       render: (val, row) => (
         <span style={{ fontWeight: 600, color: '#334155' }}>
           {val ?? row?.Store_Name ?? row?.store_Name ?? 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'State',
+      label: 'STATE',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 500, color: '#475569' }}>
+          {val ?? row?.State ?? row?.state ?? 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'City',
+      label: 'CITY',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 500, color: '#475569' }}>
+          {val ?? row?.City ?? row?.city ?? 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'Store_Manager',
+      label: 'STORE MANAGER',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 500, color: '#0284c7' }}>
+          {val ?? row?.Store_Manager ?? row?.store_Manager ?? 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'Area_Manager',
+      label: 'AREA MANAGER',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 500, color: '#334155' }}>
+          {val ?? row?.Area_Manager ?? row?.area_Manager ?? 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'ZFM',
+      label: 'ZFM',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 500, color: '#334155' }}>
+          {val ?? row?.ZFM ?? row?.zfm ?? 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'LP',
+      label: 'LP',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 500, color: '#334155' }}>
+          {val ?? row?.LP ?? row?.lp ?? 'N/A'}
         </span>
       )
     },
@@ -376,50 +512,133 @@ export default function StoreRegistrationPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="report-search-body">
-            {/* 1. Store Code */}
-            <div className="search-field">
-              <label>Store Code *</label>
-              <input
-                ref={storeCodeInputRef}
-                type="text"
-                className="vmm-auth-input"
-                placeholder="Enter store code (e.g. HD55)"
-                value={storeCode}
-                onChange={(e) => setStoreCode(e.target.value)}
-                disabled={isSubmitting}
-                autoComplete="off"
-              />
+          <div className="report-search-body report-search-body--stacked">
+            {/* Row 1: Store Location Details */}
+            <div className="report-search-row">
+              <div className="search-field">
+                <label>Store Code *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter store code (e.g. HD55)"
+                  value={storeCode}
+                  onChange={(e) => setStoreCode(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="search-field">
+                <label>Store Name *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter store name (e.g. HD55 - Dwarka)"
+                  value={storeName}
+                  onChange={(e) => setStoreName(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="search-field">
+                <label>State *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter state (e.g. Delhi, Haryana)"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="search-field">
+                <label>City *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter city (e.g. Delhi, Gurgaon)"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
             </div>
 
-            {/* 2. Store Name */}
-            <div className="search-field">
-              <label>Store Name *</label>
-              <input
-                type="text"
-                className="vmm-auth-input"
-                placeholder="Enter store name (e.g. HD55 - Dwarka)"
-                value={storeName}
-                onChange={(e) => setStoreName(e.target.value)}
-                disabled={isSubmitting}
-                autoComplete="off"
-              />
+            {/* Row 2: Management Personnel */}
+            <div className="report-search-row">
+              <div className="search-field">
+                <label>Store Manager *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter SM name or email"
+                  value={storeManager}
+                  onChange={(e) => setStoreManager(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="search-field">
+                <label>Area Manager *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter Area Manager"
+                  value={areaManager}
+                  onChange={(e) => setAreaManager(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="search-field">
+                <label>ZFM *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter ZFM"
+                  value={zfm}
+                  onChange={(e) => setZfm(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="search-field">
+                <label>LP *</label>
+                <input
+                  type="text"
+                  className="vmm-auth-input"
+                  placeholder="Enter LP"
+                  value={lp}
+                  onChange={(e) => setLp(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="off"
+                />
+              </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="search-buttons">
-              <SearchButton
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                label={isEditing ? 'Update Store' : 'Create Store'}
-                icon={isEditing ? <Edit2 size={13} /> : <Plus size={13} />}
-                className={isEditing ? 'btn-edit-mode' : ''}
-              />
-              <ClearButton
-                onClick={resetForm}
-                disabled={isSubmitting}
-                label={isEditing ? 'Cancel Edit' : 'Reset'}
-              />
+            {/* Row 3: Action Buttons (Centered) */}
+            <div className="report-search-row report-search-row--actions-center">
+              <div className="search-buttons">
+                <SearchButton
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  label={isEditing ? 'Update Store' : 'Create Store'}
+                  icon={isEditing ? <Edit2 size={13} /> : <Plus size={13} />}
+                  className={isEditing ? 'btn-edit-mode' : ''}
+                />
+                <ClearButton
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                  label={isEditing ? 'Cancel Edit' : 'Reset'}
+                />
+              </div>
             </div>
           </div>
         </form>
