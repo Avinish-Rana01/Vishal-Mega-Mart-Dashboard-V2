@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Eye, EyeOff, Power, Crown, UserPlus, Check } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Power, Crown, UserPlus, Check, Bell, BellRing, BellOff } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -183,7 +183,8 @@ export default function UserRegistrationPage() {
     setPassword(user.Password ?? user.password ?? '');
     setUserType(user.User_Type ?? user.user_Type ?? '');
     setEmailId(user.Email_ID ?? user.email_ID ?? user.emailId ?? '');
-    setIsEmailRequired(Boolean(user.Is_Email_Required ?? user.is_Email_Required ?? user.isEmailRequired));
+    const rawReq = user.Is_Email_Required ?? user.is_Email_Required ?? user.isEmailRequired;
+    setIsEmailRequired(rawReq === true || rawReq === 1 || String(rawReq).toLowerCase() === 'true' || String(rawReq) === '1');
 
     const userStoreId = user.Store_ID ?? user.store_ID;
     if (userStoreId && Number(userStoreId) > 0) {
@@ -234,7 +235,7 @@ export default function UserRegistrationPage() {
       return;
     }
     if (isEmailRequired && !emailId.trim()) {
-      setAlert({ type: 'error', message: 'Email ID is required when Email Required is checked.' });
+      setAlert({ type: 'error', message: 'Email ID is required when "Receives Updates" is enabled.' });
       return;
     }
     if (emailId.trim()) {
@@ -508,19 +509,23 @@ export default function UserRegistrationPage() {
     },
     {
       key: 'Is_Email_Required',
-      label: 'EMAIL REQ.',
+      label: 'RECEIVES UPDATES',
       align: 'center',
-      width: '95px',
+      width: '130px',
       sortable: true,
       render: (val, row) => {
         const rawVal = val ?? row?.Is_Email_Required ?? row?.is_Email_Required ?? row?.isEmailRequired;
         const isReq = rawVal === true || rawVal === 1 || String(rawVal).toLowerCase() === 'true' || String(rawVal).toLowerCase() === 'yes';
         return isReq ? (
-          <span className="vmm-email-check-badge" title="Email Required" aria-label="Email Required">
-            <Check size={12} strokeWidth={3} />
+          <span className="vmm-bell-table-badge active" title="Receives Updates Active">
+            <BellRing size={11} className="vmm-bell-icon active" />
+            <span>Active</span>
           </span>
         ) : (
-          <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>No</span>
+          <span className="vmm-bell-table-badge inactive" title="Receives Updates Inactive">
+            <BellOff size={11} />
+            <span>Off</span>
+          </span>
         );
       }
     },
@@ -707,21 +712,25 @@ export default function UserRegistrationPage() {
               />
             </div>
 
-            {/* 6. Email Required Checkbox */}
-            <div className="search-field vmm-checkbox-search-field">
-              <label className="vmm-checkbox-placeholder-label">Email Required</label>
-              <div className="vmm-checkbox-input-wrap">
-                <label className={`vmm-checkbox-label ${isEmailRequired ? 'checked' : ''}`}>
-                  <input
-                    type="checkbox"
-                    className="vmm-auth-checkbox"
-                    checked={isEmailRequired}
-                    onChange={(e) => setIsEmailRequired(e.target.checked)}
-                    disabled={isSubmitting}
-                  />
-                  <span>Email Required</span>
-                </label>
-              </div>
+            {/* 6. Receives Updates Notification Toggle */}
+            <div className="search-field">
+              <label>Notifications</label>
+              <button
+                type="button"
+                className={`vmm-notification-toggle-btn ${isEmailRequired ? 'active' : ''}`}
+                onClick={() => setIsEmailRequired(prev => !prev)}
+                disabled={isSubmitting}
+                title={isEmailRequired ? 'Click to disable updates notification' : 'Click to enable updates notification'}
+                aria-pressed={isEmailRequired}
+              >
+                {isEmailRequired ? (
+                  <BellRing size={13} className="vmm-bell-icon active" />
+                ) : (
+                  <Bell size={13} className="vmm-bell-icon" />
+                )}
+                <span>Receives Updates</span>
+                {isEmailRequired && <span className="vmm-bell-live-dot" />}
+              </button>
             </div>
 
             {/* Action Buttons */}

@@ -33,6 +33,7 @@ export default function ReportDataTableCard({
   exportFilters = {},
   directExport = false,
   showExport = true,
+  tableClassName = "vmm-table",
   getRowClassName = null,
   getRowStyle = null
 }) {
@@ -431,7 +432,7 @@ export default function ReportDataTableCard({
         lengthChange={false}
         domConfig='<"top">rt<"clear">'
         containerClassName="vmm-table-container"
-        tableClassName="vmm-table"
+        tableClassName={tableClassName}
         onSortChange={onSortChange}
         externalSortCol={sortColumn}
         externalSortDir={sortDirection}

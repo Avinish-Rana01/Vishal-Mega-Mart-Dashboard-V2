@@ -400,6 +400,54 @@
   font-size: 12px;
 }
 
+/* Explicit Column Alignment Modifiers */
+.vmm-table th.vmm-col-align-left,
+.vmm-table td.vmm-col-align-left,
+.vmm-th.vmm-col-align-left {
+  text-align: left !important;
+}
+.vmm-th.vmm-col-align-left .vmm-th-content {
+  justify-content: flex-start !important;
+}
+
+.vmm-table th.vmm-col-align-right,
+.vmm-table td.vmm-col-align-right,
+.vmm-th.vmm-col-align-right {
+  text-align: right !important;
+}
+.vmm-th.vmm-col-align-right .vmm-th-content {
+  justify-content: flex-end !important;
+}
+
+.vmm-table th.vmm-col-align-center,
+.vmm-table td.vmm-col-align-center,
+.vmm-th.vmm-col-align-center {
+  text-align: center !important;
+}
+.vmm-th.vmm-col-align-center .vmm-th-content {
+  justify-content: center !important;
+}
+
+/* Equi-spaced 5-Column Table Grid (Divides width into exact 20% fifths) */
+.vmm-table.vmm-equal-5-cols {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+.vmm-table.vmm-equal-5-cols th,
+.vmm-table.vmm-equal-5-cols td {
+  width: 20% !important;
+  min-width: 20% !important;
+  max-width: 20% !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+
+.vmm-table.vmm-equal-5-cols .vmm-th-content {
+  justify-content: center !important;
+  width: 100%;
+}
+
 .vmm-table-striped tbody tr:nth-child(even) {
   background-color: #fafbfc;
 }

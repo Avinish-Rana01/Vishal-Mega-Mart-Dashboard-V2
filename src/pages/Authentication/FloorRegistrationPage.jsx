@@ -292,6 +292,7 @@ export default function FloorRegistrationPage() {
       key: 'Store_Floor_ID',
       label: 'FLOOR ID',
       align: 'center',
+      width: '20%',
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 700, color: '#334155' }}>
@@ -302,6 +303,8 @@ export default function FloorRegistrationPage() {
     {
       key: 'Store_Name',
       label: 'STORE NAME',
+      align: 'center',
+      width: '20%',
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 600, color: '#1e293b' }}>
@@ -312,6 +315,8 @@ export default function FloorRegistrationPage() {
     {
       key: 'Store_Floor',
       label: 'FLOOR',
+      align: 'center',
+      width: '20%',
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 600, color: '#334155' }}>
@@ -323,7 +328,7 @@ export default function FloorRegistrationPage() {
       key: 'Status',
       label: 'FLOOR STATUS',
       align: 'center',
-      width: '110px',
+      width: '20%',
       sortable: true,
       render: (val, row) => {
         const statusStr = String(val ?? row?.Status ?? row?.status ?? 'Active');
@@ -340,7 +345,7 @@ export default function FloorRegistrationPage() {
       key: 'actions',
       label: 'ACTION',
       align: 'center',
-      width: '100px',
+      width: '20%',
       sortable: false,
       render: (_, row) => {
         const statusStr = String(row?.Status ?? row?.status ?? 'Active');
@@ -461,6 +466,7 @@ export default function FloorRegistrationPage() {
       <div>
         <ReportDataTableCard
           columns={columns}
+          tableClassName="vmm-table vmm-equal-5-cols"
           data={paginatedData}
           exportData={exportFormattedFloors}
           isLoading={isLoading}

@@ -381,6 +381,11 @@
   visibility: hidden;
   user-select: none;
   pointer-events: none;
+  font-size: 10px;
+  line-height: 12px;
+  height: 12px;
+  margin-bottom: 3px;
+  display: block;
 }
 
 .vmm-checkbox-input-wrap {
@@ -390,45 +395,114 @@
   box-sizing: border-box;
 }
 
-.vmm-checkbox-label {
+/* Notification Toggle Button (Replaces checkbox with animated Bell switch) */
+.vmm-notification-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   cursor: pointer;
   user-select: none;
-  font-size: 11px;
-  font-weight: 600;
-  color: #334155;
-  margin: 0 !important;
-  padding: 0 10px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0;
+  padding: 0 12px;
   height: 30px;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
+  line-height: normal;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   box-sizing: border-box;
+  outline: none;
 }
 
-.vmm-checkbox-label:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+.vmm-notification-toggle-btn:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #334155;
+  transform: translateY(-1px);
 }
 
-.vmm-checkbox-label.checked {
-  background: #eff6ff;
+.vmm-notification-toggle-btn:active {
+  transform: scale(0.98);
+}
+
+.vmm-notification-toggle-btn.active {
+  background: rgba(59, 130, 246, 0.08);
   border-color: #3B82F6;
   color: #1d4ed8;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.12);
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
-.vmm-auth-checkbox {
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
-  accent-color: #3B82F6;
-  border-radius: 4px;
-  margin: 0;
+.vmm-bell-icon {
+  color: #94a3b8;
+  transition: color 0.2s ease, transform 0.2s ease, fill 0.2s ease;
+}
+
+.vmm-notification-toggle-btn:hover .vmm-bell-icon {
+  color: #64748b;
+}
+
+.vmm-notification-toggle-btn.active .vmm-bell-icon.active {
+  color: #3B82F6;
+  fill: rgba(59, 130, 246, 0.22);
+  animation: bellSwing 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes bellSwing {
+  0% { transform: rotate(0); }
+  20% { transform: rotate(15deg); }
+  40% { transform: rotate(-13deg); }
+  60% { transform: rotate(8deg); }
+  80% { transform: rotate(-4deg); }
+  100% { transform: rotate(0); }
+}
+
+.vmm-bell-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #3B82F6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
+  margin-left: 2px;
+}
+
+/* Table Badge for Receive Updates Column */
+.vmm-bell-table-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 2px 8px;
+  width: 62px;
+  min-width: 62px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  box-sizing: border-box;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.vmm-bell-table-badge.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.vmm-bell-table-badge.active .vmm-bell-icon.active {
+  color: #3B82F6;
+  fill: rgba(59, 130, 246, 0.25);
+}
+
+.vmm-bell-table-badge.inactive {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
 }
 
 /* ==========================================================================
@@ -511,6 +585,25 @@
 .report-search-row:has(.custom-select-container.open) {
   position: relative;
   z-index: 50;
+}
+
+/* Precise vertical alignment of action buttons with form inputs */
+.report-search-card .search-field > label:not(.vmm-checkbox-label) {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+  height: 12px;
+  margin-bottom: 3px;
+  display: block;
+}
+
+.report-search-card .search-buttons {
+  margin-top: 15px;
+  height: 30px;
+}
+
+.report-search-card .report-search-row--actions-center .search-buttons {
+  margin-top: 0 !important;
 }
 
 

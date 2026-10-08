@@ -143,10 +143,11 @@ export default function BaseDataTable({
                   const isSortable = col.sortable !== false && ordering;
                   const effectiveSortKey = col.sortKey || col.key;
                   const isSorted = Boolean(activeSortCol && effectiveSortKey && activeSortCol.toLowerCase() === effectiveSortKey.toLowerCase());
+                  const alignClass = col.align === 'left' ? 'vmm-col-align-left' : col.align === 'right' ? 'vmm-col-align-right' : 'vmm-col-align-center';
                   return (
                     <th 
                       key={col.key} 
-                      className={`vmm-th ${col.className || ''} ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`.trim()}
+                      className={`vmm-th ${alignClass} ${col.className || ''} ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`.trim()}
                       onClick={() => isSortable && handleSort(col.key, col.sortKey)}
                       style={col.width ? { width: col.width } : undefined}
                     >
@@ -189,11 +190,14 @@ export default function BaseDataTable({
                       style={{ cursor: onRowClick ? 'pointer' : 'default', ...(customRowStyle || {}) }}
                       className={`vmm-tr ${customRowClass || ''}`.trim()}
                     >
-                      {columns.map((col) => (
-                        <td key={col.key} className={col.className || ''}>
-                          {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
-                        </td>
-                      ))}
+                      {columns.map((col) => {
+                        const alignClass = col.align === 'left' ? 'vmm-col-align-left' : col.align === 'right' ? 'vmm-col-align-right' : 'vmm-col-align-center';
+                        return (
+                          <td key={col.key} className={`${alignClass} ${col.className || ''}`.trim()} style={col.width ? { width: col.width } : undefined}>
+                            {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
+                          </td>
+                        );
+                      })}
                     </tr>
                   );
                 })
@@ -202,15 +206,18 @@ export default function BaseDataTable({
             {totals && (
               <tfoot>
                 <tr>
-                  {columns.map((col, idx) => (
-                    <td key={col.key}>
-                      {idx === 0
-                        ? totals[col.key] || 'TOTAL'
-                        : totals[col.key] !== undefined
-                        ? totals[col.key]
-                        : ''}
-                    </td>
-                  ))}
+                  {columns.map((col, idx) => {
+                    const alignClass = col.align === 'left' ? 'vmm-col-align-left' : col.align === 'right' ? 'vmm-col-align-right' : 'vmm-col-align-center';
+                    return (
+                      <td key={col.key} className={alignClass} style={col.width ? { width: col.width } : undefined}>
+                        {idx === 0
+                          ? totals[col.key] || 'TOTAL'
+                          : totals[col.key] !== undefined
+                          ? totals[col.key]
+                          : ''}
+                      </td>
+                    );
+                  })}
                 </tr>
               </tfoot>
             )}
