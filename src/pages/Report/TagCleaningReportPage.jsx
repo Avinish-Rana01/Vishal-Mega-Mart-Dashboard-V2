@@ -266,6 +266,12 @@ export default function TagCleaningReportPage() {
     }
   ], [pageIndex, pageSize]);
 
+  // Export filters for universal streaming export
+  const exportFilters = useMemo(() => ({
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate
+  }), [appliedFilters.fromDate, appliedFilters.toDate]);
+
   return (
     <AppLayout
       headerProps={{
@@ -355,6 +361,8 @@ export default function TagCleaningReportPage() {
           sortDirection={sortDirection}
           onSearch={handleTableSearch}
           searchPlaceholder="Search Records..."
+          reportName="TAG_CLEANING_REPORT"
+          exportFilters={exportFilters}
           exportFileName={`Tag_Cleaning_Report_${appliedFilters.fromDate}_to_${appliedFilters.toDate}.xlsx`}
         />
       </div>

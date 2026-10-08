@@ -194,6 +194,19 @@ export default function DispatchReportPage() {
     }));
   }, [modalData]);
 
+  // Main table export filters
+  const exportFilters = useMemo(() => ({
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate
+  }), [appliedFilters.fromDate, appliedFilters.toDate]);
+
+  // Modal drilldown export filters
+  const modalExportFilters = useMemo(() => ({
+    vehicleNo: selectedRow?.vehicleNo || '',
+    fromDate: selectedRow?.date || appliedFilters.fromDate,
+    toDate: selectedRow?.date || appliedFilters.toDate
+  }), [selectedRow, appliedFilters.fromDate, appliedFilters.toDate]);
+
   return (
     <AppLayout
       headerProps={{
@@ -280,7 +293,8 @@ export default function DispatchReportPage() {
           }}
           searchValue={appliedFilters.searchTerm}
           searchPlaceholder="Search in dispatches..."
-          directExport={true}
+          reportName="DISPATCH_REPORT"
+          exportFilters={exportFilters}
           exportFileName={`Dispatch_Report_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
           onSortChange={(col, dir) => {
             setSortColumn(col);
@@ -312,7 +326,9 @@ export default function DispatchReportPage() {
           tableData={modalData}
           totalRecords={modalData.length}
           isLoading={modalLoading}
-          exportFileName={`Vehicle_${selectedRow?.vehicleNo}_Details.csv`}
+          reportName="DISPATCH_REPORT_DETAILS"
+          exportFilters={modalExportFilters}
+          exportFileName={`Vehicle_${selectedRow?.vehicleNo || 'Report'}_Details.xlsx`}
           directExport={true}
         />
       )}

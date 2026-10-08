@@ -58,7 +58,6 @@ export default function TagCleaningDetailModal({
 
   // Modal Table State
   const [tableData, setTableData] = useState([]);
-  const [allExportData, setAllExportData] = useState(null);
   const [totalRecords, setTotalRecords] = useState(0);
 
   const [totalValidatedCount, setTotalValidatedCount] = useState(
@@ -126,35 +125,11 @@ export default function TagCleaningDetailModal({
     return () => controller.abort();
   }, [fetchModalData]);
 
-  // Fetch complete dataset for Excel export when total records exceed current page
-  useEffect(() => {
-    if (!formattedDate || totalRecords <= 0) return;
-    const controller = new AbortController();
-
-    const fetchAllForExport = async () => {
-      try {
-        const fullResult = await getTagCleaningData({
-          searchTerm,
-          pageIndex: 1,
-          pageSize: Math.max(totalRecords, 1000),
-          fromDate: formattedDate,
-          toDate: formattedDate,
-          sortColumn,
-          sortDirection
-        }, controller.signal);
-
-        const items = fullResult?.data || fullResult?.Data || [];
-        if (items.length > 0) {
-          setAllExportData(items);
-        }
-      } catch {
-        // Fall back to tableData if full export fetch fails
-      }
-    };
-
-    fetchAllForExport();
-    return () => controller.abort();
-  }, [formattedDate, totalRecords, searchTerm, sortColumn, sortDirection]);
+  // Export filters for universal streaming export
+  const exportFilters = useMemo(() => ({
+    fromDate: formattedDate,
+    toDate: formattedDate
+  }), [formattedDate]);
 
   // Two Summary KPI Cards matching reference design
   const summaryCards = useMemo(() => [
@@ -260,7 +235,6 @@ export default function TagCleaningDetailModal({
       summaryCards={summaryCards}
       tableColumns={tableColumns}
       tableData={tableData}
-      exportData={allExportData}
       totalRecords={totalRecords}
       isLoading={isLoading}
       pageIndex={pageIndex}
@@ -283,6 +257,9 @@ export default function TagCleaningDetailModal({
       }}
       sortColumn={sortColumn}
       sortDirection={sortDirection}
+      reportName="TAG_CLEANING_DETAILS"
+      exportFilters={exportFilters}
+      directExport={true}
       exportFileName={`Tag_Cleaning_Details_${formattedDate || 'Report'}.xlsx`}
     />
   );

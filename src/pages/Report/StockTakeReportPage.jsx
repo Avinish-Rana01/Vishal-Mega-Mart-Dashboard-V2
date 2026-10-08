@@ -367,6 +367,13 @@ export default function StockTakeReportPage() {
     }
   ], [pageIndex, pageSize]);
 
+  // Export filters for universal streaming export
+  const exportFilters = useMemo(() => ({
+    storeCode: appliedFilters.storeCode,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate
+  }), [appliedFilters.storeCode, appliedFilters.fromDate, appliedFilters.toDate]);
+
   return (
     <AppLayout
       headerProps={{
@@ -497,6 +504,8 @@ export default function StockTakeReportPage() {
           sortDirection={sortDirection}
           onSearch={handleTableSearch}
           searchPlaceholder="Search Records..."
+          reportName="STOCK_TAKE_REPORT"
+          exportFilters={exportFilters}
           exportFileName={`Stock_Take_Report_${appliedFilters.storeCode || 'ALL'}_${appliedFilters.fromDate}_to_${appliedFilters.toDate}.xlsx`}
         />
       </div>
