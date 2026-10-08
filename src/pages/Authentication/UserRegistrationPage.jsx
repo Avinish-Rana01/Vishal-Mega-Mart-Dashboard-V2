@@ -102,7 +102,7 @@ export default function UserRegistrationPage() {
         setStoreOptions(
           storesData.map(s => ({
             value: s.Store_ID ?? s.store_ID ?? s.id,
-            text: s.Store_Name ?? s.store_Name ?? `Store #${s.Store_ID ?? s.store_ID}`
+            text: s.Store_Name ?? s.store_Name ?? `Store ${s.Store_ID ?? s.store_ID}`
           }))
         );
       }
@@ -111,7 +111,7 @@ export default function UserRegistrationPage() {
         setWarehouseOptions(
           whData.map(w => ({
             value: w.WH_ID ?? w.wh_ID ?? w.id,
-            text: w.Wh_Name ?? w.wh_Name ?? `Warehouse #${w.WH_ID ?? w.wh_ID}`
+            text: w.Wh_Name ?? w.wh_Name ?? `Warehouse ${w.WH_ID ?? w.wh_ID}`
           }))
         );
       }
@@ -270,7 +270,7 @@ export default function UserRegistrationPage() {
     if (!confirmModal.user) return;
     const user = confirmModal.user;
     const userId = user.User_ID ?? user.user_ID ?? user.id;
-    const name = user.User_Name ?? user.user_Name ?? `User #${userId}`;
+    const name = user.User_Name ?? user.user_Name ?? `User ${userId}`;
 
     setConfirmModal(prev => ({ ...prev, isLoading: true }));
     try {
@@ -360,7 +360,7 @@ export default function UserRegistrationPage() {
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 700, color: '#334155' }}>
-          #{val ?? row?.User_ID ?? row?.user_ID}
+          {val ?? row?.User_ID ?? row?.user_ID}
         </span>
       )
     },
@@ -492,7 +492,7 @@ export default function UserRegistrationPage() {
       <div className="report-search-card">
         <div className="report-search-header">
           <span>
-            {isEditing ? `EDITING USER #${editingUserId}` : 'USER REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing ? `EDITING USER ${editingUserId}` : 'USER REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
         </div>
 

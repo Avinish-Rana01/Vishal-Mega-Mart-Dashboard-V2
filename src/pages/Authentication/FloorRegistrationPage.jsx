@@ -67,7 +67,7 @@ export default function FloorRegistrationPage() {
         setStoreOptions(
           data.map((s) => ({
             value: String(s.Store_ID ?? s.store_ID ?? s.id),
-            text: s.Store_Name ?? s.store_Name ?? `Store #${s.Store_ID ?? s.store_ID}`
+            text: s.Store_Name ?? s.store_Name ?? `Store ${s.Store_ID ?? s.store_ID}`
           }))
         );
       }
@@ -186,7 +186,7 @@ export default function FloorRegistrationPage() {
     if (!confirmModal.floor) return;
     const floor = confirmModal.floor;
     const floorId = floor.Store_Floor_ID ?? floor.store_Floor_ID ?? floor.id;
-    const floorDisplayName = floor.Store_Floor ?? floor.store_Floor ?? `Floor #${floorId}`;
+    const floorDisplayName = floor.Store_Floor ?? floor.store_Floor ?? `Floor ${floorId}`;
     const storeDisplayName = floor.Store_Name ?? floor.store_Name ?? '';
 
     setConfirmModal(prev => ({ ...prev, isLoading: true }));
@@ -269,6 +269,17 @@ export default function FloorRegistrationPage() {
 
   // Table Columns Definition matching Floor Master Legacy Screen
   const columns = useMemo(() => [
+    {
+      key: 'Store_Floor_ID',
+      label: 'FLOOR ID',
+      align: 'center',
+      sortable: true,
+      render: (val, row) => (
+        <span style={{ fontWeight: 700, color: '#334155' }}>
+          {val ?? row?.Store_Floor_ID ?? row?.store_Floor_ID ?? 'N/A'}
+        </span>
+      )
+    },
     {
       key: 'Store_Name',
       label: 'STORE NAME',
@@ -367,7 +378,7 @@ export default function FloorRegistrationPage() {
       <div className="report-search-card">
         <div className="report-search-header">
           <span>
-            {isEditing ? `EDITING FLOOR #${editingFloorId}` : 'FLOOR MASTER'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing ? `EDITING FLOOR ${editingFloorId}` : 'FLOOR MASTER'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
         </div>
 

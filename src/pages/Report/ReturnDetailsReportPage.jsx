@@ -113,8 +113,8 @@ export default function ReturnDetailsReportPage() {
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
-    setFromDate(defaultDate);
-    setToDate(defaultDate);
+    setFromDate(defaultFromDate);
+    setToDate(defaultToDate);
     setSortColumn('DATE');
     setSortDirection('asc');
     setPageIndex(1);

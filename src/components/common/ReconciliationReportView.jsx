@@ -198,8 +198,8 @@ export default function ReconciliationReportView({ type = 'return' }) {
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
-    setFromDate(defaultDate);
-    setToDate(defaultDate);
+    setFromDate(defaultFromDate);
+    setToDate(defaultToDate);
     setPos('');
     setEan('');
     setEanSearchTerm('');

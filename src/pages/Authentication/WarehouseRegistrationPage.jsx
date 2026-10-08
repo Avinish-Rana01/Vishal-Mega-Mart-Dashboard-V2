@@ -168,7 +168,7 @@ export default function WarehouseRegistrationPage() {
     if (!confirmModal.warehouse) return;
     const wh = confirmModal.warehouse;
     const whId = wh.WH_ID ?? wh.wh_ID ?? wh.id;
-    const whDisplayName = wh.Wh_Name ?? wh.wh_Name ?? wh.Wh_Code ?? `Warehouse #${whId}`;
+    const whDisplayName = wh.Wh_Name ?? wh.wh_Name ?? wh.Wh_Code ?? `Warehouse ${whId}`;
 
     setConfirmModal(prev => ({ ...prev, isLoading: true }));
     try {
@@ -257,7 +257,7 @@ export default function WarehouseRegistrationPage() {
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 700, color: '#334155' }}>
-          #{val ?? row?.WH_ID ?? row?.wh_ID}
+          {val ?? row?.WH_ID ?? row?.wh_ID}
         </span>
       )
     },
@@ -372,7 +372,7 @@ export default function WarehouseRegistrationPage() {
       <div className="report-search-card">
         <div className="report-search-header">
           <span>
-            {isEditing ? `EDITING WAREHOUSE #${editingWhId}` : 'WAREHOUSE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing ? `EDITING WAREHOUSE ${editingWhId}` : 'WAREHOUSE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
         </div>
 

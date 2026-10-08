@@ -163,7 +163,7 @@ export default function StoreRegistrationPage() {
     if (!confirmModal.store) return;
     const store = confirmModal.store;
     const storeId = store.Store_ID ?? store.store_ID ?? store.id;
-    const storeDisplayName = store.Store_Name ?? store.store_Name ?? store.Store_Code ?? `Store #${storeId}`;
+    const storeDisplayName = store.Store_Name ?? store.store_Name ?? store.Store_Code ?? `Store ${storeId}`;
 
     setConfirmModal(prev => ({ ...prev, isLoading: true }));
     try {
@@ -250,7 +250,7 @@ export default function StoreRegistrationPage() {
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 700, color: '#334155' }}>
-          #{val ?? row?.Store_ID ?? row?.store_ID}
+          {val ?? row?.Store_ID ?? row?.store_ID}
         </span>
       )
     },
@@ -352,7 +352,7 @@ export default function StoreRegistrationPage() {
       <div className="report-search-card">
         <div className="report-search-header">
           <span>
-            {isEditing ? `EDITING STORE #${editingStoreId}` : 'STORE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
+            {isEditing ? `EDITING STORE ${editingStoreId}` : 'STORE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
         </div>
 

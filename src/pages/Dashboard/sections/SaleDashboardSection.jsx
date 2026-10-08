@@ -430,12 +430,7 @@ export default function SaleDashboardSection() {
               </span>
             </td>
             <td className="cc-data-grid-td">
-              <span 
-                className="sale-clickable-cell"
-                style={{ color: '#3B82F6', fontWeight: 600 }}
-                onClick={() => handleCellClick(row, 'TOTAL_TAFFETA_SALE')}
-                title="Click to view Taffeta Sale details"
-              >
+              <span style={{ color: '#3B82F6', fontWeight: 600 }}>
                 {Number(row.TOTAL_TAFFETA_SALE || 0).toLocaleString('en-IN')}
               </span>
             </td>
