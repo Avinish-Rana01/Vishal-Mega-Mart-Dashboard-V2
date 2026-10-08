@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Power } from 'lucide-react';
+import { Edit2, Power, Plus } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -24,6 +24,8 @@ export default function WarehouseRegistrationPage() {
   const [whAddress, setWhAddress] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingWhId, setEditingWhId] = useState(null);
+  const [editTriggerAnim, setEditTriggerAnim] = useState(false);
+  const whCodeInputRef = useRef(null);
 
   // Table Data & Loading State
   const [warehouses, setWarehouses] = useState([]);
@@ -80,6 +82,17 @@ export default function WarehouseRegistrationPage() {
     fetchWarehouses();
   }, [fetchWarehouses]);
 
+  // Keyboard shortcut: Escape cancels edit mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isEditing) {
+        resetForm();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditing]);
+
   // Reset / Clear form
   const resetForm = () => {
     setWhCode('');
@@ -87,6 +100,7 @@ export default function WarehouseRegistrationPage() {
     setWhAddress('');
     setIsEditing(false);
     setEditingWhId(null);
+    setEditTriggerAnim(false);
   };
 
   // Populate form for Edit Mode
@@ -96,6 +110,11 @@ export default function WarehouseRegistrationPage() {
     setWhCode(wh.Wh_Code ?? wh.wh_Code ?? '');
     setWhName(wh.Wh_Name ?? wh.wh_Name ?? '');
     setWhAddress(wh.Wh_Address ?? wh.wh_Address ?? '');
+
+    // Trigger field entrance shake
+    setEditTriggerAnim(true);
+    setTimeout(() => setEditTriggerAnim(false), 550);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -369,8 +388,8 @@ export default function WarehouseRegistrationPage() {
       <ToastNotification alert={alert} onClose={() => setAlert(null)} />
 
       {/* Top Search / Form Card (VMM Standard Design) */}
-      <div className="report-search-card">
-        <div className="report-search-header">
+      <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
+        <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
             {isEditing ? `EDITING WAREHOUSE ${editingWhId}` : 'WAREHOUSE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
@@ -382,6 +401,7 @@ export default function WarehouseRegistrationPage() {
             <div className="search-field">
               <label>Warehouse Code *</label>
               <input
+                ref={whCodeInputRef}
                 type="text"
                 className="vmm-auth-input"
                 placeholder="Enter warehouse code (e.g. VMM001)"
@@ -426,6 +446,8 @@ export default function WarehouseRegistrationPage() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 label={isEditing ? 'Update Warehouse' : 'Create Warehouse'}
+                icon={isEditing ? <Edit2 size={13} /> : <Plus size={13} />}
+                className={isEditing ? 'btn-edit-mode' : ''}
               />
               <ClearButton
                 onClick={resetForm}
@@ -459,6 +481,10 @@ export default function WarehouseRegistrationPage() {
           onSortChange={handleSortChange}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          getRowClassName={(row) => {
+            const rowId = row?.WH_ID ?? row?.wh_ID ?? row?.id;
+            return isEditing && Number(editingWhId) === Number(rowId) ? 'vmm-row-currently-editing' : '';
+          }}
         />
       </div>
 

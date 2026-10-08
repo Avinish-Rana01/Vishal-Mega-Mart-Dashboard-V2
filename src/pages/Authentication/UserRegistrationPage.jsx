@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Eye, EyeOff, Power, Crown } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Power, Crown, UserPlus } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -38,6 +38,8 @@ export default function UserRegistrationPage() {
   const [isEmailRequired, setIsEmailRequired] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
+  const [editTriggerAnim, setEditTriggerAnim] = useState(false);
+  const usernameInputRef = useRef(null);
 
   // Table Data & Loading State
   const [users, setUsers] = useState([]);
@@ -148,6 +150,17 @@ export default function UserRegistrationPage() {
     fetchUsers();
   }, [loadDropdowns, fetchUsers]);
 
+  // Keyboard shortcut: Escape cancels edit mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isEditing) {
+        resetForm();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditing]);
+
   // Reset / Clear form
   const resetForm = () => {
     setUserName('');
@@ -159,6 +172,7 @@ export default function UserRegistrationPage() {
     setIsEmailRequired(false);
     setIsEditing(false);
     setEditingUserId(null);
+    setEditTriggerAnim(false);
   };
 
   // Populate form for Edit Mode
@@ -187,6 +201,10 @@ export default function UserRegistrationPage() {
     } else {
       setWhId('');
     }
+
+    // Trigger snappy entrance shake animation
+    setEditTriggerAnim(true);
+    setTimeout(() => setEditTriggerAnim(false), 550);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -579,8 +597,8 @@ export default function UserRegistrationPage() {
       <ToastNotification alert={alert} onClose={() => setAlert(null)} />
 
       {/* Top Search / Form Card (VMM Standard Design) */}
-      <div className="report-search-card">
-        <div className="report-search-header">
+      <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
+        <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
             {isEditing ? `EDITING USER ${editingUserId}` : 'USER REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
@@ -629,6 +647,7 @@ export default function UserRegistrationPage() {
             <div className="search-field">
               <label>Username *</label>
               <input
+                ref={usernameInputRef}
                 type="text"
                 className="vmm-auth-input"
                 placeholder="Enter username"
@@ -701,6 +720,8 @@ export default function UserRegistrationPage() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 label={isEditing ? 'Update User' : 'Create User'}
+                icon={isEditing ? <Edit2 size={13} /> : <UserPlus size={13} />}
+                className={isEditing ? 'btn-edit-mode' : ''}
               />
               <ClearButton
                 onClick={resetForm}
@@ -735,8 +756,15 @@ export default function UserRegistrationPage() {
           sortColumn={sortColumn}
           sortDirection={sortDirection}
           getRowClassName={(row) => {
+            const rowId = row?.User_ID ?? row?.user_ID ?? row?.id;
+            const isCurrentlyEditing = isEditing && Number(editingUserId) === Number(rowId);
             const role = String(row?.User_Type ?? row?.user_Type ?? '');
-            return /super\s*admin/i.test(role) ? 'super-admin-row' : '';
+            const isSuperAdmin = /super\s*admin/i.test(role);
+
+            const classes = [];
+            if (isSuperAdmin) classes.push('super-admin-row');
+            if (isCurrentlyEditing) classes.push('vmm-row-currently-editing');
+            return classes.join(' ');
           }}
         />
       </div>

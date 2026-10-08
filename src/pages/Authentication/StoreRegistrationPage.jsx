@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Power } from 'lucide-react';
+import { Edit2, Power, Plus } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -23,6 +23,8 @@ export default function StoreRegistrationPage() {
   const [storeName, setStoreName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingStoreId, setEditingStoreId] = useState(null);
+  const [editTriggerAnim, setEditTriggerAnim] = useState(false);
+  const storeCodeInputRef = useRef(null);
 
   // Table Data & Loading State
   const [stores, setStores] = useState([]);
@@ -79,12 +81,24 @@ export default function StoreRegistrationPage() {
     fetchStores();
   }, [fetchStores]);
 
+  // Keyboard shortcut: Escape cancels edit mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isEditing) {
+        resetForm();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditing]);
+
   // Reset / Clear form
   const resetForm = () => {
     setStoreCode('');
     setStoreName('');
     setIsEditing(false);
     setEditingStoreId(null);
+    setEditTriggerAnim(false);
   };
 
   // Populate form for Edit Mode
@@ -93,6 +107,11 @@ export default function StoreRegistrationPage() {
     setEditingStoreId(store.Store_ID ?? store.store_ID ?? store.id);
     setStoreCode(store.Store_Code ?? store.store_Code ?? '');
     setStoreName(store.Store_Name ?? store.store_Name ?? '');
+
+    // Trigger field entrance shake
+    setEditTriggerAnim(true);
+    setTimeout(() => setEditTriggerAnim(false), 550);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -349,8 +368,8 @@ export default function StoreRegistrationPage() {
       <ToastNotification alert={alert} onClose={() => setAlert(null)} />
 
       {/* Top Search / Form Card (VMM Standard Design) */}
-      <div className="report-search-card">
-        <div className="report-search-header">
+      <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
+        <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
             {isEditing ? `EDITING STORE ${editingStoreId}` : 'STORE REGISTRATION'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
@@ -362,6 +381,7 @@ export default function StoreRegistrationPage() {
             <div className="search-field">
               <label>Store Code *</label>
               <input
+                ref={storeCodeInputRef}
                 type="text"
                 className="vmm-auth-input"
                 placeholder="Enter store code (e.g. HD55)"
@@ -392,6 +412,8 @@ export default function StoreRegistrationPage() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 label={isEditing ? 'Update Store' : 'Create Store'}
+                icon={isEditing ? <Edit2 size={13} /> : <Plus size={13} />}
+                className={isEditing ? 'btn-edit-mode' : ''}
               />
               <ClearButton
                 onClick={resetForm}
@@ -425,6 +447,10 @@ export default function StoreRegistrationPage() {
           onSortChange={handleSortChange}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          getRowClassName={(row) => {
+            const rowId = row?.Store_ID ?? row?.store_ID ?? row?.id;
+            return isEditing && Number(editingStoreId) === Number(rowId) ? 'vmm-row-currently-editing' : '';
+          }}
         />
       </div>
 

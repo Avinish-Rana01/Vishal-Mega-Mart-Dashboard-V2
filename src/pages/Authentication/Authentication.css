@@ -172,6 +172,18 @@
   border-left: 3px solid #f59e0b !important;
 }
 
+/* Row currently in Edit Mode */
+.vmm-table tbody tr.vmm-row-currently-editing,
+.vmm-table-striped tbody tr.vmm-row-currently-editing,
+.vmm-table-striped tbody tr.vmm-row-currently-editing:nth-child(even),
+.vmm-table-striped tbody tr.vmm-row-currently-editing:nth-child(odd) {
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+
+.vmm-table tbody tr.vmm-row-currently-editing td:first-child {
+  border-left: 3px solid #10B981 !important;
+}
+
 /* ==========================================================================
    Checkbox Field in Authentication Forms (Laser-Aligned with vmm-auth-input)
    ========================================================================== */
@@ -232,3 +244,44 @@
   border-radius: 4px;
   margin: 0;
 }
+
+/* ==========================================================================
+   Edit Mode Dynamics (Field-Only Shake & Green Header Gradient)
+   ========================================================================== */
+
+/* Header and card container remain completely motionless */
+.report-search-card.vmm-edit-shake-anim {
+  transform: none !important;
+}
+
+.report-search-header {
+  transform: none !important;
+}
+
+/* Staggered shake animation ONLY on text/input fields */
+.report-search-card.vmm-edit-shake-anim .search-field {
+  animation: vmmFieldShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.report-search-card.vmm-edit-shake-anim .search-field:nth-child(1) { animation-delay: 0.02s; }
+.report-search-card.vmm-edit-shake-anim .search-field:nth-child(2) { animation-delay: 0.05s; }
+.report-search-card.vmm-edit-shake-anim .search-field:nth-child(3) { animation-delay: 0.08s; }
+.report-search-card.vmm-edit-shake-anim .search-field:nth-child(4) { animation-delay: 0.11s; }
+.report-search-card.vmm-edit-shake-anim .search-field:nth-child(5) { animation-delay: 0.14s; }
+.report-search-card.vmm-edit-shake-anim .search-field:nth-child(6) { animation-delay: 0.17s; }
+
+@keyframes vmmFieldShake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Edit Mode Header: Vibrant Green with high-contrast gradient effect */
+.report-search-header.vmm-edit-mode-header {
+  background: linear-gradient(to right, #34d399 0%, #10B981 35%, #047857 80%, #064e3b 100%) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+

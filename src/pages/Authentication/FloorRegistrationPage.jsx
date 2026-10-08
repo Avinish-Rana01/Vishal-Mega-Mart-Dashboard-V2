@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Power } from 'lucide-react';
+import { Edit2, Power, Plus } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -25,6 +25,8 @@ export default function FloorRegistrationPage() {
   const [floorName, setFloorName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingFloorId, setEditingFloorId] = useState(null);
+  const [editTriggerAnim, setEditTriggerAnim] = useState(false);
+  const floorNameInputRef = useRef(null);
 
   // Store Dropdown Options
   const [storeOptions, setStoreOptions] = useState([]);
@@ -102,12 +104,24 @@ export default function FloorRegistrationPage() {
     fetchFloors();
   }, [fetchStores, fetchFloors]);
 
+  // Keyboard shortcut: Escape cancels edit mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isEditing) {
+        resetForm();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditing]);
+
   // Reset / Clear form
   const resetForm = () => {
     setSelectedStoreId('');
     setFloorName('');
     setIsEditing(false);
     setEditingFloorId(null);
+    setEditTriggerAnim(false);
   };
 
   // Populate form for Edit Mode
@@ -116,6 +130,11 @@ export default function FloorRegistrationPage() {
     setEditingFloorId(floor.Store_Floor_ID ?? floor.store_Floor_ID ?? floor.id);
     setSelectedStoreId(String(floor.Store_ID ?? floor.store_ID ?? ''));
     setFloorName(floor.Store_Floor ?? floor.store_Floor ?? '');
+
+    // Trigger field entrance shake
+    setEditTriggerAnim(true);
+    setTimeout(() => setEditTriggerAnim(false), 550);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -375,8 +394,8 @@ export default function FloorRegistrationPage() {
       <ToastNotification alert={alert} onClose={() => setAlert(null)} />
 
       {/* Top Search / Form Card (VMM Standard Design) */}
-      <div className="report-search-card">
-        <div className="report-search-header">
+      <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
+        <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
           <span>
             {isEditing ? `EDITING FLOOR ${editingFloorId}` : 'FLOOR MASTER'} - NOTE : FIELDS MARKED WITH (*) ARE REQUIRED
           </span>
@@ -400,6 +419,7 @@ export default function FloorRegistrationPage() {
             <div className="search-field">
               <label>Floor *</label>
               <input
+                ref={floorNameInputRef}
                 type="text"
                 className="vmm-auth-input"
                 placeholder="Enter Floor"
@@ -415,12 +435,14 @@ export default function FloorRegistrationPage() {
               <SearchButton
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                label={isEditing ? 'Update Floor' : 'Submit'}
+                label={isEditing ? 'Update Floor' : 'Create Floor'}
+                icon={isEditing ? <Edit2 size={13} /> : <Plus size={13} />}
+                className={isEditing ? 'btn-edit-mode' : ''}
               />
               <ClearButton
                 onClick={resetForm}
                 disabled={isSubmitting}
-                label={isEditing ? 'Cancel Edit' : 'Clear'}
+                label={isEditing ? 'Cancel Edit' : 'Reset'}
               />
             </div>
           </div>
@@ -449,6 +471,10 @@ export default function FloorRegistrationPage() {
           onSortChange={handleSortChange}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          getRowClassName={(row) => {
+            const rowId = row?.Store_Floor_ID ?? row?.store_Floor_ID ?? row?.id;
+            return isEditing && Number(editingFloorId) === Number(rowId) ? 'vmm-row-currently-editing' : '';
+          }}
         />
       </div>
 

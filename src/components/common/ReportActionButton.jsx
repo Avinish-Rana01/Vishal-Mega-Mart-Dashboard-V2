@@ -42,19 +42,22 @@ export const BackButton = ({ onClick, label = 'Back', disabled = false }) => (
 
 /**
  * SearchButton — Modern vibrant blue gradient pill button matching VMM primary actions.
+ * Supports optional custom icon and variant classes.
  * @param {Object} props
  * @param {Function} props.onClick - Click handler
  * @param {boolean} [props.disabled] - Disabled state
  * @param {string} [props.label] - Button text (default: "Search")
+ * @param {React.ReactNode} [props.icon] - Optional custom icon
+ * @param {string} [props.className] - Optional custom class name
  */
-export const SearchButton = ({ onClick, disabled = false, label = 'Search' }) => (
+export const SearchButton = ({ onClick, disabled = false, label = 'Search', icon, className = '' }) => (
   <button
     type="button"
-    className="report-action-btn report-action-btn--search"
+    className={`report-action-btn report-action-btn--search ${className}`.trim()}
     onClick={onClick}
     disabled={disabled}
   >
-    <Search size={14} />
+    {icon !== undefined ? icon : <Search size={14} />}
     {label}
   </button>
 );
