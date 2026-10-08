@@ -32,7 +32,9 @@ export default function ReportDataTableCard({
   exportParams = {},
   exportFilters = {},
   directExport = false,
-  showExport = true
+  showExport = true,
+  getRowClassName = null,
+  getRowStyle = null
 }) {
   const [internalSearch, setInternalSearch] = useState(searchValue || '');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -427,6 +429,8 @@ export default function ReportDataTableCard({
         onSortChange={onSortChange}
         externalSortCol={sortColumn}
         externalSortDir={sortDirection}
+        getRowClassName={getRowClassName}
+        getRowStyle={getRowStyle}
       />
       
       <div className="ls-toolbar-bottom">

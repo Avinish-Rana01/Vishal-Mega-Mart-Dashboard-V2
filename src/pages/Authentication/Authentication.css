@@ -151,4 +151,26 @@
   color: #15803d;
 }
 
+/* ==========================================================================
+   Super Admin Golden Row Styling
+   ========================================================================== */
+.vmm-table tbody tr.super-admin-row,
+.vmm-table-striped tbody tr.super-admin-row,
+.vmm-table-striped tbody tr.super-admin-row:nth-child(even),
+.vmm-table-striped tbody tr.super-admin-row:nth-child(odd) {
+  background: linear-gradient(90deg, rgba(254, 243, 199, 0.45) 0%, rgba(254, 249, 195, 0.3) 50%, rgba(254, 243, 199, 0.18) 100%) !important;
+}
+
+.vmm-table tbody tr.super-admin-row:hover,
+.vmm-table-striped tbody tr.super-admin-row:hover,
+.vmm-table-striped tbody tr.super-admin-row:nth-child(even):hover,
+.vmm-table-striped tbody tr.super-admin-row:nth-child(odd):hover {
+  background: linear-gradient(90deg, rgba(253, 230, 138, 0.6) 0%, rgba(254, 240, 138, 0.45) 50%, rgba(253, 230, 138, 0.3) 100%) !important;
+}
+
+.vmm-table tbody tr.super-admin-row td:first-child {
+  border-left: 3px solid #f59e0b !important;
+}
+
+
 

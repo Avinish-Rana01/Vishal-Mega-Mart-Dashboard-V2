@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit2, Eye, EyeOff, Power } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Power, Crown } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -380,9 +380,46 @@ export default function UserRegistrationPage() {
       sortable: true,
       render: (val, row) => {
         const role = String(val ?? row?.User_Type ?? row?.user_Type ?? 'N/A');
+        const isSuperAdmin = /super\s*admin/i.test(role);
         const isAdmin = role.toLowerCase().includes('admin');
+
+        if (isSuperAdmin) {
+          return (
+            <span 
+              style={{ 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                fontWeight: 700, 
+                color: '#d97706',
+                letterSpacing: '0.2px' 
+              }}
+            >
+              <Crown 
+                size={15} 
+                color="#d97706" 
+                fill="#f59e0b" 
+                style={{ 
+                  filter: 'drop-shadow(0 1px 2px rgba(217, 119, 6, 0.4))',
+                  flexShrink: 0 
+                }} 
+              />
+              <span 
+                style={{ 
+                  background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: 'drop-shadow(0 1px 1px rgba(245, 158, 11, 0.25))'
+                }}
+              >
+                {role}
+              </span>
+            </span>
+          );
+        }
+
         return (
-          <span style={{ fontWeight: 600, color: isAdmin ? '#2563eb' : '#475569' }}>
+          <span style={{ fontWeight: 600, color: isAdmin ? '#3B82F6' : '#475569' }}>
             {role}
           </span>
         );
@@ -613,6 +650,10 @@ export default function UserRegistrationPage() {
           onSortChange={handleSortChange}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          getRowClassName={(row) => {
+            const role = String(row?.User_Type ?? row?.user_Type ?? '');
+            return /super\s*admin/i.test(role) ? 'super-admin-row' : '';
+          }}
         />
       </div>
 

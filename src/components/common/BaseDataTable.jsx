@@ -23,7 +23,9 @@ export default function BaseDataTable({
   ordering = true,
   onSortChange = null,
   externalSortCol = null,
-  externalSortDir = null
+  externalSortDir = null,
+  getRowClassName = null,
+  getRowStyle = null
 }) {
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState(null); // 'asc' | 'desc' | null
@@ -178,12 +180,14 @@ export default function BaseDataTable({
                 </tr>
               ) : (
                 sortedData.map((row, rowIdx) => {
+                  const customRowClass = getRowClassName ? getRowClassName(row, rowIdx) : '';
+                  const customRowStyle = getRowStyle ? getRowStyle(row, rowIdx) : undefined;
                   return (
                     <tr 
                       key={rowIdx}
                       onClick={() => onRowClick && onRowClick(row)}
-                      style={{ cursor: onRowClick ? 'pointer' : 'default' }}
-                      className="vmm-tr"
+                      style={{ cursor: onRowClick ? 'pointer' : 'default', ...(customRowStyle || {}) }}
+                      className={`vmm-tr ${customRowClass || ''}`.trim()}
                     >
                       {columns.map((col) => (
                         <td key={col.key} className={col.className || ''}>
