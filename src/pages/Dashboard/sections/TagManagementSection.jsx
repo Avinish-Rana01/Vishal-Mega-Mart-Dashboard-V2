@@ -197,11 +197,11 @@ export default function TagManagementSection() {
                 segments={cycleData}
                 centerText={cycleTotal.toLocaleString('en-IN')}
                 centerSubtext="Total Tag Count"
-                height={175}
+                height={220}
                 cy="80%"
                 centerTop="74%"
                 innerRadius="65%"
-                outerRadius="92%"
+                outerRadius="95%"
                 showLegend={false}
                 halfCircle={true}
               />

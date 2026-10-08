@@ -51,7 +51,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
           <span style={{ color: '#64748b' }}>Total DPOS Sale:</span>
-          <span style={{ fontWeight: 700, color: '#1e293b' }}>{data.DPOS?.toLocaleString('en-IN')}</span>
+          <span style={{ fontWeight: 700, color: '#f97316' }}>{data.DPOS?.toLocaleString('en-IN')}</span>
         </div>
         <div style={{ height: '1px', background: '#f1f5f9', margin: '8px 0' }}></div>
         {payload.map((entry, index) => (
@@ -308,15 +308,15 @@ export default function SaleDashboardSection() {
           {barData.length > 0 && (
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '14px', margin: '4px 0 10px 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#EF5350' }} />
                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Manual Sale</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#3B82F6' }} />
                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Taffeta Sale</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10B981' }} />
                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>RFID Checkout</span>
               </div>
             </div>
@@ -331,9 +331,9 @@ export default function SaleDashboardSection() {
                   stacked={true}
                   customTooltip={<CustomTooltip />}
                   bars={[
-                    { dataKey: 'RFID', color: '#10b981', label: 'RFID Checkout' },
-                    { dataKey: 'Taffeta', color: '#8b5cf6', label: 'Taffeta Sale' },
-                    { dataKey: 'Manual', color: '#f59e0b', label: 'Manual Sale' }
+                    { dataKey: 'RFID', color: '#10B981', label: 'RFID Checkout' },
+                    { dataKey: 'Taffeta', color: '#3B82F6', label: 'Taffeta Sale' },
+                    { dataKey: 'Manual', color: '#EF5350', label: 'Manual Sale' }
                   ]}
                   height={235}
                   hideLegend={true}
@@ -394,7 +394,7 @@ export default function SaleDashboardSection() {
                 className="cc-row-tooltip-wrapper sale-clickable-cell"
                 onClick={() => handleCellClick(row, 'STORE')}
                 title="Click to view daily store sales report"
-                style={{ color: '#1d4ed8', fontWeight: 700 }}
+                style={{ color: '#3B82F6', fontWeight: 700 }}
               >
                 <span>
                   {row.STORE || '—'}
@@ -412,7 +412,7 @@ export default function SaleDashboardSection() {
             <td className="cc-data-grid-td">
               <span 
                 className="sale-clickable-cell"
-                style={{ color: '#1d4ed8', fontWeight: 600 }}
+                style={{ color: '#f97316', fontWeight: 700 }}
                 onClick={() => handleCellClick(row, 'TOTAL_DPOS_SALE')}
                 title="Click to view POS Sale details"
               >
@@ -422,7 +422,7 @@ export default function SaleDashboardSection() {
             <td className="cc-data-grid-td">
               <span 
                 className="sale-clickable-cell"
-                style={{ color: '#1d4ed8', fontWeight: 600 }}
+                style={{ color: '#10B981', fontWeight: 600 }}
                 onClick={() => handleCellClick(row, 'TOTAL_RFID_CHECKOUT')}
                 title="Click to view RFID Checkout details"
               >
@@ -430,12 +430,19 @@ export default function SaleDashboardSection() {
               </span>
             </td>
             <td className="cc-data-grid-td">
-              {Number(row.TOTAL_TAFFETA_SALE || 0).toLocaleString('en-IN')}
+              <span 
+                className="sale-clickable-cell"
+                style={{ color: '#3B82F6', fontWeight: 600 }}
+                onClick={() => handleCellClick(row, 'TOTAL_TAFFETA_SALE')}
+                title="Click to view Taffeta Sale details"
+              >
+                {Number(row.TOTAL_TAFFETA_SALE || 0).toLocaleString('en-IN')}
+              </span>
             </td>
             <td className="cc-data-grid-td">
               <span 
                 className="sale-clickable-cell"
-                style={{ color: '#1d4ed8', fontWeight: 600 }}
+                style={{ color: '#EF5350', fontWeight: 600 }}
                 onClick={() => handleCellClick(row, 'TOTAL_MANUAL_SALE')}
                 title="Click to view Manual Sale details"
               >

@@ -19,8 +19,8 @@ import '../../../components/charts/DashboardSection.css';
 import './CycleCountShared.css';
 import * as Icons from 'lucide-react';
 
-const COLOR_PROCESSED = '#10b981'; // Green (Completed)
-const COLOR_UNPROCESSED = '#f59e0b'; // Amber (Pending/Unprocessed)
+const COLOR_PROCESSED = '#10B981'; // Green (Completed)
+const COLOR_UNPROCESSED = '#3B82F6'; // Blue (Unprocessed)
 
 export default function DcValidationSection() {
   const navigate = useNavigate();
@@ -380,7 +380,7 @@ export default function DcValidationSection() {
                 title="Click to view Unprocessed HU Details"
               >
                 {unprocessed > 0 ? (
-                  <span className="dc-clickable-cell" style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', background: '#fef3c7', color: '#d97706', fontWeight: 700, borderRadius: '4px', padding: '1px 6px', fontSize: '11px' }}>
+                  <span className="dc-clickable-cell" style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', background: '#eff6ff', color: '#3B82F6', fontWeight: 700, borderRadius: '4px', padding: '1px 6px', fontSize: '11px' }}>
                     {unprocessed.toLocaleString('en-IN')}
                   </span>
                 ) : (

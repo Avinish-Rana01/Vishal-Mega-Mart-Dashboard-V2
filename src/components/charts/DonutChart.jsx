@@ -15,6 +15,7 @@ export default function DonutChart({
   segments = [],
   centerText,
   centerSubtext,
+  centerTextSize,
   height = 220,
   showLegend = true,
   halfCircle = false,
@@ -47,7 +48,7 @@ export default function DonutChart({
   const defaultCenterTop = centerTop || (halfCircle ? '72%' : (showLegend ? '45%' : '50%'));
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', height: height, width: '100%' }}>
+    <div ref={containerRef} style={{ position: 'relative', height: height, width: '100%', maxWidth: halfCircle ? '380px' : '100%', margin: '0 auto' }}>
       {hasBeenVisible && (
         <>
           <ResponsiveContainer width="100%" height="100%">
@@ -95,14 +96,27 @@ export default function DonutChart({
               textAlign: 'center',
               pointerEvents: 'none',
               zIndex: 0,
+              width: '100%',
+              padding: '0 8px',
+              boxSizing: 'border-box'
             }}>
               {centerText && (
-                <div style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
+                <div style={{
+                  fontSize: centerTextSize || (
+                    halfCircle
+                      ? (String(centerText).length > 7 ? '20px' : String(centerText).length > 5 ? '23px' : '28px')
+                      : (String(centerText).length > 7 ? '18px' : '22px')
+                  ),
+                  fontWeight: '800',
+                  color: '#0f172a',
+                  lineHeight: 1.1,
+                  whiteSpace: 'nowrap'
+                }}>
                   {centerText}
                 </div>
               )}
               {centerSubtext && (
-                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', marginTop: '4px', whiteSpace: 'nowrap' }}>
                   {centerSubtext}
                 </div>
               )}

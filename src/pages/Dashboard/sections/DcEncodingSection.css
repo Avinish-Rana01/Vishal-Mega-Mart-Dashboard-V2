@@ -87,7 +87,7 @@
   }
 
   .dc-target-progress-card .dc-donut-wrapper {
-    height: 175px !important;
+    height: 230px !important;
     flex: none !important;
     width: 100% !important;
   }
@@ -104,7 +104,7 @@
   }
 
   .dc-target-progress-card .dc-donut-wrapper {
-    height: 170px !important;
+    height: 220px !important;
   }
 }
 
@@ -120,6 +120,6 @@
   }
 
   .dc-target-progress-card .dc-donut-wrapper {
-    height: 165px !important;
+    height: 210px !important;
   }
 }

@@ -8,7 +8,6 @@ import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemo
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
-import StoreRankList from '../../../components/charts/StoreRankList';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
@@ -52,10 +51,10 @@ const VoidVsEncodedTooltip = ({ active, payload }) => {
             <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
           )}
         </div>
-        <div style={{ fontSize: '13px', color: '#d97706', marginBottom: '4px' }}>Void Qty : <span style={{ fontWeight: 600 }}>{data.Void}</span></div>
-        <div style={{ fontSize: '13px', color: '#eab308', marginBottom: '8px' }}>Encoded Qty : <span style={{ fontWeight: 600 }}>{data.Encoded}</span></div>
+        <div style={{ fontSize: '13px', color: '#3B82F6', marginBottom: '4px' }}>Void Qty : <span style={{ fontWeight: 600 }}>{data.Void}</span></div>
+        <div style={{ fontSize: '13px', color: '#60A5FA', marginBottom: '8px' }}>Encoded Qty : <span style={{ fontWeight: 600 }}>{data.Encoded}</span></div>
         <div style={{ height: '1px', background: '#f1f5f9', margin: '4px 0 8px 0' }}></div>
-        <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Voids : <span style={{ fontWeight: 600 }}>{data.Difference}</span></div>
+        <div style={{ fontSize: '13px', color: '#EF5350' }}>Pending Voids : <span style={{ fontWeight: 600 }}>{data.Difference}</span></div>
       </div>
     );
   }
@@ -107,13 +106,13 @@ const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
                         <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
                       )}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#ef4444' }}>Pending Voids: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
+                    <div style={{ fontSize: '13px', color: '#EF5350' }}>Pending Voids: <span style={{ fontWeight: 600 }}>{data.pending}</span></div>
                   </div>
                 );
               }
               return null;
             }} />
-              <Bar dataKey="pending" fill="#ef4444" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
+              <Bar dataKey="pending" fill="#EF5350" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -144,14 +143,14 @@ const MemoizedEncodingChart = React.memo(({ data, onBarClick, onAxisClick }) => 
                         <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', marginLeft: '12px' }}>{data.name}</span>
                       )}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#10b981' }}>Encode Rate: <span style={{ fontWeight: 600 }}>{data.rate.toFixed(1)}%</span></div>
+                    <div style={{ fontSize: '13px', color: '#10B981' }}>Encode Rate: <span style={{ fontWeight: 600 }}>{data.rate.toFixed(1)}%</span></div>
                   </div>
                 );
               }
               return null;
             }} />
-            <Bar dataKey="rate" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
-              <LabelList dataKey="rate" position="right" formatter={(val) => `${val.toFixed(1)}%`} style={{ fontSize: '11px', fontWeight: 600, fill: '#10b981' }} />
+            <Bar dataKey="rate" fill="#10B981" radius={[0, 4, 4, 0]} barSize={20} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
+              <LabelList dataKey="rate" position="right" formatter={(val) => `${val.toFixed(1)}%`} style={{ fontSize: '11px', fontWeight: 600, fill: '#10B981' }} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -287,9 +286,9 @@ export default function VoidDashboardSection() {
         />
       </div>
 
-      {/* 2. Charts Row (Full Width Bar Chart) */}
-      <div className="ds-charts-row ds-grow">
-        <div className="ds-card ds-grow" style={{height: '359px'}}>
+      {/* 2. Charts Row (Bar Chart + SemiDonut Chart) */}
+      <div className="ds-charts-row ds-charts-row--2col">
+        <div className="ds-card" style={{ height: '359px' }}>
           <ChartToolbar
             leftContent={
               <CustomDropdown
@@ -318,24 +317,24 @@ export default function VoidDashboardSection() {
               {chartView === 'grouped' && (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#fcd34d' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#93C5FD' }} />
                     <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encoded Qty</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#d97706' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#3B82F6' }} />
                     <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Void Qty</span>
                   </div>
                 </>
               )}
               {chartView === 'pending' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ef4444' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#EF5350' }} />
                   <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Pending Voids</span>
                 </div>
               )}
               {chartView === 'encoding' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10B981' }} />
                   <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Encode Rate</span>
                 </div>
               )}
@@ -348,8 +347,8 @@ export default function VoidDashboardSection() {
                     <GroupedBarChart
                       data={barData}
                       bars={[
-                        { dataKey: 'Void', color: '#d97706', label: 'Void Qty' },
-                        { dataKey: 'Encoded', color: '#fcd34d', label: 'Encoded Qty' }
+                        { dataKey: 'Void', color: '#3B82F6', label: 'Void Qty' },
+                        { dataKey: 'Encoded', color: '#93C5FD', label: 'Encoded Qty' }
                       ]}
                       height="100%"
                       hideLegend={true}
@@ -367,38 +366,17 @@ export default function VoidDashboardSection() {
             {chartView === 'encoding' && <MemoizedEncodingChart data={encodingChartData} onBarClick={handleBarClick} onAxisClick={handleStoreClick} />}
           </div>
         </div>
-      </div>
-
-      {/* 3. Quick-List & Donut Row */}
-      <div className="ds-charts-row ds-charts-row--equal" style={{ height: '264px', flexShrink: 0 }}>
-        {/* Left: Store Rank List */}
-        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Highest Voids</h3>
-          <div style={{ flex: 1, minHeight: 0, marginTop: '16px', overflowY: 'auto' }}>
-            <StoreRankList
-              items={rankList}
-              labelKey="STORE_NAME"
-              sublabelKey="STORE"
-              valueKey="DIFFERENCE_QTY"
-              diffKey="VOID_QTY"
-              diffLabel="Total Voids:"
-              statusFn={() => 'danger'}
-              formatValue={(val) => `${val} Pending`}
-              emptyText=""
-              onItemClick={(row) => handleStoreClick(row.STORE)}
-            />
-          </div>
-        </div>
 
         {/* Right: SemiDonut Chart */}
-        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="ds-card" style={{ display: 'flex', flexDirection: 'column', height: '359px' }}>
           <h3 className="ds-card-title" style={{ color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, fontSize: '15px' }}>Overall Encoding Completion</h3>
+          <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b' }}>Rate of voided items successfully encoded</p>
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SemiDonutChart
               value={encodeRaw}
               maxValue={totalVoidRaw}
               centerLabel="Encoded"
-              primaryColor="#d97706"
+              primaryColor="#3B82F6"
             />
           </div>
         </div>

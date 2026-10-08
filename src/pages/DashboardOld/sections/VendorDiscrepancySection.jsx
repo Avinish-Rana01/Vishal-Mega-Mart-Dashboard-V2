@@ -284,7 +284,7 @@ export default function VendorDiscrepancySection() {
               value={totalScannedRaw}
               maxValue={totalExpectedRaw}
               centerLabel="Received"
-              primaryColor="#0d9488"
+              primaryColor="#3B82F6"
             />
           </div>
         </div>

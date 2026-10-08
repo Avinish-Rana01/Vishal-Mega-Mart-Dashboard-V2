@@ -232,11 +232,11 @@ export default function DcEncodingSection() {
                       </span>
                     </div>
                   }
-                  height={175}
-                  innerRadius="65%"
-                  outerRadius="92%"
-                  cy="80%"
-                  centerTop="74%"
+                  height={240}
+                  innerRadius="68%"
+                  outerRadius="98%"
+                  cy="82%"
+                  centerTop="72%"
                   showLegend={false}
                   halfCircle={true}
                   tooltipFormatter={(value, name) => 

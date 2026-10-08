@@ -18,6 +18,8 @@ export default function SemiDonutChart({
   centerLabel = 'Progress',
   primaryColor = '#1d4ed8',
   emptyColor = '#e2e8f0',
+  height = 240,
+  maxWidth = 360,
 }) {
   const safeMax = maxValue > 0 ? maxValue : 1;
   const percent = Math.min(100, Math.max(0, (value / safeMax) * 100));
@@ -31,7 +33,7 @@ export default function SemiDonutChart({
   const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', height: '190px', width: '100%', maxWidth: '280px', margin: '0 auto' }}>
+    <div ref={containerRef} style={{ position: 'relative', height: `${height}px`, width: '100%', maxWidth: `${maxWidth}px`, margin: '0 auto' }}>
       {hasBeenVisible && (
         <>
           <ResponsiveContainer width="100%" height="100%">
@@ -39,11 +41,11 @@ export default function SemiDonutChart({
               <Pie
                 data={pieData}
                 cx="50%"
-                cy="75%"
+                cy="80%"
                 startAngle={180}
                 endAngle={0}
-                innerRadius="70%"
-                outerRadius="100%"
+                innerRadius="68%"
+                outerRadius="98%"
                 paddingAngle={0}
                 dataKey="value"
                 stroke="none"
@@ -63,16 +65,16 @@ export default function SemiDonutChart({
           {/* Center text overlay */}
           <div style={{
             position: 'absolute',
-            bottom: '10px',
+            bottom: '16px',
             left: 0,
             right: 0,
             textAlign: 'center',
             pointerEvents: 'none',
           }}>
-            <div style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
+            <div style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', lineHeight: 1 }}>
               {percent.toFixed(0)}%
             </div>
-            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#64748b', marginTop: '6px' }}>
               {centerLabel}
             </div>
           </div>

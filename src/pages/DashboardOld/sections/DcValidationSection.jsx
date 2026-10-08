@@ -14,8 +14,8 @@ import '../../../components/charts/DashboardSection.css';
 import './CycleCountSection.css';
 import * as Icons from 'lucide-react';
 
-const COLOR_PROCESSED = '#06b6d4'; // Cyan
-const COLOR_UNPROCESSED = '#64748b'; // Gray
+const COLOR_PROCESSED = '#10B981'; // Green
+const COLOR_UNPROCESSED = '#3B82F6'; // Blue
 
 export default function DcValidationSection() {
   const { data, totals, isLoading, error } = useDcValidation();

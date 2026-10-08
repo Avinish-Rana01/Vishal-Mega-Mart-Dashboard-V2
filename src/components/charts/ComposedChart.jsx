@@ -92,7 +92,7 @@ export default function ComposedChart({
                 <span style={{ color: '#475569', fontSize: '13px', marginRight: '16px' }}>{entry.name}:</span>
                 <span style={{ 
                   fontWeight: 'bold', 
-                  color: entry.name.includes('%') ? '#0d9488' : (String(val).includes('-') ? '#ef4444' : '#0f172a'), 
+                  color: entry.color || '#0f172a', 
                   fontSize: '13px', 
                   marginLeft: 'auto' 
                 }}>{val}</span>
@@ -176,7 +176,7 @@ export default function ComposedChart({
             orientation="right" 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fill: '#0d9488', fontSize: 11 }} 
+            tick={{ fill: lines[0]?.color || '#EF5350', fontSize: 11 }} 
             dx={10}
             tickFormatter={(val) => `${val}%`}
           />
