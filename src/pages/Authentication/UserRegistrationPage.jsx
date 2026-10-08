@@ -34,6 +34,8 @@ export default function UserRegistrationPage() {
   const [userType, setUserType] = useState('');
   const [storeId, setStoreId] = useState('');
   const [whId, setWhId] = useState('');
+  const [emailId, setEmailId] = useState('');
+  const [isEmailRequired, setIsEmailRequired] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
 
@@ -153,6 +155,8 @@ export default function UserRegistrationPage() {
     setUserType('');
     setStoreId('');
     setWhId('');
+    setEmailId('');
+    setIsEmailRequired(false);
     setIsEditing(false);
     setEditingUserId(null);
   };
@@ -164,6 +168,8 @@ export default function UserRegistrationPage() {
     setUserName(user.User_Name ?? user.user_Name ?? '');
     setPassword(user.Password ?? user.password ?? '');
     setUserType(user.User_Type ?? user.user_Type ?? '');
+    setEmailId(user.Email_ID ?? user.email_ID ?? user.emailId ?? '');
+    setIsEmailRequired(Boolean(user.Is_Email_Required ?? user.is_Email_Required ?? user.isEmailRequired));
 
     const userStoreId = user.Store_ID ?? user.store_ID;
     if (userStoreId && Number(userStoreId) > 0) {
@@ -209,6 +215,17 @@ export default function UserRegistrationPage() {
       setAlert({ type: 'error', message: 'Please select an assigned warehouse for Warehouse users.' });
       return;
     }
+    if (isEmailRequired && !emailId.trim()) {
+      setAlert({ type: 'error', message: 'Email ID is required when Email Required is checked.' });
+      return;
+    }
+    if (emailId.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailId.trim())) {
+        setAlert({ type: 'error', message: 'Please enter a valid email address.' });
+        return;
+      }
+    }
 
     setIsSubmitting(true);
     try {
@@ -220,7 +237,9 @@ export default function UserRegistrationPage() {
           password: password.trim(),
           userType: userType.trim(),
           storeId: isStoreRole ? storeId : 0,
-          whId: isWarehouseRole ? whId : 0
+          whId: isWarehouseRole ? whId : 0,
+          emailId: emailId.trim(),
+          isEmailRequired
         });
       } else {
         res = await createUser({
@@ -228,7 +247,9 @@ export default function UserRegistrationPage() {
           password: password.trim(),
           userType: userType.trim(),
           storeId: isStoreRole ? storeId : 0,
-          whId: isWarehouseRole ? whId : 0
+          whId: isWarehouseRole ? whId : 0,
+          emailId: emailId.trim(),
+          isEmailRequired
         });
       }
 
@@ -309,8 +330,9 @@ export default function UserRegistrationPage() {
         const role = String(u.User_Type ?? u.user_Type ?? '').toLowerCase();
         const store = String(u.Store_Name ?? u.store_Name ?? '').toLowerCase();
         const wh = String(u.Warehouse_Name ?? u.warehouse_Name ?? '').toLowerCase();
+        const email = String(u.Email_ID ?? u.email_ID ?? u.emailId ?? '').toLowerCase();
         const id = String(u.User_ID ?? u.user_ID ?? '');
-        return name.includes(term) || role.includes(term) || store.includes(term) || wh.includes(term) || id.includes(term);
+        return name.includes(term) || role.includes(term) || store.includes(term) || wh.includes(term) || email.includes(term) || id.includes(term);
       });
     }
 
@@ -347,6 +369,8 @@ export default function UserRegistrationPage() {
       User_Type: u.User_Type || 'N/A',
       Store_Name: (!u.Store_Name || u.Store_Name === 'NA' || u.Store_Name === '—') ? 'N/A' : u.Store_Name,
       Warehouse_Name: (!u.Warehouse_Name || u.Warehouse_Name === 'NA' || u.Warehouse_Name === '—') ? 'N/A' : u.Warehouse_Name,
+      Email_ID: u.Email_ID || 'N/A',
+      Is_Email_Required: (u.Is_Email_Required === true || u.Is_Email_Required === 1 || u.Is_Email_Required === 'True') ? 'Yes' : 'No',
       Status: u.Status || 'Active'
     }));
   }, [sortedAndFilteredUsers]);
@@ -448,6 +472,35 @@ export default function UserRegistrationPage() {
           <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
         ) : (
           <span style={{ fontWeight: 500, color: '#334155' }}>{w}</span>
+        );
+      }
+    },
+    {
+      key: 'Email_ID',
+      label: 'EMAIL ID',
+      sortable: true,
+      render: (val, row) => {
+        const email = val ?? row?.Email_ID ?? row?.email_ID ?? row?.emailId;
+        return (!email || email === '—') ? (
+          <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
+        ) : (
+          <span style={{ fontWeight: 500, color: '#334155' }}>{email}</span>
+        );
+      }
+    },
+    {
+      key: 'Is_Email_Required',
+      label: 'EMAIL REQ.',
+      align: 'center',
+      sortable: true,
+      render: (val, row) => {
+        const isReq = Boolean(val ?? row?.Is_Email_Required ?? row?.is_Email_Required ?? row?.isEmailRequired);
+        return isReq ? (
+          <span className="vmm-status-pill active" style={{ fontSize: '10px', padding: '1px 6px' }}>
+            Yes
+          </span>
+        ) : (
+          <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>No</span>
         );
       }
     },
@@ -608,6 +661,37 @@ export default function UserRegistrationPage() {
                 >
                   {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
+              </div>
+            </div>
+
+            {/* 5. Email ID */}
+            <div className="search-field">
+              <label>Email ID {isEmailRequired && '*'}</label>
+              <input
+                type="email"
+                className="vmm-auth-input"
+                placeholder="Enter email address"
+                value={emailId}
+                onChange={(e) => setEmailId(e.target.value)}
+                disabled={isSubmitting}
+                autoComplete="off"
+              />
+            </div>
+
+            {/* 6. Email Required Checkbox */}
+            <div className="search-field vmm-checkbox-search-field">
+              <label className="vmm-checkbox-placeholder-label">Email Required</label>
+              <div className="vmm-checkbox-input-wrap">
+                <label className={`vmm-checkbox-label ${isEmailRequired ? 'checked' : ''}`}>
+                  <input
+                    type="checkbox"
+                    className="vmm-auth-checkbox"
+                    checked={isEmailRequired}
+                    onChange={(e) => setIsEmailRequired(e.target.checked)}
+                    disabled={isSubmitting}
+                  />
+                  <span>Email Required</span>
+                </label>
               </div>
             </div>
 

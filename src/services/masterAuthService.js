@@ -89,7 +89,7 @@ export const getUserList = async () => {
 /**
  * 5. Create a new user
  */
-export const createUser = async ({ userName, password, userType, storeId = 0, whId = 0 }) => {
+export const createUser = async ({ userName, password, userType, storeId = 0, whId = 0, emailId = '', isEmailRequired = false }) => {
   const entryBy = getActiveUserId() || 26;
   return await executeMaster('Insert_user_registration', {
     user_Name: userName?.trim(),
@@ -97,6 +97,8 @@ export const createUser = async ({ userName, password, userType, storeId = 0, wh
     user_Type: userType?.trim(),
     store_ID: Number(storeId) || 0,
     wh_ID: Number(whId) || 0,
+    email_ID: emailId?.trim() || '',
+    is_Email_Required: Boolean(isEmailRequired),
     entry_By: Number(entryBy)
   });
 };
@@ -104,7 +106,7 @@ export const createUser = async ({ userName, password, userType, storeId = 0, wh
 /**
  * 6. Update existing user details (password, role, assigned store/warehouse)
  */
-export const updateUser = async ({ userId, userName, password, userType, storeId = 0, whId = 0 }) => {
+export const updateUser = async ({ userId, userName, password, userType, storeId = 0, whId = 0, emailId = '', isEmailRequired = false }) => {
   const modifyBy = getActiveUserId() || 26;
   return await executeMaster('Update_user_registration', {
     user_ID: Number(userId),
@@ -113,6 +115,8 @@ export const updateUser = async ({ userId, userName, password, userType, storeId
     user_Type: userType?.trim(),
     store_ID: Number(storeId) || 0,
     wh_ID: Number(whId) || 0,
+    email_ID: emailId?.trim() || '',
+    is_Email_Required: Boolean(isEmailRequired),
     modify_By: Number(modifyBy)
   });
 };
@@ -137,11 +141,17 @@ export const getStoreMasterList = async () => {
 /**
  * 9. Create a new store
  */
-export const createStoreMaster = async ({ storeCode, storeName }) => {
+export const createStoreMaster = async ({ storeCode, storeName, state = '', city = '', storeManager = '', areaManager = '', zfm = '', lp = '' }) => {
   const entryBy = getActiveUserId() || 26;
   return await executeMaster('Insert_tbl_Store_Master', {
     store_Code: storeCode?.trim(),
     store_Name: storeName?.trim(),
+    state: state?.trim() || '',
+    city: city?.trim() || '',
+    store_Manager: storeManager?.trim() || '',
+    area_Manager: areaManager?.trim() || '',
+    zfm: zfm?.trim() || '',
+    lp: lp?.trim() || '',
     entry_By: Number(entryBy)
   });
 };
@@ -149,12 +159,18 @@ export const createStoreMaster = async ({ storeCode, storeName }) => {
 /**
  * 10. Update existing store details
  */
-export const updateStoreMaster = async ({ storeId, storeCode, storeName }) => {
+export const updateStoreMaster = async ({ storeId, storeCode, storeName, state = '', city = '', storeManager = '', areaManager = '', zfm = '', lp = '' }) => {
   const modifyBy = getActiveUserId() || 26;
   return await executeMaster('Update_tbl_Store_Master', {
     store_ID: Number(storeId),
     store_Code: storeCode?.trim(),
     store_Name: storeName?.trim(),
+    state: state?.trim() || '',
+    city: city?.trim() || '',
+    store_Manager: storeManager?.trim() || '',
+    area_Manager: areaManager?.trim() || '',
+    zfm: zfm?.trim() || '',
+    lp: lp?.trim() || '',
     modify_By: Number(modifyBy)
   });
 };
