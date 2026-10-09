@@ -16,12 +16,12 @@ export const getActiveUserRole = () => {
     const raw = sessionStorage.getItem('vmm_user');
     if (raw) {
       const user = JSON.parse(raw);
-      return user.userType || user.UserType || user.User_Type || user.role || user.Role || 'Super Admin';
+      return user.userType || user.UserType || user.User_Type || user.role || user.Role || '';
     }
   } catch (e) {
     // fallback
   }
-  return 'Super Admin';
+  return '';
 };
 
 /**
@@ -51,8 +51,8 @@ export const getUserRoles = async () => {
  * 2. Fetch stores dropdown for user assignment
  */
 export const getStoreDropdown = async () => {
-  const userId = getActiveUserId() || 26;
-  const userType = getActiveUserRole() || 'Super Admin';
+  const userId = getActiveUserId() || 0;
+  const userType = getActiveUserRole();
   const res = await executeMaster('SP_DDL_StoreID', {
     user_ID: Number(userId),
     user_Type: userType
@@ -64,8 +64,8 @@ export const getStoreDropdown = async () => {
  * 3. Fetch warehouses dropdown for user assignment
  */
 export const getWarehouseDropdown = async () => {
-  const userId = getActiveUserId() || 26;
-  const userType = getActiveUserRole() || 'Super Admin';
+  const userId = getActiveUserId() || 0;
+  const userType = getActiveUserRole();
   const res = await executeMaster('SP_DDL_WarehouseID', {
     user_ID: Number(userId),
     user_Type: userType
@@ -77,8 +77,8 @@ export const getWarehouseDropdown = async () => {
  * 4. Fetch the full users directory
  */
 export const getUserList = async () => {
-  const userId = getActiveUserId() || 26;
-  const userType = getActiveUserRole() || 'Super Admin';
+  const userId = getActiveUserId() || 0;
+  const userType = getActiveUserRole();
   const res = await executeMaster('SP_Bind_User_Master', {
     user_ID: Number(userId),
     user_Type: userType
@@ -90,7 +90,7 @@ export const getUserList = async () => {
  * 5. Create a new user
  */
 export const createUser = async ({ userName, password, userType, storeId = 0, whId = 0, emailId = '', isEmailRequired = false }) => {
-  const entryBy = getActiveUserId() || 26;
+  const entryBy = getActiveUserId() || 0;
   return await executeMaster('Insert_user_registration', {
     user_Name: userName?.trim(),
     password: password?.trim(),
@@ -107,7 +107,7 @@ export const createUser = async ({ userName, password, userType, storeId = 0, wh
  * 6. Update existing user details (password, role, assigned store/warehouse)
  */
 export const updateUser = async ({ userId, userName, password, userType, storeId = 0, whId = 0, emailId = '', isEmailRequired = false }) => {
-  const modifyBy = getActiveUserId() || 26;
+  const modifyBy = getActiveUserId() || 0;
   return await executeMaster('Update_user_registration', {
     user_ID: Number(userId),
     user_Name: userName?.trim(),
@@ -142,7 +142,7 @@ export const getStoreMasterList = async () => {
  * 9. Create a new store
  */
 export const createStoreMaster = async ({ storeCode, storeName, state = '', city = '', storeManager = '', areaManager = '', zfm = '', lp = '' }) => {
-  const entryBy = getActiveUserId() || 26;
+  const entryBy = getActiveUserId() || 0;
   return await executeMaster('Insert_tbl_Store_Master', {
     store_Code: storeCode?.trim(),
     store_Name: storeName?.trim(),
@@ -160,7 +160,7 @@ export const createStoreMaster = async ({ storeCode, storeName, state = '', city
  * 10. Update existing store details
  */
 export const updateStoreMaster = async ({ storeId, storeCode, storeName, state = '', city = '', storeManager = '', areaManager = '', zfm = '', lp = '' }) => {
-  const modifyBy = getActiveUserId() || 26;
+  const modifyBy = getActiveUserId() || 0;
   return await executeMaster('Update_tbl_Store_Master', {
     store_ID: Number(storeId),
     store_Code: storeCode?.trim(),
@@ -196,7 +196,7 @@ export const getWarehouseMasterList = async () => {
  * 13. Create a new warehouse
  */
 export const createWarehouseMaster = async ({ whCode, whName, whAddress = '' }) => {
-  const entryBy = getActiveUserId() || 26;
+  const entryBy = getActiveUserId() || 0;
   return await executeMaster('Insert_tbl_Warehouse_Master', {
     wh_Code: whCode?.trim(),
     wh_Name: whName?.trim(),
@@ -209,7 +209,7 @@ export const createWarehouseMaster = async ({ whCode, whName, whAddress = '' }) 
  * 14. Update existing warehouse details
  */
 export const updateWarehouseMaster = async ({ whId, whCode, whName, whAddress = '' }) => {
-  const modifyBy = getActiveUserId() || 26;
+  const modifyBy = getActiveUserId() || 0;
   return await executeMaster('Update_tbl_warehouse_Master', {
     wh_ID: Number(whId),
     wh_Code: whCode?.trim(),
@@ -232,7 +232,12 @@ export const toggleWarehouseStatus = async (whId) => {
  * 16. Fetch the full Floor Master directory
  */
 export const getFloorMasterList = async () => {
-  const res = await executeMaster('SP_Bind_FloorMaster');
+  const userId = getActiveUserId() || 0;
+  const userType = getActiveUserRole();
+  const res = await executeMaster('SP_Bind_FloorMaster', {
+    user_ID: Number(userId),
+    user_Type: userType
+  });
   return res?.data || [];
 };
 
@@ -240,7 +245,7 @@ export const getFloorMasterList = async () => {
  * 17. Create a new store floor
  */
 export const createFloorMaster = async ({ storeId, floorName }) => {
-  const entryBy = getActiveUserId() || 26;
+  const entryBy = getActiveUserId() || 0;
   return await executeMaster('Insert_tbl_Store_Floor_Mst', {
     store_ID: Number(storeId),
     store_Floor: floorName?.trim(),
@@ -252,7 +257,7 @@ export const createFloorMaster = async ({ storeId, floorName }) => {
  * 18. Update existing floor details
  */
 export const updateFloorMaster = async ({ floorId, storeId, floorName }) => {
-  const modifyBy = getActiveUserId() || 26;
+  const modifyBy = getActiveUserId() || 0;
   return await executeMaster('Update_tbl_Store_Floor_Mst', {
     store_Floor_ID: Number(floorId),
     store_ID: Number(storeId),
