@@ -3,6 +3,12 @@
   overflow: visible !important;
   z-index: 1050 !important;
   position: relative;
+  transition: background 0.4s ease !important;
+}
+
+/* Edit Mode: Shift sidebar gradient from Blue to Vibrant Green (#10B981) while preserving circular glass overlay */
+body.vmm-edit-mode-active .vmm-sidebar {
+  background: linear-gradient(180deg, #34d399 0%, #10B981 40%, #047857 100%) !important;
 }
 
 .vmm-nav-dropdown {

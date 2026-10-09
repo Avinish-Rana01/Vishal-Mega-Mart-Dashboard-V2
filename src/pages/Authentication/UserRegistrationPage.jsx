@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Edit2, Eye, EyeOff, Power, Crown, UserPlus, Check, Bell, BellRing, BellOff } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
@@ -55,6 +56,7 @@ export default function UserRegistrationPage() {
 
   // Feedback Notification Banner
   const [alert, setAlert] = useState(null); // { type: 'success' | 'error', message: string }
+  const [bottomToast, setBottomToast] = useState(null); // Mobile downside toast: { message: string, icon: JSX }
 
   // Confirm Modal Dialog State
   const [confirmModal, setConfirmModal] = useState({
@@ -71,6 +73,13 @@ export default function UserRegistrationPage() {
     return () => clearTimeout(timer);
   }, [alert]);
 
+  // Auto-dismiss mobile bottom toast after 1.8 seconds (snappy feedback)
+  useEffect(() => {
+    if (!bottomToast) return;
+    const timer = setTimeout(() => setBottomToast(null), 1800);
+    return () => clearTimeout(timer);
+  }, [bottomToast]);
+
   // Determine role-based conditional dropdown visibility
   // Store Admin is a roving/general administrator and does not require a store assignment during user registration.
   // Only regular store staff (Store User / Store) require an assigned store.
@@ -86,6 +95,16 @@ export default function UserRegistrationPage() {
     const lower = userType.toLowerCase();
     return lower.includes('warehouse');
   }, [userType]);
+
+  // Notification toggle requires an email address
+  const hasEmail = Boolean(emailId && emailId.trim());
+
+  // Automatically reset notifications if email is cleared
+  useEffect(() => {
+    if (!hasEmail && isEmailRequired) {
+      setIsEmailRequired(false);
+    }
+  }, [hasEmail, isEmailRequired]);
 
   // Load dropdown lists on mount
   const loadDropdowns = useCallback(async () => {
@@ -164,6 +183,18 @@ export default function UserRegistrationPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isEditing]);
 
+  // Sync edit mode state to document.body for sidebar green gradient transition
+  useEffect(() => {
+    if (isEditing) {
+      document.body.classList.add('vmm-edit-mode-active');
+    } else {
+      document.body.classList.remove('vmm-edit-mode-active');
+    }
+    return () => {
+      document.body.classList.remove('vmm-edit-mode-active');
+    };
+  }, [isEditing]);
+
   // Reset / Clear form
   const resetForm = () => {
     setUserName('');
@@ -176,6 +207,27 @@ export default function UserRegistrationPage() {
     setIsEditing(false);
     setEditingUserId(null);
     setEditTriggerAnim(false);
+    setBottomToast(null);
+  };
+
+  // Toggle notification updates with mobile downside toast alert
+  const handleToggleNotification = () => {
+    if (!hasEmail) return;
+    const nextState = !isEmailRequired;
+    setIsEmailRequired(nextState);
+
+    const cleanEmail = emailId.trim();
+    if (nextState) {
+      setBottomToast({
+        message: `${cleanEmail} now receives email updates`,
+        icon: <BellRing size={15} color="#F59E0B" />
+      });
+    } else {
+      setBottomToast({
+        message: `Email updates turned off for ${cleanEmail}`,
+        icon: <BellOff size={15} color="#94A3B8" />
+      });
+    }
   };
 
   // Populate form for Edit Mode
@@ -238,7 +290,7 @@ export default function UserRegistrationPage() {
       return;
     }
     if (isEmailRequired && !emailId.trim()) {
-      setAlert({ type: 'error', message: 'Email ID is required when "Receives Updates" is enabled.' });
+      setAlert({ type: 'error', message: 'Email ID is required when "Recieved E-mail Updates" is enabled.' });
       return;
     }
     if (emailId.trim()) {
@@ -612,6 +664,15 @@ export default function UserRegistrationPage() {
       {/* Floating Alert Notification Toast */}
       <ToastNotification alert={alert} onClose={() => setAlert(null)} />
 
+      {/* Mobile Downside Toast (Snackbar) rendered via Portal directly to body */}
+      {bottomToast && typeof document !== 'undefined' && createPortal(
+        <div className="vmm-mobile-toast" role="status" aria-live="polite">
+          {bottomToast.icon}
+          <span>{bottomToast.message}</span>
+        </div>,
+        document.body
+      )}
+
       {/* Top Search / Form Card (VMM Standard Design) */}
       <div className={`report-search-card ${editTriggerAnim ? 'vmm-edit-shake-anim' : ''}`}>
         <div className={`report-search-header ${isEditing ? 'vmm-edit-mode-header' : ''}`}>
@@ -715,41 +776,47 @@ export default function UserRegistrationPage() {
               />
             </div>
 
-            {/* 6. Receives Updates Notification Toggle */}
-            <div className="search-field">
-              <label>Notifications</label>
-              <button
-                type="button"
-                className={`vmm-notification-toggle-btn ${isEmailRequired ? 'active' : ''}`}
-                onClick={() => setIsEmailRequired(prev => !prev)}
-                disabled={isSubmitting}
-                title={isEmailRequired ? 'Click to disable updates notification' : 'Click to enable updates notification'}
-                aria-pressed={isEmailRequired}
-              >
-                {isEmailRequired ? (
-                  <BellRing size={13} className="vmm-bell-icon active" />
-                ) : (
-                  <Bell size={13} className="vmm-bell-icon" />
-                )}
-                <span>Receives Updates</span>
-                {isEmailRequired && <span className="vmm-bell-live-dot" />}
-              </button>
-            </div>
+            {/* 6. Receives Updates Notification & Action Buttons (Single line on mobile) */}
+            <div className="vmm-bottom-actions-row">
+              <div className="search-field vmm-notif-search-field">
+                <label>Notifications</label>
+                <button
+                  type="button"
+                  className={`vmm-notification-toggle-btn ${isEmailRequired ? 'active' : ''}`}
+                  onClick={handleToggleNotification}
+                  disabled={isSubmitting || !hasEmail}
+                  title={
+                    !hasEmail
+                      ? 'Enter an email address to enable notifications'
+                      : (isEmailRequired ? 'Click to disable email updates' : 'Click to enable email updates')
+                  }
+                  aria-pressed={isEmailRequired}
+                >
+                  {isEmailRequired ? (
+                    <BellRing size={13} className="vmm-bell-icon active" />
+                  ) : (
+                    <Bell size={13} className="vmm-bell-icon" />
+                  )}
+                  <span>Recieved E-mail Updates</span>
+                  {isEmailRequired && <span className="vmm-bell-live-dot" />}
+                </button>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="search-buttons">
-              <SearchButton
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                label={isEditing ? 'Update User' : 'Create User'}
-                icon={isEditing ? <Edit2 size={13} /> : <UserPlus size={13} />}
-                className={isEditing ? 'btn-edit-mode' : ''}
-              />
-              <ClearButton
-                onClick={resetForm}
-                disabled={isSubmitting}
-                label={isEditing ? 'Cancel Edit' : 'Reset'}
-              />
+              {/* Action Buttons */}
+              <div className="search-buttons">
+                <SearchButton
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  label={isEditing ? 'Update User' : 'Create User'}
+                  icon={isEditing ? <Edit2 size={13} /> : <UserPlus size={13} />}
+                  className={isEditing ? 'btn-edit-mode' : ''}
+                />
+                <ClearButton
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                  label={isEditing ? 'Cancel Edit' : 'Reset'}
+                />
+              </div>
             </div>
           </div>
         </form>

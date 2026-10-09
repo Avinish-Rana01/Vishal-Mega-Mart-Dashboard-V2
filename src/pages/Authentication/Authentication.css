@@ -419,23 +419,43 @@
   outline: none;
 }
 
-.vmm-notification-toggle-btn:hover {
+.vmm-notification-toggle-btn:not(.active):not(:disabled):hover {
   background: #e2e8f0;
   border-color: #cbd5e1;
   color: #334155;
   transform: translateY(-1px);
 }
 
-.vmm-notification-toggle-btn:active {
+.vmm-notification-toggle-btn:not(:disabled):active {
   transform: scale(0.98);
 }
 
-.vmm-notification-toggle-btn.active {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: #3B82F6;
-  color: #1d4ed8;
+.vmm-notification-toggle-btn:disabled,
+.vmm-notification-toggle-btn:disabled:hover,
+.vmm-notification-toggle-btn:disabled:active {
+  opacity: 0.52;
+  cursor: not-allowed;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.vmm-notification-toggle-btn:disabled .vmm-bell-icon,
+.vmm-notification-toggle-btn:disabled:hover .vmm-bell-icon {
+  color: #cbd5e1;
+  transform: none !important;
+}
+
+.vmm-notification-toggle-btn.active,
+.vmm-notification-toggle-btn.active:hover,
+.vmm-notification-toggle-btn.active:focus {
+  background: rgba(245, 158, 11, 0.10);
+  border-color: #F59E0B;
+  color: #B45309;
   font-weight: 600;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
 .vmm-bell-icon {
@@ -443,13 +463,14 @@
   transition: color 0.2s ease, transform 0.2s ease, fill 0.2s ease;
 }
 
-.vmm-notification-toggle-btn:hover .vmm-bell-icon {
+.vmm-notification-toggle-btn:not(.active):hover .vmm-bell-icon {
   color: #64748b;
 }
 
-.vmm-notification-toggle-btn.active .vmm-bell-icon.active {
-  color: #3B82F6;
-  fill: rgba(59, 130, 246, 0.22);
+.vmm-notification-toggle-btn.active .vmm-bell-icon.active,
+.vmm-notification-toggle-btn.active:hover .vmm-bell-icon.active {
+  color: #D97706;
+  fill: rgba(245, 158, 11, 0.28);
   animation: bellSwing 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
@@ -466,8 +487,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #3B82F6;
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
+  background-color: #F59E0B;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
   margin-left: 2px;
 }
 
@@ -489,14 +510,14 @@
 }
 
 .vmm-bell-table-badge.active {
-  background: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(245, 158, 11, 0.12);
+  color: #B45309;
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
 .vmm-bell-table-badge.active .vmm-bell-icon.active {
-  color: #3B82F6;
-  fill: rgba(59, 130, 246, 0.25);
+  color: #D97706;
+  fill: rgba(245, 158, 11, 0.28);
 }
 
 .vmm-bell-table-badge.inactive {
@@ -605,5 +626,146 @@
 .report-search-card .report-search-row--actions-center .search-buttons {
   margin-top: 0 !important;
 }
+
+/* ==========================================================================
+   Mobile Downside Toast Notification (Android / Snackbar Capsule Style)
+   ========================================================================== */
+.vmm-mobile-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+  padding: 10px 22px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  box-shadow: 
+    0 16px 36px -4px rgba(0, 0, 0, 0.45),
+    0 6px 14px -2px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: vmmMobileToastSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: min(92vw, 480px);
+  box-sizing: border-box;
+}
+
+.vmm-mobile-toast svg {
+  flex-shrink: 0;
+}
+
+.vmm-mobile-toast span {
+  display: inline-block;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+@keyframes vmmMobileToastSlideUp {
+  0% {
+    transform: translate(-50%, 28px) scale(0.92);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .vmm-mobile-toast {
+    bottom: calc(105px + env(safe-area-inset-bottom, 0px)) !important;
+    font-size: 12px;
+    padding: 10px 18px;
+    gap: 8px;
+    max-width: calc(100vw - 32px);
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   User Registration Bottom Actions Row (Notifications + Create/Reset Buttons)
+   ========================================================================== */
+.vmm-bottom-actions-row {
+  display: contents;
+}
+
+@media (max-width: 768px) {
+  .vmm-bottom-actions-row {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+  }
+
+  .vmm-bottom-actions-row .vmm-notif-search-field {
+    flex: 1.15 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+  }
+
+  .vmm-bottom-actions-row .vmm-notif-search-field label {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    margin-bottom: 3px !important;
+    color: #475569 !important;
+    line-height: 12px !important;
+    height: 12px !important;
+  }
+
+  .vmm-bottom-actions-row .vmm-notification-toggle-btn {
+    width: 100% !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 9.5px !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+  }
+
+  .vmm-bottom-actions-row .search-buttons {
+    grid-column: auto !important;
+    flex: 1.35 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    margin-top: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    height: 32px !important;
+    align-items: center !important;
+  }
+
+  .vmm-bottom-actions-row .search-buttons .report-action-btn,
+  .vmm-bottom-actions-row .search-buttons .btn-search,
+  .vmm-bottom-actions-row .search-buttons .btn-clear {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    padding: 0 6px !important;
+    font-size: 10.5px !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+    gap: 4px !important;
+  }
+}
+
+
 
 

@@ -115,6 +115,18 @@ export default function FloorRegistrationPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isEditing]);
 
+  // Sync edit mode state to document.body for sidebar green gradient transition
+  useEffect(() => {
+    if (isEditing) {
+      document.body.classList.add('vmm-edit-mode-active');
+    } else {
+      document.body.classList.remove('vmm-edit-mode-active');
+    }
+    return () => {
+      document.body.classList.remove('vmm-edit-mode-active');
+    };
+  }, [isEditing]);
+
   // Reset / Clear form
   const resetForm = () => {
     setSelectedStoreId('');
