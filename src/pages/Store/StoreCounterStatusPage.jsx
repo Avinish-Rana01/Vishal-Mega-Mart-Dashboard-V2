@@ -3,6 +3,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import { getCounterStatusStores, getCounterStatusDetails } from '../../services/storeService';
 import { Monitor, Layers, Wifi, WifiOff, Calendar, Clock } from 'lucide-react';
 import { liveStockSocket } from '../../services/liveStockSocket';
+import { useAuth } from '../../context/AuthContext';
 import './StoreCounterStatusPage.css';
 
 // Fallback stores matching legacy VMM store identifiers
@@ -45,19 +46,20 @@ const extractCounterNumber = (rawName, fallbackIdx) => {
 };
 
 export default function StoreCounterStatusPage() {
+  const { userId, userRole, storeName, storeCode } = useAuth();
   const [storeOptions, setStoreOptions] = useState([]);
-  const [selectedStore, setSelectedStore] = useState(1);
+  const [selectedStore, setSelectedStore] = useState(null);
   const [counters, setCounters] = useState([]);
   const [isLoadingStores, setIsLoadingStores] = useState(false);
   const [isLoadingCounters, setIsLoadingCounters] = useState(false);
   const [recentlyUpdatedIds, setRecentlyUpdatedIds] = useState(new Set());
   const [isSocketConnected, setIsSocketConnected] = useState(liveStockSocket.isConnected);
 
-  // 1. Fetch authorized stores list
+  // 1. Fetch authorized stores list scoped to user's permissions
   const fetchStores = useCallback(async () => {
     setIsLoadingStores(true);
     try {
-      const data = await getCounterStatusStores();
+      const data = await getCounterStatusStores(userId);
       if (Array.isArray(data) && data.length > 0) {
         const formatted = data.map((item) => ({
           value: item.store_ID ?? item.Store_ID ?? item.id ?? item.Store_Id,
@@ -65,25 +67,34 @@ export default function StoreCounterStatusPage() {
         }));
         setStoreOptions(formatted);
 
-        // Auto-select store: preserve HD55 if available, else first store
-        const has55 = formatted.find((s) => String(s.text).includes('HD55') || s.value === 1 || s.value === 55);
-        if (has55) {
-          setSelectedStore(has55.value);
-        } else if (formatted.length > 0) {
-          setSelectedStore(formatted[0].value);
+        // Auto-select store: if user has assigned storeCode/storeName, pick that; else fallback to HD55 or first available
+        let autoSelected = null;
+        if (storeName || storeCode) {
+          const matched = formatted.find(s => 
+            (storeCode && String(s.text).includes(storeCode)) || 
+            (storeName && String(s.text).toLowerCase().includes(storeName.toLowerCase()))
+          );
+          if (matched) autoSelected = matched.value;
         }
+
+        if (!autoSelected) {
+          const has55 = formatted.find((s) => String(s.text).includes('HD55') || s.value === 1 || s.value === 55);
+          autoSelected = has55 ? has55.value : formatted[0]?.value;
+        }
+
+        setSelectedStore(autoSelected);
       } else {
-        setStoreOptions(FALLBACK_STORES);
-        setSelectedStore(1);
+        setStoreOptions(userRole === 'Super Admin' ? FALLBACK_STORES : []);
+        setSelectedStore(userRole === 'Super Admin' ? 1 : null);
       }
     } catch (err) {
       console.warn('Unable to load stores from API, using fallback store list.', err);
-      setStoreOptions(FALLBACK_STORES);
-      setSelectedStore(1);
+      setStoreOptions(userRole === 'Super Admin' ? FALLBACK_STORES : []);
+      setSelectedStore(userRole === 'Super Admin' ? 1 : null);
     } finally {
       setIsLoadingStores(false);
     }
-  }, []);
+  }, [userId, userRole, storeName, storeCode]);
 
   // 2. Fetch counter status details for selected store
   const fetchCounters = useCallback(async (storeId) => {

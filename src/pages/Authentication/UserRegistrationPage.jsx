@@ -72,10 +72,13 @@ export default function UserRegistrationPage() {
   }, [alert]);
 
   // Determine role-based conditional dropdown visibility
+  // Store Admin is a roving/general administrator and does not require a store assignment during user registration.
+  // Only regular store staff (Store User / Store) require an assigned store.
   const isStoreRole = useMemo(() => {
     if (!userType) return false;
-    const lower = userType.toLowerCase();
-    return lower.includes('store');
+    const lower = userType.toLowerCase().trim();
+    if (lower === 'store admin' || lower.includes('store admin')) return false;
+    return lower === 'store' || lower.includes('store');
   }, [userType]);
 
   const isWarehouseRole = useMemo(() => {

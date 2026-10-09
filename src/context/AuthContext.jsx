@@ -232,7 +232,7 @@ export const AuthProvider = ({ children }) => {
     }
     // Fallback based on userRole if allowedSections array is not yet present
     if (role === 'Store Admin') {
-      return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status', 'get_sap_stock_take', 'user_registration'].includes(sectionKey);
+      return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status', 'get_sap_stock_take', 'user_registration', 'floor_registration'].includes(sectionKey);
     }
     if (role === 'Store User' || role === 'Store') {
       return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status'].includes(sectionKey);
