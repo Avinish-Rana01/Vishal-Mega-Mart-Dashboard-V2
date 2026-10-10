@@ -3,10 +3,14 @@ import { getActiveUserId } from './stockService';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5050';
 
-const getHeaders = () => ({
-  'Accept': 'application/json',
-  'Content-Type': 'application/json'
-});
+const getHeaders = () => {
+  const uid = getActiveUserId();
+  return {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    ...(uid ? { 'X-User-Id': String(uid) } : {})
+  };
+};
 
 /**
  * Helper to dynamically get the active user's role from session storage
@@ -28,12 +32,15 @@ export const getActiveUserRole = () => {
  * Universal dispatcher for SP_Master calls
  */
 export const executeMaster = async (status, payload = {}) => {
+  const currentUserId = getActiveUserId();
   const requestBody = {
     status,
+    user_ID: payload.user_ID ?? currentUserId,
+    userId: payload.userId ?? currentUserId,
     ...payload
   };
 
-  const response = await axios.post(`${API_BASE}/api/Master/Execute`, requestBody, {
+  const response = await axios.post(`${API_BASE}/api/Master/Execute${currentUserId ? `?userId=${currentUserId}` : ''}`, requestBody, {
     headers: getHeaders()
   });
   return response.data;

@@ -3,38 +3,68 @@ import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-// Helper for default headers
-const getHeaders = () => ({
-  'Accept': 'application/json'
-});
-
-  // Helper to dynamically get the active user ID from current authenticated session
-  export const getActiveUserId = () => {
-    try {
-      const raw = sessionStorage.getItem('vmm_user');
-      if (raw) {
-        const user = JSON.parse(raw);
-        // Direct match for all common casings (notably userID from login response)
-        const direct = user.userID ?? user.userId ?? user.UserID ?? user.User_Id ?? user.USER_ID ?? user.user_id ?? user.id ?? user.Id;
-        if (direct !== undefined && direct !== null && String(direct).trim() !== '') {
-          return direct;
-        }
-        // Case-insensitive key scan fallback
-        for (const key of Object.keys(user)) {
-          const lower = key.toLowerCase();
-          if (lower === 'userid' || lower === 'user_id') {
-            const val = user[key];
-            if (val !== undefined && val !== null && String(val).trim() !== '') {
-              return val;
-            }
+// Helper to dynamically get the active user ID from current authenticated session
+export const getActiveUserId = () => {
+  try {
+    const raw = sessionStorage.getItem('vmm_user');
+    if (raw) {
+      const user = JSON.parse(raw);
+      // Direct match for all common casings (notably userID from login response)
+      const direct = user.userID ?? user.userId ?? user.UserID ?? user.User_Id ?? user.USER_ID ?? user.user_id ?? user.id ?? user.Id;
+      if (direct !== undefined && direct !== null && String(direct).trim() !== '') {
+        return direct;
+      }
+      // Case-insensitive key scan fallback
+      for (const key of Object.keys(user)) {
+        const lower = key.toLowerCase();
+        if (lower === 'userid' || lower === 'user_id') {
+          const val = user[key];
+          if (val !== undefined && val !== null && String(val).trim() !== '') {
+            return val;
           }
         }
       }
-    } catch {
-      // fallback if parse fails
     }
-    return 1;
+  } catch {
+    // fallback if parse fails
+  }
+  return null;
+};
+
+// Helper for default headers
+const getHeaders = () => {
+  const uid = getActiveUserId();
+  return {
+    'Accept': 'application/json',
+    ...(uid ? { 'X-User-Id': String(uid) } : {})
   };
+};
+
+// Global Axios Request Interceptor: Automatically injects X-User-Id and userId query param on every API call
+axios.interceptors.request.use((config) => {
+  const userId = getActiveUserId();
+  if (userId) {
+    config.headers = config.headers || {};
+    config.headers['X-User-Id'] = String(userId);
+
+    // If request has params object, ensure userId is attached
+    if (config.params) {
+      if (!config.params.userId && !config.params.UserId && !config.params.user_id) {
+        config.params.userId = userId;
+      }
+    } else if (config.url && typeof config.url === 'string') {
+      // If it's an API call, append userId query parameter if not already present
+      const lower = config.url.toLowerCase();
+      if (lower.includes('/api/') && !lower.includes('/api/auth/login') && !lower.includes('/api/auth/change-password')) {
+        if (!lower.includes('userid=') && !lower.includes('user_id=')) {
+          const sep = config.url.includes('?') ? '&' : '?';
+          config.url = `${config.url}${sep}userId=${encodeURIComponent(userId)}`;
+        }
+      }
+    }
+  }
+  return config;
+}, (error) => Promise.reject(error));
 
 // ==============================================================
 // Dashboard APIs

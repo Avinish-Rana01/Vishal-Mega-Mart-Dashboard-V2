@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import { getActiveUserId } from './stockService';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -10,10 +11,13 @@ export const uploadDispatchFile = async (file, status, signal, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('status', status);
+  const userId = getActiveUserId();
+  if (userId) formData.append('userId', userId);
 
-  const response = await axios.post(`${API_BASE}/api/Dispatch/upload`, formData, {
+  const response = await axios.post(`${API_BASE}/api/Dispatch/upload${userId ? `?userId=${userId}` : ''}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
+      ...(userId ? { 'X-User-Id': String(userId) } : {})
     },
     timeout: 120000,
     signal,
@@ -34,10 +38,13 @@ export const uploadDispatchFile = async (file, status, signal, onProgress) => {
 export const uploadPicklistFile = async (file, signal, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
+  const userId = getActiveUserId();
+  if (userId) formData.append('userId', userId);
 
-  const response = await axios.post(`${API_BASE}/api/Dispatch/picklist-upload`, formData, {
+  const response = await axios.post(`${API_BASE}/api/Dispatch/picklist-upload${userId ? `?userId=${userId}` : ''}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
+      ...(userId ? { 'X-User-Id': String(userId) } : {})
     },
     timeout: 120000,
     signal,
@@ -56,8 +63,13 @@ export const uploadPicklistFile = async (file, signal, onProgress) => {
  * Fetch dispatch report data (SP_NEW_REPORT status='DISPATCH_REPORT_DATA')
  */
 export const getDispatchReport = async (params, signal) => {
+  const userId = getActiveUserId();
+  const effectiveParams = { ...params, ...(userId ? { userId } : {}) };
   const response = await axios.get(`${API_BASE}/api/Dispatch/report`, {
-    params,
+    params: effectiveParams,
+    headers: {
+      ...(userId ? { 'X-User-Id': String(userId) } : {})
+    },
     timeout: 30000,
     signal,
   });
@@ -68,8 +80,13 @@ export const getDispatchReport = async (params, signal) => {
  * Fetch modal details for vehicle drill-down (SP_NEW_REPORT status='DISPATCH_REPORT_DATA_VIEW')
  */
 export const getDispatchReportDetails = async (params, signal) => {
+  const userId = getActiveUserId();
+  const effectiveParams = { ...params, ...(userId ? { userId } : {}) };
   const response = await axios.get(`${API_BASE}/api/Dispatch/report-details`, {
-    params,
+    params: effectiveParams,
+    headers: {
+      ...(userId ? { 'X-User-Id': String(userId) } : {})
+    },
     timeout: 30000,
     signal,
   });

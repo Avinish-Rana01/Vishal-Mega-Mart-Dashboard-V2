@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { getActiveUserId } from '../services/stockService';
 
 /**
  * Custom hook for downloading server-streamed reports with progress tracking
@@ -52,10 +53,21 @@ export const useStreamingExport = () => {
         setProgressPercent(estimatedProgress);
       }, 300);
 
-      const response = await fetch(downloadUrl, {
+      const uid = getActiveUserId();
+      let targetUrl = downloadUrl;
+      if (uid && typeof targetUrl === 'string') {
+        const lower = targetUrl.toLowerCase();
+        if (!lower.includes('userid=') && !lower.includes('user_id=')) {
+          const sep = targetUrl.includes('?') ? '&' : '?';
+          targetUrl = `${targetUrl}${sep}userId=${encodeURIComponent(uid)}`;
+        }
+      }
+
+      const response = await fetch(targetUrl, {
         method: 'GET',
         headers: {
-          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/octet-stream, */*'
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/octet-stream, */*',
+          ...(uid ? { 'X-User-Id': String(uid) } : {})
         },
         signal: controller.signal
       });

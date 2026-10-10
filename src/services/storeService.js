@@ -3,10 +3,14 @@ import { getActiveUserId } from './stockService';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-const getHeaders = () => ({
-  'Accept': 'application/json',
-  'Content-Type': 'application/json'
-});
+const getHeaders = () => {
+  const uid = getActiveUserId();
+  return {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    ...(uid ? { 'X-User-Id': String(uid) } : {})
+  };
+};
 
 /**
  * Fetch list of authorized stores for Counter Status dropdown.
@@ -17,7 +21,7 @@ const getHeaders = () => ({
  * @returns {Promise<Array<Object>>} Resolves to the array of accessible stores.
  */
 export const getCounterStatusStores = async (userId = null) => {
-  const effectiveUserId = userId || getActiveUserId() || 26;
+  const effectiveUserId = userId || getActiveUserId();
   try {
     const response = await axios.get(`${API_BASE}/api/Store/counter-status-stores?userId=${effectiveUserId}`, {
       headers: getHeaders()
@@ -30,9 +34,10 @@ export const getCounterStatusStores = async (userId = null) => {
     console.warn('Dedicated store endpoint unavailable, falling back to Master/Execute');
   }
 
-  const fallback = await axios.post(`${API_BASE}/api/Master/Execute`, {
+  const fallback = await axios.post(`${API_BASE}/api/Master/Execute?userId=${effectiveUserId}`, {
     status: 'STORENAME_FOR_COUNTER_STATUS',
-    user_ID: effectiveUserId
+    user_ID: effectiveUserId,
+    userId: effectiveUserId
   }, { headers: getHeaders() });
   return fallback.data?.data || [];
 };
@@ -47,8 +52,9 @@ export const getCounterStatusStores = async (userId = null) => {
  */
 export const getCounterStatusDetails = async (storeId) => {
   if (!storeId) return [];
+  const currentUserId = getActiveUserId();
   try {
-    const response = await axios.get(`${API_BASE}/api/Store/counter-status?storeId=${storeId}`, {
+    const response = await axios.get(`${API_BASE}/api/Store/counter-status?storeId=${storeId}&userId=${currentUserId}`, {
       headers: getHeaders()
     });
     if (response.data && response.data.success) {
@@ -59,9 +65,11 @@ export const getCounterStatusDetails = async (storeId) => {
     console.warn('Dedicated counter endpoint unavailable, falling back to Master/Execute');
   }
 
-  const fallback = await axios.post(`${API_BASE}/api/Master/Execute`, {
+  const fallback = await axios.post(`${API_BASE}/api/Master/Execute?userId=${currentUserId}`, {
     status: 'COUNTER_STATUS_DETAILS',
-    store_ID: Number(storeId)
+    store_ID: Number(storeId),
+    user_ID: currentUserId,
+    userId: currentUserId
   }, { headers: getHeaders() });
   return fallback.data?.data || [];
 };
