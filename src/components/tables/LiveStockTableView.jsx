@@ -148,8 +148,16 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
     return () => controller.abort();
   }, [selectedStore, selectedDate, pageIndex, pageSize, selectedArticle, sortColumn, sortDirection]);
 
-  const numRenderer = (val) => <span className="vmm-link-num">{typeof val === 'number' ? val.toLocaleString('en-IN') : val}</span>;
-  const linkRenderer = (val) => <span className="vmm-link-num">{val}</span>;
+  const numRenderer = (val) => (
+    <span className="livestock-cell-num">
+      {typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? '0')}
+    </span>
+  );
+  const textRenderer = (val) => (
+    <span className="livestock-cell-text">
+      {val ?? '—'}
+    </span>
+  );
 
   const getSelectedStoreName = () => {
     if (reportSummary?.storeName) return reportSummary.storeName;
@@ -166,8 +174,8 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       sortable: false,
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
-    { key: 'stockDate', label: 'Stock Date', sortKey: 'STOCK_DATE' },
-    { key: 'articleNo', label: 'Article No', sortKey: 'ARTICLE', render: linkRenderer },
+    { key: 'stockDate', label: 'Stock Date', sortKey: 'STOCK_DATE', render: textRenderer },
+    { key: 'articleNo', label: 'Article No', sortKey: 'ARTICLE', render: textRenderer },
     { key: 'sapStock', label: 'SAP Stock', sortKey: 'SAP_STOCK', render: numRenderer },
     { key: 'rfidStock', label: 'RFID Stock', sortKey: 'RFID_STOCK', render: numRenderer },
     { key: 'diff', label: 'Difference', sortKey: 'DIFF', render: numRenderer }

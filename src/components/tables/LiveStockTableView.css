@@ -314,4 +314,24 @@
   background-color: #94a3b8 !important;
 }
 
+/* Clear, legible non-link cell styling with reduced font weight */
+.livestock-cell-num {
+  color: #334155;
+  font-weight: 400;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none !important;
+  cursor: default !important;
+  display: inline-block;
+}
+
+.livestock-cell-text {
+  color: #334155;
+  font-weight: 400;
+  font-size: 13px;
+  text-decoration: none !important;
+  cursor: default !important;
+  display: inline-block;
+}
+
 

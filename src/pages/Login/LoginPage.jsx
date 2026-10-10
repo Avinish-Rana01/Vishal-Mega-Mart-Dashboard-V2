@@ -155,7 +155,7 @@ export default function LoginPage() {
                         <input
                           type="text"
                           className="login-input"
-                          placeholder="Enter your email address"
+                          placeholder="Enter your username"
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
                           onFocus={() => handleFocus('username')}
@@ -226,7 +226,7 @@ export default function LoginPage() {
                     </div>
 
                     {errors.form && <div className="login-error-text" style={{ marginBottom: '16px' }}>{errors.form}</div>}
-                    {successMsg && <div style={{ color: '#16a34a', fontSize: '13px', marginBottom: '16px' }}>{successMsg}</div>}
+                    {successMsg && <div style={{ color: '#10B981', fontSize: '13px', marginBottom: '16px' }}>{successMsg}</div>}
                     
                     <div className="login-action-row" style={{ justifyContent: 'flex-end' }}>
                       <button type="submit" className="login-btn" disabled={isLoading}>

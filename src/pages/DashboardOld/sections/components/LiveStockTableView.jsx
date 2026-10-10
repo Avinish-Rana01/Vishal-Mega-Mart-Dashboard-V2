@@ -133,8 +133,16 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
     return () => controller.abort();
   }, [selectedStore, selectedDate, pageIndex, pageSize, selectedArticle]);
 
-  const numRenderer = (val) => <span className="vmm-link-num">{typeof val === 'number' ? val.toLocaleString('en-IN') : val}</span>;
-  const linkRenderer = (val) => <span className="vmm-link-num">{val}</span>;
+  const numRenderer = (val) => (
+    <span className="livestock-cell-num">
+      {typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? '0')}
+    </span>
+  );
+  const textRenderer = (val) => (
+    <span className="livestock-cell-text">
+      {val ?? '—'}
+    </span>
+  );
 
   const getSelectedStoreName = () => {
     if (reportSummary?.storeName) return reportSummary.storeName;
@@ -146,8 +154,8 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
 
   const columns = [
     { key: 'srNo', label: 'Sr.No' },
-    { key: 'stockDate', label: 'Stock Date' },
-    { key: 'articleNo', label: 'Article No', render: linkRenderer },
+    { key: 'stockDate', label: 'Stock Date', render: textRenderer },
+    { key: 'articleNo', label: 'Article No', render: textRenderer },
     { key: 'sapStock', label: 'SAP Stock', render: numRenderer },
     { key: 'rfidStock', label: 'RFID Stock', render: numRenderer },
     { key: 'diff', label: 'Difference', render: numRenderer }

@@ -8,23 +8,58 @@
   width: 100%;
   background: #ffffff;
   border-radius: 16px;
-  padding: 13px 16px;
+  padding: 14px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 88px;
   overflow: hidden;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none !important;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.45s ease;
   cursor: default;
   z-index: 1;
 }
 
+/* Ultra-luxurious glass reflection & silky shine sheen passing across the card */
+.curve-card-modern::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -190%;
+  width: 90%;
+  height: 160%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.01) 15%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.45) 55%,
+    rgba(255, 255, 255, 0.01) 85%,
+    transparent 100%
+  );
+  transform: rotate(24deg);
+  pointer-events: none;
+  z-index: 5;
+  filter: blur(0.75px);
+  opacity: 0;
+  transition: opacity 0.3s ease, left 0s 0.35s;
+}
+
+.curve-card-modern:hover::before {
+  opacity: 1;
+  left: 230%;
+  transition: left 1.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
 .curve-card-modern:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-color: #cbd5e1;
+  background: #ffffff;
+  border: none !important;
+  box-shadow: 
+    0 16px 32px -4px rgba(15, 23, 42, 0.09),
+    0 6px 16px -2px rgba(0, 0, 0, 0.04);
 }
 
 .curve-card-clickable {
@@ -32,12 +67,14 @@
 }
 
 .curve-card-clickable:hover {
-  transform: translateY(-5px) scale(1.01);
-  box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: none !important;
+  box-shadow: 
+    0 20px 38px -4px rgba(15, 23, 42, 0.12),
+    0 8px 18px -2px rgba(0, 0, 0, 0.05);
 }
 
 .curve-card-clickable:active {
-  transform: translateY(-2px) scale(0.99);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.07);
 }
 
 .curve-card-content {
@@ -63,6 +100,11 @@
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.curve-card-modern:hover .curve-card-title {
+  color: #475569;
 }
 
 .curve-card-value {
@@ -71,6 +113,7 @@
   /* font-weight: 800; */
   color: #0f172a;
   line-height: 1.2;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .curve-card-icon-wrapper {
@@ -85,30 +128,20 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
 }
 
 .curve-card-modern:hover .curve-card-icon-wrapper {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.08) translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.09);
 }
 
 .curve-card-icon-wrapper svg {
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
-/* Strip legacy nested circular badges if present */
-.curve-card-icon-wrapper .hu-card-icon,
-.curve-card-icon-wrapper .dc-card-icon {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  padding: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  border-radius: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+.curve-card-modern:hover .curve-card-icon-wrapper svg {
+  transform: scale(1.05);
 }
 
 .curve-card-waves {
@@ -120,6 +153,13 @@
   height: 40px;
   z-index: 0;
   pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.curve-card-modern:hover .curve-card-waves {
+  opacity: 1;
+  transform: scaleY(1.08);
 }
 
 .curve-card-progress-container {

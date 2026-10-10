@@ -290,7 +290,7 @@ export default function UserRegistrationPage() {
       return;
     }
     if (isEmailRequired && !emailId.trim()) {
-      setAlert({ type: 'error', message: 'Email ID is required when "Recieved E-mail Updates" is enabled.' });
+      setAlert({ type: 'error', message: 'Email ID is required when "Receive E-mail Updates" is enabled.' });
       return;
     }
     if (emailId.trim()) {
@@ -797,7 +797,7 @@ export default function UserRegistrationPage() {
                   ) : (
                     <Bell size={13} className="vmm-bell-icon" />
                   )}
-                  <span>Recieved E-mail Updates</span>
+                  <span>Receive E-mail Updates</span>
                   {isEmailRequired && <span className="vmm-bell-live-dot" />}
                 </button>
               </div>
