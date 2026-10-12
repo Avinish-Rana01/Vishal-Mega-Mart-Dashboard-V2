@@ -7,7 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { ClearButton, BackButton, SearchButton } from '../../components/common/ReportActionButton';
 import { getReportStores, getStoreSaleReport } from '../../services/stockService';
 import './common-reports.css';
 
@@ -40,11 +40,18 @@ export default function StoreSaleReportPage() {
     return formatDate(base);
   })();
 
-  // Filter States
+  // Draft Filter States
   const [selectedStore, setSelectedStore] = useState(initialStore);
   const [fromDate, setFromDate] = useState(defaultFromDate);
   const [toDate, setToDate] = useState(defaultToDate);
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Decoupled search filters actually passed to API
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore,
+    fromDate: defaultFromDate,
+    toDate: defaultToDate
+  });
 
   // Data States
   const [tableData, setTableData] = useState([]);
@@ -103,13 +110,12 @@ export default function StoreSaleReportPage() {
     fetchControllerRef.current = controller;
 
     setIsLoading(true);
-    setTableData([]);
     setError(null);
     try {
       const result = await getStoreSaleReport({
-        storeCode: selectedStore,
-        fromDate,
-        toDate,
+        storeCode: appliedFilters.storeCode,
+        fromDate: appliedFilters.fromDate,
+        toDate: appliedFilters.toDate,
         pageIndex: pIndex,
         pageSize: pSize,
         sortColumn,
@@ -138,7 +144,7 @@ export default function StoreSaleReportPage() {
         setIsLoading(false);
       }
     }
-  }, [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }, [appliedFilters, sortColumn, sortDirection]);
 
   // Initial and reactive fetch
   useEffect(() => {
@@ -150,6 +156,16 @@ export default function StoreSaleReportPage() {
     };
   }, [fetchReport, pageIndex, pageSize]);
 
+  // Handle Search
+  const handleSearch = () => {
+    setPageIndex(1);
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate
+    });
+  };
+
   // Handle Clear / Reset
   const handleClear = () => {
     setSelectedStore(initialStore);
@@ -157,11 +173,12 @@ export default function StoreSaleReportPage() {
     setToDate(defaultToDate);
     setSortColumn('DATE');
     setSortDirection('desc');
-    if (pageIndex === 1) {
-      fetchReport(1, pageSize);
-    } else {
-      setPageIndex(1);
-    }
+    setPageIndex(1);
+    setAppliedFilters({
+      storeCode: initialStore,
+      fromDate: defaultFromDate,
+      toDate: defaultToDate
+    });
   };
 
   // Get Store Display Name for info banner
@@ -250,12 +267,12 @@ export default function StoreSaleReportPage() {
   ], [selectedStore, fromDate, pageIndex, pageSize]);
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   return (
     <AppLayout 
@@ -275,10 +292,7 @@ export default function StoreSaleReportPage() {
               <label>Store Code *</label>
               <SearchableDropdown
                 value={selectedStore}
-                onChange={(val) => {
-                  setSelectedStore(val);
-                  setPageIndex(1);
-                }}
+                onChange={(val) => setSelectedStore(val)}
                 options={storeOptions}
                 placeholder="Select Store Code"
                 labelKey="text"
@@ -290,10 +304,7 @@ export default function StoreSaleReportPage() {
               <label>From Date</label>
               <CustomDatePicker
                 value={fromDate}
-                onChange={(dateStr) => {
-                  setFromDate(dateStr);
-                  setPageIndex(1);
-                }}
+                onChange={(dateStr) => setFromDate(dateStr)}
                 placeholder="From Date"
               />
             </div>
@@ -302,16 +313,14 @@ export default function StoreSaleReportPage() {
               <label>To Date</label>
               <CustomDatePicker
                 value={toDate}
-                onChange={(dateStr) => {
-                  setToDate(dateStr);
-                  setPageIndex(1);
-                }}
+                onChange={(dateStr) => setToDate(dateStr)}
                 placeholder="To Date"
               />
             </div>
 
-            <div className="search-buttons">
-              <ClearButton onClick={handleClear} />
+            <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
+              <SearchButton onClick={handleSearch} disabled={isLoading} loading={isLoading} />
+              <ClearButton onClick={handleClear} disabled={isLoading} />
             </div>
           </div>
         </div>
@@ -319,8 +328,8 @@ export default function StoreSaleReportPage() {
         {/* Selected Store & Date Info Bar (Image 2) */}
         <ReportStatsHeader 
           storeName={getSelectedStoreName()}
-          fromDate={fromDate}
-          toDate={toDate}
+          fromDate={appliedFilters.fromDate}
+          toDate={appliedFilters.toDate}
         />
 
         {/* 4 KPI Curved Cards (Image 2) */}
@@ -366,7 +375,7 @@ export default function StoreSaleReportPage() {
             pageSize={pageSize}
             reportName="STORE_SALE_REPORT"
             exportFilters={exportFilters}
-            exportFileName={`Store_Sale_Report_${selectedStore}_${fromDate}_to_${toDate}.xlsx`}
+            exportFileName={`Store_Sale_Report_${appliedFilters.storeCode}_${appliedFilters.fromDate}_to_${appliedFilters.toDate}.xlsx`}
             onPageChange={(newPg) => setPageIndex(newPg)}
             onPageSizeChange={(newSize) => {
               setPageSize(newSize);

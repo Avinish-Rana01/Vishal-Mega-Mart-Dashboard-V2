@@ -7,6 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
+import { ClearButton, SearchButton } from '../../components/common/ReportActionButton';
 import { getReportStores, getStoreGrcReport } from '../../services/stockService';
 import './common-reports.css';
 
@@ -65,6 +66,13 @@ export default function StoreGrcReportPage() {
   const [fromDate, setFromDate] = useState(defaultFromDate);
   const [toDate, setToDate] = useState(defaultToDate);
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Decoupled search filters actually sent to API
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore,
+    fromDate: defaultFromDate,
+    toDate: defaultToDate
+  });
   
   const [tableData, setTableData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,12 +86,21 @@ export default function StoreGrcReportPage() {
   const [sortDirection, setSortDirection] = useState('DESC');
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setPageIndex(1);
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate
+    });
+  };
 
   const handleClear = () => {
     setSelectedStore(initialStore);
@@ -92,6 +109,11 @@ export default function StoreGrcReportPage() {
     setSortColumn('GRC_DATE');
     setSortDirection('DESC');
     setPageIndex(1);
+    setAppliedFilters({
+      storeCode: initialStore,
+      fromDate: defaultFromDate,
+      toDate: defaultToDate
+    });
   };
 
   // Vibrant gradient pairs matching Store Sale Report design
@@ -123,10 +145,9 @@ export default function StoreGrcReportPage() {
     const controller = new AbortController();
     const fetchReport = async () => {
       setIsLoading(true);
-      setTableData([]);
       setError(null);
       try {
-        const result = await getStoreGrcReport(selectedStore, fromDate, toDate, pageIndex, pageSize, sortColumn, sortDirection, controller.signal);
+        const result = await getStoreGrcReport(appliedFilters.storeCode, appliedFilters.fromDate, appliedFilters.toDate, pageIndex, pageSize, sortColumn, sortDirection, controller.signal);
         
         if (controller.signal.aborted) return;
         
@@ -159,16 +180,17 @@ export default function StoreGrcReportPage() {
           });
         }
       } catch (err) {
-        if (err.name === 'AbortError') return;
-        console.error("Error fetching store GRC report:", err);
-        setError("Unable to load report data.");
+        if (err.name !== 'AbortError') {
+          console.error("Error fetching store GRC report:", err);
+          setError("Unable to load report data.");
+        }
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }
     };
     fetchReport();
     return () => controller.abort();
-  }, [selectedStore, fromDate, toDate, pageIndex, pageSize, sortColumn, sortDirection]);
+  }, [appliedFilters, pageIndex, pageSize, sortColumn, sortDirection]);
 
   const getSelectedStoreName = () => {
     if (reportSummary?.storeName) return reportSummary.storeName;
@@ -213,10 +235,7 @@ export default function StoreGrcReportPage() {
                 <label>Store Code *</label>
                 <SearchableDropdown
                   value={selectedStore}
-                  onChange={(val) => {
-                    setSelectedStore(val);
-                    setPageIndex(1);
-                  }}
+                  onChange={(val) => setSelectedStore(val)}
                   options={storeOptions}
                   placeholder="Select Store Code"
                 />
@@ -225,10 +244,7 @@ export default function StoreGrcReportPage() {
                 <label>From Date *</label>
                 <CustomDatePicker
                   value={fromDate}
-                  onChange={(dateStr) => {
-                    setFromDate(dateStr);
-                    setPageIndex(1);
-                  }}
+                  onChange={(dateStr) => setFromDate(dateStr)}
                   placeholder="From Date"
                 />
               </div>
@@ -236,12 +252,13 @@ export default function StoreGrcReportPage() {
                 <label>To Date *</label>
                 <CustomDatePicker
                   value={toDate}
-                  onChange={(dateStr) => {
-                    setToDate(dateStr);
-                    setPageIndex(1);
-                  }}
+                  onChange={(dateStr) => setToDate(dateStr)}
                   placeholder="To Date"
                 />
+              </div>
+              <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
+                <SearchButton onClick={handleSearch} disabled={isLoading} loading={isLoading} />
+                <ClearButton onClick={handleClear} disabled={isLoading} />
               </div>
             </div>
           </div>
@@ -249,8 +266,8 @@ export default function StoreGrcReportPage() {
           {/* Selected Info Bar */}
           <ReportStatsHeader 
             storeName={getSelectedStoreName()}
-            fromDate={fromDate}
-            toDate={toDate}
+            fromDate={appliedFilters.fromDate}
+            toDate={appliedFilters.toDate}
           />
 
           {/* Curved Cards */}
@@ -315,7 +332,7 @@ export default function StoreGrcReportPage() {
               totalRecords={totalRecords}
               reportName="STORE_GRC_SUMMARY"
               exportFilters={exportFilters}
-              exportFileName={`Store_GRC_Report_${selectedStore}_${fromDate}_${toDate}.xlsx`}
+              exportFileName={`Store_GRC_Report_${appliedFilters.storeCode}_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
             />
           </div>
     </AppLayout>

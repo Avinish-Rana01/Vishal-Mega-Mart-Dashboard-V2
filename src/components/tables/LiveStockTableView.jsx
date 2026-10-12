@@ -5,7 +5,7 @@ import SearchableDropdown from "../common/SearchableDropdown";
 import CustomDatePicker from "../common/CustomDatePicker";
 import CurvedCard from "../common/CurvedCard";
 import ReportStatsHeader from "../common/ReportStatsHeader";
-import { ClearButton } from "../common/ReportActionButton";
+import { SearchButton, ClearButton } from "../common/ReportActionButton";
 import { getReportStores, searchReportArticles, getReportLiveStock } from "../../services/stockService";
 import './LiveStockTableView.css'; // We'll copy LiveStockReport.css styles here
 import '../../pages/Report/common-reports.css';
@@ -14,6 +14,13 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
   const [selectedStore, setSelectedStore] = useState(initialStore);
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Applied Filters State (only updated on Search / Mount / Clear)
+  const [appliedFilters, setAppliedFilters] = useState({
+    store: initialStore,
+    date: initialDate,
+    article: ''
+  });
   
   const [articleData, setArticleData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,13 +76,13 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
   const [selectedArticle, setSelectedArticle] = useState('');
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate: selectedDate,
-    toDate: selectedDate,
-    articleNo: selectedArticle,
+    storeCode: appliedFilters.store,
+    fromDate: appliedFilters.date,
+    toDate: appliedFilters.date,
+    articleNo: appliedFilters.article,
     sortColumn,
     sortDirection
-  }), [selectedStore, selectedDate, selectedArticle, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Sync Article options: use table data by default; only call search API when user actively types a search query
   useEffect(() => {
@@ -111,7 +118,16 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getReportLiveStock(selectedStore, selectedDate, selectedArticle, pageIndex, pageSize, sortColumn, sortDirection, controller.signal);
+        const result = await getReportLiveStock(
+          appliedFilters.store, 
+          appliedFilters.date, 
+          appliedFilters.article, 
+          pageIndex, 
+          pageSize, 
+          sortColumn, 
+          sortDirection, 
+          controller.signal
+        );
         
         if (controller.signal.aborted) return;
         
@@ -146,7 +162,31 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
     };
     fetchReport();
     return () => controller.abort();
-  }, [selectedStore, selectedDate, pageIndex, pageSize, selectedArticle, sortColumn, sortDirection]);
+  }, [appliedFilters, pageIndex, pageSize, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setAppliedFilters({
+      store: selectedStore,
+      date: selectedDate,
+      article: selectedArticle
+    });
+    setPageIndex(1);
+  };
+
+  const handleClear = () => {
+    setSelectedStore(initialStore);
+    setSelectedDate(initialDate);
+    setSelectedArticle('');
+    setArticleSearchTerm('');
+    setSortColumn('STOCK_DATE');
+    setSortDirection('asc');
+    setAppliedFilters({
+      store: initialStore,
+      date: initialDate,
+      article: ''
+    });
+    setPageIndex(1);
+  };
 
   const numRenderer = (val) => (
     <span className="livestock-cell-num">
@@ -161,10 +201,10 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
 
   const getSelectedStoreName = () => {
     if (reportSummary?.storeName) return reportSummary.storeName;
-    if (!selectedStore) return 'None';
+    if (!appliedFilters.store) return 'None';
     const options = Array.isArray(storeOptions) ? storeOptions : [];
-    const opt = options.find(o => o?.STORE === selectedStore || o?.value === selectedStore);
-    return opt?.STORE_NAME || opt?.label || selectedStore;
+    const opt = options.find(o => o?.STORE === appliedFilters.store || o?.value === appliedFilters.store);
+    return opt?.STORE_NAME || opt?.label || appliedFilters.store;
   };
 
   const columns = [
@@ -193,12 +233,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
             <label>Store Code</label>
             <SearchableDropdown
               value={selectedStore}
-              onChange={(val) => {
-                setSelectedStore(val);
-                setSelectedArticle('');
-                setArticleSearchTerm('');
-                setPageIndex(1);
-              }}
+              onChange={(val) => setSelectedStore(val)}
               options={storeOptions}
               placeholder="Select Store Code"
             />
@@ -215,10 +250,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
             <label>Article No</label>
             <SearchableDropdown
               value={selectedArticle}
-              onChange={(val) => {
-                setSelectedArticle(val);
-                setPageIndex(1);
-              }}
+              onChange={(val) => setSelectedArticle(val)}
               options={articleOptions}
               placeholder="Select Article No"
               searchPlaceholder="Search Article No"
@@ -230,12 +262,14 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
             />
           </div>
           <div className="search-buttons">
+            <SearchButton
+              onClick={handleSearch}
+              disabled={isLoading}
+              loading={isLoading}
+            />
             <ClearButton
-              onClick={() => {
-                setSelectedArticle('');
-                setArticleSearchTerm('');
-                setPageIndex(1);
-              }}
+              onClick={handleClear}
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -244,7 +278,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       {/* Selected Info Bar */}
       <ReportStatsHeader 
         storeName={getSelectedStoreName()}
-        date={selectedDate}
+        date={appliedFilters.date}
       />
 
       {/* KPI Cards */}
@@ -294,7 +328,7 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
           sortDirection={sortDirection}
           reportName="LIVE_STOCK_REPORT"
           exportFilters={exportFilters}
-          exportFileName={`Live_Stock_Report_${selectedStore}_${selectedDate}.xlsx`}
+          exportFileName={`Live_Stock_Report_${appliedFilters.store}_${appliedFilters.date}.xlsx`}
           directExport={true}
         />
       </div>

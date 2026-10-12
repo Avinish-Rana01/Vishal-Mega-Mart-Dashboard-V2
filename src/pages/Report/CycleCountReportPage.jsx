@@ -6,7 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CycleCountModal from '../../components/modals/CycleCountModal';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton } from '../../components/common/ReportActionButton';
+import { ClearButton, SearchButton } from '../../components/common/ReportActionButton';
 import { getCycleCountReport, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
 import './common-reports.css';
@@ -38,6 +38,13 @@ export default function CycleCountReportPage() {
   const [toDate, setToDate] = useState(defaultToDate);
   const [storeOptions, setStoreOptions] = useState([]);
   
+  // Decoupled search filters actually passed to API
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore || '',
+    fromDate: defaultFromDate,
+    toDate: defaultToDate
+  });
+
   const [reportData, setReportData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,12 +58,12 @@ export default function CycleCountReportPage() {
   const [sortDirection, setSortDirection] = useState('DESC');
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,17 +86,26 @@ export default function CycleCountReportPage() {
 
   // Fetch Report Data
   const fetchReportData = async (signal) => {
-    if (!selectedStore) {
+    if (!appliedFilters.storeCode) {
       setReportData([]);
       setTotalRecords(0);
       return;
     }
     
     setIsLoading(true);
-    setReportData([]);
     setError(null);
     try {
-      const result = await getCycleCountReport(pageIndex, pageSize, searchTerm, selectedStore, fromDate, toDate, sortColumn, sortDirection, signal);
+      const result = await getCycleCountReport(
+        pageIndex, 
+        pageSize, 
+        searchTerm, 
+        appliedFilters.storeCode, 
+        appliedFilters.fromDate, 
+        appliedFilters.toDate, 
+        sortColumn, 
+        sortDirection, 
+        signal
+      );
       setReportData(result?.items || result?.Items || []);
       setTotalRecords(result?.summary?.recordCount || result?.Summary?.RecordCount || 0);
     } catch (err) {
@@ -106,17 +122,31 @@ export default function CycleCountReportPage() {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [pageIndex, pageSize, searchTerm, selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }, [pageIndex, pageSize, searchTerm, appliedFilters, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setPageIndex(1);
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate
+    });
+  };
 
   const handleClear = () => {
     setSelectedStore('');
-    setFromDate('');
-    setToDate('');
+    setFromDate(defaultFromDate);
+    setToDate(defaultToDate);
     setReportData([]);
     setTotalRecords(0);
     setSortColumn('DATE');
     setSortDirection('DESC');
     setPageIndex(1);
+    setAppliedFilters({
+      storeCode: '',
+      fromDate: defaultFromDate,
+      toDate: defaultToDate
+    });
   };
 
   const handleRefClick = (row) => {
@@ -159,7 +189,7 @@ export default function CycleCountReportPage() {
     { key: 'Time_Taken', label: 'TIME TAKEN' }
   ];
 
-  const storeDisplay = storeOptions.find(s => s.value === selectedStore)?.text || selectedStore;
+  const storeDisplay = storeOptions.find(s => s.value === appliedFilters.storeCode)?.text || appliedFilters.storeCode;
 
   return (
     <AppLayout 
@@ -204,17 +234,18 @@ export default function CycleCountReportPage() {
               </div>
 
               <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
-                <ClearButton onClick={handleClear} />
+                <SearchButton onClick={handleSearch} disabled={isLoading} loading={isLoading} />
+                <ClearButton onClick={handleClear} disabled={isLoading} />
               </div>
             </div>
           </div>
 
           {/* Info Banner */}
-          {selectedStore && (
+          {appliedFilters.storeCode && (
             <ReportStatsHeader 
               storeName={storeDisplay}
-              fromDate={fromDate}
-              toDate={toDate}
+              fromDate={appliedFilters.fromDate}
+              toDate={appliedFilters.toDate}
             />
           )}
 
@@ -242,7 +273,7 @@ export default function CycleCountReportPage() {
               totalRecords={totalRecords}
               reportName="CYCLE_COUNT_SUMMARY"
               exportFilters={exportFilters}
-              exportFileName={`Cycle_Count_${selectedStore || 'ALL'}_${fromDate || 'ALL'}_${toDate || 'ALL'}.xlsx`}
+              exportFileName={`Cycle_Count_${appliedFilters.storeCode || 'ALL'}_${appliedFilters.fromDate || 'ALL'}_${appliedFilters.toDate || 'ALL'}.xlsx`}
               onSearch={setSearchTerm}
               searchPlaceholder="Search Records"
             />

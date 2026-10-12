@@ -6,7 +6,7 @@ import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { SearchButton, ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getWHEncodingDetails, getWHEncodingUsers } from '../../services/stockService';
 import { dateRenderer, numRenderer, numRendererRed } from '../../utils/dashboardColumns';
 import EpcRangeBreakdown, { DEFAULT_EPC_RANGES as EPC_RANGES } from '../../components/common/EpcRangeBreakdown';
@@ -26,6 +26,13 @@ export default function WHEncodingSummaryPage() {
   const [apiUserOptions, setApiUserOptions] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [isUserSearching, setIsUserSearching] = useState(false);
+
+  // Applied Filters State (only updated on Search / Mount / Clear)
+  const [appliedFilters, setAppliedFilters] = useState({
+    fromDate: getTodayDate(),
+    toDate: getTodayDate(),
+    selectedUser: ''
+  });
 
   // Data state
   const [reportData, setReportData] = useState([]);
@@ -56,12 +63,12 @@ export default function WHEncodingSummaryPage() {
   const [rangeSummary, setRangeSummary] = useState({});
 
   const exportFilters = useMemo(() => ({
-    userId: selectedUser,
-    fromDate,
-    toDate,
+    userId: appliedFilters.selectedUser,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedUser, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // ---- Fetch data ----
   const fetchData = useCallback(async (signal) => {
@@ -72,9 +79,9 @@ export default function WHEncodingSummaryPage() {
         searchTerm,
         pageIndex,
         pageSize,
-        user: selectedUser,
-        fromDate,
-        toDate,
+        user: appliedFilters.selectedUser,
+        fromDate: appliedFilters.fromDate,
+        toDate: appliedFilters.toDate,
         sortColumn,
         sortDirection
       }, signal);
@@ -112,7 +119,7 @@ export default function WHEncodingSummaryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchTerm, pageIndex, pageSize, selectedUser, fromDate, toDate, sortColumn, sortDirection]);
+  }, [searchTerm, pageIndex, pageSize, appliedFilters, sortColumn, sortDirection]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -210,24 +217,35 @@ export default function WHEncodingSummaryPage() {
   // ---- Handlers ----
   const handleFromDateChange = (val) => {
     setFromDate(val);
-    setSelectedUser('');
-    setPageIndex(1);
   };
 
   const handleToDateChange = (val) => {
     setToDate(val);
-    setSelectedUser('');
+  };
+
+  const handleSearch = () => {
+    setAppliedFilters({
+      fromDate,
+      toDate,
+      selectedUser
+    });
     setPageIndex(1);
   };
 
   const handleClear = () => {
-    setFromDate(getTodayDate());
-    setToDate(getTodayDate());
+    const today = getTodayDate();
+    setFromDate(today);
+    setToDate(today);
     setSelectedUser('');
     setUserSearchTerm('');
     setSearchTerm('');
     setSortColumn('ENCODE_DATE');
     setSortDirection('desc');
+    setAppliedFilters({
+      fromDate: today,
+      toDate: today,
+      selectedUser: ''
+    });
     setPageIndex(1);
   };
 
@@ -339,7 +357,6 @@ export default function WHEncodingSummaryPage() {
                 value={selectedUser}
                 onChange={(val) => {
                   setSelectedUser(val ? String(val) : '');
-                  setPageIndex(1);
                 }}
                 placeholder="Select User"
                 searchPlaceholder="Search User..."
@@ -353,6 +370,11 @@ export default function WHEncodingSummaryPage() {
             </div>
 
             <div className="search-buttons">
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
               <ClearButton
                 onClick={handleClear}
                 disabled={isLoading}
@@ -365,9 +387,9 @@ export default function WHEncodingSummaryPage() {
 
         {/* Stats Sub-header */}
         <ReportStatsHeader
-          storeName={selectedUser ? `USER: ${selectedUserLabel}` : 'ALL USERS'}
-          fromDate={fromDate}
-          toDate={toDate}
+          storeName={appliedFilters.selectedUser ? `USER: ${selectedUserLabel}` : 'ALL USERS'}
+          fromDate={appliedFilters.fromDate}
+          toDate={appliedFilters.toDate}
         />
 
         {/* 5 KPI Curved Cards */}
@@ -437,7 +459,7 @@ export default function WHEncodingSummaryPage() {
             sortDirection={sortDirection}
             reportName="WAREHOUSE_ENCODING_SUMMARY"
             exportFilters={exportFilters}
-            exportFileName={`WH_Encoding_Summary_${fromDate}_${toDate}.xlsx`}
+            exportFileName={`WH_Encoding_Summary_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => { setSearchTerm(term); setPageIndex(1); }}
           />

@@ -7,7 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { SearchButton, ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getReturnDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
 import './common-reports.css';
@@ -38,6 +38,13 @@ export default function ReturnDetailsReportPage() {
   const [fromDate, setFromDate] = useState(defaultFromDate);
   const [toDate, setToDate] = useState(defaultToDate);
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Applied Filters State (only updated on Search / Mount / Clear)
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore || '',
+    fromDate: defaultFromDate,
+    toDate: defaultToDate
+  });
   
   const navigate = useNavigate();
   
@@ -59,12 +66,12 @@ export default function ReturnDetailsReportPage() {
   });
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -87,7 +94,16 @@ export default function ReturnDetailsReportPage() {
     setReportData([]);
     setError(null);
     try {
-      const result = await getReturnDetails(selectedStore, fromDate, toDate, pageIndex, pageSize, sortColumn || 'DATE', sortDirection || 'asc', signal);
+      const result = await getReturnDetails(
+        appliedFilters.storeCode, 
+        appliedFilters.fromDate, 
+        appliedFilters.toDate, 
+        pageIndex, 
+        pageSize, 
+        sortColumn || 'DATE', 
+        sortDirection || 'asc', 
+        signal
+      );
       setReportData(result?.data || result?.Data || []);
       setTotalRecords(result?.recordCount || result?.RecordCount || 0);
       setTotals({
@@ -109,7 +125,16 @@ export default function ReturnDetailsReportPage() {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [pageIndex, pageSize, selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }, [pageIndex, pageSize, appliedFilters, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate
+    });
+    setPageIndex(1);
+  };
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
@@ -117,6 +142,11 @@ export default function ReturnDetailsReportPage() {
     setToDate(defaultToDate);
     setSortColumn('DATE');
     setSortDirection('asc');
+    setAppliedFilters({
+      storeCode: initialStore || '',
+      fromDate: defaultFromDate,
+      toDate: defaultToDate
+    });
     setPageIndex(1);
   };
 
@@ -128,7 +158,7 @@ export default function ReturnDetailsReportPage() {
     
     navigate('/reports/return-reconciliation', {
       state: {
-        storeCode: selectedStore,
+        storeCode: appliedFilters.storeCode,
         date: rowDate
       }
     });
@@ -198,15 +228,20 @@ export default function ReturnDetailsReportPage() {
             
             <div className="search-field">
               <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={(val) => { setFromDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={fromDate} onChange={(val) => setFromDate(val)} />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={toDate} onChange={(val) => setToDate(val)} />
             </div>
 
             <div className="search-buttons">
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
               <ClearButton onClick={handleClear} />
               <BackButton onClick={() => navigate(-1)} label="Back to Return Summary" />
             </div>
@@ -216,9 +251,9 @@ export default function ReturnDetailsReportPage() {
       {error && <div className="report-error-banner">{error}</div>}
 
       <ReportStatsHeader 
-        storeName={selectedStore || 'ALL STORES'}
-        fromDate={fromDate}
-        toDate={toDate}
+        storeName={appliedFilters.storeCode || 'ALL STORES'}
+        fromDate={appliedFilters.fromDate}
+        toDate={appliedFilters.toDate}
       />
 
       <div className="ds-kpi-row">
@@ -258,7 +293,7 @@ export default function ReturnDetailsReportPage() {
           pageSize={pageSize}
           reportName="RETURN_DETAILS"
           exportFilters={exportFilters}
-          exportFileName={`Return_Details_${selectedStore || 'ALL'}_${fromDate}_to_${toDate}.xlsx`}
+          exportFileName={`Return_Details_${appliedFilters.storeCode || 'ALL'}_${appliedFilters.fromDate}_to_${appliedFilters.toDate}.xlsx`}
           onPageChange={setPageIndex}
           onPageSizeChange={setPageSize}
           isLoading={isLoading}

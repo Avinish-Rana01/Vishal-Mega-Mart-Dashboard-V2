@@ -398,7 +398,7 @@ export default function AllocatedStoreReportPage() {
           </div>
 
           <div className="report-search-center-actions">
-            <SearchButton onClick={handleSearch} disabled={isLoading} />
+            <SearchButton onClick={handleSearch} disabled={isLoading} loading={isLoading} />
             <ClearButton onClick={handleClear} disabled={isLoading} />
             <BackButton onClick={handleBackToDcSummary} label="Back to DC Summary" />
           </div>

@@ -6,7 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { ClearButton, BackButton, SearchButton } from '../../components/common/ReportActionButton';
 import './common-reports.css';
 import { getDCDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
@@ -45,6 +45,13 @@ export default function DcReportPage() {
   const [fromDate, setFromDate] = useState(initialFromDate);
   const [toDate, setToDate] = useState(initialToDate);
 
+  // Decoupled search filters actually sent to API
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeName: initialStore,
+    fromDate: initialFromDate,
+    toDate: initialToDate
+  });
+
   const [storeOptions, setStoreOptions] = useState([]);
   const [reportData, setReportData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,12 +73,12 @@ export default function DcReportPage() {
   });
 
   const exportFilters = useMemo(() => ({
-    storeName: selectedStore,
-    fromDate,
-    toDate,
+    storeName: appliedFilters.storeName,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -100,13 +107,12 @@ export default function DcReportPage() {
   // Fetch DC Report Data
   const fetchReportData = useCallback(async (signal) => {
     setIsLoading(true);
-    setReportData([]);
     setError(null);
     try {
       const result = await getDCDetails({
-        storeName: selectedStore,
-        fromDate,
-        toDate,
+        storeName: appliedFilters.storeName,
+        fromDate: appliedFilters.fromDate,
+        toDate: appliedFilters.toDate,
         pageIndex,
         pageSize,
         searchTerm,
@@ -134,7 +140,7 @@ export default function DcReportPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedStore, fromDate, toDate, pageIndex, pageSize, searchTerm, sortColumn, sortDirection, storeDisplayName]);
+  }, [appliedFilters, pageIndex, pageSize, searchTerm, sortColumn, sortDirection, storeDisplayName]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -143,6 +149,14 @@ export default function DcReportPage() {
   }, [fetchReportData]);
 
   // Search & Filter actions
+  const handleSearch = () => {
+    setPageIndex(1);
+    setAppliedFilters({
+      storeName: selectedStore,
+      fromDate,
+      toDate
+    });
+  };
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
@@ -152,6 +166,11 @@ export default function DcReportPage() {
     setSortColumn('DATE');
     setSortDirection('desc');
     setPageIndex(1);
+    setAppliedFilters({
+      storeName: initialStore || '',
+      fromDate: getSevenDaysAgo(),
+      toDate: getTodayDate()
+    });
   };
 
   // Drilldown navigations
@@ -164,12 +183,12 @@ export default function DcReportPage() {
     const rowDate = row ? getRowDateString(row) : '';
     navigate('/reports/hu-report', {
       state: {
-        receivingPlant: row?.Reciving_Plant || selectedStore,
+        receivingPlant: row?.Reciving_Plant || appliedFilters.storeName,
         storeName: row?.STORE_NAME || storeDisplayName,
-        date: rowDate || fromDate,
+        date: rowDate || appliedFilters.fromDate,
         huStatus: huStatus,
-        fromDate: rowDate || fromDate,
-        toDate: rowDate || toDate
+        fromDate: rowDate || appliedFilters.fromDate,
+        toDate: rowDate || appliedFilters.toDate
       }
     });
   };
@@ -178,11 +197,11 @@ export default function DcReportPage() {
     const rowDate = row ? getRowDateString(row) : '';
     navigate('/reports/allocated-store-report', {
       state: {
-        storeCode: row?.Reciving_Plant || selectedStore,
+        storeCode: row?.Reciving_Plant || appliedFilters.storeName,
         storeName: row?.STORE_NAME || storeDisplayName,
-        date: rowDate || fromDate,
-        fromDate: rowDate || fromDate,
-        toDate: rowDate || toDate
+        date: rowDate || appliedFilters.fromDate,
+        fromDate: rowDate || appliedFilters.fromDate,
+        toDate: rowDate || appliedFilters.toDate
       }
     });
   };
@@ -295,15 +314,20 @@ export default function DcReportPage() {
 
             <div className="search-field">
               <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={(val) => { setFromDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={fromDate} onChange={(val) => setFromDate(val)} />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={toDate} onChange={(val) => setToDate(val)} />
             </div>
 
-            <div className="search-buttons">
+            <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
               <ClearButton
                 onClick={handleClear}
                 disabled={isLoading}
@@ -317,8 +341,8 @@ export default function DcReportPage() {
         {/* Selected Store / Date Subheader Bar */}
         <ReportStatsHeader 
             storeName={displayStoreTitle}
-            fromDate={fromDate}
-            toDate={toDate}
+            fromDate={appliedFilters.fromDate}
+            toDate={appliedFilters.toDate}
           />
 
         {/* 3 Curved KPI Cards */}
@@ -372,7 +396,7 @@ export default function DcReportPage() {
             sortDirection={sortDirection}
             reportName="DC_VALIDATION_DETAILS"
             exportFilters={exportFilters}
-            exportFileName={`DC_Report_${selectedStore}_${fromDate}_${toDate}.xlsx`}
+            exportFileName={`DC_Report_${appliedFilters.storeName}_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => setSearchTerm(term)}
           />

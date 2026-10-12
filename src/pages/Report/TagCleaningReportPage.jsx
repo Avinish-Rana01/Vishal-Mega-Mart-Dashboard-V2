@@ -301,7 +301,7 @@ export default function TagCleaningReportPage() {
           </div>
 
           <div className="search-buttons">
-            <SearchButton onClick={handleSearch} disabled={isLoading} />
+            <SearchButton onClick={handleSearch} disabled={isLoading} loading={isLoading} />
             <ClearButton onClick={handleClear} disabled={isLoading} />
           </div>
         </div>

@@ -7,7 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { SearchButton, ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { 
   getReportStores, 
   getSaleData, 
@@ -43,7 +43,7 @@ export default function TotalDposSalePage() {
   const initialToDate = formatDateStr(state.toDate);
   const initialColumnName = state.columnName || 'TOTAL_DPOS_SALE';
 
-  // Filters State
+  // Filters State (Draft inputs)
   const [selectedStore, setSelectedStore] = useState(initialStore);
   const [fromDate, setFromDate] = useState(initialFromDate);
   const [toDate, setToDate] = useState(initialToDate);
@@ -51,6 +51,17 @@ export default function TotalDposSalePage() {
   const [selectedPos, setSelectedPos] = useState('');
   const [selectedArticle, setSelectedArticle] = useState('');
   const [selectedEan, setSelectedEan] = useState('');
+
+  // Applied Filters State (Only updated on Search / Mount / Reset)
+  const [appliedFilters, setAppliedFilters] = useState({
+    store: initialStore,
+    fromDate: initialFromDate,
+    toDate: initialToDate,
+    columnName: initialColumnName,
+    pos: '',
+    article: '',
+    ean: ''
+  });
 
   // Dropdown Options
   const [storeOptions, setStoreOptions] = useState([]);
@@ -80,10 +91,24 @@ export default function TotalDposSalePage() {
   // Sync state if location.state changes
   useEffect(() => {
     if (location.state) {
-      if (location.state.store) setSelectedStore(location.state.store);
-      if (location.state.fromDate) setFromDate(formatDateStr(location.state.fromDate));
-      if (location.state.toDate) setToDate(formatDateStr(location.state.toDate));
-      if (location.state.columnName) setColumnName(location.state.columnName);
+      const store = location.state.store || 'HD44';
+      const fDate = formatDateStr(location.state.fromDate);
+      const tDate = formatDateStr(location.state.toDate);
+      const col = location.state.columnName || 'TOTAL_DPOS_SALE';
+      setSelectedStore(store);
+      setFromDate(fDate);
+      setToDate(tDate);
+      setColumnName(col);
+      setAppliedFilters({
+        store,
+        fromDate: fDate,
+        toDate: tDate,
+        columnName: col,
+        pos: '',
+        article: '',
+        ean: ''
+      });
+      setPageIndex(1);
     }
   }, [location.state]);
 
@@ -126,10 +151,10 @@ export default function TotalDposSalePage() {
     const fetchCounters = async () => {
       try {
         const data = await getSalePosCounters({
-          columnName,
-          store: selectedStore,
-          fromDate,
-          toDate
+          columnName: appliedFilters.columnName,
+          store: appliedFilters.store,
+          fromDate: appliedFilters.fromDate,
+          toDate: appliedFilters.toDate
         }, controller.signal);
         if (Array.isArray(data)) {
           setPosOptions(data.map(item => ({
@@ -143,11 +168,11 @@ export default function TotalDposSalePage() {
         if (err.name !== 'AbortError' && err.name !== 'CanceledError') console.error("Failed to load POS counters", err);
       }
     };
-    if (selectedStore && fromDate) {
+    if (appliedFilters.store && appliedFilters.fromDate) {
       fetchCounters();
     }
     return () => controller.abort();
-  }, [selectedStore, fromDate, toDate, columnName]);
+  }, [appliedFilters.store, appliedFilters.fromDate, appliedFilters.toDate, appliedFilters.columnName]);
 
   // Table-derived options
   const tableArticleOptions = useMemo(() => {
@@ -280,15 +305,15 @@ export default function TotalDposSalePage() {
     setError(null);
     try {
       const result = await getSaleData({
-        columnName,
-        store: selectedStore,
-        storeCode: selectedStore,
-        storeName: selectedStore,
-        fromDate,
-        toDate: toDate || fromDate,
-        pos: selectedPos,
-        articleNo: selectedArticle,
-        ean: selectedEan,
+        columnName: appliedFilters.columnName,
+        store: appliedFilters.store,
+        storeCode: appliedFilters.store,
+        storeName: appliedFilters.store,
+        fromDate: appliedFilters.fromDate,
+        toDate: appliedFilters.toDate || appliedFilters.fromDate,
+        pos: appliedFilters.pos,
+        articleNo: appliedFilters.article,
+        ean: appliedFilters.ean,
         pageIndex: pIndex,
         pageSize: pSize,
         sortColumn,
@@ -320,7 +345,7 @@ export default function TotalDposSalePage() {
         setIsLoading(false);
       }
     }
-  }, [columnName, selectedStore, fromDate, toDate, selectedPos, selectedArticle, selectedEan, sortColumn, sortDirection]);
+  }, [appliedFilters, sortColumn, sortDirection]);
 
   // Single source of truth for pagination and initial fetch
   useEffect(() => {
@@ -332,17 +357,39 @@ export default function TotalDposSalePage() {
     };
   }, [fetchData, pageIndex, pageSize]);
 
+  const handleSearch = () => {
+    setAppliedFilters({
+      store: selectedStore,
+      fromDate,
+      toDate,
+      columnName,
+      pos: selectedPos,
+      article: selectedArticle,
+      ean: selectedEan
+    });
+    setPageIndex(1);
+  };
+
   const handleResetFilters = () => {
+    setSelectedStore(initialStore);
+    setFromDate(initialFromDate);
+    setToDate(initialToDate);
+    setColumnName(initialColumnName);
     setSelectedPos('');
     setSelectedArticle('');
     setSelectedEan('');
     setSortColumn('ITEM_CD');
     setSortDirection('asc');
-    if (pageIndex === 1) {
-      fetchData(1, pageSize);
-    } else {
-      setPageIndex(1);
-    }
+    setAppliedFilters({
+      store: initialStore,
+      fromDate: initialFromDate,
+      toDate: initialToDate,
+      columnName: initialColumnName,
+      pos: '',
+      article: '',
+      ean: ''
+    });
+    setPageIndex(1);
   };
 
   const isRfidCheckout = columnName === 'TOTAL_RFID_CHECKOUT';
@@ -449,14 +496,14 @@ export default function TotalDposSalePage() {
   }, [columnName]);
 
   const exportParams = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate,
-    toDate,
-    pos: selectedPos,
-    articleNo: selectedArticle,
-    ean: selectedEan,
-    columnName
-  }), [selectedStore, fromDate, toDate, selectedPos, selectedArticle, selectedEan, columnName]);
+    storeCode: appliedFilters.store,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
+    pos: appliedFilters.pos,
+    articleNo: appliedFilters.article,
+    ean: appliedFilters.ean,
+    columnName: appliedFilters.columnName
+  }), [appliedFilters]);
 
   return (
     <AppLayout
@@ -566,14 +613,20 @@ export default function TotalDposSalePage() {
 
             {/* Action Buttons */}
             <div className="search-buttons">
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
+
               <ClearButton onClick={handleResetFilters} />
 
               <BackButton
                 onClick={() => navigate('/reports/store-sale', {
                   state: {
-                    store: selectedStore,
-                    fromDate,
-                    toDate
+                    store: appliedFilters.store,
+                    fromDate: appliedFilters.fromDate,
+                    toDate: appliedFilters.toDate
                   }
                 })}
                 label="Back to Sale Summary"
@@ -587,8 +640,8 @@ export default function TotalDposSalePage() {
           <ReportStatsHeader 
             leftLabel="REPORT TYPE"
             leftValue={reportTitle}
-            fromDate={fromDate || '—'}
-            toDate={toDate || '—'}
+            fromDate={appliedFilters.fromDate || '—'}
+            toDate={appliedFilters.toDate || '—'}
           />
         )}
 
@@ -598,7 +651,7 @@ export default function TotalDposSalePage() {
           <div className="report-curved-cards report-curved-cards">
             <CurvedCard
               title="STORE"
-              value={selectedStore || '—'}
+              value={appliedFilters.store || '—'}
               waveColor={cardGradients[0]}
               icon={<ShoppingBag size={20} color="#ffffff" />}
               animate={false}
@@ -623,7 +676,7 @@ export default function TotalDposSalePage() {
           <div className="report-curved-cards">
             <CurvedCard
               title="ASSIGNED STORE"
-              value={selectedStore || '—'}
+              value={appliedFilters.store || '—'}
               waveColor={cardGradients[0]}
               icon={<ShoppingBag size={20} color="#ffffff" />}
               animate={false}
@@ -664,7 +717,7 @@ export default function TotalDposSalePage() {
             pageSize={pageSize}
             reportName={exportReportName}
             exportParams={exportParams}
-            exportFileName={`${reportTitle.replace(/\s+/g, '_')}_${selectedStore || 'All'}_${fromDate || 'Date'}.xlsx`}
+            exportFileName={`${reportTitle.replace(/\s+/g, '_')}_${appliedFilters.store || 'All'}_${appliedFilters.fromDate || 'Date'}.xlsx`}
             onPageChange={(newPg) => setPageIndex(newPg)}
             onPageSizeChange={(newSize) => {
               setPageSize(newSize);

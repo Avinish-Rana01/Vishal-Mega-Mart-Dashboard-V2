@@ -328,6 +328,7 @@ export default function HuSummaryReportPage() {
               <SearchButton
                 onClick={handleSearch}
                 disabled={isLoading}
+                loading={isLoading}
               />
               <ClearButton
                 onClick={handleClear}

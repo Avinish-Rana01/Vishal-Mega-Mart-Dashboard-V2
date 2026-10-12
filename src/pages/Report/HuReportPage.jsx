@@ -6,7 +6,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { ClearButton, BackButton, SearchButton } from '../../components/common/ReportActionButton';
 import './common-reports.css';
 import { getHuDetails, searchValidationHuNumbers } from '../../services/stockService';
 import { dateRenderer } from '../../utils/dashboardColumns';
@@ -38,6 +38,15 @@ export default function HuReportPage() {
   const [fromDate, setFromDate] = useState(initialDate);
   const [toDate, setToDate] = useState(initialDate);
 
+  // Decoupled search filters actually sent to API
+  const [appliedFilters, setAppliedFilters] = useState({
+    receivingPlant: initialPlant,
+    huStatus: initialStatus,
+    huNumber: '',
+    fromDate: initialDate,
+    toDate: initialDate
+  });
+
   // HU Status dropdown options (Only Processed HU and Unprocessed HU, no "All")
   const statusOptions = useMemo(() => [
     { id: '1', text: 'Processed HU', value: '1' },
@@ -68,14 +77,14 @@ export default function HuReportPage() {
   });
 
   const exportFilters = useMemo(() => ({
-    receivingPlant,
-    huStatus,
-    huNo: huNumber,
-    fromDate,
-    toDate,
+    receivingPlant: appliedFilters.receivingPlant,
+    huStatus: appliedFilters.huStatus,
+    huNo: appliedFilters.huNumber,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [receivingPlant, huStatus, huNumber, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // HU Number Options derived from current table data
   const tableHuOptions = useMemo(() => {
@@ -139,15 +148,14 @@ export default function HuReportPage() {
   // Fetch HU details
   const fetchReportData = useCallback(async (signal) => {
     setIsLoading(true);
-    setReportData([]);
     setError(null);
     try {
       const result = await getHuDetails({
-        receivingPlant,
-        huStatus,
-        fromDate,
-        toDate,
-        huNo: huNumber,
+        receivingPlant: appliedFilters.receivingPlant,
+        huStatus: appliedFilters.huStatus,
+        fromDate: appliedFilters.fromDate,
+        toDate: appliedFilters.toDate,
+        huNo: appliedFilters.huNumber,
         pageIndex,
         pageSize,
         searchTerm,
@@ -175,13 +183,24 @@ export default function HuReportPage() {
         setIsLoading(false);
       }
     }
-  }, [receivingPlant, huStatus, fromDate, toDate, huNumber, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
+  }, [appliedFilters, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
 
   useEffect(() => {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
   }, [fetchReportData]);
+
+  const handleSearch = () => {
+    setPageIndex(1);
+    setAppliedFilters({
+      receivingPlant,
+      huStatus,
+      huNumber,
+      fromDate,
+      toDate
+    });
+  };
 
   const handleClear = () => {
     setHuStatus(initialStatus);
@@ -194,6 +213,13 @@ export default function HuReportPage() {
     setSortColumn('HU_Number');
     setSortDirection('asc');
     setPageIndex(1);
+    setAppliedFilters({
+      receivingPlant: initialPlant,
+      huStatus: initialStatus,
+      huNumber: '',
+      fromDate: initialDate,
+      toDate: initialDate
+    });
   };
 
   // Table Columns matching user's screenshot
@@ -366,12 +392,17 @@ export default function HuReportPage() {
             </div>
 
             <div className="search-buttons">
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
               <ClearButton
                 onClick={handleClear}
                 disabled={isLoading}
               />
               <BackButton
-                onClick={() => navigate('/reports/dc-report', { state: { storeCode: receivingPlant } })}
+                onClick={() => navigate('/reports/dc-report', { state: { storeCode: appliedFilters.receivingPlant } })}
                 label="Back to DC Summary"
               />
             </div>
@@ -383,9 +414,9 @@ export default function HuReportPage() {
         {/* Selected Status / Date Subheader Bar */}
         <ReportStatsHeader 
             leftLabel="HU STATUS"
-            leftValue={receivingPlant ? `${displayStatusLabel} | PLANT: ${receivingPlant}` : displayStatusLabel}
-            fromDate={fromDate}
-            toDate={toDate}
+            leftValue={appliedFilters.receivingPlant ? `${displayStatusLabel} | PLANT: ${appliedFilters.receivingPlant}` : displayStatusLabel}
+            fromDate={appliedFilters.fromDate}
+            toDate={appliedFilters.toDate}
           />
 
         {/* 5 Curved KPI Cards */}
@@ -442,7 +473,7 @@ export default function HuReportPage() {
             sortDirection={sortDirection}
             reportName="HU_DETAILS"
             exportFilters={exportFilters}
-            exportFileName={`HU_Report_${receivingPlant}_${huStatus}_${fromDate}.xlsx`}
+            exportFileName={`HU_Report_${appliedFilters.receivingPlant}_${appliedFilters.huStatus}_${appliedFilters.fromDate}.xlsx`}
             searchPlaceholder="Search Records"
             onSearch={(term) => setSearchTerm(term)}
           />

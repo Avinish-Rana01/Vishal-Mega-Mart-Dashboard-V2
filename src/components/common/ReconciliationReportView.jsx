@@ -7,7 +7,7 @@ import SearchableDropdown from './SearchableDropdown';
 import CustomDatePicker from './CustomDatePicker';
 import CurvedCard from './CurvedCard';
 import ReportStatsHeader from './ReportStatsHeader';
-import { ClearButton, BackButton } from './ReportActionButton';
+import { SearchButton, ClearButton, BackButton } from './ReportActionButton';
 import '../../pages/Report/common-reports.css';
 import {
   getVoidReconciliationData,
@@ -50,6 +50,15 @@ export default function ReconciliationReportView({ type = 'return' }) {
   const [pos, setPos] = useState('');
   const [ean, setEan] = useState('');
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Applied Filters State (only updated on Search / Mount / Clear)
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore || '',
+    fromDate: defaultFromDate,
+    toDate: defaultToDate,
+    pos: '',
+    ean: ''
+  });
   
   const [posOptions, setPosOptions] = useState([]);
   const [eanSearchTerm, setEanSearchTerm] = useState('');
@@ -77,14 +86,14 @@ export default function ReconciliationReportView({ type = 'return' }) {
   });
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    pos,
-    ean,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    pos: appliedFilters.pos,
+    ean: appliedFilters.ean,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, pos, ean, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -172,7 +181,18 @@ export default function ReconciliationReportView({ type = 'return' }) {
     setError(null);
     try {
       const fetchApi = isReturn ? getReturnReconciliationData : getVoidReconciliationData;
-      const result = await fetchApi(selectedStore, fromDate, toDate, pos, ean, pageIndex, pageSize, sortColumn, sortDirection, signal);
+      const result = await fetchApi(
+        appliedFilters.storeCode, 
+        appliedFilters.fromDate, 
+        appliedFilters.toDate, 
+        appliedFilters.pos, 
+        appliedFilters.ean, 
+        pageIndex, 
+        pageSize, 
+        sortColumn, 
+        sortDirection, 
+        signal
+      );
       setReportData(result?.data || result?.Data || []);
       setTotalRecords(result?.recordCount ?? result?.RecordCount ?? 0);
       setTotals({
@@ -194,7 +214,18 @@ export default function ReconciliationReportView({ type = 'return' }) {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [isReturn, pageIndex, pageSize, selectedStore, fromDate, toDate, pos, ean, sortColumn, sortDirection]);
+  }, [isReturn, pageIndex, pageSize, appliedFilters, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate,
+      pos,
+      ean
+    });
+    setPageIndex(1);
+  };
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
@@ -205,6 +236,13 @@ export default function ReconciliationReportView({ type = 'return' }) {
     setEanSearchTerm('');
     setSortColumn(isReturn ? 'BILL_DATE' : 'DATE');
     setSortDirection('asc');
+    setAppliedFilters({
+      storeCode: initialStore || '',
+      fromDate: defaultFromDate,
+      toDate: defaultToDate,
+      pos: '',
+      ean: ''
+    });
     setPageIndex(1);
   };
 
@@ -274,10 +312,10 @@ export default function ReconciliationReportView({ type = 'return' }) {
   ];
 
   const getStoreName = () => {
-    if (!selectedStore) return 'ALL STORES';
-    const storeObj = storeOptions.find(s => s.id === selectedStore || s.text?.startsWith(selectedStore));
+    if (!appliedFilters.storeCode) return 'ALL STORES';
+    const storeObj = storeOptions.find(s => s.id === appliedFilters.storeCode || s.text?.startsWith(appliedFilters.storeCode));
     if (storeObj) return storeObj.text;
-    return selectedStore;
+    return appliedFilters.storeCode;
   };
 
   return (
@@ -342,6 +380,11 @@ export default function ReconciliationReportView({ type = 'return' }) {
             </div>
 
             <div className="search-buttons">
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
               <ClearButton onClick={handleClear} />
               <BackButton 
                 onClick={() => navigate(-1)} 
@@ -355,8 +398,8 @@ export default function ReconciliationReportView({ type = 'return' }) {
 
       <ReportStatsHeader 
         storeName={getStoreName()}
-        fromDate={fromDate}
-        toDate={toDate}
+        fromDate={appliedFilters.fromDate}
+        toDate={appliedFilters.toDate}
       />
 
       <div className="ds-kpi-row">
@@ -417,7 +460,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
           sortDirection={sortDirection}
           reportName={isReturn ? "RETURN_RECONCILIATION_SUMMARY" : "VOID_RECONCILIATION_SUMMARY"}
           exportFilters={exportFilters}
-          exportFileName={`${isReturn ? 'Return' : 'Void'}_Reconciliation_${selectedStore || 'ALL'}_${fromDate}_${toDate}.xlsx`}
+          exportFileName={`${isReturn ? 'Return' : 'Void'}_Reconciliation_${appliedFilters.storeCode || 'ALL'}_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
         />
       </div>
 
@@ -426,11 +469,11 @@ export default function ReconciliationReportView({ type = 'return' }) {
           type={type}
           modalData={{
             ...selectedModalRow,
-            selectedStore,
-            fromDate,
-            toDate,
-            pos: selectedModalRow.COUNTER_NO || selectedModalRow.pos || pos,
-            ean: selectedModalRow.EAN || ean
+            selectedStore: appliedFilters.storeCode,
+            fromDate: appliedFilters.fromDate,
+            toDate: appliedFilters.toDate,
+            pos: selectedModalRow.COUNTER_NO || selectedModalRow.pos || appliedFilters.pos,
+            ean: selectedModalRow.EAN || appliedFilters.ean
           }}
           onClose={() => setSelectedModalRow(null)}
         />

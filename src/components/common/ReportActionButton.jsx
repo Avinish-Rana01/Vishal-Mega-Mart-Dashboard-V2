@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw, ArrowLeft, Search } from 'lucide-react';
+import { RotateCcw, ArrowLeft, Search, Loader2 } from 'lucide-react';
 import './ReportActionButton.css';
 
 /**
@@ -42,22 +42,34 @@ export const BackButton = ({ onClick, label = 'Back', disabled = false }) => (
 
 /**
  * SearchButton — Modern vibrant blue gradient pill button matching VMM primary actions.
- * Supports optional custom icon and variant classes.
+ * Supports optional custom icon, loading spinner, and variant classes.
  * @param {Object} props
  * @param {Function} props.onClick - Click handler
  * @param {boolean} [props.disabled] - Disabled state
+ * @param {boolean} [props.loading] - Loading state (shows animated spinner and "Searching...")
  * @param {string} [props.label] - Button text (default: "Search")
  * @param {React.ReactNode} [props.icon] - Optional custom icon
  * @param {string} [props.className] - Optional custom class name
  */
-export const SearchButton = ({ onClick, disabled = false, label = 'Search', icon, className = '' }) => (
+export const SearchButton = ({ 
+  onClick, 
+  disabled = false, 
+  loading = false, 
+  label = 'Search', 
+  icon, 
+  className = '' 
+}) => (
   <button
     type="button"
-    className={`report-action-btn report-action-btn--search ${className}`.trim()}
+    className={`report-action-btn report-action-btn--search ${loading ? 'is-loading' : ''} ${className}`.trim()}
     onClick={onClick}
-    disabled={disabled}
+    disabled={disabled || loading}
   >
-    {icon !== undefined ? icon : <Search size={14} />}
-    {label}
+    {loading ? (
+      <Loader2 size={14} className="report-btn-spinner" />
+    ) : (
+      icon !== undefined ? icon : <Search size={14} />
+    )}
+    {loading ? 'Searching...' : label}
   </button>
 );

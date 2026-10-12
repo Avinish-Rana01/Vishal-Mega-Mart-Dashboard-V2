@@ -7,7 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { SearchButton, ClearButton, BackButton } from '../../components/common/ReportActionButton';
 import { getVoidDetails, getBindStores } from '../../services/stockService';
 import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,13 @@ export default function VoidDetailsReportPage() {
   const [fromDate, setFromDate] = useState(defaultFromDate);
   const [toDate, setToDate] = useState(defaultToDate);
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Applied Filters State (only updated on Search / Mount / Clear)
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore || '',
+    fromDate: defaultFromDate,
+    toDate: defaultToDate
+  });
   
   const navigate = useNavigate();
   
@@ -60,12 +67,12 @@ export default function VoidDetailsReportPage() {
   });
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -88,7 +95,16 @@ export default function VoidDetailsReportPage() {
     setReportData([]);
     setError(null);
     try {
-      const result = await getVoidDetails(selectedStore, fromDate, toDate, pageIndex, pageSize, sortColumn || 'DATE', sortDirection || 'asc', signal);
+      const result = await getVoidDetails(
+        appliedFilters.storeCode, 
+        appliedFilters.fromDate, 
+        appliedFilters.toDate, 
+        pageIndex, 
+        pageSize, 
+        sortColumn || 'DATE', 
+        sortDirection || 'asc', 
+        signal
+      );
       setReportData(result?.data || result?.Data || []);
       setTotalRecords(result?.recordCount || result?.RecordCount || 0);
       setTotals({
@@ -110,7 +126,16 @@ export default function VoidDetailsReportPage() {
     const controller = new AbortController();
     fetchReportData(controller.signal);
     return () => controller.abort();
-  }, [pageIndex, pageSize, selectedStore, fromDate, toDate, sortColumn, sortDirection]);
+  }, [pageIndex, pageSize, appliedFilters, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate
+    });
+    setPageIndex(1);
+  };
 
   const handleClear = () => {
     setSelectedStore(initialStore || '');
@@ -118,6 +143,11 @@ export default function VoidDetailsReportPage() {
     setToDate(defaultToDate);
     setSortColumn('DATE');
     setSortDirection('asc');
+    setAppliedFilters({
+      storeCode: initialStore || '',
+      fromDate: defaultFromDate,
+      toDate: defaultToDate
+    });
     setPageIndex(1);
   };
 
@@ -200,15 +230,20 @@ export default function VoidDetailsReportPage() {
             
             <div className="search-field">
               <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={(val) => { setFromDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={fromDate} onChange={(val) => setFromDate(val)} />
             </div>
 
             <div className="search-field">
               <label>To Date</label>
-              <CustomDatePicker value={toDate} onChange={(val) => { setToDate(val); setPageIndex(1); }} />
+              <CustomDatePicker value={toDate} onChange={(val) => setToDate(val)} />
             </div>
 
             <div className="search-buttons">
+              <SearchButton
+                onClick={handleSearch}
+                disabled={isLoading}
+                loading={isLoading}
+              />
               <ClearButton onClick={handleClear} />
               <BackButton onClick={() => navigate(-1)} label="Back to Void Summary" />
             </div>
@@ -218,9 +253,9 @@ export default function VoidDetailsReportPage() {
       {error && <div className="report-error-banner">{error}</div>}
 
       <ReportStatsHeader 
-        storeName={selectedStore || 'ALL STORES'}
-        fromDate={fromDate}
-        toDate={toDate}
+        storeName={appliedFilters.storeCode || 'ALL STORES'}
+        fromDate={appliedFilters.fromDate}
+        toDate={appliedFilters.toDate}
       />
 
       <div className="ds-kpi-row">
@@ -260,7 +295,7 @@ export default function VoidDetailsReportPage() {
           pageSize={pageSize}
           reportName="VOID_DETAILS"
           exportFilters={exportFilters}
-          exportFileName={`Void_Details_${selectedStore || 'ALL'}_${fromDate}_to_${toDate}.xlsx`}
+          exportFileName={`Void_Details_${appliedFilters.storeCode || 'ALL'}_${appliedFilters.fromDate}_to_${appliedFilters.toDate}.xlsx`}
           onPageChange={setPageIndex}
           onPageSizeChange={setPageSize}
           isLoading={isLoading}

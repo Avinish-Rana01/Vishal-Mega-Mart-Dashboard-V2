@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, Loader2 } from 'lucide-react';
 
 /**
  * Pure React Data Table Component
@@ -135,7 +135,15 @@ export default function BaseDataTable({
           </table>
         </div>
       ) : (
-        <div className="dt-container">
+        <div className="dt-container" style={{ position: 'relative' }}>
+          {isLoading && sortedData.length > 0 && (
+            <div className="vmm-table-loading-overlay">
+              <div className="vmm-table-loader-pill">
+                <Loader2 size={16} className="vmm-table-spinner" />
+                <span>Loading records...</span>
+              </div>
+            </div>
+          )}
           <table className={`${tableClassName} dataTable ${striped ? 'vmm-table-striped' : ''}`}>
             <thead>
               <tr>
@@ -176,7 +184,14 @@ export default function BaseDataTable({
               {sortedData.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} style={{ textAlign: 'center', padding: '36px 20px', color: '#94a3b8', fontSize: '13px' }}>
-                    No matching records found
+                    {isLoading ? (
+                      <div className="vmm-table-empty-loading">
+                        <Loader2 size={20} className="vmm-table-spinner" />
+                        <span>Loading records...</span>
+                      </div>
+                    ) : (
+                      'No matching records found'
+                    )}
                   </td>
                 </tr>
               ) : (

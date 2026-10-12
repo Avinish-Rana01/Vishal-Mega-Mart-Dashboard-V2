@@ -7,7 +7,7 @@ import SearchableDropdown from '../../components/common/SearchableDropdown';
 import CustomDatePicker from '../../components/common/CustomDatePicker';
 import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
-import { ClearButton, BackButton } from '../../components/common/ReportActionButton';
+import { ClearButton, BackButton, SearchButton } from '../../components/common/ReportActionButton';
 import ViewDetailsButton from '../../components/common/ViewDetailsButton';
 import { getReportStores, searchGrcHuNumbers, getGrcDetails } from '../../services/stockService';
 import GrcDetailsModal from '../../components/modals/GrcDetailsModal';
@@ -50,6 +50,15 @@ export default function GrcReportPage() {
   const [grcStatus, setGrcStatus] = useState(initialGrcStatus);
   const [selectedModalRow, setSelectedModalRow] = useState(null);
   const [storeOptions, setStoreOptions] = useState([]);
+
+  // Decoupled search filters actually sent to API
+  const [appliedFilters, setAppliedFilters] = useState({
+    storeCode: initialStore,
+    fromDate: initialFromDate,
+    toDate: initialToDate,
+    selectedHu: '',
+    grcStatus: initialGrcStatus
+  });
 
   // Vibrant gradient wave colors matching Store Sale Report design
   const cardGradients = useMemo(() => [
@@ -102,14 +111,14 @@ export default function GrcReportPage() {
   const [selectedHu, setSelectedHu] = useState('');
 
   const exportFilters = useMemo(() => ({
-    storeCode: selectedStore,
-    huNo: selectedHu,
-    grcStatus,
-    fromDate,
-    toDate,
+    storeCode: appliedFilters.storeCode,
+    huNo: appliedFilters.selectedHu,
+    grcStatus: appliedFilters.grcStatus,
+    fromDate: appliedFilters.fromDate,
+    toDate: appliedFilters.toDate,
     sortColumn,
     sortDirection
-  }), [selectedStore, selectedHu, grcStatus, fromDate, toDate, sortColumn, sortDirection]);
+  }), [appliedFilters, sortColumn, sortDirection]);
 
   // Fetch HU Options based on search term
   React.useEffect(() => {
@@ -136,10 +145,20 @@ export default function GrcReportPage() {
     const controller = new AbortController();
     const fetchReport = async () => {
       setIsLoading(true);
-      setGrcData([]);
       setError(null);
       try {
-        const result = await getGrcDetails(pageIndex, pageSize, grcStatus, selectedStore, selectedHu, fromDate, toDate, sortColumn, sortDirection, controller.signal);
+        const result = await getGrcDetails(
+          pageIndex, 
+          pageSize, 
+          appliedFilters.grcStatus, 
+          appliedFilters.storeCode, 
+          appliedFilters.selectedHu, 
+          appliedFilters.fromDate, 
+          appliedFilters.toDate, 
+          sortColumn, 
+          sortDirection, 
+          controller.signal
+        );
         
         if (controller.signal.aborted) return;
         
@@ -149,23 +168,17 @@ export default function GrcReportPage() {
           storeCode: item.STORE_CODE,
           huNumber: item.HU,
           status: item.RECEIVED_STATUS || item.GRC_STATUS,
-          grcStatus: grcStatus,
+          grcStatus: appliedFilters.grcStatus,
           grcDate: item.GRC_DATE ? String(item.GRC_DATE).split('T')[0] : '',
           rawGrcDate: item.GRC_DATE || '',
           action: 'View Details'
         }));
         
         setGrcData(mappedData);
-
-        // We no longer rely on initialHuNumbers from the table
-        // if (!selectedHu) {
-        //   setInitialHuNumbers(Array.from(new Set(mappedData.map(a => a.huNumber))).filter(Boolean).map(a => ({ id: a, text: a })));
-        // }
-
         setTotalRecords(result.totalRecords || 0);
 
       } catch (err) {
-        if (err.name === 'AbortError') return;
+        if (err.name !== 'AbortError') return;
         console.error("Error fetching GRC details:", err);
         setError("Unable to load report data.");
       } finally {
@@ -174,7 +187,36 @@ export default function GrcReportPage() {
     };
     fetchReport();
     return () => controller.abort();
-  }, [selectedStore, fromDate, toDate, pageIndex, pageSize, selectedHu, grcStatus, sortColumn, sortDirection]);
+  }, [appliedFilters, pageIndex, pageSize, sortColumn, sortDirection]);
+
+  const handleSearch = () => {
+    setPageIndex(1);
+    setAppliedFilters({
+      storeCode: selectedStore,
+      fromDate,
+      toDate,
+      selectedHu,
+      grcStatus
+    });
+  };
+
+  const handleClear = () => {
+    setSelectedStore(initialStore);
+    setSelectedHu('');
+    setHuSearchTerm('');
+    setFromDate(todayStr);
+    setToDate(todayStr);
+    setSortColumn('GRC_DATE');
+    setSortDirection('asc');
+    setPageIndex(1);
+    setAppliedFilters({
+      storeCode: initialStore,
+      fromDate: todayStr,
+      toDate: todayStr,
+      selectedHu: '',
+      grcStatus: initialGrcStatus
+    });
+  };
 
   const actionRenderer = (val, row) => (
     <ViewDetailsButton 
@@ -277,15 +319,15 @@ export default function GrcReportPage() {
                 />
               </div>
 
-              <div className="search-buttons">
+              <div className="search-buttons" style={{ alignSelf: 'flex-end', display: 'flex', gap: '10px' }}>
+                <SearchButton 
+                  onClick={handleSearch}
+                  disabled={isLoading}
+                  loading={isLoading}
+                />
                 <ClearButton 
-                  onClick={() => {
-                    setSelectedHu('');
-                    setHuSearchTerm('');
-                    setFromDate(todayStr);
-                    setToDate(todayStr);
-                    setPageIndex(1);
-                  }}
+                  onClick={handleClear}
+                  disabled={isLoading}
                 />
                 <BackButton 
                   onClick={() => navigate(-1)} 
@@ -297,9 +339,9 @@ export default function GrcReportPage() {
 
           {/* Stats Header */}
           <ReportStatsHeader 
-            storeName={storeOptions.find(s => s.id === selectedStore)?.text || selectedStore || 'ALL STORES'}
-            fromDate={fromDate}
-            toDate={toDate}
+            storeName={storeOptions.find(s => s.id === appliedFilters.storeCode)?.text || appliedFilters.storeCode || 'ALL STORES'}
+            fromDate={appliedFilters.fromDate}
+            toDate={appliedFilters.toDate}
           />
 
           <div className="report-curved-cards">
@@ -342,7 +384,7 @@ export default function GrcReportPage() {
               totalRecords={totalRecords}
               reportName="GRC_DETAILS"
               exportFilters={exportFilters}
-              exportFileName={`GRC_Report_${selectedStore}_${grcStatus}_${fromDate}_${toDate}.xlsx`}
+              exportFileName={`GRC_Report_${appliedFilters.storeCode}_${appliedFilters.grcStatus}_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
             />
           </div>
 
