@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useMemo } from 'react';
+import React, { forwardRef, useRef, useMemo, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
@@ -13,12 +13,13 @@ const MONTH_SHORT = [
 /**
  * Custom Input component forwardRef for react-datepicker
  */
-const CustomDateInput = forwardRef(({ value, onClick, placeholder, disabled, isClearable, onClear }, ref) => {
+const CustomDateInput = forwardRef(({ value, onClick, placeholder, disabled, isClearable, onClear, isOpen }, ref) => {
   return (
     <div 
-      className={`vmm-date-input-container ${disabled ? 'disabled' : ''}`}
+      className={`vmm-date-input-container ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`}
       onClick={!disabled ? onClick : undefined}
       ref={ref}
+      tabIndex={disabled ? -1 : 0}
     >
       <span className={`vmm-date-input-text ${value ? 'has-value' : 'placeholder'}`}>
         {value || placeholder || 'Select Date'}
@@ -77,6 +78,7 @@ export default function CustomDatePicker({
   };
 
   const pickerRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const selectedDate = parseDate(value);
 
@@ -140,12 +142,15 @@ export default function CustomDatePicker({
         name={name}
         popperPlacement="bottom-start"
         portalId="root-portal"
+        onCalendarOpen={() => setIsOpen(true)}
+        onCalendarClose={() => setIsOpen(false)}
         customInput={
           <CustomDateInput 
             placeholder={placeholder} 
             disabled={disabled}
             isClearable={isClearable}
             onClear={handleClear}
+            isOpen={isOpen}
           />
         }
         renderCustomHeader={({

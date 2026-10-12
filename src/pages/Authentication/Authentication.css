@@ -64,25 +64,43 @@
   transition: color 0.15s ease;
 }
 
-/* Borderless filled style for SearchableDropdown triggers in Authentication forms */
-.report-search-card .custom-select-trigger {
+/* Borderless filled style for SearchableDropdown and CustomDatePicker triggers */
+.report-search-card .custom-select-trigger,
+.sales-filter-card .custom-select-trigger,
+.report-search-card .vmm-date-input-container,
+.sales-filter-card .vmm-date-input-container {
   border: 1px solid transparent;
   background: #f1f5f9;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.report-search-card .custom-select-trigger:hover {
+.report-search-card .custom-select-trigger:hover,
+.sales-filter-card .custom-select-trigger:hover,
+.report-search-card .vmm-date-input-container:hover,
+.sales-filter-card .vmm-date-input-container:hover {
   background: #e2e8f0;
+  border-color: transparent;
 }
 
 .report-search-card .custom-select-trigger.open,
-.report-search-card .custom-select-trigger:focus {
+.report-search-card .custom-select-trigger:focus,
+.sales-filter-card .custom-select-trigger.open,
+.sales-filter-card .custom-select-trigger:focus,
+.report-search-card .vmm-date-input-container.open,
+.report-search-card .vmm-date-input-container:focus,
+.sales-filter-card .vmm-date-input-container.open,
+.sales-filter-card .vmm-date-input-container:focus,
+.report-search-card .react-datepicker-wrapper:focus-within .vmm-date-input-container,
+.sales-filter-card .react-datepicker-wrapper:focus-within .vmm-date-input-container {
   border-color: #3b82f6;
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
-.report-search-card .custom-select-trigger.disabled {
+.report-search-card .custom-select-trigger.disabled,
+.sales-filter-card .custom-select-trigger.disabled,
+.report-search-card .vmm-date-input-container.disabled,
+.sales-filter-card .vmm-date-input-container.disabled {
   opacity: 0.65;
   cursor: not-allowed;
   background: #e2e8f0;

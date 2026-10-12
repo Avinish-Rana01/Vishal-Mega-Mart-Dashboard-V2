@@ -85,7 +85,9 @@
 .report-search-card:has(.custom-select-container.open),
 .sales-filter-card:has(.custom-select-container.open),
 .report-search-card:has(.custom-select-trigger.open),
-.sales-filter-card:has(.custom-select-trigger.open) {
+.sales-filter-card:has(.custom-select-trigger.open),
+.report-search-card:has(.vmm-date-input-container.open),
+.sales-filter-card:has(.vmm-date-input-container.open) {
   z-index: 500 !important;
 }
 
@@ -126,18 +128,70 @@
 .input-group {
   display: flex;
   align-items: center;
-  border: 1px solid #cbd5e1;
+  border: 1px solid transparent;
   border-radius: 10px;
-  background: #f9f9f9;
+  background: #f1f5f9;
   overflow: hidden;
-  height: 32px;
-  transition: all 0.2s ease;
+  height: 30px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.input-group:hover {
+  background: #e2e8f0;
 }
 
 .input-group:focus-within {
   border-color: #3b82f6;
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Unified Pill Form Controls for all Report Search / Filter Cards */
+.report-search-card .custom-select-trigger,
+.sales-filter-card .custom-select-trigger,
+.report-search-card .vmm-date-input-container,
+.sales-filter-card .vmm-date-input-container {
+  border: 1px solid transparent;
+  background: #f1f5f9;
+  border-radius: 10px;
+  height: 30px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.report-search-card .custom-select-trigger:hover,
+.sales-filter-card .custom-select-trigger:hover,
+.report-search-card .vmm-date-input-container:hover,
+.sales-filter-card .vmm-date-input-container:hover {
+  background: #e2e8f0;
+  border-color: transparent;
+}
+
+.report-search-card .custom-select-trigger.open,
+.report-search-card .custom-select-trigger:focus,
+.sales-filter-card .custom-select-trigger.open,
+.sales-filter-card .custom-select-trigger:focus,
+.report-search-card .vmm-date-input-container.open,
+.report-search-card .vmm-date-input-container:focus,
+.sales-filter-card .vmm-date-input-container.open,
+.sales-filter-card .vmm-date-input-container:focus,
+.report-search-card .react-datepicker-wrapper:focus-within .vmm-date-input-container,
+.sales-filter-card .react-datepicker-wrapper:focus-within .vmm-date-input-container {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.report-search-card .custom-select-trigger.disabled,
+.sales-filter-card .custom-select-trigger.disabled,
+.report-search-card .vmm-date-input-container.disabled,
+.sales-filter-card .vmm-date-input-container.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: #e2e8f0;
+  border-color: transparent;
 }
 
 .input-group input {
@@ -883,6 +937,18 @@
   cursor: default;
 }
 
+/* ---- HU Summary Report: Remove underlines from all cell values, render numbers in black ---- */
+.hu-summary-page .report-table-wrapper td,
+.hu-summary-page .report-table-wrapper td *,
+.hu-summary-page .report-table-wrapper .vmm-link-num {
+  text-decoration: none !important;
+  cursor: default;
+}
+
+.hu-summary-page .report-table-wrapper .vmm-link-num {
+  color: #0f172a !important;
+}
+
 .wh-encoding-page .vmm-table th,
 .wh-encoding-page .vmm-th {
   padding: 6px 3px !important;
@@ -958,10 +1024,10 @@
    TAG INVENTORY DISTRIBUTION SPECIALIZED OVERRIDES
    ======================================================== */
 .report-page-container.tag-dist-page {
-  padding: 12px 16px 28px 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0;
   background-color: transparent;
   min-height: auto;
   box-sizing: border-box;
@@ -969,9 +1035,10 @@
 
 .tag-dist-page .report-curved-cards {
   display: flex;
-  gap: 14px;
-  margin: 0;
-  width: 100%;
+  gap: 6px;
+  margin: 10px 10px 4px 10px;
+  width: auto;
+  box-sizing: border-box;
 }
 
 .tag-dist-page .report-curved-cards .ds-kpi-item {
@@ -982,6 +1049,7 @@
 @media (max-width: 900px) {
   .tag-dist-page .report-curved-cards {
     flex-direction: column;
+    margin: 8px 10px 4px 10px;
   }
 }
 
@@ -1012,22 +1080,20 @@
 }
 
 .tag-section-divider {
-  width: 100%;
-  height: 1px;
-  border-bottom: 1.5px dotted #cbd5e1;
-  margin: 0;
+  display: none;
 }
 
 .tag-store-inventory-card {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  padding: 16px 20px 18px 20px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 0 3px rgba(0, 0, 0, 0.02);
+  padding: 12px 16px 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 0;
+  gap: 10px;
+  margin: 0 10px 4px 10px;
+  box-sizing: border-box;
 }
 
 .tag-store-header-row {

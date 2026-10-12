@@ -22,31 +22,34 @@
   justify-content: space-between;
   width: 100%;
   height: 30px;
-  padding: 0 11px;
-  background-color: #f9f9f9;
-  border: 1px solid #cbd5e1;
+  padding: 0 12px;
+  background-color: #f1f5f9;
+  border: 1px solid transparent;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
+  outline: none;
   user-select: none;
 }
 
 .vmm-date-input-container:hover {
-  border-color: #94a3b8;
-  background-color: #f8fafc;
+  background-color: #e2e8f0;
+  border-color: transparent;
 }
 
 .vmm-date-input-container:focus,
-.react-datepicker-wrapper:focus-within .vmm-date-input-container {
+.vmm-date-input-container.open,
+.react-datepicker-wrapper:focus-within .vmm-date-input-container,
+.vmm-datepicker-wrapper:focus-within .vmm-date-input-container {
   background-color: #ffffff;
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
 .vmm-date-input-container.disabled {
-  background-color: #f1f5f9;
-  border-color: #e2e8f0;
+  background-color: #e2e8f0;
+  border-color: transparent;
   cursor: not-allowed;
   opacity: 0.65;
 }
@@ -61,7 +64,7 @@
 }
 
 .vmm-date-input-text.has-value {
-  color: #1e293b;
+  color: #334155;
 }
 
 .vmm-date-input-text.placeholder {
@@ -71,7 +74,7 @@
 .vmm-date-input-actions {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   margin-left: 6px;
 }
 
@@ -94,14 +97,20 @@
 }
 
 .vmm-date-calendar-icon {
-  color: #64748b;
+  color: #94a3b8;
   transition: color 0.2s ease;
   flex-shrink: 0;
 }
 
-.vmm-date-input-container:hover .vmm-date-calendar-icon,
+.vmm-date-input-container:hover .vmm-date-calendar-icon {
+  color: #64748b;
+}
+
+.vmm-date-input-container:focus .vmm-date-calendar-icon,
+.vmm-date-input-container.open .vmm-date-calendar-icon,
+.react-datepicker-wrapper:focus-within .vmm-date-calendar-icon,
 .vmm-datepicker-wrapper:focus-within .vmm-date-calendar-icon {
-  color: #1d4ed8;
+  color: #3b82f6;
 }
 
 /* ==========================================================================
@@ -180,7 +189,7 @@
 
 .vmm-dp-nav-btn:hover:not(:disabled) {
   background-color: #eff6ff;
-  color: #1d4ed8;
+  color: #3b82f6;
   border-color: #bfdbfe;
 }
 
@@ -233,7 +242,7 @@
 .vmm-dp-year-select:hover,
 .vmm-dp-month-select:focus,
 .vmm-dp-year-select:focus {
-  border-color: #1d4ed8;
+  border-color: #3b82f6;
 }
 
 /* Day Names Header (S M T W T F S) */
@@ -284,7 +293,7 @@
 
 .react-datepicker__day:hover:not(.react-datepicker__day--disabled) {
   background-color: #eff6ff !important;
-  color: #1d4ed8 !important;
+  color: #3b82f6 !important;
   border-radius: 6px !important;
 }
 
@@ -305,7 +314,7 @@
 }
 
 .react-datepicker__day--today.react-datepicker__day--selected {
-  border: 1px solid #1d4ed8 !important;
+  border: 1px solid #3b82f6 !important;
 }
 
 /* Outside Month Day */
@@ -338,7 +347,7 @@
 
 .vmm-dp-today-btn {
   background-color: #eff6ff;
-  color: #1d4ed8;
+  color: #3b82f6;
   border: 1px solid #bfdbfe;
   border-radius: 5px;
   padding: 3px 10px;

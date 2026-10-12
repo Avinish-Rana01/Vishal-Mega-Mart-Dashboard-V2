@@ -8,7 +8,7 @@ import CurvedCard from '../../components/common/CurvedCard';
 import ReportStatsHeader from '../../components/common/ReportStatsHeader';
 import { ClearButton, SearchButton } from '../../components/common/ReportActionButton';
 import { getHUSummaryDetails, searchValidationHuNumbers } from '../../services/stockService';
-import { dateRenderer, numRenderer } from '../../utils/dashboardColumns';
+import { dateRenderer } from '../../utils/dashboardColumns';
 import * as Icons from 'lucide-react';
 import './common-reports.css';
 
@@ -239,7 +239,7 @@ export default function HuSummaryReportPage() {
       render: (val, row) => {
         const hu = val || row?.hU_NUMBER || row?.HU_No || row?.hU_NO || row?.HU_NO || '—';
         return (
-          <span style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+          <span style={{ color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>
             {hu}
           </span>
         );
@@ -249,13 +249,27 @@ export default function HuSummaryReportPage() {
       key: 'ACT_QTY',
       label: 'Article Quantity',
       className: 'text-center',
-      render: (val, row) => numRenderer(val ?? row?.acT_QTY ?? row?.ACTUAL_QTY ?? row?.actuaL_QTY ?? row?.Act_Qty ?? 0)
+      render: (val, row) => {
+        const num = val ?? row?.acT_QTY ?? row?.ACTUAL_QTY ?? row?.actuaL_QTY ?? row?.Act_Qty ?? 0;
+        return (
+          <span style={{ color: '#0f172a', fontWeight: 600, textDecoration: 'none' }}>
+            {typeof num === 'number' ? num.toLocaleString('en-IN') : num}
+          </span>
+        );
+      }
     },
     {
       key: 'SCAN_QTY',
       label: 'Scanned Quantity',
       className: 'text-center',
-      render: (val, row) => numRenderer(val ?? row?.scaN_QTY ?? row?.Scan_Qty ?? row?.SCAN_QTY ?? 0)
+      render: (val, row) => {
+        const num = val ?? row?.scaN_QTY ?? row?.Scan_Qty ?? row?.SCAN_QTY ?? 0;
+        return (
+          <span style={{ color: '#0f172a', fontWeight: 600, textDecoration: 'none' }}>
+            {typeof num === 'number' ? num.toLocaleString('en-IN') : num}
+          </span>
+        );
+      }
     },
     {
       key: 'HU_SCAN_DATE',
@@ -270,7 +284,7 @@ export default function HuSummaryReportPage() {
       headerProps={{
         breadcrumb: (
           <>
-            HOME - PAGES - REPORT - <span className="active">HU SUMMARY REPORT</span>
+            HOME - PAGES - DASHBOARD - <span className="active">HU SUMMARY REPORT</span>
           </>
         ),
         showBackButton: true,
@@ -278,7 +292,7 @@ export default function HuSummaryReportPage() {
       }}
       mainClassName="flex-col-main"
     >
-      <div className="report-page-container">
+      <div className="report-page-container hu-summary-page">
         {/* Filter Card */}
         <div className="report-search-card">
           <div className="report-search-header">

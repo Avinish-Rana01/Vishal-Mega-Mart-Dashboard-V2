@@ -83,6 +83,8 @@ rect:focus {
 .report-search-card:has(.custom-select-container.open),
 .sales-filter-card:has(.custom-select-container.open),
 .report-search-card:has(.custom-select-trigger.open),
-.sales-filter-card:has(.custom-select-trigger.open) {
+.sales-filter-card:has(.custom-select-trigger.open),
+.report-search-card:has(.vmm-date-input-container.open),
+.sales-filter-card:has(.vmm-date-input-container.open) {
   z-index: 500 !important;
 }

@@ -32,6 +32,7 @@ const ROUTE_BREADCRUMBS = {
   '/reports/hu-summary': 'HOME - PAGES - DASHBOARD - HU SUMMARY REPORT',
   '/reports/tag-inventory-distribution': 'HOME - PAGES - DASHBOARD - TAG INVENTORY DISTRIBUTION',
   '/reports/tag-distribution': 'HOME - PAGES - DASHBOARD - TAG INVENTORY DISTRIBUTION',
+  '/tag-management/distribution': 'HOME - PAGES - TAG MANAGEMENT - DISTRIBUTION',
   '/reports/vendor-discrepancy': 'HOME - PAGES - DASHBOARD - VENDOR DISCREPANCY SUMMARY',
   '/reports/vendor-discrepancy-summary': 'HOME - PAGES - DASHBOARD - VENDOR DISCREPANCY SUMMARY',
   '/reports/total-dpos-sale': 'HOME - PAGES - DASHBOARD - TOTAL DPOS SALE REPORT',

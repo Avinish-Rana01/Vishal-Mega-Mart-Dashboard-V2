@@ -206,7 +206,7 @@ export default function TagInventoryDistributionPage() {
       headerProps={{
         breadcrumb: (
           <>
-            HOME - PAGES - TAG MANAGEMENT - <span className="active">TAG INVENTORY/RECYCLE DISTRIBUTION</span>
+            HOME - PAGES - TAG MANAGEMENT - <span className="active">DISTRIBUTION</span>
           </>
         ),
         showBackButton: true,
@@ -355,7 +355,7 @@ export default function TagInventoryDistributionPage() {
         </div>
 
         {/* 3. Bottom Section: Data Table */}
-        <div className="report-table-wrapper" style={{ marginTop: '4px' }}>
+        <div className="report-table-wrapper">
           <ReportDataTableCard
             columns={columns}
             data={reportData}
