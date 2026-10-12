@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Store, RotateCcw, Ban, CheckCircle, MinusCircle } from 'lucide-react';
+import { Store, RotateCcw, Ban, CheckCircle, MinusCircle, Calendar, CalendarRange } from 'lucide-react';
 import AppLayout from '../layout/AppLayout';
 import ReportDataTableCard from './ReportDataTableCard';
 import SearchableDropdown from './SearchableDropdown';
@@ -44,18 +44,41 @@ export default function ReconciliationReportView({ type = 'return' }) {
     return { defaultFromDate: fmt(past), defaultToDate: fmt(today) };
   }, [initialDate, initialFromDate, initialToDate]);
 
+  const isInitialSingleDate = Boolean(initialDate || (initialFromDate && initialToDate && initialFromDate === initialToDate));
+  const [dateMode, setDateMode] = useState(isInitialSingleDate ? 'single' : 'range');
+  const [savedToDate, setSavedToDate] = useState(defaultToDate);
+
   const [selectedStore, setSelectedStore] = useState(initialStore || '');
   const [fromDate, setFromDate] = useState(defaultFromDate);
-  const [toDate, setToDate] = useState(defaultToDate);
+  const [toDate, setToDate] = useState(isInitialSingleDate ? defaultFromDate : defaultToDate);
   const [pos, setPos] = useState('');
   const [ean, setEan] = useState('');
   const [storeOptions, setStoreOptions] = useState([]);
+
+  const handleDateModeChange = (mode) => {
+    if (mode === dateMode) return;
+    setDateMode(mode);
+    if (mode === 'single') {
+      setSavedToDate(toDate);
+      setToDate(fromDate);
+    } else {
+      const restored = (savedToDate && savedToDate !== fromDate) ? savedToDate : defaultToDate;
+      setToDate(restored);
+    }
+  };
+
+  const handleFromDateChange = (val) => {
+    setFromDate(val);
+    if (dateMode === 'single') {
+      setToDate(val);
+    }
+  };
 
   // Applied Filters State (only updated on Search / Mount / Clear)
   const [appliedFilters, setAppliedFilters] = useState({
     storeCode: initialStore || '',
     fromDate: defaultFromDate,
-    toDate: defaultToDate,
+    toDate: isInitialSingleDate ? defaultFromDate : defaultToDate,
     pos: '',
     ean: ''
   });
@@ -94,6 +117,21 @@ export default function ReconciliationReportView({ type = 'return' }) {
     sortColumn,
     sortDirection
   }), [appliedFilters, sortColumn, sortDirection]);
+
+  const isSingleDateApplied = Boolean(
+    appliedFilters.fromDate &&
+    appliedFilters.toDate &&
+    appliedFilters.fromDate === appliedFilters.toDate
+  );
+
+  const exportFileName = useMemo(() => {
+    const prefix = isReturn ? 'Return' : 'Void';
+    const store = appliedFilters.storeCode || 'ALL';
+    if (isSingleDateApplied) {
+      return `${prefix}_Reconciliation_${store}_${appliedFilters.fromDate}.xlsx`;
+    }
+    return `${prefix}_Reconciliation_${store}_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`;
+  }, [isReturn, appliedFilters.storeCode, appliedFilters.fromDate, appliedFilters.toDate, isSingleDateApplied]);
 
   // Fetch Store Dropdown Options
   useEffect(() => {
@@ -217,10 +255,11 @@ export default function ReconciliationReportView({ type = 'return' }) {
   }, [isReturn, pageIndex, pageSize, appliedFilters, sortColumn, sortDirection]);
 
   const handleSearch = () => {
+    const effectiveToDate = dateMode === 'single' ? fromDate : toDate;
     setAppliedFilters({
       storeCode: selectedStore,
       fromDate,
-      toDate,
+      toDate: effectiveToDate,
       pos,
       ean
     });
@@ -230,7 +269,9 @@ export default function ReconciliationReportView({ type = 'return' }) {
   const handleClear = () => {
     setSelectedStore(initialStore || '');
     setFromDate(defaultFromDate);
-    setToDate(defaultToDate);
+    setToDate(isInitialSingleDate ? defaultFromDate : defaultToDate);
+    setSavedToDate(defaultToDate);
+    setDateMode(isInitialSingleDate ? 'single' : 'range');
     setPos('');
     setEan('');
     setEanSearchTerm('');
@@ -239,7 +280,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
     setAppliedFilters({
       storeCode: initialStore || '',
       fromDate: defaultFromDate,
-      toDate: defaultToDate,
+      toDate: isInitialSingleDate ? defaultFromDate : defaultToDate,
       pos: '',
       ean: ''
     });
@@ -328,28 +369,50 @@ export default function ReconciliationReportView({ type = 'return' }) {
     >
       <div className="report-search-card">
         <div className="report-search-header">
-            <span>NOTE : FIELDS MARKED WITH (*) ARE REQUIRED</span>
+          <div className="report-date-mode-toggle-group">
+            <button
+              type="button"
+              className={`report-date-mode-pill ${dateMode === 'single' ? 'active' : ''}`}
+              onClick={() => handleDateModeChange('single')}
+              title="Filter by single day"
+            >
+              <Calendar size={13} />
+              <span>Single Date</span>
+            </button>
+            <button
+              type="button"
+              className={`report-date-mode-pill ${dateMode === 'range' ? 'active' : ''}`}
+              onClick={() => handleDateModeChange('range')}
+              title="Filter by date range"
+            >
+              <CalendarRange size={13} />
+              <span>Date Range</span>
+            </button>
           </div>
-          <div className="report-search-body">
-            <div className="search-field">
-              <label>Store Code</label>
-              <SearchableDropdown
-                options={storeOptions}
-                value={selectedStore}
-                onChange={setSelectedStore}
-                placeholder="All Stores"
-              />
-            </div>
-            
-            <div className="search-field">
-              <label>From Date *</label>
-              <CustomDatePicker value={fromDate} onChange={setFromDate} />
-            </div>
+          <span>NOTE : FIELDS MARKED WITH (*) ARE REQUIRED</span>
+        </div>
+        <div className="report-search-body">
+          <div className="search-field">
+            <label>Store Code</label>
+            <SearchableDropdown
+              options={storeOptions}
+              value={selectedStore}
+              onChange={setSelectedStore}
+              placeholder="All Stores"
+            />
+          </div>
+          
+          <div className="search-field">
+            <label>{dateMode === 'single' ? 'Date *' : 'From Date *'}</label>
+            <CustomDatePicker value={fromDate} onChange={handleFromDateChange} />
+          </div>
 
+          {dateMode === 'range' && (
             <div className="search-field">
               <label>To Date</label>
               <CustomDatePicker value={toDate} onChange={setToDate} />
             </div>
+          )}
 
             <div className="search-field">
               <label>POS Counter</label>
@@ -460,7 +523,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
           sortDirection={sortDirection}
           reportName={isReturn ? "RETURN_RECONCILIATION_SUMMARY" : "VOID_RECONCILIATION_SUMMARY"}
           exportFilters={exportFilters}
-          exportFileName={`${isReturn ? 'Return' : 'Void'}_Reconciliation_${appliedFilters.storeCode || 'ALL'}_${appliedFilters.fromDate}_${appliedFilters.toDate}.xlsx`}
+          exportFileName={exportFileName}
         />
       </div>
 

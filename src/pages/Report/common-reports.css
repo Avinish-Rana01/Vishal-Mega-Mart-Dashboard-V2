@@ -97,9 +97,57 @@
   padding: 6px 12px;
   font-size: 10px;
   font-weight: 700;
-  text-align: right;
   border-top-left-radius: 11px;
   border-top-right-radius: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.report-search-header > span:only-child {
+  margin-left: auto;
+}
+
+.report-date-mode-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.report-date-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+}
+
+.report-date-mode-pill:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.report-date-mode-pill.active {
+  background: #ffffff;
+  color: #1e3a8a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  font-weight: 700;
+}
+
+.report-date-mode-pill.active svg {
+  color: #3b82f6; /* Blue standard */
 }
 
 .report-search-body {

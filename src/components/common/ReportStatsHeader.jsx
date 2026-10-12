@@ -7,14 +7,25 @@ export default function ReportStatsHeader({ storeName, leftLabel, leftValue, dat
   let dateDisplay = null;
   
   if (fromDate && toDate) {
-    dateDisplay = (
-      <div className="report-header-date">
-        <Calendar size={16} />
-        <span>FROM DATE : <strong>{fromDate}</strong></span>
-        <span className="divider">|</span>
-        <span>TO DATE : <strong>{toDate}</strong></span>
-      </div>
-    );
+    const cleanFrom = String(fromDate).split('T')[0].trim();
+    const cleanTo = String(toDate).split('T')[0].trim();
+    if (cleanFrom === cleanTo) {
+      dateDisplay = (
+        <div className="report-header-date">
+          <Calendar size={16} />
+          <span>DATE : <strong>{cleanFrom}</strong></span>
+        </div>
+      );
+    } else {
+      dateDisplay = (
+        <div className="report-header-date">
+          <Calendar size={16} />
+          <span>FROM DATE : <strong>{fromDate}</strong></span>
+          <span className="divider">|</span>
+          <span>TO DATE : <strong>{toDate}</strong></span>
+        </div>
+      );
+    }
   } else if (date) {
     dateDisplay = (
       <div className="report-header-date">
