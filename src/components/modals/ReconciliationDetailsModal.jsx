@@ -52,6 +52,7 @@ export default function ReconciliationDetailsModal({ modalData, onClose, type = 
   const billDate = rawDate ? String(rawDate).split('T')[0].split(' ')[0] : '';
   const pos = getVal(modalData, 'COUNTER_NO') || getVal(modalData, 'CounterNo') || getVal(modalData, 'POS') || getVal(modalData, 'pos') || '';
   const ean = getVal(modalData, 'EAN') || getVal(modalData, 'ean') || '';
+  const mode = modalData?.mode || 'single';
 
   const [tableData, setTableData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -69,9 +70,10 @@ export default function ReconciliationDetailsModal({ modalData, onClose, type = 
     billDate,
     pos,
     ean,
+    mode,
     sortColumn,
     sortDirection
-  }), [storeCode, billDate, pos, ean, sortColumn, sortDirection]);
+  }), [storeCode, billDate, pos, ean, mode, sortColumn, sortDirection]);
 
   // Close modal on Escape key
   useEffect(() => {
@@ -98,6 +100,7 @@ export default function ReconciliationDetailsModal({ modalData, onClose, type = 
         searchTerm,
         sortColumn,
         sortDirection,
+        mode,
         signal
       });
 

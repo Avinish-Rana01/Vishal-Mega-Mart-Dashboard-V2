@@ -80,7 +80,8 @@ export default function ReconciliationReportView({ type = 'return' }) {
     fromDate: defaultFromDate,
     toDate: isInitialSingleDate ? defaultFromDate : defaultToDate,
     pos: '',
-    ean: ''
+    ean: '',
+    mode: isInitialSingleDate ? 'single' : 'range'
   });
   
   const [posOptions, setPosOptions] = useState([]);
@@ -114,15 +115,12 @@ export default function ReconciliationReportView({ type = 'return' }) {
     ean: appliedFilters.ean,
     fromDate: appliedFilters.fromDate,
     toDate: appliedFilters.toDate,
+    mode: appliedFilters.mode,
     sortColumn,
     sortDirection
   }), [appliedFilters, sortColumn, sortDirection]);
 
-  const isSingleDateApplied = Boolean(
-    appliedFilters.fromDate &&
-    appliedFilters.toDate &&
-    appliedFilters.fromDate === appliedFilters.toDate
-  );
+  const isSingleDateApplied = appliedFilters.mode === 'single';
 
   const exportFileName = useMemo(() => {
     const prefix = isReturn ? 'Return' : 'Void';
@@ -229,7 +227,8 @@ export default function ReconciliationReportView({ type = 'return' }) {
         pageSize, 
         sortColumn, 
         sortDirection, 
-        signal
+        signal,
+        appliedFilters.mode
       );
       setReportData(result?.data || result?.Data || []);
       setTotalRecords(result?.recordCount ?? result?.RecordCount ?? 0);
@@ -261,7 +260,8 @@ export default function ReconciliationReportView({ type = 'return' }) {
       fromDate,
       toDate: effectiveToDate,
       pos,
-      ean
+      ean,
+      mode: dateMode
     });
     setPageIndex(1);
   };
@@ -282,7 +282,8 @@ export default function ReconciliationReportView({ type = 'return' }) {
       fromDate: defaultFromDate,
       toDate: isInitialSingleDate ? defaultFromDate : defaultToDate,
       pos: '',
-      ean: ''
+      ean: '',
+      mode: isInitialSingleDate ? 'single' : 'range'
     });
     setPageIndex(1);
   };
@@ -535,6 +536,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
             selectedStore: appliedFilters.storeCode,
             fromDate: appliedFilters.fromDate,
             toDate: appliedFilters.toDate,
+            mode: appliedFilters.mode,
             pos: selectedModalRow.COUNTER_NO || selectedModalRow.pos || appliedFilters.pos,
             ean: selectedModalRow.EAN || appliedFilters.ean
           }}

@@ -111,7 +111,7 @@
 .report-date-mode-toggle-group {
   display: inline-flex;
   align-items: center;
-  background: rgba(15, 23, 42, 0.25);
+  background: rgba(255, 255, 255, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 2px;

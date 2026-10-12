@@ -231,11 +231,12 @@ export const getReturnDetails = async (storeName = '', fromDate = '', toDate = '
   return response.data;
 };
 
-export const getReturnReconciliationData = async (storeName = '', fromDate = '', toDate = '', pos = '', ean = '', pageIndex = 1, pageSize = 100, sortColumn = 'BILL_DATE', sortDirection = 'asc', signal) => {
+export const getReturnReconciliationData = async (storeName = '', fromDate = '', toDate = '', pos = '', ean = '', pageIndex = 1, pageSize = 100, sortColumn = 'BILL_DATE', sortDirection = 'asc', signal, mode = 'single') => {
   const store = encodeURIComponent(storeName || '');
   const p = encodeURIComponent(pos || '');
   const e = encodeURIComponent(ean || '');
-  const response = await axios.get(`${API_BASE}/api/stock/void/return-reconciliation?storeName=${store}&fromDate=${fromDate}&toDate=${toDate}&pos=${p}&ean=${e}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`, {
+  const m = encodeURIComponent(mode || 'single');
+  const response = await axios.get(`${API_BASE}/api/stock/void/return-reconciliation?storeName=${store}&fromDate=${fromDate}&toDate=${toDate}&pos=${p}&ean=${e}&pageIndex=${pageIndex}&pageSize=${pageSize}&sortColumn=${sortColumn}&sortDirection=${sortDirection}&mode=${m}`, {
     headers: getHeaders(),
     signal
   });
@@ -252,6 +253,7 @@ export const getReturnReconciliationDataModel = async ({
   searchTerm = '',
   sortColumn = 'BILL_DATE',
   sortDirection = 'ASC',
+  mode = 'single',
   signal
 } = {}) => {
   const params = new URLSearchParams();
@@ -264,6 +266,7 @@ export const getReturnReconciliationDataModel = async ({
   if (searchTerm) params.append('SearchTerm', searchTerm);
   if (sortColumn) params.append('SortColumn', sortColumn);
   if (sortDirection) params.append('SortDirection', sortDirection);
+  if (mode) params.append('Mode', mode);
 
   const response = await axios.get(
     `${API_BASE}/api/Stock/GetReturnReconciliationDataModel?${params.toString()}`,
