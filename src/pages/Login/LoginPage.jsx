@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [view, setView] = useState('login'); // 'login', 'forgot', 'change'
   
   // Login State
-  const [username, setUsername] = useState('Admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
   // Forgot Password State
