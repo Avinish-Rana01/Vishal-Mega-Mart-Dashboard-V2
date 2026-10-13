@@ -186,10 +186,10 @@ export default function LoginPage() {
 
                     {errors.form && <div className="login-error-text" style={{ marginBottom: '16px' }}>{errors.form}</div>}
                     
-                    <div className="login-action-row">
-                      <button type="button" className="login-link" onClick={() => setView('forgot')}>
+                    <div className="login-action-row" style={{ justifyContent: 'flex-end' }}>
+                      {/* <button type="button" className="login-link" onClick={() => setView('forgot')}>
                         Forgot your password?
-                      </button>
+                      </button> */}
                       <button type="submit" className="login-btn" disabled={isLoading}>
                         {isLoading ? 'Signing in...' : 'Sign in'}
                       </button>
