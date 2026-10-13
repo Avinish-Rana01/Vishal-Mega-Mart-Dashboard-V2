@@ -61,10 +61,16 @@ export default function StoreCounterStatusPage() {
     try {
       const data = await getCounterStatusStores(userId);
       if (Array.isArray(data) && data.length > 0) {
-        const formatted = data.map((item) => ({
-          value: item.store_ID ?? item.Store_ID ?? item.id ?? item.Store_Id,
-          text: item.store_Name ?? item.Store_Name ?? item.name ?? item.Store_name ?? String(item.store_ID || item.Store_ID)
-        }));
+        const formatted = [];
+        const seenValues = new Set();
+        for (const item of data) {
+          const val = item.store_ID ?? item.Store_ID ?? item.id ?? item.Store_Id;
+          const text = item.store_Name ?? item.Store_Name ?? item.name ?? item.Store_name ?? String(val);
+          if (val !== undefined && val !== null && !seenValues.has(String(val))) {
+            seenValues.add(String(val));
+            formatted.push({ value: val, text });
+          }
+        }
         setStoreOptions(formatted);
 
         // Auto-select store: if user has assigned storeCode/storeName, pick that; else fallback to HD55 or first available
