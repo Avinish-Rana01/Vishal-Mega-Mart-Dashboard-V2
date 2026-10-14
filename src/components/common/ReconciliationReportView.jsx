@@ -20,6 +20,7 @@ import {
 } from '../../services/stockService';
 import { dateRenderer } from '../../utils/dashboardColumns';
 import ReconciliationDetailsModal from '../modals/ReconciliationDetailsModal';
+import ViewDetailsButton from './ViewDetailsButton';
 
 export default function ReconciliationReportView({ type = 'return' }) {
   const isReturn = type === 'return';
@@ -341,14 +342,19 @@ export default function ReconciliationReportView({ type = 'return' }) {
     { 
       key: 'ACTION', 
       label: 'ACTION', 
+      align: 'center',
       render: (val, row) => (
-        <span 
-          onClick={() => setSelectedModalRow(row)}
-          style={{ color: '#16a34a', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', cursor: 'pointer', width: '100%' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          View Details
-        </span>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+          <ViewDetailsButton 
+            label="View Details"
+            variant="blue"
+            title="Click to view full reconciliation details"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedModalRow(row);
+            }}
+          />
+        </div>
       )
     }
   ];
