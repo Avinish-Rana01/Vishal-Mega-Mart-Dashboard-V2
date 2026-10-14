@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Loader2 } from 'lucide-react';
 import CurvedCard from './CurvedCard';
 import ReportDataTableCard from './ReportDataTableCard';
 
@@ -70,7 +71,15 @@ export default function DetailsModal({
 
           {/* Data Table */}
           {tableColumns && tableColumns.length > 0 && (
-            <div style={{ backgroundColor: 'white', borderRadius: '8px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+            <div style={{ backgroundColor: 'white', borderRadius: '8px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
+              {isLoading && (!tableData || tableData.length === 0) && (
+                <div className="vmm-table-loading-overlay" style={{ zIndex: 50 }}>
+                  <div className="vmm-table-loader-pill">
+                    <Loader2 size={16} className="vmm-table-spinner" />
+                    <span>Loading details...</span>
+                  </div>
+                </div>
+              )}
               <ReportDataTableCard 
                 columns={tableColumns}
                 data={tableData}

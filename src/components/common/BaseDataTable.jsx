@@ -96,7 +96,7 @@ export default function BaseDataTable({
   return (
     <div className={containerClassName}>
       {showSkeleton ? (
-        <div className="dt-container">
+        <div className="dt-container" style={{ position: 'relative', minWidth: '100%', width: 'max-content' }}>
           <table className={`${tableClassName} dataTable vmm-skeleton-table ${striped ? 'vmm-table-striped' : ''}`}>
             <thead>
               <tr>
@@ -135,7 +135,7 @@ export default function BaseDataTable({
           </table>
         </div>
       ) : (
-        <div className="dt-container" style={{ position: 'relative' }}>
+        <div className="dt-container" style={{ position: 'relative', minWidth: '100%', width: 'max-content' }}>
           {isLoading && sortedData.length > 0 && (
             <div className="vmm-table-loading-overlay">
               <div className="vmm-table-loader-pill">
