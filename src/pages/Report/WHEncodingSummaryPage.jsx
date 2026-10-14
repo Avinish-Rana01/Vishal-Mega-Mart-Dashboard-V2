@@ -63,7 +63,7 @@ export default function WHEncodingSummaryPage() {
   const [rangeSummary, setRangeSummary] = useState({});
 
   const exportFilters = useMemo(() => ({
-    userId: appliedFilters.selectedUser,
+    user: appliedFilters.selectedUser || '0',
     fromDate: appliedFilters.fromDate,
     toDate: appliedFilters.toDate,
     sortColumn,
