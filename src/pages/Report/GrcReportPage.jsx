@@ -69,14 +69,27 @@ export default function GrcReportPage() {
   // Ensure state updates if we navigate with new state
   React.useEffect(() => {
     if (location.state) {
-      if (location.state.store) setSelectedStore(location.state.store);
-      if (location.state.fromDate) setFromDate(location.state.fromDate.substring(0, 10));
-      if (location.state.toDate) setToDate(location.state.toDate.substring(0, 10));
-      if (location.state.grcStatus !== undefined && location.state.grcStatus !== null && location.state.grcStatus !== '') {
-        setGrcStatus(String(location.state.grcStatus));
-      }
+      const s = location.state.store || initialStore;
+      const f = location.state.fromDate ? location.state.fromDate.substring(0, 10) : todayStr;
+      const t = location.state.toDate ? location.state.toDate.substring(0, 10) : todayStr;
+      const st = (location.state.grcStatus !== undefined && location.state.grcStatus !== null && location.state.grcStatus !== '')
+        ? String(location.state.grcStatus)
+        : '1';
+
+      setSelectedStore(s);
+      setFromDate(f);
+      setToDate(t);
+      setGrcStatus(st);
+      setPageIndex(1);
+      setAppliedFilters({
+        storeCode: s,
+        fromDate: f,
+        toDate: t,
+        selectedHu: '',
+        grcStatus: st
+      });
     }
-  }, [location.state]);
+  }, [location.state, initialStore, todayStr]);
   
   const [grcData, setGrcData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

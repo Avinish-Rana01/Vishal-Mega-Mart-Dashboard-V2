@@ -200,7 +200,52 @@ export default function StoreGrcReportPage() {
     return opt?.STORE_NAME || opt?.label || selectedStore;
   };
 
-  const numRenderer = (val) => <span className="vmm-link-num">{typeof val === 'number' ? val.toLocaleString('en-IN') : val}</span>;
+  const handleCellClick = (row, status) => {
+    const storeCode = appliedFilters.storeCode || selectedStore;
+    if (!storeCode) return;
+
+    let dateOnly = row?.date ? String(row.date).split('T')[0].split(' ')[0] : appliedFilters.fromDate;
+
+    navigate('/reports/grc', {
+      state: {
+        store: storeCode,
+        fromDate: dateOnly,
+        toDate: dateOnly,
+        grcStatus: String(status)
+      }
+    });
+  };
+
+  const handleSummaryCardClick = (status) => {
+    const storeCode = appliedFilters.storeCode || selectedStore;
+    if (!storeCode) return;
+
+    navigate('/reports/grc', {
+      state: {
+        store: storeCode,
+        fromDate: appliedFilters.fromDate,
+        toDate: appliedFilters.toDate,
+        grcStatus: String(status)
+      }
+    });
+  };
+
+  const createCellRenderer = (status, titleText, colorStyle = {}) => (val, row) => {
+    const displayVal = typeof val === 'number' ? val.toLocaleString('en-IN') : (val ?? 0);
+    return (
+      <span
+        className="vmm-link-num"
+        style={{ cursor: 'pointer', ...colorStyle }}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCellClick(row, status);
+        }}
+        title={`Click to view ${titleText} in GRC Report (Status: ${status})`}
+      >
+        {displayVal}
+      </span>
+    );
+  };
 
   const columns = [
     { 
@@ -210,11 +255,74 @@ export default function StoreGrcReportPage() {
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
     { key: 'date', label: 'DATE', sortKey: 'GRC_DATE' },
-    { key: 'huReceivedQty', label: 'HU RECEIVED QTY', sortKey: 'HU_RECEIVED_QTY', render: numRenderer },
-    { key: 'whValidatedQty', label: 'WH VALIDATED QTY', sortKey: 'HU_VALIDATED_QTY', render: numRenderer },
-    { key: 'storeValidatedQty', label: 'STORE VALIDATED QTY', sortKey: 'HHT_VALIDATE_QTY', render: numRenderer },
-    { key: 'pendingQty', label: 'STORE PENDING FOR VALIDATION (QTY)', sortKey: 'STORE_PENDING_QTY', render: numRenderer },
-    { key: 'wrongHuQty', label: 'WRONG HU QTY', sortKey: 'HU_WRONG_QTY', render: numRenderer }
+    { 
+      key: 'huReceivedQty', 
+      label: 'HU RECEIVED QTY', 
+      sortKey: 'HU_RECEIVED_QTY', 
+      render: createCellRenderer('4', 'Received HUs', { color: '#0284c7', fontWeight: 700 }) 
+    },
+    { 
+      key: 'whValidatedQty', 
+      label: 'WH VALIDATED QTY', 
+      sortKey: 'HU_VALIDATED_QTY', 
+      render: createCellRenderer('1', 'WH Validated HUs', { color: '#16a34a', fontWeight: 700 }) 
+    },
+    { 
+      key: 'storeValidatedQty', 
+      label: 'STORE VALIDATED QTY', 
+      sortKey: 'HHT_VALIDATE_QTY', 
+      render: createCellRenderer('2', 'Store Validated HUs', { color: '#9333ea', fontWeight: 700 }) 
+    },
+    { 
+      key: 'pendingQty', 
+      label: 'STORE PENDING FOR VALIDATION (QTY)', 
+      sortKey: 'STORE_PENDING_QTY', 
+      render: (val, row) => {
+        const num = val ?? 0;
+        return (
+          <span
+            className="vmm-link-num"
+            style={{ 
+              color: num > 0 ? '#d97706' : '#16a34a', 
+              fontWeight: 700, 
+              cursor: 'pointer' 
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCellClick(row, '3');
+            }}
+            title="Click to view Pending HUs in GRC Report (Status: 3)"
+          >
+            {typeof val === 'number' ? val.toLocaleString('en-IN') : val}
+          </span>
+        );
+      }
+    },
+    { 
+      key: 'wrongHuQty', 
+      label: 'WRONG HU QTY', 
+      sortKey: 'HU_WRONG_QTY', 
+      render: (val, row) => {
+        const num = val ?? 0;
+        return (
+          <span
+            className="vmm-link-num"
+            style={{ 
+              color: num > 0 ? '#dc2626' : '#16a34a', 
+              fontWeight: 700, 
+              cursor: 'pointer' 
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCellClick(row, '0');
+            }}
+            title="Click to view Wrong HUs in GRC Report (Status: 0)"
+          >
+            {typeof val === 'number' ? val.toLocaleString('en-IN') : val}
+          </span>
+        );
+      }
+    }
   ];
 
   return (
@@ -277,6 +385,7 @@ export default function StoreGrcReportPage() {
               value={reportSummary?.huReceivedQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[0]}
               icon={<Package size={20} color="#ffffff" />}
+              onClick={() => handleSummaryCardClick('4')}
             />
 
             <CurvedCard 
@@ -284,6 +393,7 @@ export default function StoreGrcReportPage() {
               value={reportSummary?.whValidatedQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[1]}
               icon={<Building2 size={20} color="#ffffff" />}
+              onClick={() => handleSummaryCardClick('1')}
             />
 
             <CurvedCard 
@@ -291,6 +401,7 @@ export default function StoreGrcReportPage() {
               value={reportSummary?.storeValidatedQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[2]}
               icon={<Store size={20} color="#ffffff" />}
+              onClick={() => handleSummaryCardClick('2')}
             />
 
             <CurvedCard 
@@ -298,6 +409,7 @@ export default function StoreGrcReportPage() {
               value={reportSummary?.pendingQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[3]}
               icon={<Clock size={20} color="#ffffff" />}
+              onClick={() => handleSummaryCardClick('3')}
             />
 
             <CurvedCard 
@@ -305,6 +417,7 @@ export default function StoreGrcReportPage() {
               value={reportSummary?.wrongHuQty?.toLocaleString('en-IN') || '0'} 
               waveColor={cardGradients[4]}
               icon={<AlertTriangle size={20} color="#ffffff" />}
+              onClick={() => handleSummaryCardClick('0')}
             />
           </div>
 

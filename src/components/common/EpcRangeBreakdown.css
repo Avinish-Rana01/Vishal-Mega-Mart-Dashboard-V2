@@ -71,20 +71,22 @@
 
 /* Individual Card */
 .epc-range-card {
-  flex: 0 0 116px;
-  min-width: 116px;
+  flex: 0 0 148px;
+  min-width: 148px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-top: 3px solid #3b82f6;
   border-radius: 10px;
-  padding: 7px 9px 8px 9px;
+  padding: 8px 10px 9px 10px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: space-between;
+  gap: 6px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
               box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
               border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .epc-range-card:hover {
@@ -116,7 +118,7 @@
 }
 
 .epc-card-title {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #334155;
   text-transform: uppercase;
@@ -146,7 +148,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 8px;
+  width: 100%;
 }
 
 .epc-stat-col {
@@ -154,6 +157,8 @@
   align-items: center;
   gap: 3px;
   line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .epc-stat-success {
@@ -165,9 +170,11 @@
 }
 
 .epc-stat-num {
-  font-size: 14.5px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .epc-stat--muted {
@@ -186,7 +193,7 @@
 
 .epc-pct-pill {
   display: inline-block;
-  padding: 1.5px 6px;
+  padding: 1.5px 7px;
   border-radius: 9999px;
   font-size: 9.5px;
   font-weight: 700;
@@ -218,8 +225,8 @@
    Standout Summary Total Card
    ========================================================================== */
 .epc-range-card--total {
-  flex: 0 0 126px;
-  min-width: 126px;
+  flex: 0 0 168px;
+  min-width: 168px;
   background: linear-gradient(145deg, #f0f7ff 0%, #e0edff 100%);
   border: 1px solid #bfdbfe;
   border-top: 3px solid #1d4ed8;
@@ -235,9 +242,10 @@
 .epc-card-title--total {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   color: #1e40af;
   font-weight: 800;
+  font-size: 11px;
 }
 
 .epc-card-dot--total {
@@ -251,5 +259,6 @@
 
 .epc-stat-num--total {
   color: #1d4ed8;
+  font-size: 13px;
   font-weight: 800;
 }
