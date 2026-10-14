@@ -239,8 +239,8 @@ export default function TagInventoryDistributionPage() {
           <div className="ds-kpi-item">
             <CurvedCard
               title="TOTAL TAG COUNT"
-              value={summary.recordCount.toLocaleString('en-IN')}
-              animate={false}
+              value={isLoading ? '—' : summary.recordCount.toLocaleString('en-IN')}
+              animate={!isLoading}
               waveColor={['#d8b4fe', '#c026d3']}
               icon={<Icons.Tag size={18} color="#a855f7" />}
               badge={
@@ -255,13 +255,13 @@ export default function TagInventoryDistributionPage() {
           <div className="ds-kpi-item">
             <CurvedCard
               title="TOTAL RECYCLE COUNT"
-              value={summary.cycleCount.toLocaleString('en-IN')}
-              animate={false}
+              value={isLoading ? '—' : summary.cycleCount.toLocaleString('en-IN')}
+              animate={!isLoading}
               waveColor={['#86efac', '#10b981']}
               icon={<Icons.RefreshCw size={18} color="#10b981" />}
               badge={
                 <div className="tag-kpi-pill tag-kpi-pill--green">
-                  <Icons.TrendingUp size={13} style={{ strokeWidth: 2.5 }} /> Average {summary.avgRecycle}
+                  <Icons.TrendingUp size={13} style={{ strokeWidth: 2.5 }} /> Average {isLoading ? '—' : summary.avgRecycle}
                 </div>
               }
             />
@@ -283,10 +283,20 @@ export default function TagInventoryDistributionPage() {
 
             <div className="tag-store-header-badges">
               <div className="tag-stat-badge">
-                Total Stores : <strong>{totalStoresCount}</strong>
+                Total Stores :{' '}
+                {isLoading ? (
+                  <span className="vmm-shimmer tag-stat-badge-shimmer" />
+                ) : (
+                  <strong>{totalStoresCount}</strong>
+                )}
               </div>
               <div className="tag-stat-badge">
-                Total Tags : <strong>{totalStoreTags.toLocaleString('en-IN')}</strong>
+                Total Tags :{' '}
+                {isLoading ? (
+                  <span className="vmm-shimmer tag-stat-badge-shimmer tag-stat-badge-shimmer--lg" />
+                ) : (
+                  <strong>{totalStoreTags.toLocaleString('en-IN')}</strong>
+                )}
               </div>
               <button 
                 type="button" 
@@ -311,8 +321,9 @@ export default function TagInventoryDistributionPage() {
           <div className="tag-slider-wrapper">
             <button
               type="button"
-              className="tag-slider-arrow prev"
+              className={`tag-slider-arrow prev ${isLoading ? 'tag-slider-arrow--disabled' : ''}`}
               onClick={handleScrollLeft}
+              disabled={isLoading || storeCards.length === 0}
               title="Previous stores"
               aria-label="Previous stores"
             >
@@ -320,7 +331,15 @@ export default function TagInventoryDistributionPage() {
             </button>
 
             <div className="tag-slider-track" ref={sliderRef}>
-              {storeCards.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 6 }).map((_, idx) => (
+                  <div key={`store-skeleton-${idx}`} className="tag-store-item-card tag-store-skeleton-card">
+                    <div className="tag-store-skeleton-icon" />
+                    <div className="tag-store-skeleton-line tag-store-skeleton-title" />
+                    <div className="tag-store-skeleton-line tag-store-skeleton-count" />
+                  </div>
+                ))
+              ) : storeCards.length > 0 ? (
                 storeCards.map((store) => (
                   <div key={store.id} className="tag-store-item-card">
                     <div className={`tag-store-item-icon-box tag-store-item-icon-box--${store.theme}`}>
@@ -336,16 +355,21 @@ export default function TagInventoryDistributionPage() {
                   </div>
                 ))
               ) : (
-                <div style={{ padding: '16px', color: '#94a3b8', fontSize: '13px' }}>
-                  No store inventory data available.
+                <div className="tag-store-empty-container">
+                  <div className="tag-store-empty-icon">
+                    <Icons.Store size={26} />
+                  </div>
+                  <div className="tag-store-empty-text">No store inventory data available</div>
+                  <div className="tag-store-empty-sub">There are currently no active store tag distribution records.</div>
                 </div>
               )}
             </div>
 
             <button
               type="button"
-              className="tag-slider-arrow next"
+              className={`tag-slider-arrow next ${isLoading ? 'tag-slider-arrow--disabled' : ''}`}
               onClick={handleScrollRight}
+              disabled={isLoading || storeCards.length === 0}
               title="Next stores"
               aria-label="Next stores"
             >

@@ -1378,6 +1378,117 @@
   letter-spacing: -0.01em;
 }
 
+/* Store Wise Tag Inventory Loading Skeleton & Empty State */
+.tag-stat-badge-shimmer {
+  display: inline-block;
+  width: 24px;
+  height: 14px;
+  border-radius: 4px;
+  vertical-align: middle;
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: vmmTableShimmer 1.5s infinite;
+}
+
+.tag-stat-badge-shimmer--lg {
+  width: 46px;
+}
+
+.tag-store-skeleton-card {
+  flex: 0 0 240px;
+  min-width: 220px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #f1f5f9;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+  pointer-events: none;
+}
+
+.tag-store-skeleton-card:hover {
+  transform: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+  border-color: #f1f5f9;
+}
+
+.tag-store-skeleton-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: vmmTableShimmer 1.5s infinite;
+}
+
+.tag-store-skeleton-line {
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: vmmTableShimmer 1.5s infinite;
+}
+
+.tag-store-skeleton-title {
+  width: 120px;
+  height: 14px;
+}
+
+.tag-store-skeleton-count {
+  width: 64px;
+  height: 18px;
+  border-radius: 6px;
+}
+
+.tag-slider-arrow--disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+/* Polished Empty State for Carousel */
+.tag-store-empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.tag-store-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.tag-store-empty-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 3px;
+}
+
+.tag-store-empty-sub {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 /* ---- Bottom Data Table Pill Badges ---- */
 
 .tag-id-cell {
