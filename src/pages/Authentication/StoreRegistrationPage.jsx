@@ -103,9 +103,9 @@ export default function StoreRegistrationPage() {
           states: (data.states || []).map(s => ({ value: s, text: s })),
           cities: data.cities || [],
           storeManagers: (data.storeManagers || []).map(sm => ({ value: sm, text: sm })),
-          areaManagers: (data.areaManagers || []).map(am => ({ value: am, text: am })),
-          zfms: (data.zfms || []).map(z => ({ value: z, text: z })),
-          lps: (data.lps || []).map(l => ({ value: l, text: l }))
+          areaManagers: (data.areaManagers || data.AreaManagers || []).map(am => ({ value: am, text: am })),
+          zfms: (data.zfms || data.zfMs || data.ZFMs || []).map(z => ({ value: z, text: z })),
+          lps: (data.lps || data.lPs || data.LPs || []).map(l => ({ value: l, text: l }))
         });
       }
     } catch (err) {

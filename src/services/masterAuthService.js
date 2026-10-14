@@ -309,8 +309,8 @@ export const getStoreFormDropdownOptions = async () => {
       const states = parseJson(firstRow.States ?? firstRow.states).map(x => x?.State ?? x?.state).filter(Boolean);
       const cities = parseJson(firstRow.Cities ?? firstRow.cities).map(x => ({ state: x?.State ?? x?.state, city: x?.City ?? x?.city }));
       const areaManagers = parseJson(firstRow.AreaManagers ?? firstRow.areaManagers).map(x => x?.Area_Manager ?? x?.area_Manager).filter(Boolean);
-      const zfms = parseJson(firstRow.ZFMs ?? firstRow.zfms).map(x => x?.ZFM ?? x?.zfm).filter(Boolean);
-      const lps = parseJson(firstRow.LPs ?? firstRow.lps).map(x => x?.LP ?? x?.lp).filter(Boolean);
+      const zfms = parseJson(firstRow.ZFMs ?? firstRow.zfms ?? firstRow.zfMs).map(x => x?.ZFM ?? x?.zfm).filter(Boolean);
+      const lps = parseJson(firstRow.LPs ?? firstRow.lps ?? firstRow.lPs).map(x => x?.LP ?? x?.lp).filter(Boolean);
       const storeManagers = parseJson(firstRow.StoreManagers ?? firstRow.storeManagers).map(x => x?.Store_Manager ?? x?.store_Manager).filter(Boolean);
 
       return {
