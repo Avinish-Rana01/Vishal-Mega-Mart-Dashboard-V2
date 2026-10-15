@@ -50,12 +50,20 @@ export const executeMaster = async (status, payload = {}) => {
  * 1. Fetch available system user roles from Role_Master (Super Admin, Store Admin, Area Manager, ZFM, LP, etc.)
  */
 export const getUserRoles = async () => {
-  const res = await executeMaster('Bind_Role_Id');
+  const userId = getActiveUserId();
+  const userType = getActiveUserRole();
+  const res = await executeMaster('Bind_Role_Id', {
+    user_ID: Number(userId),
+    user_Type: userType
+  });
   if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
     return res.data;
   }
   // Fallback to legacy BIND_USER_TYPE if Bind_Role_Id returns empty
-  const fallbackRes = await executeMaster('BIND_USER_TYPE');
+  const fallbackRes = await executeMaster('BIND_USER_TYPE', {
+    user_ID: Number(userId),
+    user_Type: userType
+  });
   return fallbackRes?.data || [];
 };
 

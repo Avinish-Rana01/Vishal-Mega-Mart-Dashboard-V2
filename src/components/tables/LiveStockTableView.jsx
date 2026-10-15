@@ -135,7 +135,10 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
         const mappedData = itemsArray.map((item) => ({
           srNo: item.RowNumber,
           stockDate: (item.STOCK_DATE || item.DATE) ? (item.STOCK_DATE || item.DATE).split('T')[0] : '',
+          mcCode: item.MC_CODE || '—',
+          mcDesc: item.MC_DESC || '—',
           articleNo: item.ARTICLE,
+          artDesc: item.ART_DESC || '—',
           sapStock: item.SAP_STOCK,
           rfidStock: item.RFID_STOCK,
           diff: item.DIFFERENCE || item.DIFF
@@ -215,7 +218,10 @@ export default function LiveStockTableView({ initialStore = 'HD44', initialDate 
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
     { key: 'stockDate', label: 'Stock Date', sortKey: 'STOCK_DATE', render: textRenderer },
+    { key: 'mcCode', label: 'MC Code', sortKey: 'MC_CODE', render: textRenderer },
+    { key: 'mcDesc', label: 'MC Description', sortKey: 'MC_DESC', render: textRenderer },
     { key: 'articleNo', label: 'Article No', sortKey: 'ARTICLE', render: textRenderer },
+    { key: 'artDesc', label: 'Article Description', sortKey: 'ART_DESC', render: textRenderer },
     { key: 'sapStock', label: 'SAP Stock', sortKey: 'SAP_STOCK', render: numRenderer },
     { key: 'rfidStock', label: 'RFID Stock', sortKey: 'RFID_STOCK', render: numRenderer },
     { key: 'diff', label: 'Difference', sortKey: 'DIFF', render: numRenderer }
