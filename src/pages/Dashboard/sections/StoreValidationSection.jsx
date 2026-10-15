@@ -309,7 +309,17 @@ export default function StoreValidationSection() {
   const navigate = useNavigate();
   const { data: realData, totals: realTotals, isLoading, isRefreshing, error, highlightedStore, connectionStatus } = useStoreDashboard();
   const data = realData;
-  const totals = realTotals;
+  const totals = useMemo(() => {
+    if (!realTotals && (!data || data.length === 0)) return realTotals;
+    const computedPending = (data && data.length > 0)
+      ? data.reduce((sum, r) => sum + Number(r.STORE_PENDING_QTY || 0), 0)
+      : realTotals?.STORE_PENDING_QTY || 0;
+
+    return {
+      ...(realTotals || {}),
+      STORE_PENDING_QTY: typeof computedPending === 'number' ? computedPending.toLocaleString('en-IN') : computedPending
+    };
+  }, [realTotals, data]);
 
 
   const [chartView, setChartView] = useSessionState('sv_chart_view', 'grouped');

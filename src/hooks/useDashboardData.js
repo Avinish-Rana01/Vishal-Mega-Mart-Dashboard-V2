@@ -67,7 +67,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
 
         if (response.summary) {
           if (totalsMapper) {
-            setTotals(totalsMapper(response.summary));
+            setTotals(totalsMapper(response.summary, items));
           }
           const total = response.summary.totalRecords ?? response.summary.totalCount ?? response.summary.recordCount;
           if (total !== undefined && total > 0) {
@@ -503,15 +503,21 @@ const storeDashboardFilter = (row, term) =>
   (row.STORE_NAME && row.STORE_NAME.toLowerCase().includes(term)) ||
   (row.DATE && row.DATE.toLowerCase().includes(term));
 
-const storeDashboardTotals = (summary) => ({
-  STORE: 'TOTAL',
-  HU_RECEIVED_QTY: summary.huReceivedQty?.toLocaleString('en-IN') || 0,
-  HU_VALIDATED_QTY: summary.huValidatedQty?.toLocaleString('en-IN') || 0,
-  HHT_VALIDATE_QTY: summary.hhtValidateQty?.toLocaleString('en-IN') || 0,
-  HU_WRONG_QTY: summary.huWrongQty?.toLocaleString('en-IN') || 0,
-  ENCODED_QTY: summary.encodedQty?.toLocaleString('en-IN') || 0,
-  STORE_PENDING_QTY: ((summary.huReceivedQty || 0) - (summary.huValidatedQty || 0)).toLocaleString('en-IN')
-});
+const storeDashboardTotals = (summary, items = []) => {
+  const totalPending = Array.isArray(items) && items.length > 0
+    ? items.reduce((acc, row) => acc + Number(row.STORE_PENDING_QTY || 0), 0)
+    : ((summary?.huReceivedQty || 0) - ((summary?.hhtValidateQty || 0) + (summary?.huWrongQty || 0)));
+
+  return {
+    STORE: 'TOTAL',
+    HU_RECEIVED_QTY: summary.huReceivedQty?.toLocaleString('en-IN') || 0,
+    HU_VALIDATED_QTY: summary.huValidatedQty?.toLocaleString('en-IN') || 0,
+    HHT_VALIDATE_QTY: summary.hhtValidateQty?.toLocaleString('en-IN') || 0,
+    HU_WRONG_QTY: summary.huWrongQty?.toLocaleString('en-IN') || 0,
+    ENCODED_QTY: summary.encodedQty?.toLocaleString('en-IN') || 0,
+    STORE_PENDING_QTY: totalPending.toLocaleString('en-IN')
+  };
+};
 
 export const useStoreDashboard = () => {
   const baseFetch = useDashboardFetch(getStoreDashboard, storeDashboardFilter, storeDashboardTotals);
