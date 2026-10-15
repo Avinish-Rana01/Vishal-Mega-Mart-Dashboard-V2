@@ -47,18 +47,23 @@ export const executeMaster = async (status, payload = {}) => {
 };
 
 /**
- * 1. Fetch available system user roles (Super Admin, Store Admin, etc.)
+ * 1. Fetch available system user roles from Role_Master (Super Admin, Store Admin, Area Manager, ZFM, LP, etc.)
  */
 export const getUserRoles = async () => {
-  const res = await executeMaster('BIND_USER_TYPE');
-  return res?.data || [];
+  const res = await executeMaster('Bind_Role_Id');
+  if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+    return res.data;
+  }
+  // Fallback to legacy BIND_USER_TYPE if Bind_Role_Id returns empty
+  const fallbackRes = await executeMaster('BIND_USER_TYPE');
+  return fallbackRes?.data || [];
 };
 
 /**
  * 2. Fetch stores dropdown for user assignment
  */
 export const getStoreDropdown = async () => {
-  const userId = getActiveUserId() || 0;
+  const userId = getActiveUserId() || 30;
   const userType = getActiveUserRole();
   const res = await executeMaster('SP_DDL_StoreID', {
     user_ID: Number(userId),
@@ -71,7 +76,7 @@ export const getStoreDropdown = async () => {
  * 3. Fetch warehouses dropdown for user assignment
  */
 export const getWarehouseDropdown = async () => {
-  const userId = getActiveUserId() || 0;
+  const userId = getActiveUserId() || 30;
   const userType = getActiveUserRole();
   const res = await executeMaster('SP_DDL_WarehouseID', {
     user_ID: Number(userId),
@@ -84,7 +89,7 @@ export const getWarehouseDropdown = async () => {
  * 4. Fetch the full users directory
  */
 export const getUserList = async () => {
-  const userId = getActiveUserId() || 0;
+  const userId = getActiveUserId() || 30;
   const userType = getActiveUserRole();
   const res = await executeMaster('SP_Bind_User_Master', {
     user_ID: Number(userId),
@@ -239,7 +244,7 @@ export const toggleWarehouseStatus = async (whId) => {
  * 16. Fetch the full Floor Master directory
  */
 export const getFloorMasterList = async () => {
-  const userId = getActiveUserId() || 0;
+  const userId = getActiveUserId() || 30;
   const userType = getActiveUserRole();
   const res = await executeMaster('SP_Bind_FloorMaster', {
     user_ID: Number(userId),
@@ -288,7 +293,8 @@ export const toggleFloorStatus = async (floorId) => {
 export const getStoreFormDropdownOptions = async () => {
   try {
     // 1. Try dedicated GET endpoint if available
-    const getRes = await axios.get(`${API_BASE}/api/Master/StoreDropdowns`, {
+    const uid = getActiveUserId() || 30;
+    const getRes = await axios.get(`${API_BASE}/api/Master/StoreDropdowns?userId=${uid}`, {
       headers: getHeaders()
     }).catch(() => null);
 

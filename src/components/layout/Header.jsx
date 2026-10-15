@@ -126,7 +126,16 @@ export default function Header({
             {APP_INFO.TITLE}
           </h1>
           <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
-            {breadcrumb}
+            {typeof breadcrumb === 'string' ? (
+              breadcrumb.split(/\s*-\s*/).map((part, idx, arr) => (
+                <React.Fragment key={idx}>
+                  <span className={idx === arr.length - 1 ? 'active' : ''}>{part}</span>
+                  {idx < arr.length - 1 && <span className="vmm-breadcrumb-sep">-</span>}
+                </React.Fragment>
+              ))
+            ) : (
+              breadcrumb
+            )}
           </div>
         </div>
       </div>

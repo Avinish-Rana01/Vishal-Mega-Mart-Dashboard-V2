@@ -345,7 +345,7 @@ export default function StoreRegistrationPage() {
       const term = searchTerm.toLowerCase().trim();
       list = list.filter(s => {
         const code = String(s.Store_Code ?? s.store_Code ?? '').toLowerCase();
-        const name = String(s.Store_Name ?? s.store_Name ?? '').toLowerCase();
+        const name = String(s.Store_Name ?? s.STORE_NAME ?? s.StoreName ?? s.store_Name ?? '').toLowerCase();
         const id = String(s.Store_ID ?? s.store_ID ?? '');
         const stateVal = String(s.State ?? s.state ?? '').toLowerCase();
         const cityVal = String(s.City ?? s.city ?? '').toLowerCase();
@@ -372,8 +372,8 @@ export default function StoreRegistrationPage() {
     // Sort
     if (sortColumn) {
       list.sort((a, b) => {
-        let valA = a[sortColumn] ?? '';
-        let valB = b[sortColumn] ?? '';
+        let valA = a[sortColumn] ?? (sortColumn === 'Store_Name' ? (a.STORE_NAME ?? a.StoreName) : '') ?? '';
+        let valB = b[sortColumn] ?? (sortColumn === 'Store_Name' ? (b.STORE_NAME ?? b.StoreName) : '') ?? '';
         if (typeof valA === 'number' && typeof valB === 'number') {
           return sortDirection === 'desc' ? valB - valA : valA - valB;
         }
@@ -396,18 +396,21 @@ export default function StoreRegistrationPage() {
 
   // Clean formatted data for Excel Export (N/A for missing cells)
   const exportFormattedStores = useMemo(() => {
-    return sortedAndFilteredStores.map(s => ({
-      Store_ID: s.Store_ID ?? s.store_ID ?? 'N/A',
-      Store_Code: s.Store_Code ?? s.store_Code ?? 'N/A',
-      Store_Name: s.Store_Name ?? s.store_Name ?? 'N/A',
-      State: s.State ?? s.state ?? 'N/A',
-      City: s.City ?? s.city ?? 'N/A',
-      Store_Manager: s.Store_Manager ?? s.store_Manager ?? 'N/A',
-      Area_Manager: s.Area_Manager ?? s.area_Manager ?? 'N/A',
-      ZFM: s.ZFM ?? s.zfm ?? 'N/A',
-      LP: s.LP ?? s.lp ?? 'N/A',
-      Status: s.Status ?? s.status ?? 'Active'
-    }));
+    return sortedAndFilteredStores.map(s => {
+      const sName = s.Store_Name ?? s.STORE_NAME ?? s.StoreName ?? s.store_Name;
+      return {
+        Store_ID: s.Store_ID ?? s.store_ID ?? 'N/A',
+        Store_Code: s.Store_Code ?? s.store_Code ?? 'N/A',
+        Store_Name: (!sName || sName === 'NA' || sName === '—') ? 'N/A' : sName,
+        State: s.State ?? s.state ?? 'N/A',
+        City: s.City ?? s.city ?? 'N/A',
+        Store_Manager: s.Store_Manager ?? s.store_Manager ?? 'N/A',
+        Area_Manager: s.Area_Manager ?? s.area_Manager ?? 'N/A',
+        ZFM: s.ZFM ?? s.zfm ?? 'N/A',
+        LP: s.LP ?? s.lp ?? 'N/A',
+        Status: s.Status ?? s.status ?? 'Active'
+      };
+    });
   }, [sortedAndFilteredStores]);
 
   // Table Columns Definition
@@ -437,11 +440,14 @@ export default function StoreRegistrationPage() {
       key: 'Store_Name',
       label: 'STORE NAME',
       sortable: true,
-      render: (val, row) => (
-        <span style={{ fontWeight: 600, color: '#334155' }}>
-          {val ?? row?.Store_Name ?? row?.store_Name ?? 'N/A'}
-        </span>
-      )
+      render: (val, row) => {
+        const s = val ?? row?.Store_Name ?? row?.STORE_NAME ?? row?.StoreName ?? row?.store_Name;
+        return (!s || s === 'NA' || s === '—') ? (
+          <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
+        ) : (
+          <span style={{ fontWeight: 600, color: '#334155' }}>{s}</span>
+        );
+      }
     },
     {
       key: 'State',

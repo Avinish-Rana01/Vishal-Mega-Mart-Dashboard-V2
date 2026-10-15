@@ -118,7 +118,7 @@ export default function UserRegistrationPage() {
       if (Array.isArray(rolesData)) {
         setRoleOptions(
           rolesData.map(r => {
-            const val = r.User_Type ?? r.user_Type ?? r.userType ?? String(r);
+            const val = r.Role_Name ?? r.role_Name ?? r.User_Type ?? r.user_Type ?? r.userType ?? String(r);
             return { value: val, text: val };
           })
         );
@@ -528,7 +528,7 @@ export default function UserRegistrationPage() {
       label: 'ASSIGNED STORE',
       sortable: true,
       render: (val, row) => {
-        const s = val ?? row?.Store_Name ?? row?.store_Name;
+        const s = val ?? row?.Store_Name ?? row?.STORE_NAME ?? row?.StoreName ?? row?.store_Name;
         return (!s || s === 'NA' || s === '—') ? (
           <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
         ) : (
@@ -541,7 +541,7 @@ export default function UserRegistrationPage() {
       label: 'ASSIGNED WAREHOUSE',
       sortable: true,
       render: (val, row) => {
-        const w = val ?? row?.Warehouse_Name ?? row?.warehouse_Name;
+        const w = val ?? row?.Warehouse_Name ?? row?.WH_NAME ?? row?.WarehouseName ?? row?.warehouse_Name;
         return (!w || w === 'NA' || w === '—') ? (
           <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
         ) : (

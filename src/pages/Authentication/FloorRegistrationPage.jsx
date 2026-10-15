@@ -253,7 +253,7 @@ export default function FloorRegistrationPage() {
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase().trim();
       list = list.filter(f => {
-        const storeName = String(f.Store_Name ?? f.store_Name ?? '').toLowerCase();
+        const storeName = String(f.Store_Name ?? f.STORE_NAME ?? f.StoreName ?? f.store_Name ?? '').toLowerCase();
         const storeCode = String(f.Store_Code ?? f.store_Code ?? '').toLowerCase();
         const floor = String(f.Store_Floor ?? f.store_Floor ?? '').toLowerCase();
         const status = String(f.Status ?? f.status ?? '').toLowerCase();
@@ -265,8 +265,8 @@ export default function FloorRegistrationPage() {
     // Sort
     if (sortColumn) {
       list.sort((a, b) => {
-        let valA = a[sortColumn] ?? '';
-        let valB = b[sortColumn] ?? '';
+        let valA = a[sortColumn] ?? (sortColumn === 'Store_Name' ? (a.STORE_NAME ?? a.StoreName) : '') ?? '';
+        let valB = b[sortColumn] ?? (sortColumn === 'Store_Name' ? (b.STORE_NAME ?? b.StoreName) : '') ?? '';
         if (typeof valA === 'number' && typeof valB === 'number') {
           return sortDirection === 'desc' ? valB - valA : valA - valB;
         }
@@ -289,13 +289,16 @@ export default function FloorRegistrationPage() {
 
   // Clean formatted data for Excel Export
   const exportFormattedFloors = useMemo(() => {
-    return sortedAndFilteredFloors.map(f => ({
-      Floor_ID: f.Store_Floor_ID ?? 'N/A',
-      Store_Name: f.Store_Name || 'N/A',
-      Store_Code: f.Store_Code || 'N/A',
-      Floor: f.Store_Floor || 'N/A',
-      Status: f.Status || 'Active'
-    }));
+    return sortedAndFilteredFloors.map(f => {
+      const sName = f.Store_Name ?? f.STORE_NAME ?? f.StoreName ?? f.store_Name;
+      return {
+        Floor_ID: f.Store_Floor_ID ?? 'N/A',
+        Store_Name: (!sName || sName === 'NA' || sName === '—') ? 'N/A' : sName,
+        Store_Code: f.Store_Code || 'N/A',
+        Floor: f.Store_Floor || 'N/A',
+        Status: f.Status || 'Active'
+      };
+    });
   }, [sortedAndFilteredFloors]);
 
   // Table Columns Definition matching Floor Master Legacy Screen
@@ -304,7 +307,7 @@ export default function FloorRegistrationPage() {
       key: 'Store_Floor_ID',
       label: 'FLOOR ID',
       align: 'center',
-      width: '120px',
+      width: '100px',
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 700, color: '#334155' }}>
@@ -316,17 +319,22 @@ export default function FloorRegistrationPage() {
       key: 'Store_Name',
       label: 'STORE NAME',
       align: 'left',
+      width: '280px',
       sortable: true,
-      render: (val, row) => (
-        <span style={{ fontWeight: 600, color: '#1e293b' }}>
-          {val ?? row?.Store_Name ?? row?.store_Name ?? 'N/A'}
-        </span>
-      )
+      render: (val, row) => {
+        const s = val ?? row?.Store_Name ?? row?.STORE_NAME ?? row?.StoreName ?? row?.store_Name;
+        return (!s || s === 'NA' || s === '—') ? (
+          <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
+        ) : (
+          <span style={{ fontWeight: 600, color: '#1e293b' }}>{s}</span>
+        );
+      }
     },
     {
       key: 'Store_Floor',
       label: 'FLOOR',
-      align: 'center',
+      align: 'left',
+      width: '220px',
       sortable: true,
       render: (val, row) => (
         <span style={{ fontWeight: 600, color: '#334155' }}>
@@ -404,7 +412,13 @@ export default function FloorRegistrationPage() {
       headerProps={{
         breadcrumb: (
           <>
-            HOME - PAGES - MASTERS - <span className="active">FLOOR MASTER</span>
+            <span>HOME</span>
+            <span className="vmm-breadcrumb-sep">-</span>
+            <span>PAGES</span>
+            <span className="vmm-breadcrumb-sep">-</span>
+            <span>MASTERS</span>
+            <span className="vmm-breadcrumb-sep">-</span>
+            <span className="active">FLOOR MASTER</span>
           </>
         ),
         showBackButton: true,
@@ -427,7 +441,7 @@ export default function FloorRegistrationPage() {
         <form onSubmit={handleSubmit}>
           <div className="report-search-body">
             {/* 1. Store Name Dropdown */}
-            <div className="search-field">
+            <div className="search-field" style={{ maxWidth: '320px', minWidth: '220px' }}>
               <label>Store Name *</label>
               <SearchableDropdown
                 options={storeOptions}
@@ -439,7 +453,7 @@ export default function FloorRegistrationPage() {
             </div>
 
             {/* 2. Floor Text Input */}
-            <div className="search-field">
+            <div className="search-field" style={{ maxWidth: '320px', minWidth: '220px' }}>
               <label>Floor *</label>
               <input
                 ref={floorNameInputRef}
