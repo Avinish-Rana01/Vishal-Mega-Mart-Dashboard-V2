@@ -44,11 +44,11 @@ function ValidationTooltip({ active, payload }) {
         )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 14px', fontSize: '12px' }}>
-        <span style={{ color: '#94a3b8' }}>Received HU</span>  <span style={{ fontWeight: 700, color: COLOR_RECEIVED }}>{Number(d.HU_RECEIVED_QTY || 0).toLocaleString('en-IN')}</span>
-        <span style={{ color: '#94a3b8' }}>Validated HU</span> <span style={{ fontWeight: 700, color: COLOR_VALIDATED }}>{Number(d.HU_VALIDATED_QTY || 0).toLocaleString('en-IN')}</span>
-        <span style={{ color: '#94a3b8' }}>HHT Validated</span><span style={{ fontWeight: 700, color: COLOR_HHT }}>{Number(d.HHT_VALIDATE_QTY || 0).toLocaleString('en-IN')}</span>
-        <span style={{ color: '#94a3b8' }}>Pending</span>      <span style={{ fontWeight: 700, color: pending > 0 ? '#f59e0b' : '#10b981' }}>{pending.toLocaleString('en-IN')}</span>
-        <span style={{ color: '#94a3b8' }}>Wrong HU</span>     <span style={{ fontWeight: 700, color: wrong > 0 ? '#ef4444' : '#10b981' }}>{wrong.toLocaleString('en-IN')}</span>
+        <span style={{ color: '#94a3b8' }}>Received HU</span>      <span style={{ fontWeight: 700, color: COLOR_RECEIVED }}>{Number(d.HU_RECEIVED_QTY || 0).toLocaleString('en-IN')}</span>
+        <span style={{ color: '#94a3b8' }}>WH Validated</span>     <span style={{ fontWeight: 700, color: COLOR_VALIDATED }}>{Number(d.HU_VALIDATED_QTY || 0).toLocaleString('en-IN')}</span>
+        <span style={{ color: '#94a3b8' }}>Store Validated</span>  <span style={{ fontWeight: 700, color: COLOR_HHT }}>{Number(d.HHT_VALIDATE_QTY || 0).toLocaleString('en-IN')}</span>
+        <span style={{ color: '#94a3b8' }}>Pending</span>          <span style={{ fontWeight: 700, color: pending > 0 ? '#f59e0b' : '#10b981' }}>{pending.toLocaleString('en-IN')}</span>
+        <span style={{ color: '#94a3b8' }}>Wrong HU</span>         <span style={{ fontWeight: 700, color: wrong > 0 ? '#ef4444' : '#10b981' }}>{wrong.toLocaleString('en-IN')}</span>
       </div>
     </div>
   );
@@ -471,21 +471,21 @@ export default function StoreValidationSection() {
           icon={<Icons.Box />}
         />
         <KpiCard2
-          title="HU Validated"
+          title="WH Validated"
           value={<LiveTickerValue value={totals?.HU_VALIDATED_QTY || 0} />}
           badge="Processed"
           badgeVariant="success"
           icon={<Icons.CheckCircle />}
         />
         <KpiCard2
-          title="HHT Validated"
+          title="Store Validated"
           value={<LiveTickerValue value={totals?.HHT_VALIDATE_QTY || 0} />}
           badge="Verified"
           badgeVariant="purple"
           icon={<Icons.Smartphone />}
         />
         <KpiCard2
-          title="Store Pending"
+          title="Store Pending for Validation"
           value={<LiveTickerValue value={totals?.STORE_PENDING_QTY || 0} />}
           badge="Action Required"
           badgeVariant="warning"
@@ -543,12 +543,12 @@ export default function StoreValidationSection() {
         {chartView === 'grouped' && (
           <ChartLegend items={[
             { color: COLOR_RECEIVED, label: 'Received HU' },
-            { color: COLOR_VALIDATED, label: 'Validated HU' },
+            { color: COLOR_VALIDATED, label: 'WH Validated' },
           ]} />
         )}
         {chartView === 'progress' && (
           <ChartLegend items={[
-            { color: COLOR_HHT, label: 'HHT Validated' },
+            { color: COLOR_HHT, label: 'Store Validated' },
             { color: COLOR_PENDING, label: 'Pending' },
           ]} />
         )}
@@ -603,7 +603,7 @@ export default function StoreValidationSection() {
           />
         }
         headers={[
-          'Store', 'Date', 'Received HU', 'Validated HU', 'HHT Validated', 'Pending', 'Wrong HU'
+          'Store', 'Date', 'Received HU', 'WH Validated', 'Store Validated', 'Store Pending for Validation', 'Wrong HU'
         ]}
         data={tableData}
         tableClassName="sv-grid-table"
