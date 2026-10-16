@@ -36,6 +36,7 @@ export default function LoginPage() {
     title: '',
     badge: '',
     message: '',
+    tipText: '',
     buttonText: ''
   });
 
@@ -77,6 +78,10 @@ export default function LoginPage() {
       const errData = err.response?.data;
       const errorCode = errData?.errorCode || errData?.ErrorCode;
       const serverMsg = errData?.message || errData?.Message || '';
+      const userType = (errData?.userType || errData?.UserType || '').trim();
+
+      const isManagerialRole = ['store admin', 'zfm', 'area manager', 'lp'].includes(userType.toLowerCase());
+      const contactTarget = isManagerialRole ? 'the Super Admin' : 'your Store Admin';
 
       if (errorCode === 'ACCOUNT_DEACTIVATED' || serverMsg.toLowerCase().includes('deactivated')) {
         setModalConfig({
@@ -84,7 +89,8 @@ export default function LoginPage() {
           type: 'warning',
           title: 'Account Deactivated',
           badge: 'Access Restricted',
-          message: 'You are deactivated. Contact your Store Admin for your access.',
+          message: `You are deactivated. Contact ${contactTarget} for your access.`,
+          tipText: `Contact ${contactTarget} for your access.`,
           buttonText: 'Understood'
         });
       } else if (errorCode === 'NO_STORE_ASSIGNED' || serverMsg.toLowerCase().includes('no store or warehouse') || serverMsg.toLowerCase().includes('not assigned')) {
@@ -93,7 +99,8 @@ export default function LoginPage() {
           type: 'welcome',
           title: 'Welcome to Vishal Mega Mart!',
           badge: 'Store Assignment Pending',
-          message: "Welcome to the Vishal Mega Mart, You haven't assigned any store yet. Try contacting your Store Admin for store assignment.",
+          message: `Welcome to the Vishal Mega Mart, You haven't assigned any store yet. Try contacting ${contactTarget} for store assignment.`,
+          tipText: `Try contacting ${contactTarget} for store assignment.`,
           buttonText: 'Got It, Thanks'
         });
       } else {
@@ -421,9 +428,9 @@ export default function LoginPage() {
                 {/* Help Tip */}
                 <div className="auth-modal-tip-box">
                   {modalConfig.type === 'warning' ? (
-                    <span><strong>Need assistance?</strong> Contact your Store Admin for your access.</span>
+                    <span><strong>Need assistance?</strong> {modalConfig.tipText || 'Contact your Store Admin for your access.'}</span>
                   ) : (
-                    <span><strong>Next step:</strong> Try contacting your Store Admin for store assignment.</span>
+                    <span><strong>Next step:</strong> {modalConfig.tipText || 'Try contacting your Store Admin for store assignment.'}</span>
                   )}
                 </div>
 
