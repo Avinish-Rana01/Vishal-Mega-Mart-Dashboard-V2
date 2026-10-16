@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth, computeDefaultRoute } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
 import { loginUser, requestPasswordReset, changePassword } from '../../services/authService';
-import { Eye, EyeOff, ShieldCheck, ArrowLeft, Key } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, ArrowLeft, Key, AlertTriangle, Store, Sparkles, X, ShieldAlert } from 'lucide-react';
 import './LoginPage.css';
 import UnderDevelopmentPage from './UnderDevelopmentPage';
 
@@ -28,6 +28,16 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Status Notification Modal State
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    type: 'warning', // 'warning' | 'welcome'
+    title: '',
+    badge: '',
+    message: '',
+    buttonText: ''
+  });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +74,31 @@ export default function LoginPage() {
       navigate(targetRoute, { replace: true });
     } catch (err) {
       console.error('Login failed', err);
-      setErrors({ form: 'Invalid username or password. Please try again.' });
+      const errData = err.response?.data;
+      const errorCode = errData?.errorCode || errData?.ErrorCode;
+      const serverMsg = errData?.message || errData?.Message || '';
+
+      if (errorCode === 'ACCOUNT_DEACTIVATED' || serverMsg.toLowerCase().includes('deactivated')) {
+        setModalConfig({
+          isOpen: true,
+          type: 'warning',
+          title: 'Account Deactivated',
+          badge: 'Access Restricted',
+          message: 'You are deactivated. Contact your Store Admin for your access.',
+          buttonText: 'Understood'
+        });
+      } else if (errorCode === 'NO_STORE_ASSIGNED' || serverMsg.toLowerCase().includes('no store or warehouse') || serverMsg.toLowerCase().includes('not assigned')) {
+        setModalConfig({
+          isOpen: true,
+          type: 'welcome',
+          title: 'Welcome to Vishal Mega Mart!',
+          badge: 'Store Assignment Pending',
+          message: "Welcome to the Vishal Mega Mart, You haven't assigned any store yet. Try contacting your Store Admin for store assignment.",
+          buttonText: 'Got It, Thanks'
+        });
+      } else {
+        setErrors({ form: serverMsg || 'Invalid username or password. Please try again.' });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -327,6 +361,85 @@ export default function LoginPage() {
           </div>
 
         </div>
+
+        {/* Animated Auth Status Modal (Warning for Deactivated, Welcome for Unassigned) */}
+        <AnimatePresence>
+          {modalConfig.isOpen && (
+            <motion.div 
+              className="auth-modal-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+            >
+              <motion.div 
+                className={`auth-modal-card ${modalConfig.type}`}
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: 15 }}
+                transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Decorative Top Accent */}
+                <div className={`auth-modal-accent-bar ${modalConfig.type}`} />
+
+                {/* Close Button */}
+                <button 
+                  type="button"
+                  className="auth-modal-close-btn"
+                  onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+
+                {/* Icon Badge */}
+                <div className={`auth-modal-icon-badge ${modalConfig.type}`}>
+                  {modalConfig.type === 'warning' ? (
+                    <ShieldAlert size={36} color="#EF5350" strokeWidth={2.2} />
+                  ) : (
+                    <Store size={36} color="#3B82F6" strokeWidth={2.2} />
+                  )}
+                </div>
+
+                {/* Badge Chip */}
+                <div className={`auth-modal-chip ${modalConfig.type}`}>
+                  {modalConfig.type === 'warning' ? (
+                    <AlertTriangle size={13} style={{ marginRight: '6px' }} />
+                  ) : (
+                    <Sparkles size={13} style={{ marginRight: '6px' }} />
+                  )}
+                  {modalConfig.badge}
+                </div>
+
+                {/* Title */}
+                <h3 className="auth-modal-title">{modalConfig.title}</h3>
+
+                {/* Message Body */}
+                <p className="auth-modal-message">{modalConfig.message}</p>
+
+                {/* Help Tip */}
+                <div className="auth-modal-tip-box">
+                  {modalConfig.type === 'warning' ? (
+                    <span><strong>Need assistance?</strong> Contact your Store Admin for your access.</span>
+                  ) : (
+                    <span><strong>Next step:</strong> Try contacting your Store Admin for store assignment.</span>
+                  )}
+                </div>
+
+                {/* Action Button */}
+                <button 
+                  type="button"
+                  className={`auth-modal-action-btn ${modalConfig.type}`}
+                  onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+                >
+                  {modalConfig.buttonText || 'Understood'}
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </div>
     );
 }

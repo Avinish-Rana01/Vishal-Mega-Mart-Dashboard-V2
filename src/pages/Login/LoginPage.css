@@ -348,3 +348,190 @@
     height: 23px;
   }
 }
+
+/* ==========================================================================
+   AUTH STATUS MODAL (WARNING & WELCOME THEMES)
+   ========================================================================== */
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.auth-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.8);
+  position: relative;
+  overflow: hidden;
+  padding: 34px 28px 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.auth-modal-accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+}
+
+.auth-modal-accent-bar.warning {
+  background: linear-gradient(90deg, #EF5350, #F59E0B);
+}
+
+.auth-modal-accent-bar.welcome {
+  background: linear-gradient(90deg, #3B82F6, #10B981);
+}
+
+.auth-modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: rotate(90deg);
+}
+
+.auth-modal-icon-badge {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  transition: transform 0.3s ease;
+}
+
+.auth-modal-icon-badge.warning {
+  background: rgba(239, 83, 80, 0.12);
+  border: 2px solid rgba(239, 83, 80, 0.25);
+  box-shadow: 0 0 25px rgba(239, 83, 80, 0.2);
+}
+
+.auth-modal-icon-badge.welcome {
+  background: rgba(59, 130, 246, 0.12);
+  border: 2px solid rgba(59, 130, 246, 0.25);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+}
+
+.auth-modal-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.auth-modal-chip.warning {
+  background: rgba(239, 83, 80, 0.12);
+  color: #EF5350;
+  border: 1px solid rgba(239, 83, 80, 0.25);
+}
+
+.auth-modal-chip.welcome {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.auth-modal-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.3px;
+}
+
+.auth-modal-message {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #475569;
+  margin: 0 0 18px 0;
+}
+
+.auth-modal-tip-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #64748b;
+  margin-bottom: 22px;
+  width: 100%;
+  text-align: left;
+}
+
+.auth-modal-tip-box strong {
+  color: #334155;
+}
+
+.auth-modal-action-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.auth-modal-action-btn.warning {
+  background: linear-gradient(135deg, #EF5350 0%, #E53935 100%);
+  box-shadow: 0 4px 14px rgba(239, 83, 80, 0.35);
+}
+
+.auth-modal-action-btn.warning:hover {
+  background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(239, 83, 80, 0.45);
+}
+
+.auth-modal-action-btn.welcome {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+.auth-modal-action-btn.welcome:hover {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.45);
+}
