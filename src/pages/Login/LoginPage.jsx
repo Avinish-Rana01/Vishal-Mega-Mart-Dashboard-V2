@@ -80,8 +80,12 @@ export default function LoginPage() {
       const serverMsg = errData?.message || errData?.Message || '';
       const userType = (errData?.userType || errData?.UserType || '').trim();
 
-      const isManagerialRole = ['store admin', 'zfm', 'area manager', 'lp'].includes(userType.toLowerCase());
-      const contactTarget = isManagerialRole ? 'the Super Admin' : 'your Store Admin';
+      const isManagerialRole = ['store admin', 'zfm', 'area manager', 'lp', 'warehouse admin', 'wh admin'].includes(userType.toLowerCase());
+      const isWarehouseRole = ['warehouse', 'warehouse user'].includes(userType.toLowerCase());
+      const contactTarget = isManagerialRole 
+        ? 'the Super Admin' 
+        : (isWarehouseRole ? 'your Warehouse Admin' : 'your Store Admin');
+      const locationType = isWarehouseRole ? 'warehouse' : 'store';
 
       if (errorCode === 'ACCOUNT_DEACTIVATED' || serverMsg.toLowerCase().includes('deactivated')) {
         setModalConfig({
@@ -98,9 +102,9 @@ export default function LoginPage() {
           isOpen: true,
           type: 'welcome',
           title: 'Welcome to Vishal Mega Mart!',
-          badge: 'Store Assignment Pending',
-          message: `Welcome to the Vishal Mega Mart, You haven't assigned any store yet. Try contacting ${contactTarget} for store assignment.`,
-          tipText: `Try contacting ${contactTarget} for store assignment.`,
+          badge: isWarehouseRole ? 'Warehouse Assignment Pending' : 'Store Assignment Pending',
+          message: `Welcome to the Vishal Mega Mart, You haven't assigned any ${locationType} yet. Try contacting ${contactTarget} for ${locationType} assignment.`,
+          tipText: `Try contacting ${contactTarget} for ${locationType} assignment.`,
           buttonText: 'Got It, Thanks'
         });
       } else {
