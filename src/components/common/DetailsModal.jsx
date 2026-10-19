@@ -41,11 +41,11 @@ export default function DetailsModal({
         </div>
 
         {/* Body */}
-        <div className="vmm-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 14px', flex: 1, overflow: 'hidden' }}>
+        <div className="vmm-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 14px', flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
           
           {/* Meta Info */}
           {metaInfo && metaInfo.length > 0 && (
-            <div className="vmm-modal-meta-row" style={{ margin: '0 0 4px 0', padding: '6px 12px' }}>
+            <div className="vmm-modal-meta-row" style={{ margin: '0 0 4px 0', padding: '6px 12px', flexShrink: 0 }}>
               {metaInfo.map((meta, idx) => (
                 <div key={idx}>
                   {meta.label} : <span style={{ color: meta.valueColor || 'inherit' }}>{meta.value}</span>
@@ -56,7 +56,7 @@ export default function DetailsModal({
 
           {/* CurvedCards Grid */}
           {summaryCards && summaryCards.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(summaryCards.length, 6)}, 1fr)`, gap: '8px', margin: '0 0 2px 0' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(summaryCards.length, 6)}, 1fr)`, gap: '8px', margin: '0 0 2px 0', flexShrink: 0 }}>
               {summaryCards.map((card, idx) => (
                 <CurvedCard 
                   key={idx}
@@ -71,7 +71,7 @@ export default function DetailsModal({
 
           {/* Data Table */}
           {tableColumns && tableColumns.length > 0 && (
-            <div style={{ backgroundColor: 'white', borderRadius: '8px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
+            <div style={{ backgroundColor: 'white', borderRadius: '8px', flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
               {isLoading && (!tableData || tableData.length === 0) && (
                 <div className="vmm-table-loading-overlay" style={{ zIndex: 50 }}>
                   <div className="vmm-table-loader-pill">
