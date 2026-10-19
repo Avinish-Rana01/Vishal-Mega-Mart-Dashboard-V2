@@ -50,9 +50,18 @@ export default function LoginPage() {
     }
   }, [isLoggedIn, getDefaultRoute, navigate]);
 
+  useEffect(() => {
+    if (location.state?.prefillUsername) {
+      setUsername(location.state.prefillUsername);
+    }
+    if (location.state?.successMessage) {
+      setSuccessMsg(location.state.successMessage);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   const handleFocus = (field) => {
     setErrors((prev) => ({ ...prev, [field]: '' }));
-    setSuccessMsg('');
   };
 
   const handleLoginSubmit = async (e) => {
@@ -68,6 +77,7 @@ export default function LoginPage() {
 
     setIsLoading(true);
     setErrors({});
+    setSuccessMsg('');
     try {
       const response = await loginUser(username, password);
       login(response);
@@ -144,8 +154,12 @@ export default function LoginPage() {
     setErrors({});
     try {
       await changePassword(changeUsername, oldPassword, newPassword);
-      setSuccessMsg('Password changed successfully.');
-      setTimeout(() => setView('login'), 3000);
+      setSuccessMsg('Password changed successfully! Please log in with your new credentials.');
+      setUsername(changeUsername);
+      setPassword('');
+      setOldPassword('');
+      setNewPassword('');
+      setTimeout(() => setView('login'), 1200);
     } catch (err) {
       setErrors({ form: 'Failed to change password.' });
     } finally {
@@ -191,8 +205,31 @@ export default function LoginPage() {
               {view === 'login' && (
                 <motion.div key="login" variants={formVariants} initial="hidden" animate="visible" exit="exit">
                   <div className="login-title-header">Sign <span>in</span></div>
-                  <p className="login-subtitle" style={{ marginBottom: '24px', color: '#666' }}>Welcome back! Please enter your details.</p>
+                  <p className="login-subtitle" style={{ marginBottom: successMsg ? '16px' : '24px', color: '#666' }}>Welcome back! Please enter your details.</p>
                   
+                  {successMsg && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '12px 14px',
+                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        border: '1px solid #10B981',
+                        borderRadius: '8px',
+                        color: '#10B981',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        marginBottom: '20px'
+                      }}
+                    >
+                      <ShieldCheck size={18} style={{ flexShrink: 0, color: '#10B981' }} />
+                      <span>{successMsg}</span>
+                    </motion.div>
+                  )}
+
                   <form onSubmit={handleLoginSubmit}>
                     <div className="login-form-group">
                       <div className="login-input-wrapper">
@@ -342,7 +379,7 @@ export default function LoginPage() {
                     </div>
 
                     {errors.form && <div className="login-error-text" style={{ marginBottom: '16px' }}>{errors.form}</div>}
-                    {successMsg && <div style={{ color: '#16a34a', fontSize: '13px', marginBottom: '16px' }}>{successMsg}</div>}
+                    {successMsg && <div style={{ color: '#10B981', fontSize: '13px', marginBottom: '16px' }}>{successMsg}</div>}
                     
                     <div className="login-action-row" style={{ justifyContent: 'flex-end' }}>
                       <button type="submit" className="login-btn" disabled={isLoading}>

@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { KeyRound, Eye, EyeOff, Check, AlertCircle, X, ShieldCheck } from 'lucide-react';
 import { changePassword } from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 import './ChangePasswordModal.css';
 
 export default function ChangePasswordModal({ isOpen = false, onClose, userName }) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -83,18 +87,26 @@ export default function ChangePasswordModal({ isOpen = false, onClose, userName 
       const res = await changePassword(userName, currentPassword, newPassword);
 
       if (res && res.success) {
-        setSuccessMsg(res.message || 'Password changed successfully!');
+        setSuccessMsg(res.message || 'Password changed successfully! Redirecting to login...');
         setTimeout(() => {
           onClose();
-        }, 1400);
+          logout();
+          navigate('/login', {
+            replace: true,
+            state: {
+              successMessage: 'Password changed successfully! Please log in with your new credentials.',
+              prefillUsername: userName
+            }
+          });
+        }, 1200);
       } else {
+        setIsLoading(false);
         setErrorMsg(res?.message || 'Failed to update password. Please check your current password.');
       }
     } catch (err) {
+      setIsLoading(false);
       const serverMsg = err?.response?.data?.message || err?.message || 'Error occurred while updating password.';
       setErrorMsg(serverMsg);
-    } finally {
-      setIsLoading(false);
     }
   };
 
