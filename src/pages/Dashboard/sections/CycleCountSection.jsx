@@ -64,7 +64,7 @@ function DurationTooltip({ active, payload }) {
 }
 
 // ---- Memoized Chart Component ----
-const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
+const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick, highlightedRow }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
   return (
     <div ref={ref} style={{ width: '100%', minHeight: chartHeight }}>
@@ -92,6 +92,18 @@ const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
               cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
             />
             <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#3b82f6" isAnimationActive={true} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
+              {chartData.map((entry, index) => {
+                const isHighlighted = highlightedRow && (
+                  String(highlightedRow).toUpperCase() === String(entry.STORE_CODE || '').toUpperCase() ||
+                  String(highlightedRow) === String(entry.REF_NO || '')
+                );
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    className={isHighlighted ? 'bar-updated-pulse' : ''}
+                  />
+                );
+              })}
               <LabelList
                 dataKey="rawDuration"
                 position="right"
@@ -201,11 +213,15 @@ const CycleCountStockChart = React.memo(({ chartData, chartHeight, onBarClick })
 });
 
 // ---- Flex-based Net Difference Badge Column (scrolls with chart) ----
-const NetDifferenceBadgeColumn = ({ chartData }) => {
+const NetDifferenceBadgeColumn = ({ chartData, highlightedRow }) => {
   return (
     <div style={{ width: '75px', display: 'flex', flexDirection: 'column', pointerEvents: 'none', flexShrink: 0 }}>
       {chartData.map((d, i) => {
         const netDiff = Number(d.NET_DIFFERENCE || 0);
+        const isHighlighted = highlightedRow && (
+          String(highlightedRow).toUpperCase() === String(d.STORE_CODE || '').toUpperCase() ||
+          String(highlightedRow) === String(d.REF_NO || '')
+        );
 
         let bgColor, textColor, icon;
         if (netDiff > 0) { bgColor = '#00ff592b'; textColor = '#16a34a'; icon = '↑'; }
@@ -219,18 +235,20 @@ const NetDifferenceBadgeColumn = ({ chartData }) => {
             alignItems: 'center',
             gap: '5px',
           }}>
-            <div style={{
-              backgroundColor: bgColor,
-              color: textColor,
-              borderRadius: '6px',
-              padding: '2px 7px',
-              fontSize: '12px',
-              fontWeight: 700,
-              whiteSpace: 'nowrap',
-              lineHeight: '20px',
-              minWidth: '48px',
-              textAlign: 'center',
-            }}>
+            <div 
+              className={isHighlighted ? 'row-updated-pulse' : ''}
+              style={{
+                backgroundColor: bgColor,
+                color: textColor,
+                borderRadius: '6px',
+                padding: '2px 7px',
+                fontSize: '12px',
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+                lineHeight: '20px',
+                minWidth: '48px',
+                textAlign: 'center',
+              }}>
               {netDiff > 0 ? '+' : ''}{netDiff}
             </div>
             <span style={{ color: textColor, fontSize: '13px', fontWeight: 700 }}>{icon}</span>
@@ -254,7 +272,7 @@ const CustomVarianceLabel = (props) => {
 };
 
 // ---- Right Chart: Stock Variance (Recharts Stacked Implementation) ----
-const CycleCountVarianceChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
+const CycleCountVarianceChart = React.memo(({ chartData, chartHeight, onBarClick, highlightedRow }) => {
   const maxShort = Math.max(0, ...chartData.map(d => Math.abs(Number(d.SHORT_QTY || 0))));
   const maxExcess = Math.max(0, ...chartData.map(d => Number(d.EXCESS_QTY || 0)));
 
@@ -319,13 +337,13 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight, onBarClick
       </div>
 
       {/* Net Difference Badge Column — in normal flow, scrolls with chart */}
-      <NetDifferenceBadgeColumn chartData={chartData} />
+      <NetDifferenceBadgeColumn chartData={chartData} highlightedRow={highlightedRow} />
     </div>
   );
 });
 
 // ---- Split Layout Wrapper (Now a Tabbed Carousel) ----
-const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab, onBarClick }) => {
+const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab, onBarClick, highlightedRow }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
@@ -380,7 +398,7 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
                   </span>
                 </div>
               </div>
-              <CycleCountVarianceChart chartData={chartData} chartHeight={chartHeight} onBarClick={onBarClick} />
+              <CycleCountVarianceChart chartData={chartData} chartHeight={chartHeight} onBarClick={onBarClick} highlightedRow={highlightedRow} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -632,12 +650,12 @@ export default function CycleCountSection() {
                 onClearSearch={() => setSearchFilter('')}
               />
             ) : (
-              <MemoizedChart chartData={chartData} chartHeight={chartHeight} onBarClick={handleRowClick} />
+              <MemoizedChart chartData={chartData} chartHeight={chartHeight} onBarClick={handleRowClick} highlightedRow={highlightedRow} />
             )
           ) : chartView === 'distribution' ? (
             <MemoizedDistributionChart distributionData={distributionData} />
           ) : (
-            <MemoizedCycleSplitCharts chartData={chartData} chartHeight={chartHeight} activeTab={infoTab} onBarClick={handleRowClick} />
+            <MemoizedCycleSplitCharts chartData={chartData} chartHeight={chartHeight} activeTab={infoTab} onBarClick={handleRowClick} highlightedRow={highlightedRow} />
           )}
         </div>
       </div>
@@ -675,15 +693,20 @@ export default function CycleCountSection() {
             </td>
           </motion.tr>
         }
-        renderRow={(row) => (
-          <motion.tr
-            layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
-            key={row.REF_NO || row.STORE_CODE}
-            className="cc-data-grid-tr"
-          >
+        renderRow={(row) => {
+          const isRowHighlighted = highlightedRow && (
+            String(highlightedRow).toUpperCase() === String(row.STORE_CODE || '').toUpperCase() ||
+            String(highlightedRow) === String(row.REF_NO || '')
+          );
+          return (
+            <motion.tr
+              layout
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+              key={row.REF_NO || row.STORE_CODE}
+              className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}
+            >
             <td className="cc-data-grid-td cc-data-grid-td-bold">
               <div 
                 className="cc-row-tooltip-wrapper cc-clickable-cell"
@@ -720,7 +743,8 @@ export default function CycleCountSection() {
             <td className="cc-data-grid-td">{row.END_DateTime || '—'}</td>
             <td className="cc-data-grid-td">{row.rawDuration || '—'}</td>
           </motion.tr>
-        )}
+        );
+      }}
       />
       </div>
 

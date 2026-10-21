@@ -315,34 +315,67 @@ export const useCycleCount = () => {
 
     const unsub = liveStockSocket.onCycleCountPatch((patch) => {
       if (!patch) return;
-      const matchKey = patch.refNo || patch.storeCode;
+      const matchKey = patch.storeCode || patch.refNo;
 
+      // 1. Handle Removed / Deactivated Store (Parity with LiveStock & StoreValidation)
+      if (patch.isRemoved) {
+        setData((prev) => prev.filter((row) => {
+          const rowStore = row.STORE_CODE || row.STORE || '';
+          const rowRef = row.REF_NO || row.Ref_ID || '';
+          if (patch.storeCode && String(rowStore).toUpperCase() === String(patch.storeCode).toUpperCase()) {
+            return false;
+          }
+          if (patch.refNo && patch.refNo !== 'NA' && String(rowRef) === String(patch.refNo)) {
+            return false;
+          }
+          return true;
+        }));
+
+        if (patch.summaryDelta) {
+          setTotals((prev) => prev ? {
+            ...prev,
+            REF_NO: patch.summaryDelta.totalRefNo ?? prev.REF_NO,
+            recordCount: patch.summaryDelta.recordCount ?? prev.recordCount
+          } : prev);
+        }
+        return;
+      }
+
+      // 2. In-place update or prepend
       setData((prev) => {
         let found = false;
         const updated = prev.map((row) => {
-          const matchRef = patch.refNo && (String(row.REF_NO) === String(patch.refNo) || String(row.Ref_ID) === String(patch.refNo));
           const matchStore = patch.storeCode && (String(row.STORE_CODE || '').toUpperCase() === String(patch.storeCode).toUpperCase());
-          const isMatch = patch.refNo ? matchRef : matchStore;
+          const matchRef = patch.refNo && patch.refNo !== 'NA' && (String(row.REF_NO) === String(patch.refNo) || String(row.Ref_ID) === String(patch.refNo));
+          const isMatch = matchStore || matchRef;
           if (isMatch) {
             found = true;
             return {
               ...row,
+              REF_NO: patch.refNo && patch.refNo !== 'NA' ? patch.refNo : row.REF_NO,
+              STORE_NAME: patch.storeName || row.STORE_NAME,
               SCANNED_QTY: patch.newScannedQty !== undefined ? patch.newScannedQty : row.SCANNED_QTY,
               NET_DIFFERENCE: patch.newNetDifference !== undefined ? patch.newNetDifference : row.NET_DIFFERENCE,
               SHORT_QTY: patch.newShortQty !== undefined ? patch.newShortQty : row.SHORT_QTY,
               EXCESS_QTY: patch.newExcessQty !== undefined ? patch.newExcessQty : row.EXCESS_QTY,
               NO_OF_ARTICLES: patch.newNoOfArticles !== undefined ? patch.newNoOfArticles : row.NO_OF_ARTICLES,
               SYSTEM_STOCK: patch.newSystemStock !== undefined ? patch.newSystemStock : row.SYSTEM_STOCK,
+              Time_Taken: patch.timeTaken || row.Time_Taken,
+              Start_DateTime: patch.startTime || row.Start_DateTime,
+              END_DateTime: patch.endTime || row.END_DateTime,
+              CYCLE_COUNT_TYPE: patch.cycleCountType || row.CYCLE_COUNT_TYPE,
+              DATE: patch.date || row.DATE,
               _lastUpdated: Date.now()
             };
           }
           return row;
         });
 
-        if (!found && (patch.refNo || patch.storeCode)) {
+        if (!found && (patch.storeCode || patch.refNo)) {
           return [
             {
-              REF_NO: patch.refNo || '',
+              RowNumber: 1,
+              REF_NO: patch.refNo || 'NA',
               STORE_CODE: patch.storeCode || '',
               STORE_NAME: patch.storeName || patch.storeCode || '',
               SCANNED_QTY: patch.newScannedQty || 0,
@@ -351,7 +384,11 @@ export const useCycleCount = () => {
               SHORT_QTY: patch.newShortQty || 0,
               EXCESS_QTY: patch.newExcessQty || 0,
               NO_OF_ARTICLES: patch.newNoOfArticles || 0,
-              DATE: new Date().toLocaleDateString('en-CA'),
+              Time_Taken: patch.timeTaken || '—',
+              Start_DateTime: patch.startTime || '—',
+              END_DateTime: patch.endTime || '—',
+              CYCLE_COUNT_TYPE: patch.cycleCountType || 'TA',
+              DATE: patch.date || new Date().toISOString().split('T')[0],
               _lastUpdated: Date.now()
             },
             ...updated
