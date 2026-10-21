@@ -35,7 +35,7 @@ export default function VendorDiscrepancySection() {
   const navigate = useNavigate();
   const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy();
   const [chartView, setChartView] = useState('volume');
-  const [sortBy, setSortBy] = useState('EXPECTED_DESC');
+  const [sortBy, setSortBy] = useState('DIFF_PER_DESC');
 
   // Derived Metrics for Charts & Lists
   const { barData, composedData, totalExpectedRaw, totalScannedRaw, discrepancyPercent } = useMemo(() => {
