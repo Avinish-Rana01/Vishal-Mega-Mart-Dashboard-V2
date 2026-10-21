@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Shirt, Layers, ScanLine, TrendingUp, TrendingDown, ArrowDownSquare } from 'lucide-react';
+import { Shirt, Layers, ScanLine, TrendingUp, TrendingDown, ArrowDownSquare, ImageOff } from 'lucide-react';
 import DetailsModal from '../common/DetailsModal';
 import { getCycleCountDetails } from '../../services/stockService';
 
@@ -32,19 +32,42 @@ const formatTime = (val) => {
   return t || 'N/A';
 };
 
+function NoImagePlaceholder() {
+  return (
+    <div
+      style={{
+        height: '20px',
+        width: '20px',
+        borderRadius: '3px',
+        border: '1px solid #cbd5e1',
+        backgroundColor: '#f8fafc',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        verticalAlign: 'middle',
+        cursor: 'default',
+        boxSizing: 'border-box'
+      }}
+      title="No image available"
+    >
+      <ImageOff size={12} color="#94a3b8" strokeWidth={1.8} />
+    </div>
+  );
+}
+
 function ProductImageCell({ articleCode, onExpand }) {
   const [hasError, setHasError] = useState(false);
 
-  if (isEmpty(articleCode)) {
-    return <span>N/A</span>;
+  useEffect(() => {
+    setHasError(false);
+  }, [articleCode]);
+
+  if (isEmpty(articleCode) || hasError) {
+    return <NoImagePlaceholder />;
   }
 
   const cleanCode = String(articleCode).trim();
   const imageUrl = `https://webapi.vishalwholesale.co.in:8051/Product_Image/${cleanCode}.jpg`;
-
-  if (hasError) {
-    return <span>N/A</span>;
-  }
 
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: '20px', verticalAlign: 'middle' }}>
