@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import './VoidDashboardSection.css';
-import { Ban } from 'lucide-react';
+import { Ban, ArrowUpRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useVoidDashboard } from '../../../hooks/useDashboardData';
 import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
@@ -12,6 +12,7 @@ import SectionHeader, { DateBadge } from '../../../components/common/SectionHead
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
@@ -300,14 +301,26 @@ export default function VoidDashboardSection() {
               />
             }
             rightContent={
-              <CustomDropdown
-                options={SORT_OPTIONS}
-                value={sortBy}
-                onChange={setSortBy}
-                prefix="Sort:"
-                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-                menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CustomDropdown
+                  options={SORT_OPTIONS}
+                  value={sortBy}
+                  onChange={setSortBy}
+                  prefix="Sort:"
+                  buttonStyle={{ minWidth: 'auto', gap: '8px', height: '28px', display: 'inline-flex', alignItems: 'center' }}
+                  menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
+                />
+                <NeuromorphicButton 
+                  value="View Report" 
+                  icon={<ArrowUpRight size={12} />} 
+                  onClick={() => {
+                    saveDashboardReturnPoint('void');
+                    navigate('/reports/void-details');
+                  }}
+                  style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
+                  title="View Void Details Report"
+                />
+              </div>
             }
           />
           <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column', position: 'relative' }}>

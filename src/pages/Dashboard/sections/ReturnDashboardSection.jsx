@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, ArrowUpRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './ReturnDashboardSection.css';
 import { useReturnDashboard } from '../../../hooks/useDashboardData';
@@ -12,6 +12,7 @@ import SemiDonutChart from '../../../components/charts/SemiDonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import CustomDropdown from '../../../components/common/CustomDropdown';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import NeuromorphicButton from '../../../components/common/NeuromorphicButton';
 import { useIsInViewport } from '../../../hooks/useIsInViewport';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import '../../../components/charts/DashboardSection.css';
@@ -315,14 +316,26 @@ export default function ReturnDashboardSection() {
               />
             }
             rightContent={
-              <CustomDropdown
-                options={SORT_OPTIONS}
-                value={sortBy}
-                onChange={setSortBy}
-                prefix="Sort:"
-                buttonStyle={{ minWidth: 'auto', gap: '8px' }}
-                menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CustomDropdown
+                  options={SORT_OPTIONS}
+                  value={sortBy}
+                  onChange={setSortBy}
+                  prefix="Sort:"
+                  buttonStyle={{ minWidth: 'auto', gap: '8px', height: '28px', display: 'inline-flex', alignItems: 'center' }}
+                  menuStyle={{ right: 0, left: 'auto', minWidth: '180px' }}
+                />
+                <NeuromorphicButton 
+                  value="View Report" 
+                  icon={<ArrowUpRight size={12} />} 
+                  onClick={() => {
+                    saveDashboardReturnPoint('return');
+                    navigate('/reports/return-details');
+                  }}
+                  style={{ height: '28px', minHeight: '28px', display: 'inline-flex', alignItems: 'center', margin: 0 }}
+                  title="View Return Details Report"
+                />
+              </div>
             }
           />
           <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', marginTop: '10px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
