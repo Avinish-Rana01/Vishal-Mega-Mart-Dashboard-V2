@@ -7,9 +7,8 @@ import { RefreshCw, Store, Database, LineChart, Target } from 'lucide-react';
 import ChartPaginator from '../../../components/common/ChartPaginator';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import LiveTickerValue from '../../../components/common/LiveTickerValue';
-import ActionAlertBar from '../../../components/common/ActionAlertBar';
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
-import { SearchEmptyState } from '../../../components/common/ChartEmptyState';
+import { SearchEmptyState, GlobalEmptyState } from '../../../components/common/ChartEmptyState';
 import ChartToolbar from '../../../components/common/ChartToolbar';
 import ChartSearchInput from '../../../components/common/ChartSearchInput';
 import { AccuracyTooltip, StoreBarTooltip } from '../../../components/charts/LiveStockTooltips';
@@ -532,7 +531,14 @@ export default function LiveStockSection() {
           </div>
 
           <div style={{ height: '250px' }}>
-            {barChartData.length === 0 ? (
+            {(!data || data.length === 0) ? (
+              <GlobalEmptyState
+                title="No Stores Assigned"
+                subtitle="There are currently no active stores assigned to your profile."
+                icon={Store}
+                iconColor="#3B82F6"
+              />
+            ) : barChartData.length === 0 ? (
               <SearchEmptyState
                 searchFilter={searchStore}
                 title={searchStore ? `No Stores Found for "${searchStore}"` : "No Stores Match Criteria"}

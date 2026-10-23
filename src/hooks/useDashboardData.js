@@ -300,7 +300,12 @@ export const useLiveStock = () => {
       return totals || baseFetch.totals;
     }
     if (!data || data.length === 0) {
-      return totals || baseFetch.totals;
+      return {
+        STORE_CODE: 'TOTAL',
+        SAP_STOCK: '0',
+        RFID_STOCK: '0',
+        DIFFERENCE: '0'
+      };
     }
     const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
     let totalSap = 0;
@@ -485,7 +490,11 @@ export const useCycleCount = () => {
       return totals || baseFetch.totals;
     }
     if (!data || data.length === 0) {
-      return totals || baseFetch.totals;
+      return {
+        STORE_CODE: 'TOTAL',
+        REF_NO: 0,
+        recordCount: 0
+      };
     }
     return {
       STORE_CODE: 'TOTAL',
@@ -771,7 +780,15 @@ export const useStoreDashboard = () => {
       return totals || baseFetch.totals;
     }
     if (!data || data.length === 0) {
-      return totals || baseFetch.totals;
+      return {
+        STORE: 'TOTAL',
+        HU_RECEIVED_QTY: '0',
+        HU_VALIDATED_QTY: '0',
+        HU_WRONG_QTY: '0',
+        HHT_VALIDATE_QTY: '0',
+        ENCODED_QTY: '0',
+        STORE_PENDING_QTY: '0'
+      };
     }
     const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
     let rec = 0, val = 0, wrg = 0, hht = 0, enc = 0, pnd = 0;
@@ -1009,7 +1026,13 @@ export const useDcValidation = () => {
       return totals || baseFetch.totals;
     }
     if (!data || data.length === 0) {
-      return totals || baseFetch.totals;
+      return {
+        Reciving_Plant: 'TOTAL',
+        recordCount: 0,
+        PROCESSED_HU: '0',
+        UNPROCESSED_HU: '0',
+        PROCESSED_ARTICLE_QTY: '0'
+      };
     }
     const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
     let pHu = 0, uHu = 0, art = 0;
