@@ -52,7 +52,8 @@ class DashboardSocketService {
   getHubUrl() {
     let baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
     baseUrl = baseUrl.replace(/\/+$/, '');
-    return `${baseUrl}/hubs/dashboard`;
+    const uid = getActiveUserId();
+    return uid ? `${baseUrl}/hubs/dashboard?userId=${uid}` : `${baseUrl}/hubs/dashboard`;
   }
 
   async connect() {
@@ -154,6 +155,15 @@ class DashboardSocketService {
       this.connection.onreconnected(async () => {
         this.isConnected = true;
         this.notifyStatus('connected');
+        // Resubscribe to role & store dashboard groups
+        const uid = getActiveUserId();
+        if (uid) {
+          try {
+            await this.connection.invoke('SubscribeDashboard', String(uid));
+          } catch (e) {
+            console.warn('[DashboardSocket] Error resubscribing dashboard on reconnect:', e);
+          }
+        }
         // Resubscribe to active store counters if any
         for (const storeId of this.activeStoreSubscriptions) {
           try {
@@ -175,6 +185,16 @@ class DashboardSocketService {
       this.isConnected = true;
       this.isConnecting = false;
       this.notifyStatus('connected');
+
+      // Subscribe to role & store dashboard groups immediately upon connect
+      const uid = getActiveUserId();
+      if (uid) {
+        try {
+          await this.connection.invoke('SubscribeDashboard', String(uid));
+        } catch (e) {
+          console.warn('[DashboardSocket] Error subscribing dashboard on connect:', e);
+        }
+      }
     } catch (err) {
       console.warn('[DashboardSocket] Connection failed, retrying in 4s:', err?.message || err);
       this.isConnected = false;
@@ -330,6 +350,19 @@ class DashboardSocketService {
     return () => this.statusListeners.delete(callback);
   }
 
+  async subscribeDashboard(userId) {
+    const uid = userId || getActiveUserId();
+    if (!uid) return;
+    await this.ensureConnected();
+    try {
+      if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+        await this.connection.invoke('SubscribeDashboard', String(uid));
+      }
+    } catch (err) {
+      console.warn('[DashboardSocket] Error invoking SubscribeDashboard:', err);
+    }
+  }
+
   notifyStatus(status) {
     this.statusListeners.forEach(cb => {
       try {
@@ -341,5 +374,35 @@ class DashboardSocketService {
   }
 }
 
+/**
+ * Returns current logged-in User ID from sessionStorage (safe fallback across all auth schemas)
+ */
+export function getActiveUserId() {
+  try {
+    const raw = typeof window !== 'undefined' ? sessionStorage.getItem('vmm_user') : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.userID ?? parsed.userId ?? parsed.UserID ?? parsed.User_Id ?? parsed.USER_ID ?? parsed.user_id ?? parsed.id ?? parsed.Id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Checks whether active logged-in user is a Super Admin
+ */
+export function isCurrentUserSuperAdmin() {
+  try {
+    const raw = typeof window !== 'undefined' ? sessionStorage.getItem('vmm_user') : null;
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    const role = (parsed.userRole ?? parsed.UserRole ?? parsed.userType ?? parsed.UserType ?? parsed.role ?? parsed.Role ?? '').trim();
+    return role.toLowerCase() === 'super admin';
+  } catch {
+    return false;
+  }
+}
+
 export const liveStockSocket = new DashboardSocketService();
 export const dashboardSocket = liveStockSocket;
+

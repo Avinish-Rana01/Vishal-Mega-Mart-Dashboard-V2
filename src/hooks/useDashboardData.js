@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   getLiveStock,
   getCycleCount,
@@ -12,7 +12,7 @@ import {
   getWarehouseEncoding,
   getDcValidation
 } from '../services/stockService';
-import { liveStockSocket } from '../services/liveStockSocket';
+import { liveStockSocket, isCurrentUserSuperAdmin } from '../services/liveStockSocket';
 
 /**
  * Generic hook for dashboard table endpoints.
@@ -167,35 +167,69 @@ export const useLiveStock = () => {
 
     const unsubPatch = liveStockSocket.onPatch((patch) => {
       if (!patch || !patch.storeCode) return;
+      const isSuper = isCurrentUserSuperAdmin();
 
       if (patch.isRemoved) {
+        let removedRfid = 0;
+        let removedDiff = 0;
         setData((prev) => prev.filter((row) => {
           const rowStore = row.STORE_CODE || row.STORE || '';
-          return String(rowStore).toUpperCase() !== String(patch.storeCode).toUpperCase();
+          const match = String(rowStore).toUpperCase() === String(patch.storeCode).toUpperCase();
+          if (match) {
+            const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+            removedRfid = parseVal(row.RFID_STOCK);
+            removedDiff = parseVal(row.DIFFERENCE);
+          }
+          return !match;
         }));
-        if (patch.summaryDelta) {
-          setTotals((prev) => {
-            if (!prev) return prev;
-            return {
-              ...prev,
-              RFID_STOCK: patch.summaryDelta.newTotalRfid !== undefined 
-                ? patch.summaryDelta.newTotalRfid.toLocaleString('en-IN') 
-                : prev.RFID_STOCK,
-              DIFFERENCE: patch.summaryDelta.newTotalDiff !== undefined 
-                ? patch.summaryDelta.newTotalDiff.toLocaleString('en-IN') 
-                : prev.DIFFERENCE
-            };
-          });
+
+        if (isSuper) {
+          if (patch.summaryDelta) {
+            setTotals((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                RFID_STOCK: patch.summaryDelta.newTotalRfid !== undefined 
+                  ? patch.summaryDelta.newTotalRfid.toLocaleString('en-IN') 
+                  : prev.RFID_STOCK,
+                DIFFERENCE: patch.summaryDelta.newTotalDiff !== undefined 
+                  ? patch.summaryDelta.newTotalDiff.toLocaleString('en-IN') 
+                  : prev.DIFFERENCE
+              };
+            });
+          }
+        } else {
+          if (removedRfid !== 0 || removedDiff !== 0) {
+            setTotals((prev) => {
+              if (!prev) return prev;
+              const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+              return {
+                ...prev,
+                RFID_STOCK: Math.max(0, parseVal(prev.RFID_STOCK) - removedRfid).toLocaleString('en-IN'),
+                DIFFERENCE: (parseVal(prev.DIFFERENCE) - removedDiff).toLocaleString('en-IN')
+              };
+            });
+          }
         }
         return;
       }
 
       // 1. In-place row update using immutable .map()
+      let rfidDelta = 0;
+      let diffDelta = 0;
       setData((prev) => {
         let storeFound = false;
         const updated = prev.map((row) => {
           if (String(row.STORE_CODE || '').toUpperCase() === String(patch.storeCode || '').toUpperCase()) {
             storeFound = true;
+            const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+            const oldRfid = parseVal(row.RFID_STOCK);
+            const newRfid = patch.newRfidStock !== undefined ? Number(patch.newRfidStock) : oldRfid;
+            const oldDiff = parseVal(row.DIFFERENCE);
+            const newDiff = patch.newDifference !== undefined ? Number(patch.newDifference) : oldDiff;
+            rfidDelta = newRfid - oldRfid;
+            diffDelta = newDiff - oldDiff;
+
             return {
               ...row,
               RFID_STOCK: patch.newRfidStock !== undefined ? patch.newRfidStock : row.RFID_STOCK,
@@ -208,7 +242,7 @@ export const useLiveStock = () => {
           return row;
         });
 
-        // If newly scanned store is not in current view, prepend it smoothly
+        // Prepend store smoothly if newly scanned or newly assigned
         if (!storeFound && patch.storeCode) {
           return [
             {
@@ -229,8 +263,8 @@ export const useLiveStock = () => {
         return updated;
       });
 
-      // 2. In-place global KPI counter updates
-      if (patch.summaryDelta) {
+      // 2. KPI counter updates for Super Admin (scoped users dynamically sum their rows below)
+      if (isSuper && patch.summaryDelta) {
         setTotals((prev) => {
           if (!prev) return prev;
           return {
@@ -260,10 +294,35 @@ export const useLiveStock = () => {
     };
   }, []);
 
+  // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
+  const computedTotals = useMemo(() => {
+    if (isCurrentUserSuperAdmin()) {
+      return totals || baseFetch.totals;
+    }
+    if (!data || data.length === 0) {
+      return totals || baseFetch.totals;
+    }
+    const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+    let totalSap = 0;
+    let totalRfid = 0;
+    let totalDiff = 0;
+    for (const row of data) {
+      totalSap += parseVal(row.SAP_STOCK);
+      totalRfid += parseVal(row.RFID_STOCK);
+      totalDiff += parseVal(row.DIFFERENCE);
+    }
+    return {
+      STORE_CODE: 'TOTAL',
+      SAP_STOCK: totalSap.toLocaleString('en-IN'),
+      RFID_STOCK: totalRfid.toLocaleString('en-IN'),
+      DIFFERENCE: totalDiff.toLocaleString('en-IN')
+    };
+  }, [data, totals, baseFetch.totals]);
+
   return {
     ...baseFetch,
     data,
-    totals: totals || baseFetch.totals,
+    totals: computedTotals,
     highlightedStore,
     connectionStatus
   };
@@ -316,6 +375,7 @@ export const useCycleCount = () => {
     const unsub = liveStockSocket.onCycleCountPatch((patch) => {
       if (!patch) return;
       const matchKey = patch.storeCode || patch.refNo;
+      const isSuper = isCurrentUserSuperAdmin();
 
       // 1. Handle Removed / Deactivated Store (Parity with LiveStock & StoreValidation)
       if (patch.isRemoved) {
@@ -331,7 +391,7 @@ export const useCycleCount = () => {
           return true;
         }));
 
-        if (patch.summaryDelta) {
+        if (isSuper && patch.summaryDelta) {
           setTotals((prev) => prev ? {
             ...prev,
             REF_NO: patch.summaryDelta.totalRefNo ?? prev.REF_NO,
@@ -371,6 +431,7 @@ export const useCycleCount = () => {
           return row;
         });
 
+        // Prepend store smoothly if newly scanned or newly assigned
         if (!found && (patch.storeCode || patch.refNo)) {
           return [
             {
@@ -398,7 +459,7 @@ export const useCycleCount = () => {
         return updated;
       });
 
-      if (patch.summaryDelta) {
+      if (isSuper && patch.summaryDelta) {
         setTotals((prev) => prev ? {
           ...prev,
           REF_NO: patch.summaryDelta.totalRefNo ?? prev.REF_NO,
@@ -418,7 +479,22 @@ export const useCycleCount = () => {
     };
   }, []);
 
-  return { ...baseFetch, data, totals: totals || baseFetch.totals, highlightedRow, connectionStatus };
+  // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
+  const computedTotals = useMemo(() => {
+    if (isCurrentUserSuperAdmin()) {
+      return totals || baseFetch.totals;
+    }
+    if (!data || data.length === 0) {
+      return totals || baseFetch.totals;
+    }
+    return {
+      STORE_CODE: 'TOTAL',
+      REF_NO: data.length,
+      recordCount: data.length
+    };
+  }, [data, totals, baseFetch.totals]);
+
+  return { ...baseFetch, data, totals: computedTotals, highlightedRow, connectionStatus };
 };
 
 // ==========================================
@@ -587,13 +663,14 @@ export const useStoreDashboard = () => {
 
     const unsub = liveStockSocket.onStoreValidationPatch((patch) => {
       if (!patch || !patch.storeCode) return;
+      const isSuper = isCurrentUserSuperAdmin();
 
       if (patch.isRemoved) {
         setData((prev) => prev.filter((row) => {
           const rowStore = row.STORE || row.STORE_CODE || '';
           return String(rowStore).toUpperCase() !== String(patch.storeCode).toUpperCase();
         }));
-        if (patch.summaryDelta) {
+        if (isSuper && patch.summaryDelta) {
           setTotals((prev) => prev ? {
             ...prev,
             HU_RECEIVED_QTY: patch.summaryDelta.totalHuReceived?.toLocaleString('en-IN') ?? prev.HU_RECEIVED_QTY,
@@ -607,12 +684,27 @@ export const useStoreDashboard = () => {
         return;
       }
 
+      let deltaReceived = 0;
+      let deltaValidated = 0;
+      let deltaWrong = 0;
+      let deltaHht = 0;
+      let deltaEncoded = 0;
+      let deltaPending = 0;
+
       setData((prev) => {
         let found = false;
         const updated = prev.map((row) => {
           const rowStore = row.STORE || row.STORE_CODE || '';
           if (String(rowStore).toUpperCase() === String(patch.storeCode || '').toUpperCase()) {
             found = true;
+            const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+            if (patch.newHuReceivedQty !== undefined) deltaReceived = Number(patch.newHuReceivedQty) - parseVal(row.HU_RECEIVED_QTY);
+            if (patch.newHuValidatedQty !== undefined) deltaValidated = Number(patch.newHuValidatedQty) - parseVal(row.HU_VALIDATED_QTY);
+            if (patch.newHuWrongQty !== undefined) deltaWrong = Number(patch.newHuWrongQty) - parseVal(row.HU_WRONG_QTY);
+            if (patch.newHhtValidateQty !== undefined) deltaHht = Number(patch.newHhtValidateQty) - parseVal(row.HHT_VALIDATE_QTY);
+            if (patch.newEncodedQty !== undefined) deltaEncoded = Number(patch.newEncodedQty) - parseVal(row.ENCODED_QTY);
+            if (patch.newStorePendingQty !== undefined) deltaPending = Number(patch.newStorePendingQty) - parseVal(row.STORE_PENDING_QTY);
+
             return {
               ...row,
               HU_RECEIVED_QTY: patch.newHuReceivedQty !== undefined ? patch.newHuReceivedQty : row.HU_RECEIVED_QTY,
@@ -627,6 +719,7 @@ export const useStoreDashboard = () => {
           return row;
         });
 
+        // Prepend store smoothly if newly scanned or newly assigned
         if (!found && patch.storeCode) {
           return [
             {
@@ -648,7 +741,7 @@ export const useStoreDashboard = () => {
         return updated;
       });
 
-      if (patch.summaryDelta) {
+      if (isSuper && patch.summaryDelta) {
         setTotals((prev) => prev ? {
           ...prev,
           HU_RECEIVED_QTY: patch.summaryDelta.totalHuReceived?.toLocaleString('en-IN') ?? prev.HU_RECEIVED_QTY,
@@ -672,7 +765,36 @@ export const useStoreDashboard = () => {
     };
   }, []);
 
-  return { ...baseFetch, data, totals: totals || baseFetch.totals, highlightedStore, connectionStatus };
+  // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
+  const computedTotals = useMemo(() => {
+    if (isCurrentUserSuperAdmin()) {
+      return totals || baseFetch.totals;
+    }
+    if (!data || data.length === 0) {
+      return totals || baseFetch.totals;
+    }
+    const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+    let rec = 0, val = 0, wrg = 0, hht = 0, enc = 0, pnd = 0;
+    for (const row of data) {
+      rec += parseVal(row.HU_RECEIVED_QTY);
+      val += parseVal(row.HU_VALIDATED_QTY);
+      wrg += parseVal(row.HU_WRONG_QTY);
+      hht += parseVal(row.HHT_VALIDATE_QTY);
+      enc += parseVal(row.ENCODED_QTY);
+      pnd += parseVal(row.STORE_PENDING_QTY);
+    }
+    return {
+      STORE: 'TOTAL',
+      HU_RECEIVED_QTY: rec.toLocaleString('en-IN'),
+      HU_VALIDATED_QTY: val.toLocaleString('en-IN'),
+      HU_WRONG_QTY: wrg.toLocaleString('en-IN'),
+      HHT_VALIDATE_QTY: hht.toLocaleString('en-IN'),
+      ENCODED_QTY: enc.toLocaleString('en-IN'),
+      STORE_PENDING_QTY: pnd.toLocaleString('en-IN')
+    };
+  }, [data, totals, baseFetch.totals]);
+
+  return { ...baseFetch, data, totals: computedTotals, highlightedStore, connectionStatus };
 };
 
 // ==========================================
@@ -796,13 +918,14 @@ export const useDcValidation = () => {
 
     const unsub = liveStockSocket.onDcValidationPatch((patch) => {
       if (!patch || !patch.recivingPlant) return;
+      const isSuper = isCurrentUserSuperAdmin();
 
       if (patch.isRemoved) {
         setData((prev) => prev.filter((row) => {
           const rowPlant = row.Reciving_Plant || row.RECIVING_PLANT || row.RecivingPlant || row.Store_Code || row.STORE_CODE || '';
           return String(rowPlant).toUpperCase() !== String(patch.recivingPlant).toUpperCase();
         }));
-        if (patch.summaryDelta) {
+        if (isSuper && patch.summaryDelta) {
           setTotals((prev) => prev ? {
             ...prev,
             recordCount: patch.summaryDelta.recordCount ?? prev.recordCount,
@@ -814,12 +937,21 @@ export const useDcValidation = () => {
         return;
       }
 
+      let deltaProcessedHu = 0;
+      let deltaUnprocessedHu = 0;
+      let deltaArticleQty = 0;
+
       setData((prev) => {
         let found = false;
         const updated = prev.map((row) => {
           const rowPlant = row.Reciving_Plant || row.RECIVING_PLANT || row.RecivingPlant || row.Store_Code || row.STORE_CODE || '';
           if (String(rowPlant).toUpperCase() === String(patch.recivingPlant || '').toUpperCase()) {
             found = true;
+            const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+            if (patch.newProcessedHu !== undefined) deltaProcessedHu = Number(patch.newProcessedHu) - parseVal(row.PROCESSED_HU);
+            if (patch.newUnprocessedHu !== undefined) deltaUnprocessedHu = Number(patch.newUnprocessedHu) - parseVal(row.UNPROCESSED_HU);
+            if (patch.newProcessedArticleQty !== undefined) deltaArticleQty = Number(patch.newProcessedArticleQty) - parseVal(row.PROCESSED_ARTICLE_QTY);
+
             return {
               ...row,
               PROCESSED_HU: patch.newProcessedHu !== undefined ? patch.newProcessedHu : row.PROCESSED_HU,
@@ -831,6 +963,7 @@ export const useDcValidation = () => {
           return row;
         });
 
+        // Prepend plant smoothly if newly scanned or newly assigned
         if (!found && patch.recivingPlant) {
           return [
             {
@@ -848,7 +981,7 @@ export const useDcValidation = () => {
         return updated;
       });
 
-      if (patch.summaryDelta) {
+      if (isSuper && patch.summaryDelta) {
         setTotals((prev) => prev ? {
           ...prev,
           recordCount: patch.summaryDelta.recordCount ?? prev.recordCount,
@@ -870,7 +1003,31 @@ export const useDcValidation = () => {
     };
   }, []);
 
-  return { ...baseFetch, data, totals: totals || baseFetch.totals, highlightedPlant, connectionStatus };
+  // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
+  const computedTotals = useMemo(() => {
+    if (isCurrentUserSuperAdmin()) {
+      return totals || baseFetch.totals;
+    }
+    if (!data || data.length === 0) {
+      return totals || baseFetch.totals;
+    }
+    const parseVal = (v) => typeof v === 'string' ? Number(v.replace(/,/g, '')) || 0 : (Number(v) || 0);
+    let pHu = 0, uHu = 0, art = 0;
+    for (const row of data) {
+      pHu += parseVal(row.PROCESSED_HU);
+      uHu += parseVal(row.UNPROCESSED_HU);
+      art += parseVal(row.PROCESSED_ARTICLE_QTY);
+    }
+    return {
+      STORE: 'TOTAL',
+      recordCount: data.length,
+      PROCESSED_HU: pHu.toLocaleString('en-IN'),
+      UNPROCESSED_HU: uHu.toLocaleString('en-IN'),
+      PROCESSED_ARTICLE_QTY: art.toLocaleString('en-IN')
+    };
+  }, [data, totals, baseFetch.totals]);
+
+  return { ...baseFetch, data, totals: computedTotals, highlightedPlant, connectionStatus };
 };
 
 // ==========================================
