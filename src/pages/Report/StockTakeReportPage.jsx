@@ -62,7 +62,7 @@ export default function StockTakeReportPage() {
     shortQty: 0,
     excessQty: 0
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Helper to extract store code from option

@@ -422,7 +422,8 @@ export default function ReportDataTableCard({
       <BaseDataTable
         columns={columns}
         data={filteredData}
-        isLoading={isLoading || isRefreshing}
+        searchQuery={internalSearch}
+        isLoading={Boolean(isLoading || isRefreshing)}
         skeletonRowsCount={skeletonRowsCount}
         onRowClick={onRowClick}
         striped={striped}

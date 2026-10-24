@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Search, Inbox } from 'lucide-react';
 
 /**
  * Pure React Data Table Component
@@ -17,6 +17,9 @@ export default function BaseDataTable({
   enablePagination = false,
   pageSize = 10,
   searching = false,
+  searchQuery = '',
+  emptyTitle = null,
+  emptySubtitle = null,
   lengthChange = false,
   containerClassName = "vmm-table-container",
   tableClassName = "vmm-table",
@@ -40,8 +43,8 @@ export default function BaseDataTable({
     hasLoadedOnceRef.current = true;
   }
 
-  // Show shimmer skeleton ONLY on the very first initial load when there is NO data yet
-  const showSkeleton = isLoading && (!data || data.length === 0) && !hasLoadedOnceRef.current;
+  // Show shimmer skeleton whenever loading and there are no rows to display
+  const showSkeleton = Boolean(isLoading && (!data || data.length === 0));
 
   const handleSort = (colKey, colSortKey) => {
     if (!ordering) return;
@@ -183,14 +186,36 @@ export default function BaseDataTable({
             <tbody>
               {sortedData.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} style={{ textAlign: 'center', padding: '36px 20px', color: '#94a3b8', fontSize: '13px' }}>
+                  <td colSpan={columns.length} style={{ textAlign: 'center', padding: '48px 20px', color: '#94a3b8' }}>
                     {isLoading ? (
-                      <div className="vmm-table-empty-loading">
-                        <Loader2 size={20} className="vmm-table-spinner" />
-                        <span>Loading records...</span>
+                      <div className="vmm-table-empty-loading" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', minHeight: '130px' }}>
+                        <Loader2 size={28} className="vmm-table-spinner" style={{ color: '#3B82F6' }} />
+                        <span style={{ color: '#475569', fontWeight: 600, fontSize: '13px', letterSpacing: '0.02em' }}>Loading records...</span>
+                      </div>
+                    ) : searchQuery && String(searchQuery).trim() ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '110px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+                          <Search size={20} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
+                          {emptyTitle || 'No matching records found'}
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          {emptySubtitle || `No results match "${searchQuery}". Try adjusting your search term.`}
+                        </span>
                       </div>
                     ) : (
-                      'No matching records found'
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '110px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                          <Inbox size={20} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}>
+                          {emptyTitle || 'No Data Available'}
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          {emptySubtitle || 'There are currently no records for the selected filters.'}
+                        </span>
+                      </div>
                     )}
                   </td>
                 </tr>

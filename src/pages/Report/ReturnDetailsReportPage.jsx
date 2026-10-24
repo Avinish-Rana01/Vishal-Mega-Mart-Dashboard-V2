@@ -49,7 +49,7 @@ export default function ReturnDetailsReportPage() {
   const navigate = useNavigate();
   
   const [reportData, setReportData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const [pageIndex, setPageIndex] = useState(1);
