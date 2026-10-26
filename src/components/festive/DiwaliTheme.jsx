@@ -257,7 +257,402 @@ export const DiwaliHeaderDecorations = ({ enabled = IS_DIWALI_THEME_ENABLED }) =
 };
 
 /**
- * Animated Sky Shot Rocket & Radial Burst
+ * 🎆 Realistic Canvas Firecracker Engine (Adapted from Crackers suite)
+ * Scaled & tuned specifically for the 61px sidebar:
+ * - Ultra-thin hairline sparks (lineWidth ~0.85px) with white-hot burning tips.
+ * - Limited particle counts (6–9 stars) so the bursts remain elegant, uncluttered, and non-distracting.
+ * - 100% silent and strictly bounded within the sidebar width.
+ */
+export const RealisticSidebarCrackers = () => {
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    let animId = null;
+    let width = 61;
+    let height = 600;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        width = parent.clientWidth || 61;
+        height = parent.clientHeight || 600;
+      }
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Particle storage pools
+    let rocket = null;
+    const stars = [];
+    const sparks = [];
+    const flashes = [];
+
+    // Shell sequencer: cycles through the 3 realistic effects
+    const SHELL_EFFECTS = ['crysanthemum', 'willow', 'crackle'];
+    let shellIndex = 0;
+    let launchTimer = 45; // First launch after ~0.8s
+
+    // Colors derived from Crackers suite
+    const PALETTE = {
+      gold: '#fbbf24',
+      ruby: '#f43f5e',
+      emerald: '#10b981',
+      white: '#ffffff',
+      warmGold: '#facc15',
+      orange: '#f97316'
+    };
+
+    const spawnRocket = () => {
+      const currentEffect = SHELL_EFFECTS[shellIndex % SHELL_EFFECTS.length];
+      shellIndex++;
+
+      // Launch position: strictly centered in sidebar above Diya
+      const startX = width / 2;
+      const startY = height - 52;
+
+      // Target apex: between 38% and 55% from the top of the sidebar
+      const targetApexY = height * 0.40 + Math.random() * (height * 0.15);
+      const distance = startY - targetApexY;
+      const gravity = 0.075;
+      const initialVy = -Math.sqrt(2 * gravity * distance);
+
+      let shellColor = PALETTE.gold;
+      if (currentEffect === 'crysanthemum') {
+        const colors = [PALETTE.gold, PALETTE.ruby, PALETTE.emerald];
+        shellColor = colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      rocket = {
+        x: startX,
+        y: startY,
+        prevX: startX,
+        prevY: startY,
+        vx: (Math.random() - 0.5) * 0.12,
+        vy: initialVy,
+        gravity,
+        effect: currentEffect,
+        color: shellColor,
+        sparkTimer: 0
+      };
+    };
+
+    const detonateRocket = (r) => {
+      // 1. Subtle micro-flash at detonation center (tiny, non-blobby)
+      flashes.push({
+        x: r.x,
+        y: r.y,
+        radius: 6,
+        alpha: 0.65
+      });
+
+      // 2. Spawn thin, limited stars tailored for the 61px sidebar
+      if (r.effect === 'crysanthemum') {
+        // --- Effect 1: Thin Crysanthemum (8–10 delicate radiant needles) ---
+        const starCount = 9;
+        for (let i = 0; i < starCount; i++) {
+          const angle = (i / starCount) * Math.PI * 2 + (Math.random() * 0.2 - 0.1);
+          // Max spread speed ~0.65px ensures radius never exceeds 14px from center
+          const speed = 0.45 + Math.random() * 0.28;
+          stars.push({
+            x: r.x,
+            y: r.y,
+            prevX: r.x,
+            prevY: r.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            drag: 0.94,
+            gravity: 0.032,
+            color: r.color,
+            life: 32 + Math.floor(Math.random() * 12),
+            fullLife: 44,
+            effect: 'crysanthemum',
+            glitter: true
+          });
+        }
+      } else if (r.effect === 'willow') {
+        // --- Effect 2: Willow (7 golden silk threads weeping down) ---
+        const starCount = 7;
+        for (let i = 0; i < starCount; i++) {
+          const angle = (i / starCount) * Math.PI * 2 + (Math.random() * 0.2 - 0.1);
+          const speed = 0.35 + Math.random() * 0.25;
+          stars.push({
+            x: r.x,
+            y: r.y,
+            prevX: r.x,
+            prevY: r.y,
+            vx: Math.cos(angle) * speed * 0.8,
+            vy: Math.sin(angle) * speed - 0.12, // small initial upward lift
+            drag: 0.92,
+            gravity: 0.042, // heavier gravity for weeping waterfall effect
+            color: PALETTE.gold,
+            life: 55 + Math.floor(Math.random() * 20),
+            fullLife: 75,
+            effect: 'willow'
+          });
+        }
+      } else if (r.effect === 'crackle') {
+        // --- Effect 3: Crackle (7 palm tracers with micro-pop finale) ---
+        const starCount = 7;
+        for (let i = 0; i < starCount; i++) {
+          const angle = (i / starCount) * Math.PI * 2 + (Math.random() * 0.2 - 0.1);
+          const speed = 0.48 + Math.random() * 0.26;
+          stars.push({
+            x: r.x,
+            y: r.y,
+            prevX: r.x,
+            prevY: r.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            drag: 0.935,
+            gravity: 0.030,
+            color: PALETTE.warmGold,
+            life: 20 + Math.floor(Math.random() * 8),
+            fullLife: 28,
+            effect: 'crackle'
+          });
+        }
+      }
+    };
+
+    // Main animation loop
+    let lastTime = performance.now();
+    let isPageVisible = true;
+
+    const onVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    const tick = (now) => {
+      animId = requestAnimationFrame(tick);
+      if (!isPageVisible) return;
+
+      const delta = Math.min((now - lastTime) / 16.67, 2);
+      lastTime = now;
+
+      // 1. Clean alpha fading: removes previous frame trails directly to transparent
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Return to source-over for rendering bright luminous particles
+      ctx.globalCompositeOperation = 'source-over';
+
+      // 2. Render subtle micro-flashes
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        const f = flashes[i];
+        f.alpha -= 0.22 * delta;
+        if (f.alpha <= 0) {
+          flashes.splice(i, 1);
+          continue;
+        }
+        const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.radius);
+        grad.addColorStop(0, `rgba(255, 255, 255, ${f.alpha})`);
+        grad.addColorStop(0.5, `rgba(254, 240, 138, ${f.alpha * 0.3})`);
+        grad.addColorStop(1, 'rgba(250, 204, 21, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 3. Update & render Rocket
+      if (rocket) {
+        rocket.prevX = rocket.x;
+        rocket.prevY = rocket.y;
+        rocket.vy += rocket.gravity * delta;
+        rocket.x += rocket.vx * delta;
+        rocket.y += rocket.vy * delta;
+
+        // Bounded strictly inside sidebar
+        rocket.x = Math.max(10, Math.min(width - 10, rocket.x));
+
+        // Draw thin ascending rocket streak
+        ctx.lineWidth = 0.85;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(rocket.prevX, rocket.prevY);
+        ctx.lineTo(rocket.x, rocket.y);
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Rocket exhaust: occasional single micro-spark
+        rocket.sparkTimer += delta;
+        if (rocket.sparkTimer >= 2.5) {
+          rocket.sparkTimer = 0;
+          sparks.push({
+            x: rocket.x,
+            y: rocket.y + 1,
+            prevX: rocket.x,
+            prevY: rocket.y,
+            vx: (Math.random() - 0.5) * 0.2,
+            vy: Math.random() * 0.8 + 0.4,
+            color: PALETTE.orange,
+            life: 10 + Math.floor(Math.random() * 6),
+            drag: 0.90,
+            gravity: 0.04
+          });
+        }
+
+        // Apex reached (when upward velocity slows to near 0)
+        if (rocket.vy >= -0.15) {
+          detonateRocket(rocket);
+          rocket = null;
+          // Natural pause: 4.5s to 6.0s before next elegant cracker
+          launchTimer = 270 + Math.floor(Math.random() * 90);
+        }
+      } else {
+        launchTimer -= delta;
+        if (launchTimer <= 0) {
+          spawnRocket();
+        }
+      }
+
+      // 4. Update & render Thin Stars
+      ctx.lineWidth = 0.85;
+      ctx.lineCap = 'round';
+
+      for (let i = stars.length - 1; i >= 0; i--) {
+        const s = stars[i];
+        s.life -= delta;
+
+        if (s.life <= 0) {
+          // If crackle effect star dies, pop into 2-3 crisp micro-crackles!
+          if (s.effect === 'crackle') {
+            const microCount = 3;
+            for (let m = 0; m < microCount; m++) {
+              const microAngle = Math.random() * Math.PI * 2;
+              const microSpeed = 0.25 + Math.random() * 0.35;
+              sparks.push({
+                x: s.x,
+                y: s.y,
+                prevX: s.x,
+                prevY: s.y,
+                vx: Math.cos(microAngle) * microSpeed,
+                vy: Math.sin(microAngle) * microSpeed,
+                color: '#ffffff',
+                life: 6 + Math.floor(Math.random() * 5),
+                drag: 0.85,
+                gravity: 0.03
+              });
+            }
+          }
+          stars.splice(i, 1);
+          continue;
+        }
+
+        s.prevX = s.x;
+        s.prevY = s.y;
+        s.vx *= Math.pow(s.drag, delta);
+        s.vy *= Math.pow(s.drag, delta);
+        s.vy += s.gravity * delta;
+        s.x += s.vx * delta;
+        s.y += s.vy * delta;
+
+        // Strict sidebar boundary clamp: keep within [8, width - 8]
+        if (s.x < 8) {
+          s.x = 8;
+          s.vx = Math.abs(s.vx) * 0.15;
+        } else if (s.x > width - 8) {
+          s.x = width - 8;
+          s.vx = -Math.abs(s.vx) * 0.15;
+        }
+
+        // Draw thin star hairline trail
+        ctx.beginPath();
+        ctx.moveTo(s.prevX, s.prevY);
+        ctx.lineTo(s.x, s.y);
+        ctx.strokeStyle = s.color;
+        ctx.stroke();
+
+        // Draw white-hot incandescent burning tip at the leading head
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 0.65, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Emit delicate trailing micro-specks for Willow weeping
+        if (s.effect === 'willow') {
+          if (Math.random() < 0.30) {
+            sparks.push({
+              x: s.x,
+              y: s.y,
+              prevX: s.x,
+              prevY: s.y,
+              vx: s.vx * 0.1 + (Math.random() - 0.5) * 0.1,
+              vy: s.vy * 0.1 + (Math.random() * 0.2),
+              color: PALETTE.gold,
+              life: 14,
+              drag: 0.92,
+              gravity: 0.03
+            });
+          }
+        }
+      }
+
+      // 5. Update & render Sparks (hairline micro-particles)
+      ctx.lineWidth = 0.65;
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const sp = sparks[i];
+        sp.life -= delta;
+        if (sp.life <= 0) {
+          sparks.splice(i, 1);
+          continue;
+        }
+
+        sp.prevX = sp.x;
+        sp.prevY = sp.y;
+        sp.vx *= Math.pow(sp.drag, delta);
+        sp.vy *= Math.pow(sp.drag, delta);
+        sp.vy += sp.gravity * delta;
+        sp.x += sp.vx * delta;
+        sp.y += sp.vy * delta;
+
+        // Strict sidebar boundary clamp
+        if (sp.x < 6) sp.x = 6;
+        else if (sp.x > width - 6) sp.x = width - 6;
+
+        ctx.beginPath();
+        ctx.moveTo(sp.prevX, sp.prevY);
+        ctx.lineTo(sp.x, sp.y);
+        ctx.strokeStyle = sp.color;
+        ctx.stroke();
+      }
+    };
+
+    animId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="diwali-sidebar-canvas"
+      aria-hidden="true"
+    />
+  );
+};
+
+/**
+ * Animated Sky Shot Rocket & Radial Burst (Legacy CSS fallback)
  */
 export const SkyShot = ({ className = '', colorTheme = 'gold' }) => {
   const angles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
@@ -296,10 +691,8 @@ export const DiwaliSidebarDecorations = ({ enabled = IS_DIWALI_THEME_ENABLED }) 
 
   return (
     <div className="diwali-sidebar-decorations" aria-hidden="true">
-      {/* Dynamic Sky Shots bursting from bottom upwards */}
-      <SkyShot className="diwali-skyshot-1" colorTheme="gold" />
-      <SkyShot className="diwali-skyshot-2" colorTheme="ruby" />
-      <SkyShot className="diwali-skyshot-3" colorTheme="emerald" />
+      {/* 🎆 Realistic Canvas Firecracker Engine (Crysanthemum, Willow, Crackle from Crackers) */}
+      <RealisticSidebarCrackers />
 
       {/* Twinkling Sparklers */}
       <div className="diwali-sidebar-sparkle-1">
