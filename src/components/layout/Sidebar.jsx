@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Tag, Settings, Truck, ClipboardList } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
+import { DiwaliSidebarDecorations } from '../festive/DiwaliTheme';
 import './Sidebar.css';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
@@ -163,6 +164,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   return (
     <aside className={`vmm-sidebar ${isOpen ? 'open' : ''}`}>
+      <DiwaliSidebarDecorations />
       <div className="vmm-sidebar-logo">
         <Link 
           to={getDefaultRoute()} 

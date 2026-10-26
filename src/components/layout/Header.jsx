@@ -4,6 +4,7 @@ import { User, LogOut, Menu, KeyRound, Shield, Store, ChevronRight } from 'lucid
 import { useAuth } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
 import ChangePasswordModal from '../modals/ChangePasswordModal';
+import { DiwaliHeaderDecorations } from '../festive/DiwaliTheme';
 import './Header.css';
 
 export default function Header({ 
@@ -95,6 +96,7 @@ export default function Header({
 
   return (
     <header className="vmm-top-header" style={{ position: 'relative', zIndex: 1000 }}>
+      <DiwaliHeaderDecorations />
       <div className="vmm-brand-section">
         {onMenuClick && (
           <button 

@@ -1,0 +1,487 @@
+/* ==========================================================================
+   Diwali Festive Theme - Header & Sidebar Decorations
+   ========================================================================== */
+
+/* --- Keyframe Animations --- */
+@keyframes diwali-flame-flicker {
+  0%, 100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 6px #f59e0b) drop-shadow(0 0 12px #ea580c);
+  }
+  25% {
+    transform: scale(1.08, 0.95) rotate(1.5deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #fbbf24) drop-shadow(0 0 16px #f97316);
+  }
+  50% {
+    transform: scale(0.96, 1.05) rotate(-2deg);
+    opacity: 0.9;
+    filter: drop-shadow(0 0 5px #f59e0b) drop-shadow(0 0 10px #ea580c);
+  }
+  75% {
+    transform: scale(1.04, 0.98) rotate(1deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 9px #fbbf24) drop-shadow(0 0 18px #f97316);
+  }
+}
+
+@keyframes diwali-sparkle-twinkle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes diwali-lantern-sway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  33% {
+    transform: rotate(2.5deg);
+  }
+  66% {
+    transform: rotate(-2.5deg);
+  }
+}
+
+@keyframes diwali-light-glow {
+  0%, 100% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 3px #fef08a);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px #facc15);
+  }
+}
+
+/* --- Header Festive Wrapper --- */
+.diwali-header-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Mandala / Rangoli Art in Header - shifted left closer to breadcrumbs, larger size, clipped cleanly by overflow: hidden */
+.diwali-header-mandala {
+  position: absolute;
+  top: 50%;
+  left: 26.5%;
+  width: 64px;
+  height: 64px;
+  transform: translateY(-50%) rotate(15deg);
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+/* Firework near Mandala */
+.diwali-header-firework-1 {
+  position: absolute;
+  top: 50%;
+  left: 32.5%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  opacity: 0.85;
+  animation: diwali-sparkle-twinkle 2.5s ease-in-out infinite;
+}
+
+/* Garland with Hanging Fairy Lights */
+.diwali-header-garland {
+  position: absolute;
+  top: 0;
+  left: 39%;
+  width: 26%;
+  height: 24px;
+  pointer-events: none;
+}
+
+.diwali-fairy-bulb {
+  animation: diwali-light-glow 1.8s ease-in-out infinite;
+}
+
+.diwali-fairy-bulb:nth-child(even) {
+  animation-delay: 0.9s;
+}
+
+/* Hanging Lanterns (Kandils) */
+.diwali-lantern-group {
+  position: absolute;
+  top: 0;
+  right: 21%;
+  display: flex;
+  gap: 12px;
+  pointer-events: none;
+  transform-origin: top center;
+  transform: scale(0.85);
+}
+
+.diwali-kandil-1 {
+  transform-origin: top center;
+  animation: diwali-lantern-sway 4s ease-in-out infinite;
+}
+
+.diwali-kandil-2 {
+  transform-origin: top center;
+  animation: diwali-lantern-sway 4.5s ease-in-out infinite 0.8s;
+}
+
+/* 3 Diyas on Top Right - stationary on bottom ledge of header (no shifting) */
+.diwali-header-diyas {
+  position: absolute;
+  bottom: 0px;
+  right: 74px;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  pointer-events: none;
+  z-index: 1002;
+}
+
+.diwali-flame {
+  transform-origin: bottom center;
+  animation: diwali-flame-flicker 1.2s ease-in-out infinite;
+}
+
+.diwali-flame-delay-1 {
+  animation-delay: 0.25s;
+}
+
+.diwali-flame-delay-2 {
+  animation-delay: 0.5s;
+}
+
+/* --- Sidebar Festive Decorations --- */
+.diwali-sidebar-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Sky Shots: Rockets Shooting from Bottom Diya & Bursting at Apex
+   ========================================================================== */
+@keyframes skyshot-flight {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  22% {
+    transform: translateY(var(--apex));
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(var(--apex));
+    opacity: 1;
+  }
+  48% {
+    transform: translateY(var(--apex));
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+@keyframes skyshot-rocket {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+  3% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  21% {
+    opacity: 1;
+    transform: scaleY(1.15);
+  }
+  22% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  100%{
+    opacity:0;
+  }
+}
+
+@keyframes skyshot-burst {
+  0%, 21% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+  27% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  37% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1.18);
+  }
+  46% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+@keyframes skyshot-spark {
+  0%, 21% {
+    transform: rotate(var(--angle)) translateY(0) scale(0);
+    opacity: 0;
+  }
+  22% {
+    transform: rotate(var(--angle)) translateY(2px) scale(1);
+    opacity: 1;
+  }
+  28% {
+    transform: rotate(var(--angle)) translateY(calc(var(--distance) * 0.85)) scale(1.15);
+    opacity: 1;
+  }
+  38% {
+    transform: rotate(var(--angle)) translateY(var(--distance)) scale(0.9);
+    opacity: 0.75;
+  }
+  46% {
+    transform: rotate(var(--angle)) translateY(calc(var(--distance) * 1.25)) scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(var(--angle)) translateY(0) scale(0);
+    opacity: 0;
+  }
+}
+
+.diwali-skyshot {
+  position: absolute;
+  bottom: 50px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Rocket Body & Trail */
+.diwali-skyshot-rocket {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.diwali-rocket-head {
+  width: 4px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50% 50% 2px 2px;
+  box-shadow: 0 0 8px #ffffff, 0 0 14px #facc15;
+}
+
+.diwali-rocket-tail {
+  width: 2.5px;
+  height: 24px;
+  background: linear-gradient(to bottom, #fde047, #f97316, transparent);
+  opacity: 0.95;
+  filter: blur(0.4px);
+  box-shadow: 0 0 6px #ea580c;
+}
+
+/* Burst Explosion */
+.diwali-skyshot-burst {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+}
+
+.diwali-burst-core {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+}
+
+.diwali-burst-spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  transform-origin: center;
+}
+
+/* Color Themes */
+.theme-gold .diwali-burst-core {
+  box-shadow: 0 0 10px #ffffff, 0 0 20px #facc15;
+}
+.theme-gold .diwali-burst-spark {
+  background: #facc15;
+  box-shadow: 0 0 5px #fef08a, 0 0 10px #f59e0b;
+}
+
+.theme-ruby .diwali-rocket-tail {
+  background: linear-gradient(to bottom, #fecdd3, #f43f5e, transparent);
+}
+.theme-ruby .diwali-burst-core {
+  box-shadow: 0 0 10px #ffffff, 0 0 20px #fb7185;
+}
+.theme-ruby .diwali-burst-spark {
+  background: #fb7185;
+  box-shadow: 0 0 5px #ffe4e6, 0 0 10px #e11d48;
+}
+
+.theme-emerald .diwali-rocket-tail {
+  background: linear-gradient(to bottom, #a7f3d0, #10b981, transparent);
+}
+.theme-emerald .diwali-burst-core {
+  box-shadow: 0 0 10px #ffffff, 0 0 20px #34d399;
+}
+.theme-emerald .diwali-burst-spark {
+  background: #34d399;
+  box-shadow: 0 0 5px #d1fae5, 0 0 10px #059669;
+}
+
+/* --- Sky Shot 1: Golden - Apex -360px --- */
+.diwali-skyshot-1 {
+  left: 40%;
+  --apex: -360px;
+  animation: skyshot-flight 5.2s cubic-bezier(0.18, 0.7, 0.35, 1) infinite;
+}
+.diwali-skyshot-1 .diwali-skyshot-rocket {
+  animation: skyshot-rocket 5.2s ease-out infinite;
+}
+.diwali-skyshot-1 .diwali-skyshot-burst {
+  animation: skyshot-burst 5.2s ease-out infinite;
+}
+.diwali-skyshot-1 .diwali-burst-spark {
+  animation: skyshot-spark 5.2s ease-out infinite;
+}
+
+/* --- Sky Shot 2: Ruby - Apex -240px --- */
+.diwali-skyshot-2 {
+  left: 58%;
+  --apex: -240px;
+  animation: skyshot-flight 5.6s cubic-bezier(0.18, 0.7, 0.35, 1) infinite 1.8s;
+}
+.diwali-skyshot-2 .diwali-skyshot-rocket {
+  animation: skyshot-rocket 5.6s ease-out infinite 1.8s;
+}
+.diwali-skyshot-2 .diwali-skyshot-burst {
+  animation: skyshot-burst 5.6s ease-out infinite 1.8s;
+}
+.diwali-skyshot-2 .diwali-burst-spark {
+  animation: skyshot-spark 5.6s ease-out infinite 1.8s;
+}
+
+/* --- Sky Shot 3: Emerald - Apex -480px --- */
+.diwali-skyshot-3 {
+  left: 45%;
+  --apex: -480px;
+  animation: skyshot-flight 6.2s cubic-bezier(0.18, 0.7, 0.35, 1) infinite 3.5s;
+}
+.diwali-skyshot-3 .diwali-skyshot-rocket {
+  animation: skyshot-rocket 6.2s ease-out infinite 3.5s;
+}
+.diwali-skyshot-3 .diwali-skyshot-burst {
+  animation: skyshot-burst 6.2s ease-out infinite 3.5s;
+}
+.diwali-skyshot-3 .diwali-burst-spark {
+  animation: skyshot-spark 6.2s ease-out infinite 3.5s;
+}
+
+/* Sparklers down the Sidebar */
+.diwali-sidebar-sparkle-1 {
+  position: absolute;
+  top: 295px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  opacity: 0.85;
+  animation: diwali-sparkle-twinkle 2.2s ease-in-out infinite;
+}
+
+.diwali-sidebar-sparkle-2 {
+  position: absolute;
+  top: 360px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  opacity: 0.8;
+  animation: diwali-sparkle-twinkle 2.8s ease-in-out infinite 0.7s;
+}
+
+/* Mandala Arch on Sidebar */
+.diwali-sidebar-mandala {
+  position: absolute;
+  bottom: 60px;
+  left: -20px;
+  width: 75px;
+  height: 75px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Big Glowing Diya at Bottom of Sidebar */
+.diwali-sidebar-bottom-diya {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Hide or scale gracefully on small mobile screens */
+@media (max-width: 900px) {
+  .diwali-header-mandala,
+  .diwali-header-firework-1,
+  .diwali-header-garland {
+    display: none;
+  }
+  .diwali-header-diyas {
+    right: 50px;
+    transform: scale(0.85);
+  }
+}
+
+@media (max-width: 600px) {
+  .diwali-header-decorations {
+    display: none;
+  }
+}
