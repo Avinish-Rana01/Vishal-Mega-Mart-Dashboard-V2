@@ -6,17 +6,17 @@ import './DiwaliTheme.css';
  * - Set to `true`  -> Festive theme renders in Header & Sidebar.
  * - Set to `false` -> Completely disabled (returns null, 0 DOM nodes, 0 CPU).
  */
-export const IS_DIWALI_THEME_ENABLED = false;
+export const IS_DIWALI_THEME_ENABLED = true;
 export const Diya = ({ size = 36, flameDelayClass = '' }) => {
   const width = size;
   const height = size * 0.70;
 
   return (
-    <svg 
-      width={width} 
-      height={height} 
-      viewBox="0 0 100 70" 
-      fill="none" 
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 100 70"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={{ overflow: 'visible', display: 'block' }}
     >
