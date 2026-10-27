@@ -251,7 +251,10 @@ export default function UserRegistrationPage() {
       setStoreId('');
     }
 
-    if (user.Warehouse_Name && user.Warehouse_Name !== 'NA') {
+    const userWhId = user.WH_ID ?? user.wh_ID ?? user.Wh_ID;
+    if (userWhId && Number(userWhId) > 0) {
+      setWhId(userWhId);
+    } else if (user.Warehouse_Name && user.Warehouse_Name !== 'NA') {
       const match = warehouseOptions.find(w => w.text === user.Warehouse_Name);
       setWhId(match ? match.value : '');
     } else {
