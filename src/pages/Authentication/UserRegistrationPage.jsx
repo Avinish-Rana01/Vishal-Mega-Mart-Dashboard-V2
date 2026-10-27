@@ -126,19 +126,21 @@ export default function UserRegistrationPage() {
 
       if (Array.isArray(storesData)) {
         setStoreOptions(
-          storesData.map(s => ({
-            value: s.Store_ID ?? s.store_ID ?? s.id,
-            text: s.Store_Name ?? s.store_Name ?? `Store ${s.Store_ID ?? s.store_ID}`
-          }))
+          storesData.map(s => {
+            const val = s.Store_ID ?? s.store_ID ?? s.ID ?? s.id;
+            const txt = s.Store_Name ?? s.store_Name ?? s.Name ?? s.name ?? `Store ${val}`;
+            return { value: val, text: txt };
+          })
         );
       }
 
       if (Array.isArray(whData)) {
         setWarehouseOptions(
-          whData.map(w => ({
-            value: w.WH_ID ?? w.wh_ID ?? w.id,
-            text: w.Wh_Name ?? w.wh_Name ?? `Warehouse ${w.WH_ID ?? w.wh_ID}`
-          }))
+          whData.map(w => {
+            const val = w.WH_ID ?? w.wh_ID ?? w.ID ?? w.id;
+            const txt = w.Wh_Name ?? w.wh_Name ?? w.Name ?? w.name ?? `Warehouse ${val}`;
+            return { value: val, text: txt };
+          })
         );
       }
     } catch (err) {
@@ -242,20 +244,22 @@ export default function UserRegistrationPage() {
     setIsEmailRequired(rawReq === true || rawReq === 1 || String(rawReq).toLowerCase() === 'true' || String(rawReq) === '1');
 
     const userStoreId = user.Store_ID ?? user.store_ID;
+    const userStoreName = user.Store_Name ?? user.STORE_NAME ?? user.store_Name;
     if (userStoreId && Number(userStoreId) > 0) {
       setStoreId(userStoreId);
-    } else if (user.Store_Name && user.Store_Name !== 'NA') {
-      const match = storeOptions.find(s => s.text === user.Store_Name);
+    } else if (userStoreName && userStoreName !== 'NA' && userStoreName !== 'N/A') {
+      const match = storeOptions.find(s => s.text === userStoreName || String(s.value) === String(userStoreId));
       setStoreId(match ? match.value : '');
     } else {
       setStoreId('');
     }
 
     const userWhId = user.WH_ID ?? user.wh_ID ?? user.Wh_ID;
+    const userWhName = user.Warehouse_Name ?? user.WH_NAME ?? user.wh_Name ?? user.Wh_Name;
     if (userWhId && Number(userWhId) > 0) {
       setWhId(userWhId);
-    } else if (user.Warehouse_Name && user.Warehouse_Name !== 'NA') {
-      const match = warehouseOptions.find(w => w.text === user.Warehouse_Name);
+    } else if (userWhName && userWhName !== 'NA' && userWhName !== 'N/A') {
+      const match = warehouseOptions.find(w => w.text === userWhName || String(w.value) === String(userWhId));
       setWhId(match ? match.value : '');
     } else {
       setWhId('');

@@ -20,7 +20,7 @@ export const getActiveUserRole = () => {
     const raw = sessionStorage.getItem('vmm_user');
     if (raw) {
       const user = JSON.parse(raw);
-      return user.userType || user.UserType || user.User_Type || user.role || user.Role || '';
+      return user.userRole || user.UserRole || user.userType || user.UserType || user.User_Type || user.role || user.Role || '';
     }
   } catch (e) {
     // fallback
