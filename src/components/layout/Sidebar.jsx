@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Building2, Tag, Settings, Truck, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Building2, Tag, Settings, Truck, ClipboardList, Smartphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
 import { DiwaliSidebarDecorations } from '../festive/DiwaliTheme';
@@ -132,6 +132,22 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       });
     }
 
+    
+    // Devices Module (Hardware & RFID Terminals)
+    if (hasSection('Devices') || hasSection('devices') || hasSection('device_registration')) {
+      list.push({
+        id: 'devices',
+        title: 'Devices',
+        icon: Smartphone,
+        tooltipTitle: 'Device Registration',
+        defaultTo: '/auth/device-registration',
+        isActive: (pathname) => pathname.includes('device'),
+        items: [
+          { label: 'Device Registration', to: '/auth/device-registration' }
+        ]
+      });
+    }
+
     // Authentication / Master Registration Module: dynamically shown based on registration permissions
     const authItems = [];
     if (hasSection('user_registration')) {
@@ -146,6 +162,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     if (hasSection('warehouse_registration')) {
       authItems.push({ label: 'Warehouse Registration', to: '/auth/warehouse-registration' });
     }
+
 
     if (authItems.length > 0) {
       list.push({

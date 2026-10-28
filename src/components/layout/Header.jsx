@@ -52,6 +52,24 @@ export default function Header({
     return '';
   })() || 'User').trim();
 
+  // Developer check: if userType is Developer, disable and hide Change Password
+  const isDeveloper = (() => {
+    if (userType === 'Developer' || userRole === 'Developer') return true;
+    if (loggedInUser && loggedInUser.toLowerCase() === 'developer') return true;
+    try {
+      const s = sessionStorage.getItem('vmm_user');
+      if (s) {
+        const p = JSON.parse(s);
+        const ut = (p.userType || p.UserType || p.userRole || p.UserRole || '').toLowerCase();
+        if (ut === 'developer') return true;
+        const un = (p.userName || p.username || '').toLowerCase();
+        if (un === 'developer') return true;
+      }
+    } catch (e) {}
+    return false;
+  })();
+
+
   // Initials generator
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -227,7 +245,9 @@ export default function Header({
 
               {/* Profile Actions */}
               <div className="vmm-profile-actions">
-                <button
+                {!isDeveloper && (
+                  <>
+<button
                   type="button"
                   className="vmm-profile-action-btn"
                   onClick={() => {
@@ -243,6 +263,8 @@ export default function Header({
                 </button>
 
                 <div className="vmm-profile-divider" />
+                  </>
+                )}
 
                 <button
                   type="button"
@@ -261,11 +283,13 @@ export default function Header({
       </div>
 
       {/* Change Password Modal */}
-      <ChangePasswordModal
+      {!isDeveloper && (
+        <ChangePasswordModal
         isOpen={isChangePasswordOpen}
         onClose={() => setIsChangePasswordOpen(false)}
         userName={loggedInUser || 'Admin'}
       />
+      )}
     </header>
   );
 }

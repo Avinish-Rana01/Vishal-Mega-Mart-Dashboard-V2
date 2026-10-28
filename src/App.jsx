@@ -26,7 +26,7 @@ import StoreCounterStatusPage from './pages/Store/StoreCounterStatusPage';
 import DispatchMasterUploadPage from './pages/Dispatch/DispatchMasterUploadPage';
 import DispatchReportPage from './pages/Dispatch/DispatchReportPage';
 import PicklistCreationPage from './pages/Dispatch/PicklistCreationPage';
-import { UserRegistrationPage, StoreRegistrationPage, FloorRegistrationPage, WarehouseRegistrationPage } from './pages/Authentication';
+import { UserRegistrationPage, StoreRegistrationPage, FloorRegistrationPage, WarehouseRegistrationPage, DeviceRegistrationPage } from './pages/Authentication';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
@@ -129,6 +129,8 @@ export default function App() {
               <Route path="/auth/store-registration" element={<StoreRegistrationPage />} />
               <Route path="/auth/floor-registration" element={<FloorRegistrationPage />} />
               <Route path="/auth/warehouse-registration" element={<WarehouseRegistrationPage />} />
+              <Route path="/auth/device-registration" element={<DeviceRegistrationPage />} />
+              <Route path="/devices" element={<DeviceRegistrationPage />} />
             </Route>
 
             {/* 404 Catch-All */}

@@ -51,8 +51,10 @@ export const computeDefaultRoute = (userData) => {
     if (page.includes('tag-cleaning') || page.includes('tag_cleaning')) return '/reports/tag-cleaning';
     if (page.includes('stock-take') || page.includes('stock_take')) return '/reports/stock-take';
     if (page.includes('counter-status') || page.includes('counter_status')) return '/stores/counter-status';
+    if (page.includes('device')) return '/auth/device-registration';
   }
 
+  if (sections.includes('Devices') || sections.includes('devices') || sections.includes('device_registration')) return '/auth/device-registration';
   if (sections.includes('dispatch_tracking')) return '/dispatch/master-upload';
   if (sections.includes('picklist_creation')) return '/picklist/creation';
   if (sections.includes('tag_cleaning')) return '/reports/tag-cleaning';
@@ -225,7 +227,12 @@ export const AuthProvider = ({ children }) => {
       return role === 'Dispatch Admin';
     }
 
-    // Super Admin has access to all other sections
+    // Devices is strictly exclusive to Developer (hidden from Super Admin and store/DC operators)
+    if (sectionKey === 'Devices' || sectionKey === 'devices' || sectionKey === 'device_registration') {
+      return role === 'Developer' || (Array.isArray(allowedSections) && allowedSections.some(s => s === 'Devices' || s === 'devices'));
+    }
+
+    // Super Admin has access to all other standard sections
     if (role === 'Super Admin') return true;
     if (Array.isArray(allowedSections) && allowedSections.length > 0) {
       return allowedSections.includes(sectionKey);
@@ -248,6 +255,9 @@ export const AuthProvider = ({ children }) => {
     }
     if (role === 'Tag Admin') {
       return ['tag_cleaning', 'get_sap_stock_take'].includes(sectionKey);
+    }
+    if (role === 'Developer') {
+      return ['Devices', 'devices', 'device_registration'].includes(sectionKey);
     }
     return false;
   };

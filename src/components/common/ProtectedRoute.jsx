@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import MandatoryPasswordChange from '../auth/MandatoryPasswordChange';
 
 export default function ProtectedRoute({ children }) {
-  const { isLoggedIn, requirePasswordChange, loggedInUser } = useAuth();
+  const { isLoggedIn, requirePasswordChange, loggedInUser, userType, userRole } = useAuth();
   const location = useLocation();
 
   if (!isLoggedIn) {
