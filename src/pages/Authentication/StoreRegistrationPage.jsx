@@ -147,6 +147,101 @@ export default function StoreRegistrationPage() {
     }
   };
 
+  // Map of currently assigned store managers: managerName (lowercase) -> { storeId, storeCode, storeName }
+  const assignedManagersMap = useMemo(() => {
+    const map = new Map();
+    (stores || []).forEach(s => {
+      const mgr = (s.Store_Manager ?? s.store_Manager ?? s.SM_NAME ?? '').trim();
+      if (mgr && mgr !== 'NA' && mgr !== 'N/A' && mgr !== '—') {
+        const sId = s.Store_ID ?? s.store_ID ?? s.id;
+        const sCode = s.Store_Code ?? s.store_Code ?? `Store ${sId}`;
+        const sName = s.Store_Name ?? s.store_Name ?? sCode;
+        map.set(mgr.toLowerCase(), {
+          storeId: sId,
+          storeCode: sCode,
+          storeName: sName
+        });
+      }
+    });
+    return map;
+  }, [stores]);
+
+  // Enriched Store Manager options: Highlights free managers in soft green and indicates busy/assigned ones
+  const storeManagerOptions = useMemo(() => {
+    const list = (dropdownOptions.storeManagers || []).map(opt => {
+      const rawName = typeof opt === 'string' ? opt : (opt.value ?? opt.text ?? '');
+      const trimmed = String(rawName).trim();
+      const lower = trimmed.toLowerCase();
+      const assignment = assignedManagersMap.get(lower);
+
+      // If editing this store, the manager currently assigned to THIS store is not busy elsewhere
+      const isAssignedToThisStore = isEditing && assignment && String(assignment.storeId) === String(editingStoreId);
+      const isAssignedToOtherStore = Boolean(assignment && !isAssignedToThisStore);
+
+      if (isAssignedToThisStore) {
+        return {
+          value: trimmed,
+          text: trimmed,
+          badge: 'Current Manager',
+          badgeColor: '#3B82F6', // Standardized Blue
+          badgeBg: 'rgba(59, 130, 246, 0.12)',
+          isFree: false,
+          isCurrent: true,
+          style: {
+            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+            fontWeight: 500
+          }
+        };
+      }
+
+      if (isAssignedToOtherStore) {
+        return {
+          value: trimmed,
+          text: trimmed,
+          badge: `Assigned: ${assignment.storeCode}`,
+          badgeColor: '#64748b',
+          badgeBg: '#f1f5f9',
+          isFree: false,
+          isBusy: true,
+          style: {
+            backgroundColor: '#ffffff',
+            color: '#64748b'
+          }
+        };
+      }
+
+      // Free / Available Store Admin: slightly green background!
+      return {
+        value: trimmed,
+        text: trimmed,
+        badge: 'Available',
+        badgeColor: '#10B981', // Standardized Green
+        badgeBg: 'rgba(16, 185, 129, 0.15)',
+        isFree: true,
+        style: {
+          backgroundColor: 'rgba(16, 185, 129, 0.08)',
+          color: '#065f46',
+          fontWeight: 500
+        }
+      };
+    });
+
+    return [
+      {
+        value: '',
+        text: '— None (Unassigned) —',
+        badge: 'Unassigned',
+        badgeColor: '#64748b',
+        badgeBg: '#f1f5f9',
+        style: {
+          color: '#64748b',
+          fontStyle: 'italic'
+        }
+      },
+      ...list
+    ];
+  }, [dropdownOptions.storeManagers, assignedManagersMap, isEditing, editingStoreId]);
+
   // Keyboard shortcut: Escape cancels edit mode
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -193,7 +288,8 @@ export default function StoreRegistrationPage() {
     setStoreName(store.Store_Name ?? store.store_Name ?? '');
     setState(store.State ?? store.state ?? '');
     setCity(store.City ?? store.city ?? '');
-    setStoreManager(store.Store_Manager ?? store.store_Manager ?? '');
+    const sm = store.Store_Manager ?? store.store_Manager ?? '';
+    setStoreManager((!sm || sm === 'NA' || sm === 'N/A' || sm === '—') ? '' : sm);
     setAreaManager(store.Area_Manager ?? store.area_Manager ?? '');
     setZfm(store.ZFM ?? store.zfm ?? '');
     setLp(store.LP ?? store.lp ?? '');
@@ -223,10 +319,6 @@ export default function StoreRegistrationPage() {
     }
     if (!city.trim()) {
       setAlert({ type: 'error', message: 'City is required.' });
-      return;
-    }
-    if (!storeManager.trim()) {
-      setAlert({ type: 'error', message: 'Store Manager is required.' });
       return;
     }
     if (!areaManager.trim()) {
@@ -445,7 +537,7 @@ export default function StoreRegistrationPage() {
         return (!s || s === 'NA' || s === '—') ? (
           <span style={{ color: '#94a3b8', fontWeight: 500 }}>N/A</span>
         ) : (
-          <span style={{ fontWeight: 600, color: '#334155' }}>{s}</span>
+          <span style={{ fontWeight: 500, color: '#334155' }}>{s}</span>
         );
       }
     },
@@ -657,12 +749,12 @@ export default function StoreRegistrationPage() {
             {/* Row 2: Management Personnel */}
             <div className="report-search-row">
               <div className="search-field">
-                <label>Store Manager *</label>
+                <label>Store Manager</label>
                 <SearchableDropdown
                   value={storeManager}
                   onChange={(val) => setStoreManager(val)}
-                  options={dropdownOptions.storeManagers}
-                  placeholder="Select Store Manager"
+                  options={storeManagerOptions}
+                  placeholder="Select Store Manager (Optional)"
                   searchPlaceholder="Search Store Manager..."
                   disabled={isSubmitting}
                 />

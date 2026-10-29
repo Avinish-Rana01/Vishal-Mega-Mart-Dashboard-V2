@@ -30,3 +30,38 @@
   filter: brightness(1.15);
   background-color: rgba(37, 99, 235, 0.08);
 }
+
+/* Horizontal scrollable box for Processed vs Unprocessed chart */
+.dc-validation-chart-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 275px;
+  min-height: 275px;
+  max-height: 275px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.dc-validation-chart-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dc-validation-chart-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.dc-validation-chart-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dc-validation-chart-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

@@ -262,7 +262,7 @@ export default function DcValidationSection() {
         ]} />
 
         {/* Chart Container */}
-        <div style={{ minHeight: '275px', maxHeight: '275px', height: '275px', width: '100%', overflow: 'hidden', position: 'relative' }}>
+        <div style={{ minHeight: '275px', maxHeight: '275px', height: '275px', width: '100%', position: 'relative' }}>
           {chartData.length === 0 ? (
             <SearchEmptyState 
               searchFilter={searchFilter}
@@ -271,18 +271,26 @@ export default function DcValidationSection() {
               onClearSearch={() => setSearchFilter('')}
             />
           ) : (
-            <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-              <GroupedBarChart
-                data={chartData}
-                bars={[
-                  { dataKey: 'Processed', color: COLOR_PROCESSED, label: 'Processed HU' },
-                  { dataKey: 'Unprocessed', color: COLOR_UNPROCESSED, label: 'Unprocessed HU' }
-                ]}
-                height="100%"
-                hideLegend={true}
-                showValues={true}
-                isAnimationActive={false}
-              />
+            <div className="dc-validation-chart-scroll">
+              <div 
+                style={{ 
+                  minWidth: `max(100%, ${Math.max(chartData.length * 70, 520)}px)`, 
+                  width: '100%', 
+                  height: '100%' 
+                }}
+              >
+                <GroupedBarChart
+                  data={chartData}
+                  bars={[
+                    { dataKey: 'Processed', color: COLOR_PROCESSED, label: 'Processed HU' },
+                    { dataKey: 'Unprocessed', color: COLOR_UNPROCESSED, label: 'Unprocessed HU' }
+                  ]}
+                  height="100%"
+                  hideLegend={true}
+                  showValues={true}
+                  isAnimationActive={false}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -300,6 +308,7 @@ export default function DcValidationSection() {
             {`${tableData.length} store${tableData.length !== 1 ? 's' : ''}`}
           </span>
         }
+  //  tableScrollStyle={{ flex: 1, minHeight: 0, maxHeight: 'none', height: '100%' }}     
         innerWrapperStyle={{ minWidth: 'auto', width: '100%' }}
         tableStyle={{ width: '100%', tableLayout: 'auto' }}
         tableClassName="dc-grid-table"

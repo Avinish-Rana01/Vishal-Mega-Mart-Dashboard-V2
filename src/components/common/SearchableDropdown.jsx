@@ -41,7 +41,9 @@ export default function SearchableDropdown({
   };
 
   // The displayed text in the trigger
-  const selectedOption = options.find(opt => String(getOptVal(opt)) === String(value)) || (value ? { [labelKey]: value, [valueKey]: value } : null);
+  const selectedOption = (value !== undefined && value !== null && value !== '')
+    ? (options.find(opt => String(getOptVal(opt)) === String(value)) || { [labelKey]: value, [valueKey]: value })
+    : null;
   
   // Local filtering if not async
   const displayOptions = isAsync 
@@ -199,10 +201,16 @@ export default function SearchableDropdown({
                   const optVal = getOptVal(opt);
                   const optLbl = getOptLabel(opt);
                   const isSelected = String(optVal) === String(value);
+                  const optStyle = (typeof opt === 'object' && opt !== null) ? (opt.style || {}) : {};
+                  const optBadge = (typeof opt === 'object' && opt !== null) ? opt.badge : null;
+                  const optBadgeColor = (typeof opt === 'object' && opt !== null && opt.badgeColor) ? opt.badgeColor : '#64748b';
+                  const optBadgeBg = (typeof opt === 'object' && opt !== null && opt.badgeBg) ? opt.badgeBg : '#f1f5f9';
+                  const customClass = (typeof opt === 'object' && opt !== null && opt.className) ? opt.className : '';
                   return (
                     <div 
                       key={String(optVal ?? optLbl)} 
-                      className={`custom-select-option ${isSelected ? 'selected' : ''}`}
+                      className={`custom-select-option ${isSelected ? 'selected' : ''} ${customClass}`.trim()}
+                      style={optStyle}
                       role="option"
                       aria-selected={isSelected}
                       tabIndex={0}
@@ -214,12 +222,45 @@ export default function SearchableDropdown({
                         }
                       }}
                     >
-                      <span>{optLbl}</span>
-                      {isSelected && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                          <span style={{ width: '14px', height: '14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {isSelected && (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{optLbl}</span>
+                        </div>
+                        {optBadge && (
+                          <span 
+                            style={{ 
+                              fontSize: '9px', 
+                              fontWeight: 500, 
+                              width: '110px',
+                              minWidth: '110px',
+                              height: '20px',
+                              padding: '0 6px', 
+                              borderRadius: '4px',
+                              backgroundColor: optBadgeBg,
+                              color: optBadgeColor,
+                              letterSpacing: '0.2px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              textAlign: 'center',
+                              flexShrink: 0,
+                              boxSizing: 'border-box',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {optBadge}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })
