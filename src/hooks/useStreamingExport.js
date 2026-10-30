@@ -40,25 +40,21 @@ export const useStreamingExport = () => {
         }
       }
 
-      // Trigger native browser download immediately via hidden iframe.
-      // This immediately activates Chrome's native download manager in ~0.1s.
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
+      // Trigger native browser download via persistent hidden iframe.
+      // Reusing a persistent iframe ensures Chrome never abruptly kills the connection mid-stream.
+      let iframe = document.getElementById('vmm-download-frame');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'vmm-download-frame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
       iframe.src = targetUrl;
-      document.body.appendChild(iframe);
 
-      // Clean up iframe after download has initiated
       setTimeout(() => {
-        try {
-          if (iframe.parentNode) {
-            document.body.removeChild(iframe);
-          }
-        } catch {
-          // ignore cleanup errors
-        }
         setIsExporting(false);
         setProgressPercent(0);
-      }, 2500);
+      }, 1500);
 
       if (onSuccess) onSuccess();
     } catch (err) {
