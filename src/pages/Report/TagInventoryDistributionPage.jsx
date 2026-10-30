@@ -23,8 +23,10 @@ export default function TagInventoryDistributionPage() {
   // Table & Pager state
   const [reportData, setReportData] = useState([]);
   const [storeInventory, setStoreInventory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isTableLoading, setIsTableLoading] = useState(true);
   const [error, setError] = useState(null);
+  const hasLoadedOnceRef = useRef(false);
 
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -50,7 +52,10 @@ export default function TagInventoryDistributionPage() {
 
   // Fetch Tag Management details
   const fetchData = useCallback(async (signal) => {
-    setIsLoading(true);
+    if (!hasLoadedOnceRef.current) {
+      setIsInitialLoading(true);
+    }
+    setIsTableLoading(true);
     setError(null);
     try {
       const result = await getTagDetails({
@@ -60,6 +65,8 @@ export default function TagInventoryDistributionPage() {
         sortColumn,
         sortDirection
       }, signal);
+
+      if (signal?.aborted) return;
 
       const items = result?.tagData || result?.TagData || [];
       const stores = result?.storeInventory || result?.StoreInventory || [];
@@ -81,14 +88,27 @@ export default function TagInventoryDistributionPage() {
         avgRecycle: avg,
         snapshotDate: items[0]?.date ? String(items[0].date).split('T')[0] : getTodayDate()
       });
+
+      hasLoadedOnceRef.current = true;
+      setIsInitialLoading(false);
+      setIsTableLoading(false);
     } catch (err) {
-      if (err.name !== 'AbortError' && err.message !== 'canceled' && err.code !== 'ERR_CANCELED') {
-        console.error('Error fetching Tag Details:', err);
-        setError(err.message || 'Failed to fetch tag inventory data.');
-        setReportData([]);
+      if (
+        signal?.aborted || 
+        err.name === 'AbortError' || 
+        err.name === 'CanceledError' || 
+        err.message === 'canceled' || 
+        err.code === 'ERR_CANCELED'
+      ) {
+        return;
       }
-    } finally {
-      setIsLoading(false);
+      console.error('Error fetching Tag Details:', err);
+      setError(err.message || 'Failed to fetch tag inventory data.');
+      if (!hasLoadedOnceRef.current) {
+        setReportData([]);
+        setIsInitialLoading(false);
+      }
+      setIsTableLoading(false);
     }
   }, [searchTerm, pageIndex, pageSize, sortColumn, sortDirection]);
 
@@ -239,8 +259,8 @@ export default function TagInventoryDistributionPage() {
           <div className="ds-kpi-item">
             <CurvedCard
               title="TOTAL TAG COUNT"
-              value={isLoading ? '—' : summary.recordCount.toLocaleString('en-IN')}
-              animate={!isLoading}
+              value={isInitialLoading ? '—' : summary.recordCount.toLocaleString('en-IN')}
+              animate={!isInitialLoading}
               waveColor={['#d8b4fe', '#c026d3']}
               icon={<Icons.Tag size={18} color="#a855f7" />}
               badge={
@@ -255,13 +275,13 @@ export default function TagInventoryDistributionPage() {
           <div className="ds-kpi-item">
             <CurvedCard
               title="TOTAL RECYCLE COUNT"
-              value={isLoading ? '—' : summary.cycleCount.toLocaleString('en-IN')}
-              animate={!isLoading}
+              value={isInitialLoading ? '—' : summary.cycleCount.toLocaleString('en-IN')}
+              animate={!isInitialLoading}
               waveColor={['#86efac', '#10b981']}
               icon={<Icons.RefreshCw size={18} color="#10b981" />}
               badge={
                 <div className="tag-kpi-pill tag-kpi-pill--green">
-                  <Icons.TrendingUp size={13} style={{ strokeWidth: 2.5 }} /> Average {isLoading ? '—' : summary.avgRecycle}
+                  <Icons.TrendingUp size={13} style={{ strokeWidth: 2.5 }} /> Average {isInitialLoading ? '—' : summary.avgRecycle}
                 </div>
               }
             />
@@ -284,7 +304,7 @@ export default function TagInventoryDistributionPage() {
             <div className="tag-store-header-badges">
               <div className="tag-stat-badge">
                 Total Stores :{' '}
-                {isLoading ? (
+                {isInitialLoading ? (
                   <span className="vmm-shimmer tag-stat-badge-shimmer" />
                 ) : (
                   <strong>{totalStoresCount}</strong>
@@ -292,7 +312,7 @@ export default function TagInventoryDistributionPage() {
               </div>
               <div className="tag-stat-badge">
                 Total Tags :{' '}
-                {isLoading ? (
+                {isInitialLoading ? (
                   <span className="vmm-shimmer tag-stat-badge-shimmer tag-stat-badge-shimmer--lg" />
                 ) : (
                   <strong>{totalStoreTags.toLocaleString('en-IN')}</strong>
@@ -321,9 +341,9 @@ export default function TagInventoryDistributionPage() {
           <div className="tag-slider-wrapper">
             <button
               type="button"
-              className={`tag-slider-arrow prev ${isLoading ? 'tag-slider-arrow--disabled' : ''}`}
+              className={`tag-slider-arrow prev ${isInitialLoading ? 'tag-slider-arrow--disabled' : ''}`}
               onClick={handleScrollLeft}
-              disabled={isLoading || storeCards.length === 0}
+              disabled={isInitialLoading || storeCards.length === 0}
               title="Previous stores"
               aria-label="Previous stores"
             >
@@ -331,7 +351,7 @@ export default function TagInventoryDistributionPage() {
             </button>
 
             <div className="tag-slider-track" ref={sliderRef}>
-              {isLoading ? (
+              {isInitialLoading ? (
                 Array.from({ length: 6 }).map((_, idx) => (
                   <div key={`store-skeleton-${idx}`} className="tag-store-item-card tag-store-skeleton-card">
                     <div className="tag-store-skeleton-icon" />
@@ -367,9 +387,9 @@ export default function TagInventoryDistributionPage() {
 
             <button
               type="button"
-              className={`tag-slider-arrow next ${isLoading ? 'tag-slider-arrow--disabled' : ''}`}
+              className={`tag-slider-arrow next ${isInitialLoading ? 'tag-slider-arrow--disabled' : ''}`}
               onClick={handleScrollRight}
-              disabled={isLoading || storeCards.length === 0}
+              disabled={isInitialLoading || storeCards.length === 0}
               title="Next stores"
               aria-label="Next stores"
             >
@@ -383,7 +403,7 @@ export default function TagInventoryDistributionPage() {
           <ReportDataTableCard
             columns={columns}
             data={reportData}
-            isLoading={isLoading}
+            isLoading={isTableLoading}
             pageIndex={pageIndex}
             onPageChange={setPageIndex}
             pageSize={pageSize}
