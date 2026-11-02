@@ -287,3 +287,28 @@
   flex-direction: column;
 }
 
+
+/* Cell styling matching standard report table font (11px) */
+.livestock-table-view .vmm-table td,
+.livestock-table-view .vmm-table td * {
+  font-size: 11px !important;
+}
+
+.livestock-cell-num {
+  color: #334155;
+  font-weight: 400;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none !important;
+  cursor: default !important;
+  display: inline-block;
+}
+
+.livestock-cell-text {
+  color: #334155;
+  font-weight: 400;
+  font-size: 11px;
+  text-decoration: none !important;
+  cursor: default !important;
+  display: inline-block;
+}

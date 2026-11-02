@@ -118,7 +118,9 @@ export default function VoidDetailsReportPage() {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   };
 

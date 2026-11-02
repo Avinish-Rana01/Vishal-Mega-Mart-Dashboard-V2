@@ -117,7 +117,9 @@ export default function ReturnDetailsReportPage() {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   };
 

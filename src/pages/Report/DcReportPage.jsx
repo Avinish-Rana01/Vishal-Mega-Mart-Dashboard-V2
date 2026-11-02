@@ -129,8 +129,8 @@ export default function DcReportPage() {
         validatedCount: result?.validatedCount ?? result?.ValidatedCount ?? 0
       });
 
-      if (!storeDisplayName && items.length > 0 && items[0]?.STORE_NAME) {
-        setStoreDisplayName(items[0].STORE_NAME);
+      if (items.length > 0 && items[0]?.STORE_NAME) {
+        setStoreDisplayName(prev => prev || items[0].STORE_NAME);
       }
     } catch (err) {
       if (err.name !== 'AbortError' && err.message !== 'canceled' && err.code !== 'ERR_CANCELED') {
@@ -138,9 +138,11 @@ export default function DcReportPage() {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [appliedFilters, pageIndex, pageSize, searchTerm, sortColumn, sortDirection, storeDisplayName]);
+  }, [appliedFilters, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -292,23 +294,14 @@ export default function DcReportPage() {
           <div className="report-search-body">
             <div className="search-field">
               <label>Store Code</label>
-              <div className="input-group">
+              <div className="input-group readonly">
                 <input
                   type="text"
                   value={selectedStore}
-                  onChange={(e) => { setSelectedStore(e.target.value.toUpperCase()); setPageIndex(1); }}
-                  placeholder="Enter Store Code (e.g. HD44)"
+                  readOnly
+                  disabled
+                  placeholder="Store Code"
                 />
-                {selectedStore && (
-                  <button
-                    type="button"
-                    className="btn-input-clear"
-                    onClick={() => setSelectedStore('')}
-                    title="Clear Store"
-                  >
-                    ×
-                  </button>
-                )}
               </div>
             </div>
 

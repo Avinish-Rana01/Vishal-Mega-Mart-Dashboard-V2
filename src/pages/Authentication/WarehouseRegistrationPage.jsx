@@ -29,7 +29,7 @@ export default function WarehouseRegistrationPage() {
 
   // Table Data & Loading State
   const [warehouses, setWarehouses] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Table Search, Sorting & Pagination

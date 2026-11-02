@@ -45,7 +45,7 @@ export default function StoreRegistrationPage() {
 
   // Table Data & Loading State
   const [stores, setStores] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Table Search, Sorting & Pagination

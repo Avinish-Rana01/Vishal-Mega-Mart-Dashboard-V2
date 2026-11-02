@@ -33,7 +33,7 @@ export default function FloorRegistrationPage() {
 
   // Table Data & Loading State
   const [floors, setFloors] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Table Search, Sorting & Pagination

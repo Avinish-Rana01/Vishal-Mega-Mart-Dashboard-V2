@@ -114,7 +114,9 @@ export default function CycleCountReportPage() {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   };
 

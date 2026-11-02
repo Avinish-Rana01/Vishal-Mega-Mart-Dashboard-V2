@@ -217,6 +217,15 @@
   border-color: transparent;
 }
 
+.report-search-card .input-group.readonly input,
+.report-search-card .input-group.disabled input,
+.sales-filter-card .input-group.readonly input,
+.sales-filter-card .input-group.disabled input {
+  cursor: not-allowed;
+  color: #475569;
+  user-select: none;
+}
+
 .report-search-card .custom-select-trigger.open,
 .report-search-card .custom-select-trigger:focus,
 .sales-filter-card .custom-select-trigger.open,
@@ -235,7 +244,11 @@
 .report-search-card .custom-select-trigger.disabled,
 .sales-filter-card .custom-select-trigger.disabled,
 .report-search-card .vmm-date-input-container.disabled,
-.sales-filter-card .vmm-date-input-container.disabled {
+.sales-filter-card .vmm-date-input-container.disabled,
+.report-search-card .input-group.readonly,
+.report-search-card .input-group.disabled,
+.sales-filter-card .input-group.readonly,
+.sales-filter-card .input-group.disabled {
   opacity: 0.65;
   cursor: not-allowed;
   background: #e2e8f0;

@@ -59,7 +59,9 @@ export default function HuDetailsModal({ huRow, huStatus, fromDate, toDate, onCl
         console.error("Failed to fetch HU view details", err);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [huRow, huStatus, fromDate, toDate, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
 

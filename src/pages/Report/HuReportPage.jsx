@@ -343,23 +343,14 @@ export default function HuReportPage() {
 
             <div className="search-field">
               <label>Receiving Plant *</label>
-              <div className="input-group">
+              <div className="input-group readonly">
                 <input
                   type="text"
                   value={receivingPlant}
-                  onChange={(e) => setReceivingPlant(e.target.value.toUpperCase())}
-                  placeholder="Enter Plant (e.g. HD44)"
+                  readOnly
+                  disabled
+                  placeholder="Receiving Plant"
                 />
-                {receivingPlant && (
-                  <button
-                    type="button"
-                    className="btn-input-clear"
-                    onClick={() => setReceivingPlant('')}
-                    title="Clear Plant"
-                  >
-                    ×
-                  </button>
-                )}
               </div>
             </div>
 

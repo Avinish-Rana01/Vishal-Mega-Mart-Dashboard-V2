@@ -115,7 +115,9 @@ export default function VendorDiscrepancySummaryPage() {
         setError('Failed to load Vendor HU Discrepancy Report. Please check parameters and try again.');
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [searchTerm, activeFilters, pageIndex, pageSize, sortColumn, sortDirection]);
 

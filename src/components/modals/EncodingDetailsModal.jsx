@@ -62,7 +62,9 @@ export default function EncodingDetailsModal({ rowData, storeName, fromDate, toD
         console.error("Failed to fetch Encoding modal details", err);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [assignedStore, fromDate, toDate, ean, articleNo, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
 

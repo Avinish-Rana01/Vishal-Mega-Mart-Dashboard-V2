@@ -145,7 +145,9 @@ export default function StockTakeReportPage() {
         setError('Failed to fetch Stock Take report data. Please check your network or try again.');
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [appliedFilters, pageIndex, pageSize, sortColumn, sortDirection]);
 

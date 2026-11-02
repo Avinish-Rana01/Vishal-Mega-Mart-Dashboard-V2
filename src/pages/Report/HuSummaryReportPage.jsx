@@ -180,7 +180,9 @@ export default function HuSummaryReportPage() {
         setError('Failed to load HU Summary Report. Please check parameters and try again.');
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [searchTerm, pageIndex, pageSize, activeFilters, sortColumn, sortDirection]);
 

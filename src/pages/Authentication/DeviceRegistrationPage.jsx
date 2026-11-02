@@ -53,7 +53,7 @@ export default function DeviceRegistrationPage() {
 
   // Table Data & Loading State
   const [devices, setDevices] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Table Search, Sorting & Pagination

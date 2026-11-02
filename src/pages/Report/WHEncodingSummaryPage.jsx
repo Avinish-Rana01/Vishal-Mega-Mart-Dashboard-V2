@@ -117,7 +117,9 @@ export default function WHEncodingSummaryPage() {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [searchTerm, pageIndex, pageSize, appliedFilters, sortColumn, sortDirection]);
 

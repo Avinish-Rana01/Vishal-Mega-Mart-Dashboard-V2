@@ -93,7 +93,7 @@ export default function ReconciliationReportView({ type = 'return' }) {
   const navigate = useNavigate();
   
   const [reportData, setReportData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedModalRow, setSelectedModalRow] = useState(null);
   
@@ -244,7 +244,9 @@ export default function ReconciliationReportView({ type = 'return' }) {
         setReportData([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   };
 

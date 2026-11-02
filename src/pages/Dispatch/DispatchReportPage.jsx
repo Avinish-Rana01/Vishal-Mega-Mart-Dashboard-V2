@@ -47,7 +47,7 @@ export default function DispatchReportPage() {
 
   const [reportData, setReportData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Modal Details State
@@ -84,7 +84,9 @@ export default function DispatchReportPage() {
       setReportData([]);
       setTotalRecords(0);
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [appliedFilters, pageIndex, pageSize, sortColumn, sortDirection]);
 

@@ -115,7 +115,9 @@ export default function TagCleaningDetailModal({
         console.error("Failed to fetch Tag Cleaning detail modal data", err);
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [formattedDate, pageIndex, pageSize, searchTerm, sortColumn, sortDirection]);
 

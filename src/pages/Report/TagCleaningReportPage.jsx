@@ -113,7 +113,9 @@ export default function TagCleaningReportPage() {
         setError('Failed to fetch Tag Cleaning report data. Please check your network or try again.');
       }
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [appliedFilters, pageIndex, pageSize, sortColumn, sortDirection]);
 

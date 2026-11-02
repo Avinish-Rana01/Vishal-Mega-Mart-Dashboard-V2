@@ -44,7 +44,7 @@ export default function UserRegistrationPage() {
 
   // Table Data & Loading State
   const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Table Search, Sorting & Pagination
