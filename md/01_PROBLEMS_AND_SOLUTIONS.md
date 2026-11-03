@@ -425,3 +425,38 @@ if (!data || data.length === 0) {
 * Layout height never collapses.
 * KPI cards show `0`, percentages show `0.0%`.
 * The chart card retains its full structural framing, preserving a polished, executive aesthetic even on zero-activity days.
+
+---
+
+## 🛑 Problem 15: Table Loading Split, Shimmer Inconsistency & Anti-Shrink Height Preservation
+
+### Symptom:
+1. **Inconsistent Loaders**: Initial table load showed either a skeleton shimmer or a vertical 28px spinner, while pagination showed a floating frosted glass overlay pill (`vmm-table-loader-pill`).
+2. **Table Shrinking & Cumulative Layout Shift (CLS)**: When opening a report page or modal, the table collapsed to just ~120px height during loading because no records existed yet (`sortedData.length === 0`). Once the 10 data records loaded, the table jumped to ~306px, causing jarring visual jumps.
+
+### Root Cause:
+* In `BaseDataTable.jsx`, `{isLoading && sortedData.length > 0 && (...) }` restricted the frosted overlay pill exclusively to pagination when rows already existed.
+* Empty loading states fell back to rendering an ad-hoc 28px vertical spinner inside an unconstrained `<tbody>` row.
+* Standard `.vmm-table td` CSS has `padding: 6px 10px !important`, which overrode inline padding and collapsed the empty table during initial fetch.
+
+### Solution:
+1. **Single Unified Overlay Loader**:
+   - Gated the overlay unconditionally: `{isLoading && (...) }`.
+   - Removed skeleton shimmer and secondary vertical spinners entirely.
+2. **10-Row Height Preservation Formula**:
+   - Calculated exact height of 10 data rows in VMM tables: `10 rows * ~27.5px = ~274px` + `~32px header` = **`~306px`**.
+   - Container min-height:
+     ```javascript
+     minHeight: isLoading ? `${Math.round((pageSize || 10) * 27.5 + 32)}px` : undefined // 307px
+     ```
+   - Placeholder row min-height (accounting for 12px vertical td padding):
+     ```javascript
+     minHeight: `${Math.round((pageSize || 10) * 26)}px` // 260px
+     ```
+3. **Empty State Separation**:
+   - "No Data Available" and "No matching records found" only render once loading finishes (`isLoading === false` and `sortedData.length === 0`).
+
+### Result:
+* Zero layout shift: The table card maintains the exact same `~306px` height during initial load, search, sort, and pagination.
+* Completely unified and polished UI with the floating frosted pill centered across all reports and modals.
+
