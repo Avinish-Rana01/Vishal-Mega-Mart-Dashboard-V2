@@ -449,3 +449,36 @@ Whenever you want to build a new screen, type:
    | Audit Grid | ReportDataTableCard | Reusable |
    ```
 4. **Approval & Scaffolding**: Waits for user review. Once approved, it generates clean JSX, scoped CSS, wires the API service, and registers the route in `App.jsx`.
+
+---
+
+## 9. Universal Table Loading & Anti-Shrink Layout Standard
+
+To eliminate jarring UI flickers, secondary spinners, and Cumulative Layout Shift (CLS) across all data grids in the application:
+
+### 1. Single Unified Loader Overlay
+* **Rule**: Every data grid (`BaseDataTable`, `ReportDataTableCard`, `DetailsModal`) must display the **floating frosted glass overlay pill** (`.vmm-table-loading-overlay` + `.vmm-table-loader-pill`) during all loading phases:
+  - Initial mount & data fetch
+  - Search filtering & sorting
+  - Pagination page transitions
+  - Drill-down modal loading
+* **Zero Skeletons**: Ad-hoc shimmer skeletons and vertical 28px spinners inside `<tbody>` are eliminated in favor of the clean, sticky-centered overlay pill.
+
+### 2. Standardized Color Hex Invariants
+Always use these exact brand colors across all table indicators and controls:
+* **Blue**: `#3B82F6` (Loading spinner, active page, primary export button)
+* **Red**: `#EF5350` (Discrepancy indicators, void tags, destructive actions)
+* **Green**: `#10B981` (Success badges, active status, RFID verified counts)
+
+### 3. Anti-Shrink Height Calculation Formula
+When a table is loading with 0 rows (`sortedData.length === 0`), the table must **never collapse or shrink** to a small height:
+```javascript
+// Exact height of 10 data rows in VMM tables: ~274px body + ~32px header = ~306px
+const targetLoadingRows = pageSize || 10;
+const targetPlaceholderHeight = Math.round(targetLoadingRows * 26);         // 260px (accounting for 12px td padding)
+const targetContainerMinHeight = Math.round(targetLoadingRows * 27.5 + 32); // 307px container min-height
+```
+* **Container**: `style={{ minHeight: isLoading ? `${targetContainerMinHeight}px` : undefined }}`
+* **Placeholder Row**: `style={{ minHeight: `${targetPlaceholderHeight}px`, height: `${targetPlaceholderHeight}px` }}`
+* **Empty State Distinction**: When `isLoading === false` and `sortedData.length === 0`, display the standard compact "No Data Available" card without artificial height padding.
+
