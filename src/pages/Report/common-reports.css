@@ -810,14 +810,14 @@
    ======================================================== */
 .grc-report-cards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr) !important;
+  grid-template-columns: repeat(4, 1fr) !important;
   gap: 4px;
   margin: 0 12px 4px 12px;
 }
 
 @media (max-width: 1200px) {
   .grc-report-cards {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 

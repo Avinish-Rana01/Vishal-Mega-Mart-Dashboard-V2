@@ -16,7 +16,7 @@ export default function Header({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { loggedInUser, userRole, userType, storeName, storeCode, warehouseName, warehouseCode, logout } = useAuth();
+  const { loggedInUser, userRole, userType, storeName, storeCode, warehouseName, warehouseCode, hasDashboardAccess, getDefaultRoute, logout } = useAuth();
   const navigate = useNavigate();
 
   // Close dropdown on outside click
@@ -165,8 +165,8 @@ export default function Header({
           {showBackButton && (
             <button
               className="btn-back"
-              onClick={onBackClick || (() => navigate(-1))}
-              title="Go Back"
+              onClick={() => navigate(hasDashboardAccess ? '/dashboard' : getDefaultRoute())}
+              title="Back to Dashboard"
               style={{
                 background: '#f87171', color: '#fff', border: 'none', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer'
               }}

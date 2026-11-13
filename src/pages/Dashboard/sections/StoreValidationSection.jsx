@@ -23,11 +23,19 @@ import { saveDashboardReturnPoint, useSessionState } from '../../../utils/dashbo
 
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
-const COLOR_RECEIVED  = '#3b82f6'; // blue (Normal/Baseline)
-const COLOR_VALIDATED = '#10b981'; // green (Completed/Positive)
-const COLOR_HHT       = '#6366f1'; // indigo
-const COLOR_PENDING   = '#f59e0b'; // amber (Pending/In-progress)
+const COLOR_VALIDATED = '#10b981'; // green (WH Validated)
+const COLOR_HHT       = '#6366f1'; // indigo (Store Validated)
+const COLOR_PENDING   = '#f59e0b'; // amber (Pending for Validation)
 const COLOR_WRONG     = '#ef4444'; // red (Error)
+
+// ─── Legend All-Clear Pill ────────────────────────────────────────────────────
+function AllClearLegend() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', padding: '4px 8px 6px', fontSize: '12px', color: '#059669', fontWeight: 500, borderBottom: '1px solid #e8eaf0' }}>
+      <Icons.Check size={14} strokeWidth={3} /> All Clear
+    </div>
+  );
+}
 
 // ─── Tooltips ────────────────────────────────────────────────────────────────
 function ValidationTooltip({ active, payload }) {
@@ -44,7 +52,6 @@ function ValidationTooltip({ active, payload }) {
         )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 14px', fontSize: '12px' }}>
-        <span style={{ color: '#94a3b8' }}>Received HU</span>      <span style={{ fontWeight: 700, color: COLOR_RECEIVED }}>{Number(d.HU_RECEIVED_QTY || 0).toLocaleString('en-IN')}</span>
         <span style={{ color: '#94a3b8' }}>WH Validated</span>     <span style={{ fontWeight: 700, color: COLOR_VALIDATED }}>{Number(d.HU_VALIDATED_QTY || 0).toLocaleString('en-IN')}</span>
         <span style={{ color: '#94a3b8' }}>Store Validated</span>  <span style={{ fontWeight: 700, color: COLOR_HHT }}>{Number(d.HHT_VALIDATE_QTY || 0).toLocaleString('en-IN')}</span>
         <span style={{ color: '#94a3b8' }}>Pending</span>          <span style={{ fontWeight: 700, color: pending > 0 ? '#f59e0b' : '#10b981' }}>{pending.toLocaleString('en-IN')}</span>
@@ -54,73 +61,7 @@ function ValidationTooltip({ active, payload }) {
   );
 }
 
-// ─── Side Badge Columns ───────────────────────────────────────────────────────
-const WrongHUBadgeColumn = ({ chartData, chartHeight, showPending = true, onCellClick }) => (
-  <div style={{ width: '70px', height: chartHeight, display: 'flex', flexDirection: 'column', flexShrink: 0, paddingTop: '20px', paddingBottom: '35px' }}>
-    {chartData.map((d, i) => {
-      const wrong = Number(d.HU_WRONG_QTY || 0);
-      const pending = Number(d.STORE_PENDING_QTY || 0);
-      const hasError = wrong > 0;
-      const hasPending = pending > 0;
-
-      return (
-        <div key={d.STORE || i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '4px' }}>
-          {hasError ? (
-            <div 
-              className="sv-clickable-badge"
-              onClick={(e) => onCellClick && onCellClick(d, '0', e)}
-              title="Click to view Wrong HUs in GRC Report (Status: 0)"
-              style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fee2e2', color: '#dc2626', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}
-            >
-              {wrong}
-            </div>
-          ) : (
-            <div 
-              className="sv-clickable-badge"
-              onClick={(e) => onCellClick && onCellClick(d, '0', e)}
-              title="Click to view Wrong HUs in GRC Report (Status: 0)"
-              style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#dcfce7', color: '#16a34a', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
-            >
-              ✓
-            </div>
-          )}
-          {showPending && hasPending && (
-            <div 
-              className="sv-clickable-badge"
-              onClick={(e) => onCellClick && onCellClick(d, '3', e)}
-              title="Click to view Pending HUs in GRC Report (Status: 3)"
-              style={{ width: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fef3c7', color: '#d97706', borderRadius: '6px', padding: '2px 0', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}
-            >
-              {pending}
-            </div>
-          )}
-        </div>
-      );
-    })}
-  </div>
-);
-
-// ─── Custom Gap Label for Validated Bar ─────────────────────────────────────────
-const CustomGapLabel = (props) => {
-  const { x, y, width, height, value, index, data } = props;
-  const row = data && index !== undefined ? data[index] : null;
-  const pending = row ? Number(row.STORE_PENDING_QTY || 0) : 0;
-  
-  return (
-    <g>
-      <text x={x + width + 5} y={y + height / 2 + 4} fill={COLOR_VALIDATED} fontSize="11px" fontWeight="600">
-        {value}
-      </text>
-      {pending > 0 && (
-        <text x={x + width + 30} y={y + height / 2 + 4} fill="#ef4444" fontSize="11px" fontWeight="700">
-          (-{pending} gap)
-        </text>
-      )}
-    </g>
-  );
-};
-
-// ─── 1. Grouped Bar Chart (Received vs Validated) ─────────────────────────────
+// ─── 1. Grouped Bar Chart (WH Validated vs Store Validated) ──────────────────
 const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
   const ROW_HEIGHT = 16;
   const GROUP_GAP = 16;
@@ -132,29 +73,14 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
       {hasBeenVisible && (
         <div style={{ flex: 1, minWidth: 0 }}>
           <ResponsiveContainer width="100%" height={chartHeight}>
-            <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 80, left: 0, bottom: 5 }} barCategoryGap="20%">
+            <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 65, left: 0, bottom: 5 }} barCategoryGap="20%">
               <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
               <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
               <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
               <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
               <Bar 
-                dataKey="HU_RECEIVED_QTY" 
-                name="Received HU" 
-                barSize={ROW_HEIGHT} 
-                fill={COLOR_RECEIVED} 
-                radius={[4,4,4,4]} 
-                isAnimationActive={true} 
-                animationDuration={500} 
-                animationEasing="ease-out"
-                cursor="pointer"
-                minPointSize={2}
-                onClick={(entry) => onCellClick && onCellClick(entry, '4')}
-              >
-                <LabelList dataKey="HU_RECEIVED_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_RECEIVED }} />
-              </Bar>
-              <Bar 
                 dataKey="HU_VALIDATED_QTY" 
-                name="Validated HU" 
+                name="WH Validated" 
                 barSize={ROW_HEIGHT} 
                 fill={COLOR_VALIDATED} 
                 radius={[4,4,4,4]} 
@@ -165,7 +91,22 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
                 minPointSize={2}
                 onClick={(entry) => onCellClick && onCellClick(entry, '1')}
               >
-                <LabelList dataKey="HU_VALIDATED_QTY" content={<CustomGapLabel data={chartData} />} />
+                <LabelList dataKey="HU_VALIDATED_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_VALIDATED }} />
+              </Bar>
+              <Bar 
+                dataKey="HHT_VALIDATE_QTY" 
+                name="Store Validated" 
+                barSize={ROW_HEIGHT} 
+                fill={COLOR_HHT} 
+                radius={[4,4,4,4]} 
+                isAnimationActive={true} 
+                animationDuration={500} 
+                animationEasing="ease-out"
+                cursor="pointer"
+                minPointSize={2}
+                onClick={(entry) => onCellClick && onCellClick(entry, '2')}
+              >
+                <LabelList dataKey="HHT_VALIDATE_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: COLOR_HHT }} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -175,59 +116,69 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
   );
 });
 
-// ─── 2. Progress Bar Chart (HHT Validated + Pending) ──────────────────────────
-const MemoizedProgressChart = React.memo(({ chartData, onCellClick }) => {
+// ─── 2. Store Pending for Validation Chart (Highest Pending First) ───────────
+const MemoizedPendingChart = React.memo(({ chartData, searchFilter, onClearSearch, onCellClick, sortDescending = true }) => {
   const ROW_HEIGHT = 20;
   const GROUP_GAP = 16;
-  const chartHeight = Math.max(220, chartData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
+  const filteredData = useMemo(() => {
+    const nonZero = chartData.filter(d => Number(d.STORE_PENDING_QTY || 0) > 0);
+    return nonZero.sort((a, b) => sortDescending
+      ? Number(b.STORE_PENDING_QTY || 0) - Number(a.STORE_PENDING_QTY || 0)
+      : Number(a.STORE_PENDING_QTY || 0) - Number(b.STORE_PENDING_QTY || 0)
+    );
+  }, [chartData, sortDescending]);
+  const chartHeight = Math.max(220, filteredData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
   const [ref, hasBeenVisible] = useIsInViewport();
+
+  if (filteredData.length === 0) {
+    if (searchFilter && searchFilter.trim().length > 0) {
+      return (
+        <SearchEmptyState 
+          searchFilter={searchFilter}
+          title={`No Pending Validations Found for "${searchFilter}"`}
+          subtitle="Try another store or clear your search."
+          onClearSearch={onClearSearch}
+        />
+      );
+    }
+
+    return (
+      <GlobalEmptyState 
+        title="No Pending Validations"
+        subtitle="All stores are currently up to date"
+        icon={Icons.CheckCircle}
+        iconColor="#059669"
+      />
+    );
+  }
 
   return (
     <div ref={ref} style={{ display: 'flex', width: '100%', minHeight: chartHeight }}>
       {hasBeenVisible && (
-        <>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={chartHeight}>
-              <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 5 }} barCategoryGap="20%">
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
-                <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(241,245,249,0.6)' }} />
-                <Bar 
-                  dataKey="HHT_VALIDATE_QTY" 
-                  stackId="a" 
-                  name="HHT Validated" 
-                  barSize={ROW_HEIGHT} 
-                  fill={COLOR_HHT} 
-                  radius={[4,0,0,4]} 
-                  isAnimationActive={true} 
-                  animationDuration={500} 
-                  animationEasing="ease-out"
-                  cursor="pointer"
-                  onClick={(entry) => onCellClick && onCellClick(entry, '2')}
-                >
-                  <LabelList dataKey="HHT_VALIDATE_QTY" position="insideLeft" style={{ fontSize: '11px', fontWeight: 600, fill: '#fff' }} formatter={(val) => val > 0 ? val : ''} />
-                </Bar>
-                <Bar 
-                  dataKey="STORE_PENDING_QTY" 
-                  stackId="a" 
-                  name="Pending" 
-                  barSize={ROW_HEIGHT} 
-                  fill={COLOR_PENDING} 
-                  radius={[0,4,4,0]} 
-                  isAnimationActive={true} 
-                  animationDuration={500} 
-                  animationEasing="ease-out"
-                  cursor="pointer"
-                  onClick={(entry) => onCellClick && onCellClick(entry, '3')}
-                >
-                  <LabelList dataKey="STORE_PENDING_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: '#d97706' }} formatter={(val) => val > 0 ? val : ''} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <WrongHUBadgeColumn chartData={chartData} chartHeight={chartHeight} showPending={false} onCellClick={onCellClick} />
-        </>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart data={filteredData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 5 }} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical stroke="#e2e8f0" />
+              <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis dataKey="STORE" type="category" tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }} axisLine={false} tickLine={false} width={52} />
+              <Tooltip content={<ValidationTooltip />} cursor={{ fill: 'rgba(254,243,199,0.55)' }} />
+              <Bar 
+                dataKey="STORE_PENDING_QTY" 
+                name="Store Pending" 
+                barSize={ROW_HEIGHT} 
+                fill={COLOR_PENDING} 
+                radius={[4,4,4,4]} 
+                isAnimationActive={true} 
+                animationDuration={500} 
+                animationEasing="ease-out"
+                cursor="pointer"
+                onClick={(entry) => onCellClick && onCellClick(entry, '3')}
+              >
+                <LabelList dataKey="STORE_PENDING_QTY" position="right" style={{ fontSize: '11px', fontWeight: 600, fill: '#d97706' }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   );
@@ -297,8 +248,8 @@ const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearc
 
 // ─── View & Sort options ──────────────────────────────────────────────────────
 const VIEW_OPTIONS = [
-  { value: 'grouped', label: 'Received vs Validated' },
-  { value: 'progress', label: 'Validation Progress' },
+  { value: 'grouped', label: 'WH Validated vs Store Validated' },
+  { value: 'progress', label: 'Store Pending for Validation' },
   { value: 'wrong_hu', label: 'Wrong HU Distribution' },
 ];
 
@@ -364,7 +315,7 @@ export default function StoreValidationSection() {
   const tableSortOptions = useMemo(() => [
     { value: 'PENDING_DESC', label: 'Highest Pending' },
     { value: 'WRONG_DESC', label: 'Highest Wrong HU' },
-    { value: 'RECEIVED_DESC', label: 'Most Received' }
+    { value: 'VALIDATED_DESC', label: 'Highest WH Validated' }
   ], []);
 
   // Dynamically generate sort options based on current view
@@ -375,28 +326,32 @@ export default function StoreValidationSection() {
         { value: 'WRONG_ASC', label: 'Lowest Wrong HU' }
       ];
     }
-    const baseOptions = [
-      { value: 'PENDING_DESC', label: 'Highest Pending' },
-      { value: 'VALIDATED_ASC', label: 'Lowest Validated' },
-      { value: 'VALIDATED_DESC', label: 'Highest Validated' },
-    ];
-    if (chartView !== 'grouped') {
-      // Insert Wrong HU option before Store Code (spread, no mutation)
+    if (chartView === 'progress') {
       return [
-        ...baseOptions.slice(0, 2),
-        { value: 'WRONG_DESC', label: 'Highest Wrong HU' },
-        ...baseOptions.slice(2),
+        { value: 'PENDING_DESC', label: 'Highest Pending' },
+        { value: 'PENDING_ASC', label: 'Lowest Pending' }
       ];
     }
-    return baseOptions;
+    return [
+      { value: 'PENDING_DESC', label: 'Highest Pending' },
+      { value: 'VALIDATED_DESC', label: 'Highest WH Validated' },
+      { value: 'VALIDATED_ASC', label: 'Lowest WH Validated' },
+      { value: 'HHT_DESC', label: 'Highest Store Validated' }
+    ];
   }, [chartView]);
 
-  // Ensure current sort is valid for current view
+  // Ensure cached/active sorts remain valid after view or option changes
   useEffect(() => {
     if (!sortOptions.find(opt => opt.value === sortBy)) {
       setSortBy(sortOptions[0].value);
     }
-  }, [sortOptions, sortBy]);
+  }, [sortOptions, sortBy, setSortBy]);
+
+  useEffect(() => {
+    if (!tableSortOptions.find(opt => opt.value === tableSort)) {
+      setTableSort(tableSortOptions[0].value);
+    }
+  }, [tableSortOptions, tableSort, setTableSort]);
 
   // Filtered + sorted data for the chart
   const chartData = useMemo(() => {
@@ -415,6 +370,8 @@ export default function StoreValidationSection() {
     // Sort
     if (sortBy === 'PENDING_DESC') {
       result.sort((a, b) => Number(b.STORE_PENDING_QTY || 0) - Number(a.STORE_PENDING_QTY || 0));
+    } else if (sortBy === 'PENDING_ASC') {
+      result.sort((a, b) => Number(a.STORE_PENDING_QTY || 0) - Number(b.STORE_PENDING_QTY || 0));
     } else if (sortBy === 'VALIDATED_ASC') {
       result.sort((a, b) => Number(a.HU_VALIDATED_QTY || 0) - Number(b.HU_VALIDATED_QTY || 0));
     } else if (sortBy === 'WRONG_DESC') {
@@ -423,6 +380,8 @@ export default function StoreValidationSection() {
       result.sort((a, b) => Number(a.HU_WRONG_QTY || 0) - Number(b.HU_WRONG_QTY || 0));
     } else if (sortBy === 'VALIDATED_DESC') {
       result.sort((a, b) => Number(b.HU_VALIDATED_QTY || 0) - Number(a.HU_VALIDATED_QTY || 0));
+    } else if (sortBy === 'HHT_DESC') {
+      result.sort((a, b) => Number(b.HHT_VALIDATE_QTY || 0) - Number(a.HHT_VALIDATE_QTY || 0));
     } else {
       result.sort((a, b) => (a.STORE || '').localeCompare(b.STORE || ''));
     }
@@ -430,6 +389,7 @@ export default function StoreValidationSection() {
     return result;
   }, [data, searchFilter, sortBy]);
 
+  const hasPendingHUs = useMemo(() => chartData.some(d => Number(d.STORE_PENDING_QTY || 0) > 0), [chartData]);
   const hasWrongHUs = useMemo(() => chartData.some(d => Number(d.HU_WRONG_QTY || 0) > 0), [chartData]);
 
   // Separate sorted data for the Data Grid (Table)
@@ -442,8 +402,8 @@ export default function StoreValidationSection() {
       result.sort((a, b) => Number(b.STORE_PENDING_QTY || 0) - Number(a.STORE_PENDING_QTY || 0));
     } else if (tableSort === 'WRONG_DESC') {
       result.sort((a, b) => Number(b.HU_WRONG_QTY || 0) - Number(a.HU_WRONG_QTY || 0));
-    } else if (tableSort === 'RECEIVED_DESC') {
-      result.sort((a, b) => Number(b.HU_RECEIVED_QTY || 0) - Number(a.HU_RECEIVED_QTY || 0));
+    } else if (tableSort === 'VALIDATED_DESC') {
+      result.sort((a, b) => Number(b.HU_VALIDATED_QTY || 0) - Number(a.HU_VALIDATED_QTY || 0));
     }
 
     return result;
@@ -472,14 +432,7 @@ export default function StoreValidationSection() {
       />
 
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
-      <div className="cc-kpi-row">
-        <KpiCard2
-          title="HU Received"
-          value={<LiveTickerValue value={totals?.HU_RECEIVED_QTY || 0} />}
-          badge="Expected"
-          badgeVariant="default"
-          icon={<Icons.Box />}
-        />
+      <div className="cc-kpi-row" style={{ '--kpi-cols': 4 }}>
         <KpiCard2
           title="WH Validated"
           value={<LiveTickerValue value={totals?.HU_VALIDATED_QTY || 0} />}
@@ -552,23 +505,22 @@ export default function StoreValidationSection() {
         {/* ── Legend Strip (Dynamic based on View) ────────────────── */}
         {chartView === 'grouped' && (
           <ChartLegend items={[
-            { color: COLOR_RECEIVED, label: 'Received HU' },
             { color: COLOR_VALIDATED, label: 'WH Validated' },
+            { color: COLOR_HHT, label: 'Store Validated' },
           ]} />
         )}
         {chartView === 'progress' && (
-          <ChartLegend items={[
-            { color: COLOR_HHT, label: 'Store Validated' },
-            { color: COLOR_PENDING, label: 'Pending' },
-          ]} />
+          hasPendingHUs ? (
+            <ChartLegend items={[{ color: COLOR_PENDING, label: 'Store Pending' }]} />
+          ) : (
+            <AllClearLegend />
+          )
         )}
         {chartView === 'wrong_hu' && (
           hasWrongHUs ? (
             <ChartLegend items={[{ color: COLOR_WRONG, label: 'Wrong HU' }]} />
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', padding: '4px 8px 6px', fontSize: '12px', color: '#059669', fontWeight: 500, borderBottom: '1px solid #e8eaf0' }}>
-              <Icons.Check size={14} strokeWidth={3} /> All Clear
-            </div>
+            <AllClearLegend />
           )
         )}
 
@@ -584,7 +536,7 @@ export default function StoreValidationSection() {
           ) : (
             <>
               {chartView === 'grouped' && <MemoizedValidationChart chartData={chartData} onCellClick={handleCellClick} />}
-              {chartView === 'progress' && <MemoizedProgressChart chartData={chartData} onCellClick={handleCellClick} />}
+              {chartView === 'progress' && <MemoizedPendingChart chartData={chartData} searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} onCellClick={handleCellClick} sortDescending={sortBy !== 'PENDING_ASC'} />}
               {chartView === 'wrong_hu' && <MemoizedWrongHUChart chartData={chartData} searchFilter={searchFilter} onClearSearch={() => setSearchFilter('')} onCellClick={handleCellClick} />}
             </>
           )}
@@ -613,7 +565,7 @@ export default function StoreValidationSection() {
           />
         }
         headers={[
-          'Store', 'Date', 'Received HU', 'WH Validated', 'Store Validated', 'Store Pending for Validation', 'Wrong HU'
+          'Store', 'Date', 'WH Validated', 'Store Validated', 'Store Pending for Validation', 'Wrong HU'
         ]}
         data={tableData}
         tableClassName="sv-grid-table"
@@ -621,7 +573,7 @@ export default function StoreValidationSection() {
         tableStyle={{ width: '100%', tableLayout: 'auto' }}
         emptyStateContent={
           <tr>
-            <td colSpan={7} className="cc-data-grid-empty-cell">
+            <td colSpan={6} className="cc-data-grid-empty-cell">
               No validation data found
             </td>
           </tr>
@@ -629,11 +581,10 @@ export default function StoreValidationSection() {
         renderRow={(row, idx) => {
           const pending = Number(row.STORE_PENDING_QTY || 0);
           const wrong = Number(row.HU_WRONG_QTY || 0);
-          const received = Number(row.HU_RECEIVED_QTY || 0);
           const validated = Number(row.HU_VALIDATED_QTY || 0);
           const hhtValidated = Number(row.HHT_VALIDATE_QTY || 0);
 
-          const validatedColor = validated < received ? '#dc2626' : '#16a34a';
+          const validatedColor = '#16a34a';
           const hhtColor = hhtValidated < validated ? '#dc2626' : COLOR_HHT;
 
           return (
@@ -654,16 +605,6 @@ export default function StoreValidationSection() {
               </td>
               <td className="cc-data-grid-td" style={{ fontSize: '11px', color: '#64748b' }}>
                 {row.DATE ? row.DATE.split(' ')[0] : '—'}
-              </td>
-              <td className="cc-data-grid-td">
-                <span 
-                  className="sv-clickable-cell"
-                  style={{ color: COLOR_RECEIVED, fontWeight: 700 }}
-                  onClick={() => handleCellClick(row, '4')}
-                  title="Click to view Received HUs in GRC Report (Status: 4)"
-                >
-                  {received.toLocaleString('en-IN')}
-                </span>
               </td>
               <td className="cc-data-grid-td">
                 <span 

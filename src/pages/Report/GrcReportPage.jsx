@@ -269,12 +269,30 @@ export default function GrcReportPage() {
     }
   };
 
+  const handleBackToGrcSummary = () => {
+    const targetStore = appliedFilters.storeCode || selectedStore || initialStore;
+    const summaryState = {
+      store: targetStore,
+      rowDate: appliedFilters.toDate || appliedFilters.fromDate || toDate || fromDate
+    };
+
+    if (
+      location.state?.summaryFromDate &&
+      location.state?.summaryToDate &&
+      (!location.state?.summaryStore || location.state.summaryStore === targetStore)
+    ) {
+      summaryState.fromDate = location.state.summaryFromDate;
+      summaryState.toDate = location.state.summaryToDate;
+    }
+
+    navigate('/reports/store-grc', { state: summaryState });
+  };
+
   return (
     <AppLayout 
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">GRC REPORT</span></>,
-        showBackButton: true,
-        onBackClick: () => navigate(-1)
+        showBackButton: true
       }}
     >
           {/* Search Card */}
@@ -343,7 +361,7 @@ export default function GrcReportPage() {
                   disabled={isLoading}
                 />
                 <BackButton 
-                  onClick={() => navigate(-1)} 
+                  onClick={handleBackToGrcSummary} 
                   label="Back to GRC Summary" 
                 />
               </div>

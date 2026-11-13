@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Package, Building2, Store, Clock, AlertTriangle } from 'lucide-react';
+import { Building2, Store, Clock, AlertTriangle } from 'lucide-react';
 import AppLayout from '../../components/layout/AppLayout';
 import ReportDataTableCard from '../../components/common/ReportDataTableCard';
 import SearchableDropdown from '../../components/common/SearchableDropdown';
@@ -22,44 +22,54 @@ export default function StoreGrcReportPage() {
     return adjustedDate.toISOString().split('T')[0];
   };
 
-  // Determine dates for past 7 days by default, or from passed rowDate
-  const rowDate = location.state?.rowDate;
-  let defaultToDate, defaultFromDate;
+  /** Resolve initial fromDate/toDate from navigation state (explicit range or 7 days ending at rowDate). */
+  const resolveDateRangeFromState = (navState) => {
+    if (navState?.fromDate && navState?.toDate) {
+      return {
+        fromDate: String(navState.fromDate).split('T')[0].split(' ')[0],
+        toDate: String(navState.toDate).split('T')[0].split(' ')[0]
+      };
+    }
 
-  if (rowDate) {
-    // The API might send "2026-07-19 12:00 AM Sunday". Extract just the date part.
-    const dateOnlyStr = String(rowDate).split(' ')[0];
-    let passedDate = new Date(dateOnlyStr);
-    
-    // If it failed to parse natively, try to parse DD-MM-YYYY or DD-MMM-YYYY manually
-    if (isNaN(passedDate)) {
-      const parts = dateOnlyStr.split(/[-/]/);
-      if (parts.length >= 3 && parts[0].length === 2 && parts[2].length === 4) {
-        let monthStr = parts[1];
-        if (isNaN(monthStr)) {
-          const mNames = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
-          monthStr = mNames[monthStr.toLowerCase()] || '01';
+    const rowDate = navState?.rowDate;
+    if (rowDate) {
+      // The API might send "2026-07-19 12:00 AM Sunday". Extract just the date part.
+      const dateOnlyStr = String(rowDate).split(' ')[0];
+      let passedDate = new Date(dateOnlyStr);
+
+      // If it failed to parse natively, try to parse DD-MM-YYYY or DD-MMM-YYYY manually
+      if (isNaN(passedDate)) {
+        const parts = dateOnlyStr.split(/[-/]/);
+        if (parts.length >= 3 && parts[0].length === 2 && parts[2].length === 4) {
+          let monthStr = parts[1];
+          if (isNaN(monthStr)) {
+            const mNames = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
+            monthStr = mNames[monthStr.toLowerCase()] || '01';
+          }
+          passedDate = new Date(`${parts[2]}-${monthStr}-${parts[0]}`);
         }
-        passedDate = new Date(`${parts[2]}-${monthStr}-${parts[0]}`);
+      }
+
+      if (!isNaN(passedDate)) {
+        const lastWeek = new Date(passedDate);
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        return {
+          fromDate: formatDate(lastWeek),
+          toDate: formatDate(passedDate)
+        };
       }
     }
 
-    if (!isNaN(passedDate)) {
-      defaultToDate = formatDate(passedDate);
-      const lastWeek = new Date(passedDate);
-      lastWeek.setDate(lastWeek.getDate() - 7);
-      defaultFromDate = formatDate(lastWeek);
-    }
-  }
-
-  if (!defaultToDate || !defaultFromDate) {
     const today = new Date();
-    defaultToDate = formatDate(today);
     const lastWeek = new Date(today);
     lastWeek.setDate(lastWeek.getDate() - 7);
-    defaultFromDate = formatDate(lastWeek);
-  }
+    return {
+      fromDate: formatDate(lastWeek),
+      toDate: formatDate(today)
+    };
+  };
 
+  const { fromDate: defaultFromDate, toDate: defaultToDate } = resolveDateRangeFromState(location.state);
   const { store: initialStore = 'HD44' } = location.state || {};
 
   const [selectedStore, setSelectedStore] = useState(initialStore);
@@ -84,6 +94,23 @@ export default function StoreGrcReportPage() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [sortColumn, setSortColumn] = useState('GRC_DATE');
   const [sortDirection, setSortDirection] = useState('DESC');
+
+  // Sync filters when navigating into Store GRC Report with updated location.state
+  useEffect(() => {
+    if (location.state) {
+      const nextStore = location.state.store || 'HD44';
+      const nextRange = resolveDateRangeFromState(location.state);
+      setSelectedStore(nextStore);
+      setFromDate(nextRange.fromDate);
+      setToDate(nextRange.toDate);
+      setPageIndex(1);
+      setAppliedFilters({
+        storeCode: nextStore,
+        fromDate: nextRange.fromDate,
+        toDate: nextRange.toDate
+      });
+    }
+  }, [location.state]);
 
   const exportFilters = useMemo(() => ({
     storeCode: appliedFilters.storeCode,
@@ -118,7 +145,6 @@ export default function StoreGrcReportPage() {
 
   // Vibrant gradient pairs matching Store Sale Report design
   const cardGradients = useMemo(() => [
-    ['#7dd3fc', '#0284c7'], // Blue: HU RECEIVED QTY
     ['#86efac', '#22c55e'], // Green: WH VALIDATED QTY
     ['#c084fc', '#9333ea'], // Purple: STORE VALIDATED QTY
     ['#fcd34d', '#ea580c'], // Orange: PENDING FOR VALIDATION
@@ -154,7 +180,6 @@ export default function StoreGrcReportPage() {
         const mappedData = (result.items || []).map((item) => ({
           srNo: item.RowNumber || item.SR_NO || item.srNo,
           date: (item.GRC_DATE || item.DATE) ? (item.GRC_DATE || item.DATE).split('T')[0] : '',
-          huReceivedQty: item.HU_RECEIVED_QTY,
           whValidatedQty: item.HU_VALIDATED_QTY,
           storeValidatedQty: item.HHT_VALIDATE_QTY,
           pendingQty: item.STORE_PENDING_QTY,
@@ -171,7 +196,6 @@ export default function StoreGrcReportPage() {
           const pending = received - hhtValidated;
 
           setReportSummary({
-            huReceivedQty: result.summary.huReceivedQty,
             whValidatedQty: result.summary.whValidatedQty,
             storeValidatedQty: result.summary.hhtValidateQty,
             pendingQty: pending,
@@ -200,34 +224,30 @@ export default function StoreGrcReportPage() {
     return opt?.STORE_NAME || opt?.label || selectedStore;
   };
 
-  const handleCellClick = (row, status) => {
+  const navigateToGrcDetails = (fromDateVal, toDateVal, status) => {
     const storeCode = appliedFilters.storeCode || selectedStore;
     if (!storeCode) return;
-
-    let dateOnly = row?.date ? String(row.date).split('T')[0].split(' ')[0] : appliedFilters.fromDate;
 
     navigate('/reports/grc', {
       state: {
         store: storeCode,
-        fromDate: dateOnly,
-        toDate: dateOnly,
-        grcStatus: String(status)
+        fromDate: fromDateVal,
+        toDate: toDateVal,
+        grcStatus: String(status),
+        summaryStore: storeCode,
+        summaryFromDate: appliedFilters.fromDate,
+        summaryToDate: appliedFilters.toDate
       }
     });
   };
 
-  const handleSummaryCardClick = (status) => {
-    const storeCode = appliedFilters.storeCode || selectedStore;
-    if (!storeCode) return;
+  const handleCellClick = (row, status) => {
+    const dateOnly = row?.date ? String(row.date).split('T')[0].split(' ')[0] : appliedFilters.fromDate;
+    navigateToGrcDetails(dateOnly, dateOnly, status);
+  };
 
-    navigate('/reports/grc', {
-      state: {
-        store: storeCode,
-        fromDate: appliedFilters.fromDate,
-        toDate: appliedFilters.toDate,
-        grcStatus: String(status)
-      }
-    });
+  const handleSummaryCardClick = (status) => {
+    navigateToGrcDetails(appliedFilters.fromDate, appliedFilters.toDate, status);
   };
 
   const createCellRenderer = (status, titleText, colorStyle = {}) => (val, row) => {
@@ -255,12 +275,6 @@ export default function StoreGrcReportPage() {
       render: (val, row, idx) => val || ((pageIndex - 1) * pageSize + idx + 1) 
     },
     { key: 'date', label: 'DATE', sortKey: 'GRC_DATE' },
-    { 
-      key: 'huReceivedQty', 
-      label: 'HU RECEIVED QTY', 
-      sortKey: 'HU_RECEIVED_QTY', 
-      render: createCellRenderer('4', 'Received HUs', { color: '#0284c7', fontWeight: 700 }) 
-    },
     { 
       key: 'whValidatedQty', 
       label: 'WH VALIDATED QTY', 
@@ -329,8 +343,7 @@ export default function StoreGrcReportPage() {
     <AppLayout 
       headerProps={{
         breadcrumb: <>HOME - PAGES - REPORT - <span className="active">STORE GRC REPORT</span></>,
-        showBackButton: true,
-        onBackClick: () => navigate(-1)
+        showBackButton: true
       }}
     >
           {/* Search Card */}
@@ -381,17 +394,9 @@ export default function StoreGrcReportPage() {
           {/* Curved Cards */}
           <div className="report-curved-cards grc-report-cards">
             <CurvedCard 
-              title="HU RECEIVED QTY" 
-              value={reportSummary?.huReceivedQty?.toLocaleString('en-IN') || '0'} 
-              waveColor={cardGradients[0]}
-              icon={<Package size={20} color="#ffffff" />}
-              onClick={() => handleSummaryCardClick('4')}
-            />
-
-            <CurvedCard 
               title="WH VALIDATED QTY" 
               value={reportSummary?.whValidatedQty?.toLocaleString('en-IN') || '0'} 
-              waveColor={cardGradients[1]}
+              waveColor={cardGradients[0]}
               icon={<Building2 size={20} color="#ffffff" />}
               onClick={() => handleSummaryCardClick('1')}
             />
@@ -399,7 +404,7 @@ export default function StoreGrcReportPage() {
             <CurvedCard 
               title="STORE VALIDATED QTY" 
               value={reportSummary?.storeValidatedQty?.toLocaleString('en-IN') || '0'} 
-              waveColor={cardGradients[2]}
+              waveColor={cardGradients[1]}
               icon={<Store size={20} color="#ffffff" />}
               onClick={() => handleSummaryCardClick('2')}
             />
@@ -407,7 +412,7 @@ export default function StoreGrcReportPage() {
             <CurvedCard 
               title="PENDING FOR VALIDATION" 
               value={reportSummary?.pendingQty?.toLocaleString('en-IN') || '0'} 
-              waveColor={cardGradients[3]}
+              waveColor={cardGradients[2]}
               icon={<Clock size={20} color="#ffffff" />}
               onClick={() => handleSummaryCardClick('3')}
             />
@@ -415,7 +420,7 @@ export default function StoreGrcReportPage() {
             <CurvedCard 
               title="WRONG HU QTY" 
               value={reportSummary?.wrongHuQty?.toLocaleString('en-IN') || '0'} 
-              waveColor={cardGradients[4]}
+              waveColor={cardGradients[3]}
               icon={<AlertTriangle size={20} color="#ffffff" />}
               onClick={() => handleSummaryCardClick('0')}
             />
