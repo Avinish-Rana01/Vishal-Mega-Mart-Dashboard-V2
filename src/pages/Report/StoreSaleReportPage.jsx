@@ -369,7 +369,7 @@ export default function StoreSaleReportPage() {
             columns={tableColumns}
             data={tableData}
             isLoading={isLoading}
-            skeletonRowsCount={7}
+            skeletonRowsCount={10}
             totalRecords={totalRecords}
             pageIndex={pageIndex}
             pageSize={pageSize}

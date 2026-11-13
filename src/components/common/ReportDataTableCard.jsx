@@ -424,7 +424,7 @@ export default function ReportDataTableCard({
         data={filteredData}
         searchQuery={internalSearch}
         isLoading={Boolean(isLoading || isRefreshing)}
-        skeletonRowsCount={skeletonRowsCount}
+        skeletonRowsCount={Math.max(Number(skeletonRowsCount) || 10, 10)}
         onRowClick={onRowClick}
         striped={striped}
         totals={totals}

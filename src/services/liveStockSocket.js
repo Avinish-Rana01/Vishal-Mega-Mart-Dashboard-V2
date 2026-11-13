@@ -50,7 +50,7 @@ class DashboardSocketService {
   }
 
   getHubUrl() {
-    let baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    let baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
     baseUrl = baseUrl.replace(/\/+$/, '');
     const uid = getActiveUserId();
     return uid ? `${baseUrl}/hubs/dashboard?userId=${uid}` : `${baseUrl}/hubs/dashboard`;

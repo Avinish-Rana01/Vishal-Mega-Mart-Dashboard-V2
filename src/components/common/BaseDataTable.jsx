@@ -11,7 +11,7 @@ export default function BaseDataTable({
   data = [],
   totals = null,
   isLoading = false,
-  skeletonRowsCount = 4,
+  skeletonRowsCount = 10,
   onRowClick = null,
   striped = true,
   enablePagination = false,
@@ -87,6 +87,52 @@ export default function BaseDataTable({
     });
   }, [data, ordering, sortCol, sortDir, onSortChange]);
 
+  const placeholderRowCount = Math.max(Number(skeletonRowsCount) || 10, 10);
+
+  /** Map column alignment config to its corresponding CSS modifier class. */
+  const getAlignClass = (align) =>
+    align === 'left'
+      ? 'vmm-col-align-left'
+      : align === 'right'
+      ? 'vmm-col-align-right'
+      : 'vmm-col-align-center';
+
+  const renderLoadingPlaceholderRows = () => {
+    if (columns.length === 0) {
+      return (
+        <tr className="vmm-tr vmm-loading-placeholder-row" aria-hidden="true">
+          <td colSpan={1} style={{ border: 'none' }}>
+            <div style={{ minHeight: `${placeholderRowCount * 36}px` }} />
+          </td>
+        </tr>
+      );
+    }
+
+    return Array.from({ length: placeholderRowCount }).map((_, rowIdx) => (
+      <tr
+        key={`vmm-loading-row-${rowIdx}`}
+        className="vmm-tr vmm-loading-placeholder-row"
+        aria-hidden="true"
+      >
+        {columns.map((col, colIdx) => {
+          const widthPct = 55 + ((rowIdx * 17 + colIdx * 23) % 35);
+          return (
+            <td
+              key={col.key || colIdx}
+              className={`${getAlignClass(col.align)} ${col.className || ''}`.trim()}
+              style={col.width ? { width: col.width } : undefined}
+            >
+              <span
+                className="vmm-table-skeleton-bar"
+                style={{ width: `${widthPct}%` }}
+              />
+            </td>
+          );
+        })}
+      </tr>
+    ));
+  };
+
   return (
     <div className={containerClassName}>
       <div className="dt-container" style={{ position: 'relative', minWidth: '100%', width: 'max-content' }}>
@@ -105,11 +151,10 @@ export default function BaseDataTable({
                 const isSortable = col.sortable !== false && ordering;
                 const effectiveSortKey = col.sortKey || col.key;
                 const isSorted = Boolean(activeSortCol && effectiveSortKey && activeSortCol.toLowerCase() === effectiveSortKey.toLowerCase());
-                const alignClass = col.align === 'left' ? 'vmm-col-align-left' : col.align === 'right' ? 'vmm-col-align-right' : 'vmm-col-align-center';
                 return (
                   <th 
                     key={col.key} 
-                    className={`vmm-th ${alignClass} ${col.className || ''} ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`.trim()}
+                    className={`vmm-th ${getAlignClass(col.align)} ${col.className || ''} ${isSortable ? 'sortable' : ''} ${isSorted ? 'sorted' : ''}`.trim()}
                     onClick={() => isSortable && handleSort(col.key, col.sortKey)}
                     style={col.width ? { width: col.width } : undefined}
                   >
@@ -136,37 +181,39 @@ export default function BaseDataTable({
           </thead>
           <tbody>
             {sortedData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} style={{ textAlign: 'center', padding: isLoading ? '60px 20px' : '48px 20px', color: '#94a3b8' }}>
-                  {isLoading ? (
-                    <div style={{ minHeight: '130px' }} />
-                  ) : searchQuery && String(searchQuery).trim() ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '110px' }}>
-                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
-                        <Search size={20} />
+              isLoading ? (
+                renderLoadingPlaceholderRows()
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} style={{ textAlign: 'center', padding: '48px 20px', color: '#94a3b8' }}>
+                    {searchQuery && String(searchQuery).trim() ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '110px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+                          <Search size={20} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
+                          {emptyTitle || 'No matching records found'}
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          {emptySubtitle || `No results match "${searchQuery}". Try adjusting your search term.`}
+                        </span>
                       </div>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
-                        {emptyTitle || 'No matching records found'}
-                      </span>
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        {emptySubtitle || `No results match "${searchQuery}". Try adjusting your search term.`}
-                      </span>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '110px' }}>
-                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
-                        <Inbox size={20} />
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '110px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                          <Inbox size={20} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}>
+                          {emptyTitle || 'No Data Available'}
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          {emptySubtitle || 'There are currently no records for the selected filters.'}
+                        </span>
                       </div>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}>
-                        {emptyTitle || 'No Data Available'}
-                      </span>
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        {emptySubtitle || 'There are currently no records for the selected filters.'}
-                      </span>
-                    </div>
-                  )}
-                </td>
-              </tr>
+                    )}
+                  </td>
+                </tr>
+              )
             ) : (
               sortedData.map((row, rowIdx) => {
                 const customRowClass = getRowClassName ? getRowClassName(row, rowIdx) : '';
@@ -178,14 +225,11 @@ export default function BaseDataTable({
                     style={{ cursor: onRowClick ? 'pointer' : 'default', ...(customRowStyle || {}) }}
                     className={`vmm-tr ${customRowClass || ''}`.trim()}
                   >
-                    {columns.map((col) => {
-                      const alignClass = col.align === 'left' ? 'vmm-col-align-left' : col.align === 'right' ? 'vmm-col-align-right' : 'vmm-col-align-center';
-                      return (
-                        <td key={col.key} className={`${alignClass} ${col.className || ''}`.trim()} style={col.width ? { width: col.width } : undefined}>
-                          {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
-                        </td>
-                      );
-                    })}
+                    {columns.map((col) => (
+                      <td key={col.key} className={`${getAlignClass(col.align)} ${col.className || ''}`.trim()} style={col.width ? { width: col.width } : undefined}>
+                        {col.render ? col.render(row[col.key], row, rowIdx) : row[col.key]}
+                      </td>
+                    ))}
                   </tr>
                 );
               })
@@ -194,18 +238,15 @@ export default function BaseDataTable({
           {totals && (
             <tfoot>
               <tr>
-                {columns.map((col, idx) => {
-                  const alignClass = col.align === 'left' ? 'vmm-col-align-left' : col.align === 'right' ? 'vmm-col-align-right' : 'vmm-col-align-center';
-                  return (
-                    <td key={col.key} className={alignClass} style={col.width ? { width: col.width } : undefined}>
-                      {idx === 0
-                        ? totals[col.key] || 'TOTAL'
-                        : totals[col.key] !== undefined
-                        ? totals[col.key]
-                        : ''}
-                    </td>
-                  );
-                })}
+                {columns.map((col, idx) => (
+                  <td key={col.key} className={getAlignClass(col.align)} style={col.width ? { width: col.width } : undefined}>
+                    {idx === 0
+                      ? totals[col.key] || 'TOTAL'
+                      : totals[col.key] !== undefined
+                      ? totals[col.key]
+                      : ''}
+                  </td>
+                ))}
               </tr>
             </tfoot>
           )}

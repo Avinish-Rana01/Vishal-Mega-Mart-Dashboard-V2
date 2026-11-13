@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getActiveUserId } from './stockService';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5050';
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 const DEVELOPER_ID = '99999';
 
 const getHeaders = () => {
