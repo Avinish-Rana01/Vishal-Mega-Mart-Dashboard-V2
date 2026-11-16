@@ -1,8 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import AppLayout from '../../components/layout/AppLayout';
 import WorkInProgress from '../../components/common/WorkInProgress';
 import { useAuth } from '../../context/AuthContext';
+import { DashboardDataProvider } from '../../context/DashboardDataContext';
+import { useDashboardSharedData } from '../../context/dashboardDataContextValue';
 import { getDashboardReturnPoint, clearDashboardReturnPoint, getDashboardScrollContainer, useSessionState } from '../../utils/dashboardNavigationMemory';
+import OverviewSection from './sections/OverviewSection';
 import LiveStockSection from './sections/LiveStockSection';
 import CycleCountSection from './sections/CycleCountSection';
 import StoreValidationSection from './sections/StoreValidationSection';
@@ -30,13 +33,24 @@ const SECTION_COMPONENTS = {
   vendor_discrepancy: VendorDiscrepancySection,
 };
 
+const OVERVIEW_SECTIONS = [
+  'live_stock',
+  'cycle_count',
+  'store_validation',
+  'sale',
+  'void',
+  'return',
+  'dc_validation',
+  'dc_encoding',
+];
+
 const DASHBOARD_TABS = [
   {
     id: 'overview',
     label: 'Overview',
     sections: [],
-    placeholderTitle: 'Overview',
-    placeholderMessage: 'High-level cross-module highlights and executive metrics will appear here soon.',
+    isOverview: true,
+    requiredAny: OVERVIEW_SECTIONS,
   },
   {
     id: 'stock_cycle',
@@ -79,17 +93,22 @@ const SECTION_TO_TAB = DASHBOARD_TABS.reduce((acc, tab) => {
   return acc;
 }, {});
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const { hasSection } = useAuth();
+  const shared = useDashboardSharedData();
 
   const visibleTabs = useMemo(
-    () => DASHBOARD_TABS.filter((tab) => tab.sections.length === 0 || tab.sections.some((sec) => hasSection(sec))),
+    () => DASHBOARD_TABS.filter((tab) => {
+      if (tab.requiredAny) return tab.requiredAny.some((sec) => hasSection(sec));
+      if (tab.sections.length === 0) return true;
+      return tab.sections.some((sec) => hasSection(sec));
+    }),
     [hasSection]
   );
 
   const defaultTabId = useMemo(() => {
-    const firstPopulated = visibleTabs.find((tab) => tab.sections.length > 0);
-    return firstPopulated?.id || visibleTabs[0]?.id || 'overview';
+    const firstLive = visibleTabs.find((tab) => tab.isOverview || tab.sections.length > 0);
+    return firstLive?.id || visibleTabs[0]?.id || 'overview';
   }, [visibleTabs]);
 
   const [storedTab, setStoredTab] = useSessionState('dashboard_active_tab', defaultTabId);
@@ -98,7 +117,7 @@ export default function DashboardPage() {
   const indicatorReadyRef = useRef(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0, animate: false });
 
-  // Resolve active tab: report return point > permitted session tab > first live tab
+  // Resolve active tab: report return point > permitted session tab > Overview / first live tab
   const activeTab = useMemo(() => {
     const returnPoint = getDashboardReturnPoint();
     const returnTabId = returnPoint?.sectionId ? SECTION_TO_TAB[returnPoint.sectionId] : null;
@@ -117,6 +136,26 @@ export default function DashboardPage() {
     const container = getDashboardScrollContainer();
     if (container) container.scrollTop = 0;
   };
+
+  const handleJumpToSection = useCallback((sectionKey, storeCode) => {
+    const targetTab = SECTION_TO_TAB[sectionKey];
+    if (!targetTab || !visibleTabs.some((t) => t.id === targetTab)) return;
+
+    clearDashboardReturnPoint();
+    setStoredTab(targetTab);
+    if (storeCode && shared?.triggerSpotlight) {
+      shared.triggerSpotlight(sectionKey, storeCode);
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`section-${sectionKey}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }, [visibleTabs, setStoredTab, shared]);
 
   // Slide the underline indicator smoothly beneath the active tab button
   useLayoutEffect(() => {
@@ -291,7 +330,11 @@ export default function DashboardPage() {
               aria-hidden={!isActive}
               className={`vmm-dash-tab-panel${isActive ? '' : ' vmm-dash-tab-panel--hidden'}`}
             >
-              {tab.sections.length === 0 ? (
+              {tab.isOverview ? (
+                <div id="section-overview" className="vmm-dashboard-stack">
+                  <OverviewSection onJumpToSection={handleJumpToSection} />
+                </div>
+              ) : tab.sections.length === 0 ? (
                 <div className="vmm-dash-empty-tab">
                   <WorkInProgress title={tab.placeholderTitle} message={tab.placeholderMessage} />
                 </div>
@@ -311,6 +354,14 @@ export default function DashboardPage() {
         })}
       </div>
     </AppLayout>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <DashboardDataProvider>
+      <DashboardPageContent />
+    </DashboardDataProvider>
   );
 }
 

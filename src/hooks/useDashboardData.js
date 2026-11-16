@@ -13,6 +13,19 @@ import {
   getDcValidation
 } from '../services/stockService';
 import { liveStockSocket, isCurrentUserSuperAdmin } from '../services/liveStockSocket';
+import { useDashboardSharedData } from '../context/dashboardDataContextValue';
+
+const resolveSharedHook = (shared, sectionKey, fallback, highlightField = 'highlightedStore') => {
+  const base = shared?.hooks?.[sectionKey] || fallback;
+  const spot = shared?.spotlight;
+  if (spot && spot.sectionKey === sectionKey && spot.storeCode) {
+    return {
+      ...base,
+      [highlightField]: base[highlightField] || spot.storeCode,
+    };
+  }
+  return base;
+};
 
 /**
  * Generic hook for dashboard table endpoints.
@@ -22,11 +35,12 @@ import { liveStockSocket, isCurrentUserSuperAdmin } from '../services/liveStockS
  * @param {Function} filterFn - Client-side search filter predicate
  * @param {Function} totalsMapper - Mapper function to transform API summary into totals object
  * @param {number} [initialPageSize=100] - Default page size for initial data load
+ * @param {boolean} [enabled=true] - Whether the hook should actively fetch data
  */
-const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100) => {
+const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100, enabled = true) => {
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +53,11 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
     let retryTimer = null;
     
@@ -106,7 +125,7 @@ const useDashboardFetch = (apiFn, filterFn, totalsMapper, initialPageSize = 100)
       if (retryTimer) clearTimeout(retryTimer);
       controller.abort();
     };
-  }, [searchQuery, pageIndex, pageSize, refreshTrigger, apiFn, filterFn, totalsMapper]);
+  }, [enabled, searchQuery, pageIndex, pageSize, refreshTrigger, apiFn, filterFn, totalsMapper]);
 
   const refresh = useCallback(() => setRefreshTrigger(prev => prev + 1), []);
 
@@ -132,8 +151,8 @@ const liveStockTotals = (summary) => ({
   DIFFERENCE: summary.diffQty?.toLocaleString('en-IN') || 0
 });
 
-export const useLiveStock = () => {
-  const baseFetch = useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals);
+export const useLiveStockCore = (enabled = true) => {
+  const baseFetch = useDashboardFetch(getLiveStock, liveStockFilter, liveStockTotals, 100, enabled);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedStore, setHighlightedStore] = useState(null);
@@ -152,13 +171,14 @@ export const useLiveStock = () => {
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [baseFetch.isLoading, connectionStatus]);
+  }, [enabled, baseFetch.isLoading, connectionStatus]);
 
   // Connect to SignalR LiveStockHub and apply in-place micro-delta patches
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -292,7 +312,7 @@ export const useLiveStock = () => {
       unsubPatch();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, []);
+  }, [enabled]);
 
   // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
   const computedTotals = useMemo(() => {
@@ -333,6 +353,12 @@ export const useLiveStock = () => {
   };
 };
 
+export const useLiveStock = () => {
+  const shared = useDashboardSharedData();
+  const local = useLiveStockCore(!shared);
+  return resolveSharedHook(shared, 'live_stock', local, 'highlightedStore');
+};
+
 // ==========================================
 // 2. Cycle Count (Enhanced with Real-Time Delta Reducer & SignalR)
 // ==========================================
@@ -348,8 +374,8 @@ const cycleCountTotals = (summary) => ({
   recordCount: summary.recordCount || 0
 });
 
-export const useCycleCount = () => {
-  const baseFetch = useDashboardFetch(getCycleCount, cycleCountFilter, cycleCountTotals);
+export const useCycleCountCore = (enabled = true) => {
+  const baseFetch = useDashboardFetch(getCycleCount, cycleCountFilter, cycleCountTotals, 100, enabled);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedRow, setHighlightedRow] = useState(null);
@@ -365,12 +391,13 @@ export const useCycleCount = () => {
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [baseFetch.isLoading, connectionStatus]);
+  }, [enabled, baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -482,7 +509,7 @@ export const useCycleCount = () => {
       unsub();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, []);
+  }, [enabled]);
 
   // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
   const computedTotals = useMemo(() => {
@@ -506,6 +533,12 @@ export const useCycleCount = () => {
   return { ...baseFetch, data, totals: computedTotals, highlightedRow, connectionStatus };
 };
 
+export const useCycleCount = () => {
+  const shared = useDashboardSharedData();
+  const local = useCycleCountCore(!shared);
+  return resolveSharedHook(shared, 'cycle_count', local, 'highlightedRow');
+};
+
 // ==========================================
 // 3. Vendor Discrepancy (Enhanced with Real-Time Delta Reducer & SignalR)
 // ==========================================
@@ -521,8 +554,8 @@ const vendorTotals = (summary) => ({
   DIFF_TILL_DATE: summary.differenceQtyTillDate?.toLocaleString('en-IN') || 0
 });
 
-export const useVendorDiscrepancy = () => {
-  const baseFetch = useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals, 10);
+export const useVendorDiscrepancyCore = (enabled = true) => {
+  const baseFetch = useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals, 10, enabled);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedVendor, setHighlightedVendor] = useState(null);
@@ -538,12 +571,13 @@ export const useVendorDiscrepancy = () => {
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [baseFetch.isLoading, connectionStatus]);
+  }, [enabled, baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -612,9 +646,15 @@ export const useVendorDiscrepancy = () => {
       unsub();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, []);
+  }, [enabled]);
 
   return { ...baseFetch, data, totals: totals || baseFetch.totals, highlightedVendor, connectionStatus };
+};
+
+export const useVendorDiscrepancy = () => {
+  const shared = useDashboardSharedData();
+  const local = useVendorDiscrepancyCore(!shared);
+  return shared?.hooks?.vendor_discrepancy || local;
 };
 
 // ==========================================
@@ -641,8 +681,8 @@ const storeDashboardTotals = (summary, items = []) => {
   };
 };
 
-export const useStoreDashboard = () => {
-  const baseFetch = useDashboardFetch(getStoreDashboard, storeDashboardFilter, storeDashboardTotals);
+export const useStoreDashboardCore = (enabled = true) => {
+  const baseFetch = useDashboardFetch(getStoreDashboard, storeDashboardFilter, storeDashboardTotals, 100, enabled);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedStore, setHighlightedStore] = useState(null);
@@ -658,12 +698,13 @@ export const useStoreDashboard = () => {
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [baseFetch.isLoading, connectionStatus]);
+  }, [enabled, baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -772,7 +813,7 @@ export const useStoreDashboard = () => {
       unsub();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, []);
+  }, [enabled]);
 
   // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
   const computedTotals = useMemo(() => {
@@ -814,6 +855,12 @@ export const useStoreDashboard = () => {
   return { ...baseFetch, data, totals: computedTotals, highlightedStore, connectionStatus };
 };
 
+export const useStoreDashboard = () => {
+  const shared = useDashboardSharedData();
+  const local = useStoreDashboardCore(!shared);
+  return resolveSharedHook(shared, 'store_validation', local, 'highlightedStore');
+};
+
 // ==========================================
 // 5. Sale Dashboard
 // ==========================================
@@ -836,11 +883,19 @@ const saleDashboardTotals = (summary) => {
   };
 };
 
-export const useSaleDashboard = () => useDashboardFetch(
+export const useSaleDashboardCore = (enabled = true) => useDashboardFetch(
   getSaleDashboard, 
   saleDashboardFilter, 
-  saleDashboardTotals
+  saleDashboardTotals,
+  100,
+  enabled
 );
+
+export const useSaleDashboard = () => {
+  const shared = useDashboardSharedData();
+  const local = useSaleDashboardCore(!shared);
+  return resolveSharedHook(shared, 'sale', local, 'highlightedStore');
+};
 
 // ==========================================
 // 6. Void Dashboard
@@ -857,11 +912,19 @@ const voidDashboardTotals = (summary) => ({
   DIFFERENCE_QTY: (summary.pendingQty ?? summary.DIFFERENCE_QTY ?? 0).toLocaleString('en-IN')
 });
 
-export const useVoidDashboard = () => useDashboardFetch(
+export const useVoidDashboardCore = (enabled = true) => useDashboardFetch(
   getVoidDashboard, 
   voidDashboardFilter, 
-  voidDashboardTotals
+  voidDashboardTotals,
+  100,
+  enabled
 );
+
+export const useVoidDashboard = () => {
+  const shared = useDashboardSharedData();
+  const local = useVoidDashboardCore(!shared);
+  return resolveSharedHook(shared, 'void', local, 'highlightedStore');
+};
 
 // ==========================================
 // 7. Return Dashboard
@@ -878,11 +941,19 @@ const returnDashboardTotals = (summary) => ({
   DIFFERENCE_QTY: (summary.pendingQty ?? summary.DIFFERENCE_QTY ?? 0).toLocaleString('en-IN')
 });
 
-export const useReturnDashboard = () => useDashboardFetch(
+export const useReturnDashboardCore = (enabled = true) => useDashboardFetch(
   getReturnDashboard, 
   returnDashboardFilter, 
-  returnDashboardTotals
+  returnDashboardTotals,
+  100,
+  enabled
 );
+
+export const useReturnDashboard = () => {
+  const shared = useDashboardSharedData();
+  const local = useReturnDashboardCore(!shared);
+  return resolveSharedHook(shared, 'return', local, 'highlightedStore');
+};
 
 // ==========================================
 // 8. DC Validation (Enhanced with Real-Time SignalR)
@@ -898,11 +969,13 @@ const dcValidationTotals = (summary) => ({
   PROCESSED_ARTICLE_QTY: summary.articleQty || 0
 });
 
-export const useDcValidation = () => {
+export const useDcValidationCore = (enabled = true) => {
   const baseFetch = useDashboardFetch(
     getDcValidation, 
     dcValidationFilter, 
-    dcValidationTotals
+    dcValidationTotals,
+    100,
+    enabled
   );
 
 
@@ -921,12 +994,13 @@ export const useDcValidation = () => {
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!baseFetch.isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !baseFetch.isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [baseFetch.isLoading, connectionStatus]);
+  }, [enabled, baseFetch.isLoading, connectionStatus]);
 
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -1018,7 +1092,7 @@ export const useDcValidation = () => {
       unsub();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, []);
+  }, [enabled]);
 
   // Compute live KPI totals: Super Admin uses company totals; scoped users sum only their assigned rows
   const computedTotals = useMemo(() => {
@@ -1053,16 +1127,22 @@ export const useDcValidation = () => {
   return { ...baseFetch, data, totals: computedTotals, highlightedPlant, connectionStatus };
 };
 
+export const useDcValidation = () => {
+  const shared = useDashboardSharedData();
+  const local = useDcValidationCore(!shared);
+  return resolveSharedHook(shared, 'dc_validation', local, 'highlightedPlant');
+};
+
 // ==========================================
 // 9. Tag Management Charts (Enhanced with Real-Time SignalR)
 // ==========================================
-export const useTagCharts = () => {
+export const useTagChartsCore = (enabled = true) => {
   const [locationData, setLocationData] = useState([]);
   const [locationTotal, setLocationTotal] = useState(0);
   const [cycleData, setCycleData] = useState([]);
   const [cycleTotal, setCycleTotal] = useState(0);
   const [avgRecycle, setAvgRecycle] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [trigger, setTrigger] = useState(0);
@@ -1070,6 +1150,10 @@ export const useTagCharts = () => {
   const hasDataRef = useRef(false);
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(false);
+      return;
+    }
     const controller = new AbortController();
     const fetchTagCharts = async () => {
       if (!hasDataRef.current) {
@@ -1131,19 +1215,20 @@ export const useTagCharts = () => {
       clearTimeout(delayDebounceFn);
       controller.abort();
     };
-  }, [trigger]);
+  }, [enabled, trigger]);
 
   const refresh = useCallback(() => setTrigger(t => t + 1), []);
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [isLoading, connectionStatus]);
+  }, [enabled, isLoading, connectionStatus]);
 
   // Real-time SignalR subscription for Tag Management deltas
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -1179,7 +1264,7 @@ export const useTagCharts = () => {
       unsub();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, [refresh]);
+  }, [enabled, refresh]);
 
   return {
     locationData,
@@ -1195,13 +1280,19 @@ export const useTagCharts = () => {
   };
 };
 
+export const useTagCharts = () => {
+  const shared = useDashboardSharedData();
+  const local = useTagChartsCore(!shared);
+  return shared?.hooks?.tag_management || local;
+};
+
 // ==========================================
 // 10. Warehouse Encoding (Enhanced with Real-Time SignalR)
 // ==========================================
-export const useWarehouseEncoding = () => {
+export const useWarehouseEncodingCore = (enabled = true) => {
   const [data, setData] = useState([]);
   const [chartData, setChartData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [error, setError] = useState(null);
@@ -1215,6 +1306,10 @@ export const useWarehouseEncoding = () => {
   const [trigger, setTrigger] = useState(0);
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(false);
+      return;
+    }
     const controller = new AbortController();
     const fetchData = async () => {
       if (!hasDataRef.current) {
@@ -1286,19 +1381,20 @@ export const useWarehouseEncoding = () => {
       clearTimeout(delayDebounceFn);
       controller.abort();
     };
-  }, [fromDate, toDate, trigger]);
+  }, [enabled, fromDate, toDate, trigger]);
 
   const refresh = useCallback(() => setTrigger(t => t + 1), []);
 
   // Connect to SignalR as soon as initial API request completes
   useEffect(() => {
-    if (!isLoading && connectionStatus === 'disconnected') {
+    if (enabled && !isLoading && connectionStatus === 'disconnected') {
       liveStockSocket.connect();
     }
-  }, [isLoading, connectionStatus]);
+  }, [enabled, isLoading, connectionStatus]);
 
   // Real-time SignalR subscription for DC Encoding deltas
   useEffect(() => {
+    if (!enabled) return;
     let highlightTimer = null;
 
     const unsubStatus = liveStockSocket.onStatusChange((status) => {
@@ -1362,7 +1458,13 @@ export const useWarehouseEncoding = () => {
       unsub();
       if (highlightTimer) clearTimeout(highlightTimer);
     };
-  }, [refresh]);
+  }, [enabled, refresh]);
 
   return { data, chartData, isLoading, isRefreshing, error, fromDate, setFromDate, toDate, setToDate, refresh, highlightedBlock, connectionStatus };
+};
+
+export const useWarehouseEncoding = () => {
+  const shared = useDashboardSharedData();
+  const local = useWarehouseEncodingCore(!shared);
+  return shared?.hooks?.dc_encoding || local;
 };

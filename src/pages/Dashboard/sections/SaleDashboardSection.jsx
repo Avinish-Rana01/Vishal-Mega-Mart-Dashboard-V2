@@ -67,7 +67,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function SaleDashboardSection() {
-  const { data, totals, isLoading, error } = useSaleDashboard();
+  const { data, totals, isLoading, error, highlightedStore } = useSaleDashboard();
   const navigate = useNavigate();
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('DPOS_DESC');
@@ -380,14 +380,16 @@ export default function SaleDashboardSection() {
             </td>
           </motion.tr>
         }
-        renderRow={(row) => (
+        renderRow={(row) => {
+          const isRowHighlighted = highlightedStore && String(highlightedStore).toUpperCase() === String(row.STORE || '').toUpperCase();
+          return (
           <motion.tr
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
             key={row.STORE}
-            className="cc-data-grid-tr"
+            className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}
           >
             <td className="cc-data-grid-td cc-data-grid-td-bold">
               <div 
@@ -445,7 +447,8 @@ export default function SaleDashboardSection() {
               </span>
             </td>
           </motion.tr>
-        )}
+          );
+        }}
       />
       </div>
 

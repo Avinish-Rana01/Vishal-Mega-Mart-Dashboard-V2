@@ -1,0 +1,389 @@
+/* Executive Overview Section — Synced with KpiCard2 + Compact Grid Styling */
+
+.vmm-ov-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 6 KpiCard2 cards in a single row on desktop */
+.vmm-ov-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(var(--ov-kpi-cols, 6), minmax(0, 1fr));
+  gap: 11px;
+}
+
+.vmm-ov-kpi-slot {
+  display: flex;
+  min-width: 0;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: transform 0.14s ease;
+  outline: none;
+}
+
+.vmm-ov-kpi-slot:hover {
+  transform: translateY(-1px);
+}
+
+.vmm-ov-kpi-slot:focus-visible {
+  box-shadow: 0 0 0 2px #3B82F6;
+}
+
+.vmm-ov-rag-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 16.5px;
+  font-weight: 700;
+}
+
+.vmm-ov-rag-r {
+  color: #EF5350;
+}
+
+.vmm-ov-rag-a {
+  color: #d97706;
+}
+
+.vmm-ov-rag-g {
+  color: #10B981;
+}
+
+.vmm-ov-rag-sep {
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Compact Scorecard Card & Dense Table */
+.vmm-ov-scorecard {
+  padding: 8px 10px 6px;
+}
+
+.vmm-ov-scorecard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 2px 7px;
+  margin-bottom: 4px;
+}
+
+.vmm-ov-header-text {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.vmm-ov-scorecard-title {
+  letter-spacing: 0.03em;
+}
+
+.vmm-ov-header-meta {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.vmm-ov-excel-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 7px;
+}
+
+.vmm-ov-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.vmm-ov-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  color: #1e293b;
+}
+
+.vmm-ov-table thead th {
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #334155;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e2e8f0;
+  background: #ffffff;
+  white-space: nowrap;
+}
+
+.vmm-ov-table thead th.vmm-ov-th-right {
+  text-align: right;
+}
+
+.vmm-ov-th-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.vmm-ov-th-btn--right {
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.vmm-ov-th-btn:hover {
+  color: #0f172a;
+}
+
+.vmm-ov-sort-icon {
+  color: #3B82F6;
+}
+
+.vmm-ov-tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.12s ease;
+  cursor: pointer;
+}
+
+.vmm-ov-tr:last-child {
+  border-bottom: none;
+}
+
+.vmm-ov-tr:hover {
+  background: #f8fafc;
+}
+
+.vmm-ov-table tbody td {
+  padding: 6px 8px;
+  vertical-align: middle;
+}
+
+.vmm-ov-td-right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status Pills */
+.vmm-ov-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.vmm-ov-status-pill--red {
+  background: #fdecec;
+  color: #EF5350;
+}
+
+.vmm-ov-status-pill--amber {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.vmm-ov-status-pill--green {
+  background: #d1fae5;
+  color: #10B981;
+}
+
+.vmm-ov-status-pill--neutral {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Clickable Cell Buttons */
+.vmm-ov-cell-link {
+  border: none;
+  background: transparent;
+  padding: 1px 4px;
+  margin: -1px -4px;
+  border-radius: 5px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.vmm-ov-cell-link:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #3B82F6;
+}
+
+.vmm-ov-cell-link--right {
+  justify-content: flex-end;
+}
+
+.vmm-ov-store-cell {
+  white-space: nowrap;
+}
+
+.vmm-ov-store-code {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.vmm-ov-cell-link:hover .vmm-ov-store-code {
+  color: #3B82F6;
+}
+
+.vmm-ov-store-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  max-width: 145px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vmm-ov-score-cell {
+  font-weight: 600;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.vmm-ov-num-bold {
+  font-weight: 600;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.vmm-ov-muted {
+  color: #94a3b8;
+}
+
+.vmm-ov-void-ret-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.vmm-ov-slash {
+  color: #94a3b8;
+}
+
+.vmm-ov-cycle-cell {
+  white-space: nowrap;
+  font-size: 11px;
+  color: #334155;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Coverage Progress Bar */
+.vmm-ov-coverage-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.vmm-ov-progress-track {
+  width: 50px;
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.vmm-ov-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.vmm-ov-progress-fill--red {
+  background: #EF5350;
+}
+
+.vmm-ov-progress-fill--amber {
+  background: #f59e0b;
+}
+
+.vmm-ov-progress-fill--green {
+  background: #10B981;
+}
+
+/* Compact Horizontal-Wrap WHY Pills */
+.vmm-ov-why-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 240px;
+}
+
+.vmm-ov-why-pill {
+  display: inline-flex;
+  align-items: center;
+  text-align: left;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.12s ease;
+}
+
+.vmm-ov-why-pill:hover {
+  filter: brightness(0.95);
+}
+
+.vmm-ov-why-pill--red {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #EF5350;
+}
+
+.vmm-ov-why-pill--amber {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #b45309;
+}
+
+.vmm-ov-why-pill--green {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #10B981;
+}
+
+@media (max-width: 1180px) {
+  .vmm-ov-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .vmm-ov-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 440px) {
+  .vmm-ov-kpi-row {
+    grid-template-columns: 1fr;
+  }
+}

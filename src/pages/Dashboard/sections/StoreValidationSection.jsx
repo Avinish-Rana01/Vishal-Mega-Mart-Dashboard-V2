@@ -587,8 +587,10 @@ export default function StoreValidationSection() {
           const validatedColor = '#16a34a';
           const hhtColor = hhtValidated < validated ? '#dc2626' : COLOR_HHT;
 
+          const isRowHighlighted = highlightedStore && String(highlightedStore).toUpperCase() === String(row.STORE || '').toUpperCase();
+
           return (
-            <tr key={row.STORE || idx} className="cc-data-grid-tr">
+            <tr key={row.STORE || idx} className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}>
               <td className="cc-data-grid-td cc-data-grid-td-bold">
                 <div 
                   className="cc-row-tooltip-wrapper sv-clickable-store"
