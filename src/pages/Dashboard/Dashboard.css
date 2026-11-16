@@ -1,10 +1,11 @@
 .vmm-dashboard-body-v2 {
-  /* padding: 24px; */
   background-color: #eceef0;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  padding: 13px 10px;
-  
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .vmm-dashboard-stack {
@@ -21,6 +22,7 @@
   padding: 11px;
   border-radius: 14px;
   background-color: #ffffff;
+  scroll-margin-top: 12px;
 }
 .ls-grid2 {
   display: grid;
@@ -36,10 +38,6 @@
 }
 
 @media (max-width: 767px) {
-  .vmm-dashboard-body-v2 {
-    padding: 8px 6px;
-  }
-
   .vmm-dashboard-stack {
     padding: 8px;
     border-radius: 12px;
@@ -58,5 +56,106 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Dashboard Tab Navigation Strip (Fixed Top Header + Independent Scroll Area Below)
+   ========================================================================== */
+.vmm-dash-tabs-bar {
+  flex-shrink: 0;
+  z-index: 40;
+  padding: 0 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.vmm-dash-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 13px 10px;
+}
+
+.vmm-dash-tabs-list {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.vmm-dash-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.vmm-dash-tab-btn {
+  position: relative;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  padding: 11px 2px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.vmm-dash-tab-btn:hover {
+  color: #0f172a;
+}
+
+.vmm-dash-tab-btn.is-active {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.vmm-dash-tab-btn.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.5px;
+  background: #0f172a;
+  border-radius: 2px 2px 0 0;
+}
+
+.vmm-dash-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vmm-dash-tab-panel--hidden {
+  display: none;
+}
+
+.vmm-dash-empty-tab {
+  min-height: 360px;
+  display: flex;
+}
+
+@media (max-width: 767px) {
+  .vmm-dash-tabs-bar {
+    padding: 0 10px;
+  }
+
+  .vmm-dash-scroll-area {
+    padding: 8px 6px;
+  }
+
+  .vmm-dash-tabs-list {
+    gap: 16px;
+  }
+
+  .vmm-dash-tab-btn {
+    padding: 9px 2px;
+    font-size: 12.5px;
+  }
 }
 

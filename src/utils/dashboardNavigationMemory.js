@@ -4,12 +4,23 @@ const RETURN_POINT_KEY = 'VMM_DASHBOARD_RETURN_POINT';
 const FILTER_PREFIX = 'VMM_DASH_STATE_';
 
 /**
+ * Returns the active vertical scroll container for the dashboard body.
+ */
+export function getDashboardScrollContainer() {
+  return (
+    document.querySelector('.vmm-dash-scroll-area') ||
+    document.querySelector('.vmm-dashboard-body-v2') ||
+    document.querySelector('.vmm-dashboard-body')
+  );
+}
+
+/**
  * Saves the current scroll position and target section ID before navigating away from the dashboard.
  * @param {string} sectionId - Identifier of the section (e.g. 'store_validation', 'cycle_count')
  */
 export function saveDashboardReturnPoint(sectionId) {
   try {
-    const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+    const container = getDashboardScrollContainer();
     const scrollTop = container ? container.scrollTop : (window.scrollY || window.pageYOffset || 0);
 
     // If scrollTop is 0 and no sectionId given, don't accidentally overwrite an existing valid return point
@@ -31,6 +42,8 @@ export function saveDashboardReturnPoint(sectionId) {
         let minDistance = Infinity;
 
         sections.forEach(sec => {
+          // Ignore sections inside CSS-hidden inactive tabs (their rect.top collapses to 0)
+          if (sec.offsetParent === null) return;
           const rect = sec.getBoundingClientRect();
           const dist = Math.abs(rect.top - (containerRect.top + 60));
           if (dist < minDistance) {

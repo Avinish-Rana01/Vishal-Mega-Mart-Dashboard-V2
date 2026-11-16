@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Tag, Settings, Truck, ClipboardList, Smartphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { clearDashboardReturnPoint } from '../../utils/dashboardNavigationMemory';
+import { clearDashboardReturnPoint, getDashboardScrollContainer } from '../../utils/dashboardNavigationMemory';
 import { DiwaliSidebarDecorations } from '../festive/DiwaliTheme';
 import './Sidebar.css';
 
@@ -25,7 +25,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     if (location.pathname !== '/dashboard') {
       navigate('/dashboard');
     } else {
-      const container = document.querySelector('.vmm-dashboard-body-v2') || document.querySelector('.vmm-dashboard-body');
+      const container = getDashboardScrollContainer();
       if (container) {
         container.scrollTo({ top: 0, behavior: 'smooth' });
       }
