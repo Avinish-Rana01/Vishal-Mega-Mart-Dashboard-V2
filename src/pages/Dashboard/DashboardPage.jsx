@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import AppLayout from '../../components/layout/AppLayout';
 import WorkInProgress from '../../components/common/WorkInProgress';
 import { useAuth } from '../../context/AuthContext';
@@ -93,6 +93,10 @@ export default function DashboardPage() {
   }, [visibleTabs]);
 
   const [storedTab, setStoredTab] = useSessionState('dashboard_active_tab', defaultTabId);
+  const tabListRef = useRef(null);
+  const tabRefs = useRef({});
+  const indicatorReadyRef = useRef(false);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, animate: false });
 
   // Resolve active tab: report return point > permitted session tab > first live tab
   const activeTab = useMemo(() => {
@@ -114,13 +118,33 @@ export default function DashboardPage() {
     if (container) container.scrollTop = 0;
   };
 
-  // Trigger resize after revealing a CSS-hidden tab so Recharts ResponsiveContainer re-measures cleanly
-  useEffect(() => {
-    const rafId = requestAnimationFrame(() => {
-      window.dispatchEvent(new Event('resize'));
-    });
-    return () => cancelAnimationFrame(rafId);
-  }, [activeTab]);
+  // Slide the underline indicator smoothly beneath the active tab button
+  useLayoutEffect(() => {
+    const updateIndicator = (shouldAnimate) => {
+      const btn = tabRefs.current[activeTab];
+      if (!btn) return;
+      setIndicator({
+        left: btn.offsetLeft,
+        width: btn.offsetWidth,
+        animate: shouldAnimate,
+      });
+    };
+
+    const animate = indicatorReadyRef.current;
+    updateIndicator(animate);
+    indicatorReadyRef.current = true;
+
+    const btn = tabRefs.current[activeTab];
+    if (animate && btn?.scrollIntoView) {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+
+    const listEl = tabListRef.current;
+    if (!listEl || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(() => updateIndicator(false));
+    ro.observe(listEl);
+    return () => ro.disconnect();
+  }, [activeTab, visibleTabs]);
 
   // Keep session tab aligned when returning from a detail report or when role permissions change
   useEffect(() => {
@@ -219,12 +243,15 @@ export default function DashboardPage() {
     <AppLayout mainClassName="vmm-dashboard-body-v2">
       {/* Sticky Chrome-like Top Tab Bar */}
       <nav className="vmm-dash-tabs-bar" aria-label="Dashboard sections">
-        <div className="vmm-dash-tabs-list" role="tablist">
+        <div className="vmm-dash-tabs-list" role="tablist" ref={tabListRef}>
           {visibleTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                ref={(el) => {
+                  tabRefs.current[tab.id] = el;
+                }}
                 type="button"
                 role="tab"
                 id={`dash-tab-${tab.id}`}
@@ -237,6 +264,16 @@ export default function DashboardPage() {
               </button>
             );
           })}
+          <span
+            aria-hidden="true"
+            className="vmm-dash-tab-indicator"
+            style={{
+              transform: `translateX(${indicator.left}px)`,
+              width: `${indicator.width}px`,
+              opacity: indicator.width > 0 ? 1 : 0,
+              transition: indicator.animate ? undefined : 'none',
+            }}
+          />
         </div>
       </nav>
 

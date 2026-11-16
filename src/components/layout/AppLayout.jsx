@@ -8,7 +8,6 @@ import { saveDashboardReturnPoint, getDashboardReturnPoint } from '../../utils/d
 const AppLayoutContext = createContext(false);
 
 const ROUTE_BREADCRUMBS = {
-  '/dashboard': 'HOME - PAGES - DASHBOARD',
   '/dashboard-old': 'HOME - PAGES - DASHBOARD (OLD)',
   '/stores/counter-status': 'HOME - PAGES - STORE COUNTER STATUS',
   '/reports/live-stock': 'HOME - PAGES - DASHBOARD - LIVE STOCK REPORT',
@@ -48,11 +47,14 @@ const ROUTE_BREADCRUMBS = {
 };
 
 function getBreadcrumb(pathname) {
+  if (pathname === '/dashboard' || pathname === '/') {
+    return null;
+  }
   if (ROUTE_BREADCRUMBS[pathname]) {
     return ROUTE_BREADCRUMBS[pathname];
   }
   const clean = pathname.replace(/^\//, '');
-  if (!clean) return 'HOME - PAGES - DASHBOARD';
+  if (!clean) return null;
   const parts = clean.split('/').map(p => p.replace(/-/g, ' ').toUpperCase());
   return `HOME - PAGES - ${parts.join(' - ')}`;
 }
@@ -129,7 +131,7 @@ export default function AppLayout({ children, headerProps = {}, mainClassName = 
   }
 
   // Dynamically resolve breadcrumb and back button state from URL path
-  const resolvedBreadcrumb = headerProps.breadcrumb || getBreadcrumb(location.pathname);
+  const resolvedBreadcrumb = headerProps.breadcrumb !== undefined ? headerProps.breadcrumb : getBreadcrumb(location.pathname);
   const resolvedShowBackButton = headerProps.showBackButton !== undefined 
     ? headerProps.showBackButton 
     : (location.pathname !== '/dashboard');

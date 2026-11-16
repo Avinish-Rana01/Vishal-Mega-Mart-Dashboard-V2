@@ -8,7 +8,7 @@ import { DiwaliHeaderDecorations } from '../festive/DiwaliTheme';
 import './Header.css';
 
 export default function Header({ 
-  breadcrumb = 'HOME - PAGES - DASHBOARD',
+  breadcrumb = null,
   showBackButton = false,
   onBackClick,
   onMenuClick 
@@ -113,7 +113,14 @@ export default function Header({
   const locationType = (storeName || storeCode) ? 'Store' : ((warehouseName || warehouseCode) ? 'Warehouse' : 'Assigned');
 
   return (
-    <header className="vmm-top-header" style={{ position: 'relative', zIndex: 1000 }}>
+    <header
+      className="vmm-top-header"
+      style={{
+        position: 'relative',
+        zIndex: 1000,
+        ...(!breadcrumb ? { height: '36px', alignItems: 'flex-start', paddingTop: '6px' } : {}),
+      }}
+    >
       <DiwaliHeaderDecorations />
       <div className="vmm-brand-section">
         {onMenuClick && (
@@ -145,18 +152,20 @@ export default function Header({
           }}>
             {APP_INFO.TITLE}
           </h1>
-          <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
-            {typeof breadcrumb === 'string' ? (
-              breadcrumb.split(/\s*-\s*/).map((part, idx, arr) => (
-                <React.Fragment key={idx}>
-                  <span className={idx === arr.length - 1 ? 'active' : ''}>{part}</span>
-                  {idx < arr.length - 1 && <span className="vmm-breadcrumb-sep">-</span>}
-                </React.Fragment>
-              ))
-            ) : (
-              breadcrumb
-            )}
-          </div>
+          {breadcrumb && (
+            <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
+              {typeof breadcrumb === 'string' ? (
+                breadcrumb.split(/\s*-\s*/).map((part, idx, arr) => (
+                  <React.Fragment key={idx}>
+                    <span className={idx === arr.length - 1 ? 'active' : ''}>{part}</span>
+                    {idx < arr.length - 1 && <span className="vmm-breadcrumb-sep">-</span>}
+                  </React.Fragment>
+                ))
+              ) : (
+                breadcrumb
+              )}
+            </div>
+          )}
         </div>
       </div>
 

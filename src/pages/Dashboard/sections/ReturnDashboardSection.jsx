@@ -85,7 +85,7 @@ const CustomYAxisTick = ({ x, y, payload, onClick }) => {
 };
 
 const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
-  const [ref, hasBeenVisible] = useIsInViewport();
+  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
   const height = Math.max(data.length * 35, 300);
   return (
     <div ref={ref} style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
@@ -112,7 +112,7 @@ const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
               }
               return null;
             }} />
-              <Bar dataKey="pending" fill="#EF5350" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
+              <Bar dataKey="pending" fill="#EF5350" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={shouldAnimate} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -122,7 +122,7 @@ const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
 });
 
 const MemoizedEncodingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
-  const [ref, hasBeenVisible] = useIsInViewport();
+  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
   const height = Math.max(data.length * 35, 300);
   return (
     <div ref={ref} style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
@@ -149,7 +149,7 @@ const MemoizedEncodingChart = React.memo(({ data, onBarClick, onAxisClick }) => 
               }
               return null;
             }} />
-            <Bar dataKey="rate" fill="#10B981" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
+            <Bar dataKey="rate" fill="#10B981" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={shouldAnimate} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
               <LabelList dataKey="rate" position="right" formatter={(val) => `${val.toFixed(1)}%`} style={{ fontSize: '11px', fontWeight: 600, fill: '#10B981' }} />
             </Bar>
           </BarChart>

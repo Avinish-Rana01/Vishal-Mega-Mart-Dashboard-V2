@@ -25,6 +25,8 @@ export default function DonutChart({
   centerTop,
   tooltipFormatter = (value) => value.toLocaleString('en-IN'),
 }) {
+  const [containerRef, hasBeenVisible, shouldAnimate] = useIsInViewport({ threshold: 0.1 });
+
   if (!segments || segments.length === 0) {
     return (
       <div style={{
@@ -39,8 +41,6 @@ export default function DonutChart({
       </div>
     );
   }
-
-  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
   const defaultCy = halfCircle ? "75%" : (showLegend ? "45%" : "50%");
   const defaultInner = innerRadius || (halfCircle ? "65%" : "55%");
@@ -65,6 +65,7 @@ export default function DonutChart({
                 dataKey="value"
                 stroke="none"
                 cornerRadius={4}
+                isAnimationActive={shouldAnimate}
               >
                 {segments.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

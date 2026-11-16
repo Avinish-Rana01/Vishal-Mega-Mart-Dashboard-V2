@@ -23,6 +23,8 @@ export default function TimelineChart({
   height = 250,
   tooltipLabel = 'Count',
 }) {
+  const [containerRef, hasBeenVisible, shouldAnimate] = useIsInViewport({ threshold: 0.1 });
+
   if (!data || data.length === 0) {
     return (
       <div style={{
@@ -48,8 +50,6 @@ export default function TimelineChart({
     [dataKey]: Number(d[dataKey]) || 0,
   }));
 
-  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
-
   return (
     <div ref={containerRef} style={{ width: '100%', height: height }}>
       {hasBeenVisible && (
@@ -72,7 +72,7 @@ export default function TimelineChart({
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
               formatter={(value) => [value.toLocaleString('en-IN'), tooltipLabel]}
             />
-            <Bar dataKey={dataKey} radius={[8, 8, 0, 0]} maxBarSize={40}>
+            <Bar dataKey={dataKey} radius={[8, 8, 0, 0]} maxBarSize={40} isAnimationActive={shouldAnimate}>
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
