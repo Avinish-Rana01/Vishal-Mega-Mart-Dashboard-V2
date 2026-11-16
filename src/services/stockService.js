@@ -89,8 +89,15 @@ export const getCycleCount = async (searchQuery = '', pageIndex = 1, pageSize = 
 };
 
 export const getVendorDiscrepancy = async (searchQuery = '', pageIndex = 1, pageSize = 10, signal) => {
-  const term = encodeURIComponent(searchQuery || '');
-  const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&sortColumn=DISCREPANCY(%)&sortDirection=desc&userId=${getActiveUserId()}`, {
+  const response = await axios.get(`${API_BASE}/api/stock/vendor-hu-discrepancy`, {
+    params: {
+      pageIndex,
+      pageSize,
+      searchTerm: searchQuery || '',
+      sortColumn: 'DISCREPANCY(%)',
+      sortDirection: 'desc',
+      userId: getActiveUserId()
+    },
     headers: getHeaders(),
     signal
   });

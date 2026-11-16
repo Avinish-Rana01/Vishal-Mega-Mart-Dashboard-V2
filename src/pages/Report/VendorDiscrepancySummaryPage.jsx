@@ -93,19 +93,18 @@ export default function VendorDiscrepancySummaryPage() {
         const actQty = result.scannedQty ?? result.ScannedQty ?? 0;
         const diffQty = result.differenceQty ?? result.DifferenceQty ?? 0;
         const excQty = result.excessQty ?? result.ExcessQty ?? 0;
-        const huTotal = (result.huCount && result.huCount > 0) 
-          ? result.huCount 
-          : (result.totalCount ?? result.TotalCount ?? 0);
+        // Use totalCount (distinct discrepant HUs from #PARKHUVENDORREPORT) rather than huCount (outward DC Scan_Qty)
+        const huTotal = result.totalCount ?? result.TotalCount ?? 0;
 
-        // Calculate shortQty: Short Qty is the negative variance (diffQty - excQty or based on shortfall)
-        const shortQty = diffQty < 0 ? diffQty : (actQty - expQty - excQty);
+        // @DIFFQTY from SP_NEW_REPORT is Short Qty only; Net Difference = Short Qty + Excess Qty
+        const netDiff = diffQty + excQty;
 
         setSummary({
           huCount: huTotal,
           actualQty: expQty,     // In SP: ACTUALQTY = Invoice Expected Qty
           scannedQty: actQty,    // In SP: SCANQTY = Physically Scanned Actual Qty
-          differenceQty: diffQty,
-          shortQty: shortQty,
+          differenceQty: netDiff,
+          shortQty: diffQty,
           excessQty: excQty
         });
       }
