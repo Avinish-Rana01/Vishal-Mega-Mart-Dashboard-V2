@@ -1,28 +1,66 @@
-import React, { useRef, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
 import './LiveTickerValue.css';
 
+const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 /**
- * LiveTickerValue
- * 
- * YouTube Live Sub Count style rolling ticker animation for KPI values.
- * - Digits roll vertically: slides UP when increasing, slides DOWN when decreasing.
- * - Horizontal layout animation: commas, decimal points, and new digit columns glide smoothly.
- * - Initial mount: displays immediately without animation.
- * - Real-time updates: only the modified digits roll into view.
- * 
+ * Single character ticker column:
+ * If numeric (0-9), renders a vertical rolling strip of 0-9 that slides to the target number.
+ * If non-numeric (e.g. ₹, ,, ., -), renders the static symbol.
+ */
+function TickerDigit({ char, index, totalDigits }) {
+  const isDigit = /^[0-9]$/.test(char);
+  const targetNum = isDigit ? parseInt(char, 10) : 0;
+  const [displayNum, setDisplayNum] = useState(0);
+
+  useEffect(() => {
+    if (!isDigit) return;
+    const raf = requestAnimationFrame(() => {
+      setDisplayNum(targetNum);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [isDigit, targetNum]);
+
+  if (!isDigit) {
+    return (
+      <span className="live-ticker-static" aria-hidden="true">
+        {char}
+      </span>
+    );
+  }
+
+  // Stagger animation slightly from right-to-left for authentic stock ticker cascade
+  const delay = Math.max(0, (totalDigits - 1 - index) * 35);
+
+  return (
+    <span className="live-ticker-digit-slot" aria-hidden="true">
+      <span
+        className="live-ticker-strip"
+        style={{
+          transform: `translateY(-${displayNum * 10}%)`,
+          transitionDelay: `${delay}ms`,
+        }}
+      >
+        {DIGITS.map((d) => (
+          <span key={d} className="live-ticker-digit">
+            {d}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Stock-market style rolling number ticker
  * @param {string|number} value - The numerical or formatted value (e.g. "2,37,564", 237564, "90%")
  * @param {string} suffix - Optional suffix (e.g. "%")
- * @param {string} className - Optional container className
+ * @param {string} className - Extra CSS classes
  */
-export default function LiveTickerValue({ value, suffix = '', className = '', duration = 0.9 }) {
-  const isFirstRender = useRef(true);
-  const prevNumRef = useRef(null);
-
-  // Parse raw number, formatted representation, and suffix
-  const { rawNum, formattedString, finalSuffix } = useMemo(() => {
+export default function LiveTickerValue({ value, suffix = '', className = '' }) {
+  const strValue = useMemo(() => {
     if (value === undefined || value === null || value === '') {
-      return { rawNum: 0, formattedString: '0', finalSuffix: suffix };
+      return `0${suffix}`;
     }
 
     const str = String(value).trim();
@@ -38,136 +76,44 @@ export default function LiveTickerValue({ value, suffix = '', className = '', du
     const num = Number(numOnly);
 
     if (isNaN(num)) {
-      return { rawNum: 0, formattedString: str, finalSuffix: detectedSuffix };
+      return `${str}${suffix && !str.endsWith(suffix) ? suffix : ''}`;
     }
 
-    // Always enforce clean Indian number formatting
     const formatted = Number.isInteger(num)
       ? num.toLocaleString('en-IN')
       : cleanStr.includes(',')
         ? cleanStr
         : num.toLocaleString('en-IN');
 
-    return { rawNum: num, formattedString: formatted, finalSuffix: detectedSuffix };
+    return `${formatted}${detectedSuffix}`;
   }, [value, suffix]);
 
-  // Determine direction: 'up' for increase, 'down' for decrease
-  const direction = useMemo(() => {
-    if (prevNumRef.current === null || isFirstRender.current) {
-      return 'up';
-    }
-    return rawNum >= prevNumRef.current ? 'up' : 'down';
-  }, [rawNum]);
-
-  // Update previous number ref after calculating direction
-  useEffect(() => {
-    prevNumRef.current = rawNum;
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-    }
-  }, [rawNum]);
-
-  // Break formatted string into structured items with stable right-to-left keys
-  const characters = useMemo(() => {
-    const chars = formattedString.split('');
-    const len = chars.length;
-    let digitCountFromRight = 0;
-    let sepCountFromRight = 0;
-
-    // Scan backwards to assign stable place values (ones, tens, hundreds...)
-    const items = [];
-    for (let i = len - 1; i >= 0; i--) {
-      const char = chars[i];
-      const isDigit = /^\d$/.test(char);
-
-      if (isDigit) {
-        items.unshift({
-          char,
-          isDigit: true,
-          placeKey: `d_${digitCountFromRight}`
-        });
-        digitCountFromRight++;
-      } else {
-        items.unshift({
-          char,
-          isDigit: false,
-          placeKey: `sep_${sepCountFromRight}_${char}`
-        });
-        sepCountFromRight++;
-      }
-    }
-
-    return items;
-  }, [formattedString]);
-
-  // Smooth deceleration transition curve (YouTube Studio / odometer style)
-  const rollTransition = useMemo(() => ({
-    duration,
-    ease: [0.16, 1, 0.3, 1]
-  }), [duration]);
+  const chars = strValue.split('');
+  const totalDigits = chars.filter((c) => /^[0-9]$/.test(c)).length;
+  let digitIndex = 0;
 
   return (
-    <span className={`live-ticker-container ${className}`}>
-      {characters.map((item) => {
-        if (!item.isDigit) {
-          return (
-            <motion.span
-              layout
-              key={item.placeKey}
-              transition={rollTransition}
-              className="live-ticker-static"
-            >
-              {item.char}
-            </motion.span>
-          );
-        }
+    <span
+      className={`live-ticker-container ${className}`.trim()}
+      aria-label={strValue}
+    >
+      <span className="live-ticker-sr-only">{strValue}</span>
+      {chars.map((char, idx) => {
+        const isNum = /^[0-9]$/.test(char);
+        const currentDigitIndex = isNum ? digitIndex++ : 0;
+        // Key from right-to-left so existing digit positions remain mounted and animate smoothly
+        const rightPos = chars.length - 1 - idx;
+        const key = `${char === '₹' ? 'curr' : char === ',' ? 'sep' : 'pos'}-${rightPos}`;
 
         return (
-          <motion.span
-            layout
-            key={item.placeKey}
-            transition={rollTransition}
-            className="live-ticker-digit-slot"
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={`${item.placeKey}_${item.char}`}
-                initial={
-                  isFirstRender.current
-                    ? false
-                    : {
-                        y: direction === 'up' ? '100%' : '-100%',
-                        opacity: 0.2
-                      }
-                }
-                animate={{
-                  y: '0%',
-                  opacity: 1
-                }}
-                exit={{
-                  y: direction === 'up' ? '-100%' : '100%',
-                  opacity: 0.2
-                }}
-                transition={rollTransition}
-                className="live-ticker-digit"
-              >
-                {item.char}
-              </motion.span>
-            </AnimatePresence>
-          </motion.span>
+          <TickerDigit
+            key={key}
+            char={char}
+            index={currentDigitIndex}
+            totalDigits={totalDigits}
+          />
         );
       })}
-
-      {finalSuffix && (
-        <motion.span
-          layout
-          key="ticker_suffix"
-          transition={rollTransition}
-          className="live-ticker-static"
-        >
-          {finalSuffix}
-        </motion.span>
-      )}
     </span>
   );
 }

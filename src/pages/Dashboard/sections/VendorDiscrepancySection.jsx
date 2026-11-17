@@ -41,15 +41,23 @@ const VARIANCE_SORT_OPTIONS = [
   { value: 'DIFF_PER_DESC', label: 'Highest Discrepancy %' }
 ];
 
+const SORT_TO_API = {
+  EXPECTED_DESC: { sortColumn: 'EXPECTED QTY', sortDirection: 'desc' },
+  EXPECTED_ASC: { sortColumn: 'EXPECTED QTY', sortDirection: 'asc' },
+  DIFF_QTY_DESC: { sortColumn: 'VARIANCE', sortDirection: 'desc' },
+  DIFF_PER_DESC: { sortColumn: 'DISCREPANCY(%)', sortDirection: 'desc' },
+};
+
 export default function VendorDiscrepancySection() {
   const navigate = useNavigate();
-  const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy();
   const [chartView, setChartView] = useState('variance');
   const [volumeSort, setVolumeSort] = useState('EXPECTED_DESC');
   const [varianceSort, setVarianceSort] = useState('DIFF_PER_DESC');
 
   const activeSort = chartView === 'volume' ? volumeSort : varianceSort;
   const setActiveSort = chartView === 'volume' ? setVolumeSort : setVarianceSort;
+  const apiSort = SORT_TO_API[activeSort] || SORT_TO_API.DIFF_PER_DESC;
+  const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy(apiSort.sortColumn, apiSort.sortDirection);
 
   // Derived Metrics for Charts & Lists
   const { barData, composedData, totalExpectedRaw, totalScannedRaw, discrepancyPercent } = useMemo(() => {

@@ -521,8 +521,12 @@ const vendorTotals = (summary) => ({
   DIFF_TILL_DATE: summary.differenceQtyTillDate?.toLocaleString('en-IN') || 0
 });
 
-export const useVendorDiscrepancy = () => {
-  const baseFetch = useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals, 10);
+export const useVendorDiscrepancy = (sortColumn = 'DISCREPANCY(%)', sortDirection = 'desc') => {
+  const fetchVendor = useCallback(
+    (q, pIdx, pSize, sig) => getVendorDiscrepancy(q, pIdx, pSize, sig, sortColumn, sortDirection),
+    [sortColumn, sortDirection]
+  );
+  const baseFetch = useDashboardFetch(fetchVendor, vendorFilter, vendorTotals, 10);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedVendor, setHighlightedVendor] = useState(null);
