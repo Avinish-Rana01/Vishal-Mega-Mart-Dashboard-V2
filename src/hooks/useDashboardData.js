@@ -1085,10 +1085,10 @@ export const useTagCharts = () => {
 
         if (controller.signal.aborted) return;
 
-        const locTotal = locData.summary?.recordCount || 0;
         const storeVal = locData.summary?.storeCount || 0;
         const whVal = locData.summary?.warehouseCount || 0;
         const newTagsVal = locData.summary?.newTags ?? locData.summary?.NewTags ?? 0;
+        const locTotal = (storeVal + whVal + newTagsVal) || locData.summary?.recordCount || 0;
         setLocationTotal(locTotal);
         setLocationData([
           { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },
@@ -1158,7 +1158,7 @@ export const useTagCharts = () => {
 
       setLocationData((prev) => {
         const effectiveNewTags = patchNewTags !== undefined ? patchNewTags : (prev.find(i => i.name === 'New Tags')?.value || 0);
-        const locTotal = patch.recordCount || patch.RecordCount || (storeVal + whVal + effectiveNewTags);
+        const locTotal = (storeVal + whVal + effectiveNewTags) || patch.recordCount || patch.RecordCount || 0;
         setLocationTotal(locTotal);
         return [
           { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },
