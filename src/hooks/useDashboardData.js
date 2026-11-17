@@ -554,8 +554,12 @@ const vendorTotals = (summary) => ({
   DIFF_TILL_DATE: summary.differenceQtyTillDate?.toLocaleString('en-IN') || 0
 });
 
-export const useVendorDiscrepancyCore = (enabled = true) => {
-  const baseFetch = useDashboardFetch(getVendorDiscrepancy, vendorFilter, vendorTotals, 10, enabled);
+export const useVendorDiscrepancyCore = (enabled = true, sortColumn = 'DISCREPANCY(%)', sortDirection = 'desc') => {
+  const fetchVendor = useCallback(
+    (q, pIdx, pSize, sig) => getVendorDiscrepancy(q, pIdx, pSize, sig, sortColumn, sortDirection),
+    [sortColumn, sortDirection]
+  );
+  const baseFetch = useDashboardFetch(fetchVendor, vendorFilter, vendorTotals, 10, enabled);
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState(null);
   const [highlightedVendor, setHighlightedVendor] = useState(null);
@@ -651,9 +655,20 @@ export const useVendorDiscrepancyCore = (enabled = true) => {
   return { ...baseFetch, data, totals: totals || baseFetch.totals, highlightedVendor, connectionStatus };
 };
 
-export const useVendorDiscrepancy = () => {
+export const useVendorDiscrepancy = (sortColumn = 'DISCREPANCY(%)', sortDirection = 'desc') => {
   const shared = useDashboardSharedData();
-  const local = useVendorDiscrepancyCore(!shared);
+  const syncSharedSort = shared?.setVendorSort;
+
+  useEffect(() => {
+    if (!syncSharedSort) return;
+    syncSharedSort((prev) => (
+      prev.sortColumn === sortColumn && prev.sortDirection === sortDirection
+        ? prev
+        : { sortColumn, sortDirection }
+    ));
+  }, [syncSharedSort, sortColumn, sortDirection]);
+
+  const local = useVendorDiscrepancyCore(!shared, sortColumn, sortDirection);
   return shared?.hooks?.vendor_discrepancy || local;
 };
 
@@ -1169,10 +1184,10 @@ export const useTagChartsCore = (enabled = true) => {
 
         if (controller.signal.aborted) return;
 
-        const locTotal = locData.summary?.recordCount || 0;
         const storeVal = locData.summary?.storeCount || 0;
         const whVal = locData.summary?.warehouseCount || 0;
         const newTagsVal = locData.summary?.newTags ?? locData.summary?.NewTags ?? 0;
+        const locTotal = (storeVal + whVal + newTagsVal) || locData.summary?.recordCount || 0;
         setLocationTotal(locTotal);
         setLocationData([
           { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },
@@ -1243,7 +1258,7 @@ export const useTagChartsCore = (enabled = true) => {
 
       setLocationData((prev) => {
         const effectiveNewTags = patchNewTags !== undefined ? patchNewTags : (prev.find(i => i.name === 'New Tags')?.value || 0);
-        const locTotal = patch.recordCount || patch.RecordCount || (storeVal + whVal + effectiveNewTags);
+        const locTotal = (storeVal + whVal + effectiveNewTags) || patch.recordCount || patch.RecordCount || 0;
         setLocationTotal(locTotal);
         return [
           { name: 'Inventory at Store', value: storeVal, displayValue: storeVal.toLocaleString('en-IN'), percent: ((storeVal / (locTotal || 1)) * 100).toFixed(2), color: '#8b5cf6' },

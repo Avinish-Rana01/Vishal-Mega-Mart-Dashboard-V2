@@ -34,9 +34,14 @@ export function DashboardDataProvider({ children }) {
   const canTagManagement = hasSection('tag_management');
   const canDcEncoding = hasSection('dc_encoding');
 
+  const [vendorSort, setVendorSort] = useState({
+    sortColumn: 'DISCREPANCY(%)',
+    sortDirection: 'desc',
+  });
+
   const liveStock = useLiveStockCore(canLiveStock);
   const cycleCount = useCycleCountCore(canCycleCount);
-  const vendorDiscrepancy = useVendorDiscrepancyCore(canVendor);
+  const vendorDiscrepancy = useVendorDiscrepancyCore(canVendor, vendorSort.sortColumn, vendorSort.sortDirection);
   const storeValidation = useStoreDashboardCore(canStoreValidation);
   const sale = useSaleDashboardCore(canSale);
   const voidData = useVoidDashboardCore(canVoid);
@@ -141,6 +146,7 @@ export function DashboardDataProvider({ children }) {
     dcEncodingErrors,
     spotlight,
     triggerSpotlight,
+    setVendorSort,
   }), [hooks, dcEncodingErrors, spotlight, triggerSpotlight]);
 
   return (

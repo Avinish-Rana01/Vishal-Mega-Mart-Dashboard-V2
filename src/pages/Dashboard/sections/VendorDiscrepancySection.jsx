@@ -31,11 +31,33 @@ const formatVendorTick = (name) => {
   return trimmed.length > 22 ? `${trimmed.substring(0, 20)}...` : trimmed;
 };
 
+const VOLUME_SORT_OPTIONS = [
+  { value: 'EXPECTED_DESC', label: 'Highest Expected' },
+  { value: 'EXPECTED_ASC', label: 'Lowest Expected' }
+];
+
+const VARIANCE_SORT_OPTIONS = [
+  { value: 'DIFF_QTY_DESC', label: 'Highest Variance' },
+  { value: 'DIFF_PER_DESC', label: 'Highest Discrepancy %' }
+];
+
+const SORT_TO_API = {
+  EXPECTED_DESC: { sortColumn: 'EXPECTED QTY', sortDirection: 'desc' },
+  EXPECTED_ASC: { sortColumn: 'EXPECTED QTY', sortDirection: 'asc' },
+  DIFF_QTY_DESC: { sortColumn: 'VARIANCE', sortDirection: 'desc' },
+  DIFF_PER_DESC: { sortColumn: 'DISCREPANCY(%)', sortDirection: 'desc' },
+};
+
 export default function VendorDiscrepancySection() {
   const navigate = useNavigate();
-  const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy();
-  const [chartView, setChartView] = useState('volume');
-  const [sortBy, setSortBy] = useState('DIFF_PER_DESC');
+  const [chartView, setChartView] = useState('variance');
+  const [volumeSort, setVolumeSort] = useState('EXPECTED_DESC');
+  const [varianceSort, setVarianceSort] = useState('DIFF_PER_DESC');
+
+  const activeSort = chartView === 'volume' ? volumeSort : varianceSort;
+  const setActiveSort = chartView === 'volume' ? setVolumeSort : setVarianceSort;
+  const apiSort = SORT_TO_API[activeSort] || SORT_TO_API.DIFF_PER_DESC;
+  const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy(apiSort.sortColumn, apiSort.sortDirection);
 
   // Derived Metrics for Charts & Lists
   const { barData, composedData, totalExpectedRaw, totalScannedRaw, discrepancyPercent } = useMemo(() => {
@@ -43,11 +65,16 @@ export default function VendorDiscrepancySection() {
 
     // 1. Robust sort with tie-breakers and NaN prevention
     const sortedData = [...data].sort((a, b) => {
-      switch (sortBy) {
+      switch (activeSort) {
         case 'EXPECTED_DESC': {
           const diff = parseNum(b.ACTUAL_QTY) - parseNum(a.ACTUAL_QTY);
           if (diff !== 0) return diff;
           return Math.abs(parseNum(b.DIFF_QTY)) - Math.abs(parseNum(a.DIFF_QTY));
+        }
+        case 'EXPECTED_ASC': {
+          const diff = parseNum(a.ACTUAL_QTY) - parseNum(b.ACTUAL_QTY);
+          if (diff !== 0) return diff;
+          return Math.abs(parseNum(a.DIFF_QTY)) - Math.abs(parseNum(b.DIFF_QTY));
         }
         case 'DIFF_QTY_DESC': {
           const diff = Math.abs(parseNum(b.DIFF_QTY)) - Math.abs(parseNum(a.DIFF_QTY));
@@ -73,7 +100,12 @@ export default function VendorDiscrepancySection() {
       vendorName: row.VENDOR_NAME || '',
       TOTAL_QTY: Number(row.TOTAL_QTY || 0),
       Expected: Number(row.ACTUAL_QTY || 0),
-      Scanned: Number(row.SCANNED_QTY || 0)
+      Scanned: Number(row.SCANNED_QTY || 0),
+      DIFF_PER: row.DIFF_PER !== undefined && row.DIFF_PER !== null
+        ? Number(row.DIFF_PER)
+        : (Number(row.ACTUAL_QTY || 0) > 0
+          ? (Math.abs(Number(row.DIFF_QTY || 0)) / Number(row.ACTUAL_QTY)) * 100
+          : 0)
     }));
 
     const composedData = top10.map(row => ({
@@ -96,7 +128,7 @@ export default function VendorDiscrepancySection() {
       : '0%';
 
     return { barData, composedData, totalExpectedRaw, totalScannedRaw, discrepancyPercent };
-  }, [data, totals, sortBy]);
+  }, [data, totals, activeSort]);
 
   // Navigate to summary report filtered by clicked vendor
   const handleVendorClick = (vendorParam) => {
@@ -256,13 +288,9 @@ export default function VendorDiscrepancySection() {
             rightContent={
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <CustomDropdown
-                  options={[
-                    { value: 'EXPECTED_DESC', label: 'Highest Expected' },
-                    { value: 'DIFF_QTY_DESC', label: 'Highest Variance' },
-                    { value: 'DIFF_PER_DESC', label: 'Highest Discrepancy %' }
-                  ]}
-                  value={sortBy}
-                  onChange={setSortBy}
+                  options={chartView === 'volume' ? VOLUME_SORT_OPTIONS : VARIANCE_SORT_OPTIONS}
+                  value={activeSort}
+                  onChange={setActiveSort}
                   prefix="Sort:"
                   buttonStyle={{ minWidth: 'auto', gap: '8px', height: '28px', display: 'inline-flex', alignItems: 'center' }}
                   menuStyle={{ left: 'auto', right: 0, minWidth: '220px' }}
@@ -345,6 +373,13 @@ export default function VendorDiscrepancySection() {
                               <span style={{ fontWeight: 'bold', color: '#0f172a', fontSize: '13px', marginLeft: 'auto' }}>{entry.value}</span>
                             </div>
                           ))}
+                          <div style={{ display: 'flex', alignItems: 'center', margin: '6px 0 0', paddingTop: '6px', borderTop: '1px solid #f1f5f9' }}>
+                            <div style={{ width: '10px', height: '10px', backgroundColor: '#EF5350', marginRight: '8px', borderRadius: '50%' }}></div>
+                            <span style={{ color: '#475569', fontSize: '13px', marginRight: '16px' }}>Discrepancy %:</span>
+                            <span style={{ fontWeight: 'bold', color: '#EF5350', fontSize: '13px', marginLeft: 'auto' }}>
+                              {Number(dataObj.DIFF_PER || 0).toFixed(2)}%
+                            </span>
+                          </div>
                         </div>
                       );
                     }
