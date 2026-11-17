@@ -17,12 +17,6 @@ export const formatIn = (val) => Math.round(parseNum(val)).toLocaleString('en-IN
 
 export const clamp = (num, min, max) => Math.min(max, Math.max(min, num));
 
-export const normalizeStoreCode = (code) => {
-  const clean = String(code || '').trim().toUpperCase();
-  if (!clean || clean === 'TOTAL' || clean === '—' || clean === 'NA') return '';
-  return clean;
-};
-
 /**
  * Classifies percentage metrics using standard store thresholds:
  * < 50% Red, 50% - 90% Amber, > 90% Green.
@@ -35,14 +29,14 @@ export const getCoverageTier = (pct) => {
 };
 
 /**
- * Formats cycle count row DATE + END_DateTime (or Start_DateTime) into "13 Nov 18:01".
+ * Formats cycle count row lastCcDate + lastCcEndTime (or lastCcStartTime) into "13 Nov 18:01".
  */
-export const formatCycleCountTimestamp = (row) => {
-  if (!row || !row.DATE) {
+export const formatCycleCountTimestamp = (dateStr, startTime, endTime) => {
+  if (!dateStr) {
     return { label: '—', sortKey: '', inProgress: false };
   }
 
-  const rawDate = String(row.DATE).trim().split('T')[0].split(' ')[0];
+  const rawDate = String(dateStr).trim().split('T')[0].split(' ')[0];
   let dateLabel = rawDate;
   const parts = rawDate.split('-');
   if (parts.length === 3) {
@@ -53,26 +47,22 @@ export const formatCycleCountTimestamp = (row) => {
     }
   }
 
-  const rawEnd = row.END_DateTime && row.END_DateTime !== '—' ? String(row.END_DateTime).trim() : '';
-  const rawStart = row.Start_DateTime && row.Start_DateTime !== '—' ? String(row.Start_DateTime).trim() : '';
+  const rawEnd = endTime && endTime !== '—' ? String(endTime).trim() : '';
+  const rawStart = startTime && startTime !== '—' ? String(startTime).trim() : '';
   const timeSource = rawEnd || rawStart;
   const timeMatch = timeSource.match(/(\d{1,2}:\d{2})/);
   const hhmm = timeMatch ? timeMatch[1].padStart(5, '0') : '';
 
-  const sortKey = `${rawDate}T${timeSource || '00:00:00'}`;
-  const label = hhmm ? `${dateLabel} ${hhmm}` : dateLabel;
-
   return {
-    label,
-    sortKey,
+    label: hhmm ? `${dateLabel} ${hhmm}` : dateLabel,
+    sortKey: `${rawDate}T${timeSource || '00:00:00'}`,
     inProgress: !rawEnd && Boolean(rawStart),
   };
 };
 
 /**
  * Provisional composite health score (0-100) combining coverage, RFID checkout,
- * and pending operational backlogs. Isolated in one pure function so weights
- * can be swapped cleanly once final business scoring rules are confirmed.
+ * and pending operational backlogs.
  */
 export const calculateStoreScore = (store) => {
   let weightedPoints = 0;
@@ -93,8 +83,7 @@ export const calculateStoreScore = (store) => {
     const valPenalty = Math.min(10, (store.validationPending || 0) * 0.4) + Math.min(5, (store.huWrong || 0) * 2);
     const voidRetPenalty = Math.min(10, ((store.voidPending || 0) + (store.returnPending || 0)) * 0.25);
     const dcPenalty = Math.min(5, (store.dcUnprocessed || 0) * 2);
-    const hygienePoints = clamp(30 - valPenalty - voidRetPenalty - dcPenalty, 0, 30);
-    weightedPoints += hygienePoints;
+    weightedPoints += clamp(30 - valPenalty - voidRetPenalty - dcPenalty, 0, 30);
     totalWeight += 30;
   }
 
@@ -109,10 +98,9 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
   const reasons = [];
 
   if (permissions.live_stock && store.hasLiveStock && store.coveragePct !== null && store.coveragePct < 90) {
-    const isRed = store.coveragePct < 50;
     reasons.push({
       text: `Stock coverage ${Math.round(store.coveragePct)}% (RFID ${formatIn(store.rfidStock)} of SAP ${formatIn(store.sapStock)})`,
-      severity: isRed ? 'red' : 'amber',
+      severity: store.coveragePct < 50 ? 'red' : 'amber',
       sectionKey: 'live_stock',
     });
   }
@@ -187,6 +175,7 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
       (permissions.live_stock && 'live_stock') ||
       (permissions.sale && 'sale') ||
       (permissions.store_validation && 'store_validation') ||
+      (permissions.dc_validation && 'dc_validation') ||
       'live_stock';
     reasons.push({
       text: 'All tracked RFID metrics within target thresholds',
@@ -198,224 +187,137 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
   return reasons;
 };
 
-const createEmptyStore = (code) => ({
-  storeCode: code,
-  storeName: '',
-  hasLiveStock: false,
-  sapStock: 0,
-  rfidStock: 0,
-  coveragePct: null,
-  hasSale: false,
-  dposSale: 0,
-  rfidCheckout: 0,
-  taffetaSale: 0,
-  manualSale: 0,
-  checkoutPct: null,
-  hasStoreValidation: false,
-  whValidated: 0,
-  hhtValidated: 0,
-  validationPending: 0,
-  huWrong: 0,
-  hasVoid: false,
-  voidTotal: 0,
-  voidPending: 0,
-  hasReturn: false,
-  returnTotal: 0,
-  returnPending: 0,
-  hasDcValidation: false,
-  dcProcessed: 0,
-  dcUnprocessed: 0,
-  hasCycleCount: false,
-  lastCycleCount: '—',
-  cycleCountSortKey: '',
-  cycleCountInProgress: false,
-});
-
-const getOrCreateStore = (map, rawCode, rawName) => {
-  const code = normalizeStoreCode(rawCode);
-  if (!code) return null;
-  if (!map.has(code)) {
-    map.set(code, createEmptyStore(code));
-  }
-  const entry = map.get(code);
-  const name = String(rawName || '').trim();
-  if (name && name.toUpperCase() !== 'TOTAL' && !entry.storeName) {
-    entry.storeName = name.toUpperCase();
-  }
-  return entry;
-};
-
 /**
- * Combines live hooks and permission flags into the 6 Overview KPI card models
- * and unified per-store scorecard rows.
+ * Maps the single `/api/stock/overview` response into permission-aware KPI card models
+ * and unified Store Scorecard rows.
  */
-export const buildOverviewData = ({ hooks = {}, dcEncodingErrors = {}, permissions = {} }) => {
-  const storeMap = new Map();
+export const buildOverviewData = (apiResponse, permissions = {}) => {
+  const summary = apiResponse?.summary || {};
+  const rawStores = Array.isArray(apiResponse?.stores) ? apiResponse.stores : [];
 
-  // 1. Live Stock
-  if (permissions.live_stock) {
-    (hooks.live_stock?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(storeMap, row.STORE_CODE, row.STORE_NAME);
-      if (!entry) return;
-      const sap = parseNum(row.SAP_STOCK);
-      const rfid = parseNum(row.RFID_STOCK);
-      const apiPct = parseNumOrNull(row.PERCENTAGE);
-      entry.hasLiveStock = true;
-      entry.sapStock += sap;
-      entry.rfidStock += rfid;
-      entry.coveragePct = entry.sapStock > 0
-        ? (entry.rfidStock / entry.sapStock) * 100
-        : (apiPct ?? entry.coveragePct);
-    });
-  }
-
-  // 2. Sales & RFID Checkout
-  if (permissions.sale) {
-    (hooks.sale?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(storeMap, row.STORE || row.STORE_CODE, row.STORE_NAME);
-      if (!entry) return;
-      entry.hasSale = true;
-      entry.dposSale += parseNum(row.TOTAL_DPOS_SALE);
-      entry.rfidCheckout += parseNum(row.TOTAL_RFID_CHECKOUT);
-      entry.taffetaSale += parseNum(row.TOTAL_TAFFETA_SALE);
-      entry.manualSale += parseNum(row.TOTAL_MANUAL_SALE);
-      entry.checkoutPct = entry.dposSale > 0 ? (entry.rfidCheckout / entry.dposSale) * 100 : null;
-    });
-  }
-
-  // 3. Store Validation
-  if (permissions.store_validation) {
-    (hooks.store_validation?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(storeMap, row.STORE || row.STORE_CODE, row.STORE_NAME);
-      if (!entry) return;
-      entry.hasStoreValidation = true;
-      entry.whValidated += parseNum(row.HU_VALIDATED_QTY);
-      entry.hhtValidated += parseNum(row.HHT_VALIDATE_QTY);
-      entry.validationPending += parseNum(row.STORE_PENDING_QTY);
-      entry.huWrong += parseNum(row.HU_WRONG_QTY);
-    });
-  }
-
-  // 4. Void
-  if (permissions.void) {
-    (hooks.void?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(storeMap, row.STORE || row.STORE_CODE, row.STORE_NAME);
-      if (!entry) return;
-      entry.hasVoid = true;
-      entry.voidTotal += parseNum(row.VOID_QTY);
-      entry.voidPending += parseNum(row.DIFFERENCE_QTY);
-    });
-  }
-
-  // 5. Return
-  if (permissions.return) {
-    (hooks.return?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(storeMap, row.Store_Code || row.STORE_CODE || row.STORE, row.STORE_NAME);
-      if (!entry) return;
-      entry.hasReturn = true;
-      entry.returnTotal += parseNum(row.RETURN_QTY);
-      entry.returnPending += parseNum(row.DIFFERENCE_QTY);
-    });
-  }
-
-  // 6. Cycle Count (most recent audit per store)
-  if (permissions.cycle_count) {
-    (hooks.cycle_count?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(storeMap, row.STORE_CODE || row.STORE, row.STORE_NAME);
-      if (!entry) return;
-      const formatted = formatCycleCountTimestamp(row);
-      if (!entry.hasCycleCount || formatted.sortKey > entry.cycleCountSortKey) {
-        entry.hasCycleCount = true;
-        entry.lastCycleCount = formatted.label;
-        entry.cycleCountSortKey = formatted.sortKey;
-        entry.cycleCountInProgress = formatted.inProgress;
-      }
-    });
-  }
-
-  // 7. DC Validation (Receiving Plant mapped to Store Code)
-  if (permissions.dc_validation) {
-    (hooks.dc_validation?.data || []).forEach((row) => {
-      const entry = getOrCreateStore(
-        storeMap,
-        row.Reciving_Plant || row.RECIVING_PLANT || row.Store_Code || row.STORE_CODE,
-        row.STORE_NAME
-      );
-      if (!entry) return;
-      entry.hasDcValidation = true;
-      entry.dcProcessed += parseNum(row.PROCESSED_HU);
-      entry.dcUnprocessed += parseNum(row.UNPROCESSED_HU);
-    });
-  }
-
-  // Enrich each store with score, status tier, and WHY reasons
   let redStores = 0;
   let amberStores = 0;
   let greenStores = 0;
 
-  const storeRows = Array.from(storeMap.values()).map((entry) => {
-    const coverageTier = getCoverageTier(entry.coveragePct);
-    if (entry.hasLiveStock && entry.coveragePct !== null) {
-      if (coverageTier === 'red') redStores += 1;
-      else if (coverageTier === 'amber') amberStores += 1;
-      else greenStores += 1;
-    }
+  const storeRows = rawStores
+    .map((r) => {
+      const storeCode = String(r.storeCode || '').trim().toUpperCase();
+      if (!storeCode) return null;
 
-    const score = calculateStoreScore(entry);
-    const statusTier = coverageTier !== 'neutral'
-      ? coverageTier
-      : (score !== null ? getCoverageTier(score) : 'neutral');
+      const hasLiveStock = Boolean(permissions.live_stock && r.hasLiveStock);
+      const sapStock = hasLiveStock ? parseNum(r.sapStock) : 0;
+      const rfidStock = hasLiveStock ? parseNum(r.rfidStock) : 0;
+      const coveragePct = hasLiveStock
+        ? (sapStock > 0 ? (rfidStock / sapStock) * 100 : parseNumOrNull(r.coveragePct))
+        : null;
 
-    const reasons = buildStoreWhyReasons(entry, permissions);
+      const hasSale = Boolean(permissions.sale && r.hasSale);
+      const dposSale = hasSale ? parseNum(r.totalDposSale) : 0;
+      const rfidCheckout = hasSale ? parseNum(r.totalRfidCheckout) : 0;
+      const taffetaSale = hasSale ? parseNum(r.totalTaffetaSale) : 0;
+      const manualSale = hasSale ? parseNum(r.totalManualSale) : 0;
+      const checkoutPct = hasSale && dposSale > 0 ? (rfidCheckout / dposSale) * 100 : null;
 
-    return {
-      ...entry,
-      coverageTier,
-      statusTier,
-      statusLabel: statusTier === 'red' ? 'Red' : statusTier === 'amber' ? 'Amber' : statusTier === 'green' ? 'Green' : '—',
-      score,
-      reasons,
-    };
-  });
+      const hasStoreValidation = Boolean(permissions.store_validation && r.hasStoreValidation);
+      const whValidated = hasStoreValidation ? parseNum(r.huValidatedQty) : 0;
+      const hhtValidated = hasStoreValidation ? parseNum(r.hhtValidateQty) : 0;
+      const validationPending = hasStoreValidation ? parseNum(r.storePendingQty) : 0;
+      const huWrong = hasStoreValidation ? parseNum(r.huWrongQty) : 0;
 
-  // ---- Build Top 6 KPI Summaries ----
-  const liveTotals = hooks.live_stock?.totals;
-  const totalSap = parseNumOrNull(liveTotals?.SAP_STOCK) ?? storeRows.reduce((acc, r) => acc + r.sapStock, 0);
-  const totalRfid = parseNumOrNull(liveTotals?.RFID_STOCK) ?? storeRows.reduce((acc, r) => acc + r.rfidStock, 0);
-  const overallCoveragePct = totalSap > 0 ? (totalRfid / totalSap) * 100 : 0;
+      const hasVoid = Boolean(permissions.void && r.hasVoid);
+      const voidTotal = hasVoid ? parseNum(r.voidQty) : 0;
+      const voidPending = hasVoid ? parseNum(r.voidPendingQty) : 0;
 
-  const saleTotals = hooks.sale?.totals;
-  const totalDpos = parseNumOrNull(saleTotals?.TOTAL_DPOS_SALE) ?? storeRows.reduce((acc, r) => acc + r.dposSale, 0);
-  const totalRfidSale = parseNumOrNull(saleTotals?.TOTAL_RFID_CHECKOUT) ?? storeRows.reduce((acc, r) => acc + r.rfidCheckout, 0);
-  const totalTaffetaSale = parseNumOrNull(saleTotals?.TOTAL_TAFFETA_SALE) ?? storeRows.reduce((acc, r) => acc + r.taffetaSale, 0);
-  const totalManualSale = parseNumOrNull(saleTotals?.TOTAL_MANUAL_SALE) ?? storeRows.reduce((acc, r) => acc + r.manualSale, 0);
-  const overallCheckoutPct = totalDpos > 0 ? (totalRfidSale / totalDpos) * 100 : 0;
-  const taggedDenominator = (totalRfidSale + totalManualSale) > 0
-    ? (totalRfidSale + totalManualSale)
-    : Math.max(0, totalDpos - totalTaffetaSale);
-  const taggedCapturePct = taggedDenominator > 0 ? Math.min(100, (totalRfidSale / taggedDenominator) * 100) : 0;
+      const hasReturn = Boolean(permissions.return && r.hasReturn);
+      const returnTotal = hasReturn ? parseNum(r.returnQty) : 0;
+      const returnPending = hasReturn ? parseNum(r.returnPendingQty) : 0;
 
-  const valTotals = hooks.store_validation?.totals;
-  const totalValidationPending = parseNumOrNull(valTotals?.STORE_PENDING_QTY) ?? storeRows.reduce((acc, r) => acc + r.validationPending, 0);
-  const totalWhValidated = parseNumOrNull(valTotals?.HU_VALIDATED_QTY) ?? storeRows.reduce((acc, r) => acc + r.whValidated, 0);
-  const totalWrongHu = parseNumOrNull(valTotals?.HU_WRONG_QTY) ?? storeRows.reduce((acc, r) => acc + r.huWrong, 0);
+      const hasDcValidation = Boolean(permissions.dc_validation && r.hasDcValidation);
+      const dcProcessed = hasDcValidation ? parseNum(r.dcProcessedHu) : 0;
+      const dcUnprocessed = hasDcValidation ? parseNum(r.dcUnprocessedHu) : 0;
 
-  const voidTotals = hooks.void?.totals;
-  const returnTotals = hooks.return?.totals;
-  const totalVoidPending = parseNumOrNull(voidTotals?.DIFFERENCE_QTY) ?? storeRows.reduce((acc, r) => acc + r.voidPending, 0);
-  const totalVoidQty = parseNumOrNull(voidTotals?.VOID_QTY) ?? storeRows.reduce((acc, r) => acc + r.voidTotal, 0);
-  const totalReturnPending = parseNumOrNull(returnTotals?.DIFFERENCE_QTY) ?? storeRows.reduce((acc, r) => acc + r.returnPending, 0);
-  const totalReturnQty = parseNumOrNull(returnTotals?.RETURN_QTY) ?? storeRows.reduce((acc, r) => acc + r.returnTotal, 0);
+      const hasCycleCount = Boolean(permissions.cycle_count && r.hasCycleCount);
+      const cycleFormatted = hasCycleCount
+        ? formatCycleCountTimestamp(r.lastCcDate, r.lastCcStartTime, r.lastCcEndTime)
+        : { label: '—', sortKey: '', inProgress: false };
 
-  const dcValTotals = hooks.dc_validation?.totals;
-  const totalDcUnprocessed = parseNumOrNull(dcValTotals?.UNPROCESSED_HU) ?? storeRows.reduce((acc, r) => acc + r.dcUnprocessed, 0);
+      const storeModel = {
+        storeCode,
+        storeName: String(r.storeName || '').trim().toUpperCase(),
+        hasLiveStock,
+        sapStock,
+        rfidStock,
+        coveragePct,
+        hasSale,
+        dposSale,
+        rfidCheckout,
+        taffetaSale,
+        manualSale,
+        checkoutPct,
+        hasStoreValidation,
+        whValidated,
+        hhtValidated,
+        validationPending,
+        huWrong,
+        hasVoid,
+        voidTotal,
+        voidPending,
+        hasReturn,
+        returnTotal,
+        returnPending,
+        hasDcValidation,
+        dcProcessed,
+        dcUnprocessed,
+        hasCycleCount,
+        lastCycleCount: cycleFormatted.label,
+        cycleCountSortKey: cycleFormatted.sortKey,
+        cycleCountInProgress: cycleFormatted.inProgress,
+      };
 
-  const dcEncChartData = hooks.dc_encoding?.chartData || [];
-  const dcEncodedToday = dcEncChartData.reduce((sum, item) => sum + parseNum(item.count), 0)
-    || dcEncodingErrors?.totalEncoded
-    || 0;
+      const coverageTier = getCoverageTier(coveragePct);
+      if (hasLiveStock && coveragePct !== null) {
+        if (coverageTier === 'red') redStores += 1;
+        else if (coverageTier === 'amber') amberStores += 1;
+        else greenStores += 1;
+      }
 
-  const liveStockStoreCount = redStores + amberStores + greenStores;
+      const score = calculateStoreScore(storeModel);
+      const statusTier = coverageTier !== 'neutral'
+        ? coverageTier
+        : (score !== null ? getCoverageTier(score) : 'neutral');
+
+      return {
+        ...storeModel,
+        coverageTier,
+        statusTier,
+        statusLabel: statusTier === 'red' ? 'Red' : statusTier === 'amber' ? 'Amber' : statusTier === 'green' ? 'Green' : '—',
+        score,
+        reasons: buildStoreWhyReasons(storeModel, permissions),
+      };
+    })
+    .filter(Boolean);
+
+  const totalSap = parseNum(summary.sapStock);
+  const totalRfid = parseNum(summary.rfidStock);
+  const overallCoveragePct = totalSap > 0 ? (totalRfid / totalSap) * 100 : parseNum(summary.coveragePct);
+
+  const totalDpos = parseNum(summary.dposSale);
+  const totalRfidSale = parseNum(summary.rfidCheckout);
+  const taggedCapturePct = parseNum(summary.taggedCapturePct);
+  const overallCheckoutPct = totalDpos > 0 ? (totalRfidSale / totalDpos) * 100 : parseNum(summary.checkoutPct);
+
+  const totalValidationPending = parseNum(summary.storePendingQty);
+  const totalWhValidated = parseNum(summary.huValidatedQty);
+  const totalWrongHu = parseNum(summary.huWrongQty);
+
+  const totalVoidPending = parseNum(summary.voidPendingQty);
+  const totalVoidQty = parseNum(summary.voidQty);
+  const totalReturnPending = parseNum(summary.returnPendingQty);
+  const totalReturnQty = parseNum(summary.returnQty);
+
+  const totalDcUnprocessed = parseNum(summary.dcUnprocessedHu);
+  const dcEncodedToday = parseNum(summary.dcEncodedToday);
+  const dcErrorPct = parseNum(summary.dcEncodingErrorPct);
 
   return {
     kpis: {
@@ -423,41 +325,34 @@ export const buildOverviewData = ({ hooks = {}, dcEncodingErrors = {}, permissio
         red: redStores,
         amber: amberStores,
         green: greenStores,
-        total: liveStockStoreCount,
-        accent: redStores > 0 ? 'red' : amberStores > 0 ? 'amber' : 'green',
+        total: redStores + amberStores + greenStores,
       },
       stockCoverage: {
         pct: overallCoveragePct,
         rfid: totalRfid,
         sap: totalSap,
-        accent: getCoverageTier(overallCoveragePct),
       },
       rfidCheckout: {
         pct: overallCheckoutPct,
         rfidSale: totalRfidSale,
         dposSale: totalDpos,
         taggedCapturePct,
-        accent: getCoverageTier(overallCheckoutPct),
       },
       validationPending: {
         pending: totalValidationPending,
         whValidated: totalWhValidated,
         wrong: totalWrongHu,
-        accent: totalWrongHu > 0 ? 'red' : totalValidationPending > 0 ? 'amber' : 'green',
       },
       voidReturnPending: {
         voidPending: totalVoidPending,
         returnPending: totalReturnPending,
         voidTotal: totalVoidQty,
         returnTotal: totalReturnQty,
-        accent: (totalVoidPending > 0 || totalReturnPending > 0) ? 'amber' : 'green',
       },
       dcEncoding: {
         encodedToday: dcEncodedToday,
-        errorPct: dcEncodingErrors?.errorPct ?? 0,
-        errorLoading: Boolean(dcEncodingErrors?.isLoading),
+        errorPct: dcErrorPct,
         unprocessedHu: totalDcUnprocessed,
-        accent: 'neutral',
       },
     },
     storeRows,

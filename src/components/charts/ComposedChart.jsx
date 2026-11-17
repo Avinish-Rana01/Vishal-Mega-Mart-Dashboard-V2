@@ -42,7 +42,7 @@ export default function ComposedChart({
   xAxisAngle = 0,
   margin
 }) {
-  const [containerRef, hasBeenVisible, shouldAnimate] = useIsInViewport({ threshold: 0.1 });
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
   const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
 
   React.useEffect(() => {
@@ -203,7 +203,6 @@ export default function ComposedChart({
               barSize={barSize}
               radius={[12, 12, 0, 0]} 
               minPointSize={4}
-              isAnimationActive={shouldAnimate}
               onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
               cursor={onBarClick ? 'pointer' : 'default'}
             >
@@ -232,7 +231,6 @@ export default function ComposedChart({
               strokeWidth={3}
               dot={{ r: 4, strokeWidth: 2, fill: '#fff', stroke: line.color }}
               activeDot={{ r: 6 }}
-              isAnimationActive={shouldAnimate}
             />
           ))}
           

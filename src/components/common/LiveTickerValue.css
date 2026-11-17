@@ -37,6 +37,10 @@
   will-change: transform;
 }
 
+.live-ticker-strip--resetting {
+  transition: none !important;
+}
+
 .live-ticker-digit {
   height: 1.16em;
   line-height: 1.16em;

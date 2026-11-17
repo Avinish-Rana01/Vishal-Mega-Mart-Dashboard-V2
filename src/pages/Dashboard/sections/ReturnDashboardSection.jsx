@@ -7,6 +7,7 @@ import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemo
 import SectionHeader, { DateBadge } from '../../../components/common/SectionHeader';
 import CurvedCard from '../../../components/common/CurvedCard';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import SemiDonutChart from '../../../components/charts/SemiDonutChart';
 import ChartToolbar from '../../../components/common/ChartToolbar';
@@ -85,7 +86,7 @@ const CustomYAxisTick = ({ x, y, payload, onClick }) => {
 };
 
 const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
   const height = Math.max(data.length * 35, 300);
   return (
     <div ref={ref} style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
@@ -112,7 +113,7 @@ const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
               }
               return null;
             }} />
-              <Bar dataKey="pending" fill="#EF5350" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={shouldAnimate} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
+              <Bar dataKey="pending" fill="#EF5350" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -122,7 +123,7 @@ const MemoizedPendingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
 });
 
 const MemoizedEncodingChart = React.memo(({ data, onBarClick, onAxisClick }) => {
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
   const height = Math.max(data.length * 35, 300);
   return (
     <div ref={ref} style={{ flex: 1, minHeight: '275px', position: 'relative' }}>
@@ -149,7 +150,7 @@ const MemoizedEncodingChart = React.memo(({ data, onBarClick, onAxisClick }) => 
               }
               return null;
             }} />
-            <Bar dataKey="rate" fill="#10B981" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={shouldAnimate} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
+            <Bar dataKey="rate" fill="#10B981" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4} isAnimationActive={true} animationDuration={800} onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined} cursor={onBarClick ? 'pointer' : 'default'}>
               <LabelList dataKey="rate" position="right" formatter={(val) => `${val.toFixed(1)}%`} style={{ fontSize: '11px', fontWeight: 600, fill: '#10B981' }} />
             </Bar>
           </BarChart>
@@ -276,26 +277,26 @@ export default function ReturnDashboardSection() {
         /> */}
          <KpiCard2
           title="Total Return Qty"
-          value={totals?.RETURN_QTY || '0'}
+          value={<LiveTickerValue value={totals?.RETURN_QTY || 0} />}
           badgeVariant="success"
           icon={<Icons.Barcode />}
         />
         <KpiCard2
           title="Encoded Qty"
-          value={totals?.ENCODE_QTY || '0'}
+          value={<LiveTickerValue value={totals?.ENCODE_QTY || 0} />}
           badgeVariant="success"
           icon={<Icons.Barcode />}
         />
         <KpiCard2
           title="Pending Returns"
-          value={totals?.DIFFERENCE_QTY || '0'}
+          value={<LiveTickerValue value={totals?.DIFFERENCE_QTY || 0} />}
           badge="Action Needed"
           badgeVariant="danger"
           icon={<Icons.Alert />}
         />
         <KpiCard2
           title="Encoding Rate"
-          value={`${encodePercent.toFixed(1)}%`}
+          value={<LiveTickerValue value={encodePercent.toFixed(1)} suffix="%" />}
           badge={encodePercent >= 90 ? "Excellent" : encodePercent >= 70 ? "Good" : "Low"}
           badgeVariant={encodePercent >= 90 ? "success" : encodePercent >= 70 ? "warning" : "danger"}
           icon={<Icons.Percent />}

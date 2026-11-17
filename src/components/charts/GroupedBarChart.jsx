@@ -38,11 +38,10 @@ export default function GroupedBarChart({
   onAxisClick,
   xAxisFontSize = 11,
   xAxisAngle = 0,
-  isAnimationActive,
+  isAnimationActive = true,
   minPointSize = 4
 }) {
-  const [containerRef, hasBeenVisible, shouldAnimate] = useIsInViewport({ threshold: 0.1 });
-  const animateBars = isAnimationActive !== undefined ? isAnimationActive : shouldAnimate;
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
   const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
 
   React.useEffect(() => {
@@ -169,7 +168,7 @@ export default function GroupedBarChart({
                 radius={stacked ? 0 : 12}
                 barSize={maxBarWidth || (stacked ? 32 : 24)}
                 minPointSize={minPointSize}
-                isAnimationActive={animateBars}
+                isAnimationActive={isAnimationActive}
                 onClick={onBarClick ? (data) => onBarClick(data.payload) : undefined}
                 cursor={onBarClick ? 'pointer' : 'default'}
               >

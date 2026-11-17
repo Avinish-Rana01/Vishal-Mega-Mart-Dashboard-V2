@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import AppLayout from '../../components/layout/AppLayout';
 import WorkInProgress from '../../components/common/WorkInProgress';
 import { useAuth } from '../../context/AuthContext';
-import { DashboardDataProvider } from '../../context/DashboardDataContext';
-import { useDashboardSharedData } from '../../context/dashboardDataContextValue';
 import { getDashboardReturnPoint, clearDashboardReturnPoint, getDashboardScrollContainer, useSessionState } from '../../utils/dashboardNavigationMemory';
 import OverviewSection from './sections/OverviewSection';
 import LiveStockSection from './sections/LiveStockSection';
@@ -93,9 +91,8 @@ const SECTION_TO_TAB = DASHBOARD_TABS.reduce((acc, tab) => {
   return acc;
 }, {});
 
-function DashboardPageContent() {
+export default function DashboardPage() {
   const { hasSection } = useAuth();
-  const shared = useDashboardSharedData();
 
   const visibleTabs = useMemo(
     () => DASHBOARD_TABS.filter((tab) => {
@@ -117,7 +114,7 @@ function DashboardPageContent() {
   const indicatorReadyRef = useRef(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0, animate: false });
 
-  // Resolve active tab: report return point > permitted session tab > Overview / first live tab
+  // Resolve active tab: report return point > permitted session tab > first live tab
   const activeTab = useMemo(() => {
     const returnPoint = getDashboardReturnPoint();
     const returnTabId = returnPoint?.sectionId ? SECTION_TO_TAB[returnPoint.sectionId] : null;
@@ -137,16 +134,11 @@ function DashboardPageContent() {
     if (container) container.scrollTop = 0;
   };
 
-  const handleJumpToSection = useCallback((sectionKey, storeCode) => {
+  const handleJumpToSection = useCallback((sectionKey) => {
     const targetTab = SECTION_TO_TAB[sectionKey];
     if (!targetTab || !visibleTabs.some((t) => t.id === targetTab)) return;
-
     clearDashboardReturnPoint();
     setStoredTab(targetTab);
-    if (storeCode && shared?.triggerSpotlight) {
-      shared.triggerSpotlight(sectionKey, storeCode);
-    }
-
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const el = document.getElementById(`section-${sectionKey}`);
@@ -155,7 +147,7 @@ function DashboardPageContent() {
         }
       });
     });
-  }, [visibleTabs, setStoredTab, shared]);
+  }, [visibleTabs, setStoredTab]);
 
   // Slide the underline indicator smoothly beneath the active tab button
   useLayoutEffect(() => {
@@ -354,14 +346,6 @@ function DashboardPageContent() {
         })}
       </div>
     </AppLayout>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <DashboardDataProvider>
-      <DashboardPageContent />
-    </DashboardDataProvider>
   );
 }
 

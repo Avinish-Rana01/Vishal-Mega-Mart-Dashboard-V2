@@ -66,7 +66,7 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
   const ROW_HEIGHT = 16;
   const GROUP_GAP = 16;
   const chartHeight = Math.max(220, chartData.length * (ROW_HEIGHT * 2 + GROUP_GAP) + 40);
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
 
   return (
     <div ref={ref} style={{ display: 'flex', width: '100%', minHeight: chartHeight }}>
@@ -84,7 +84,7 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
                 barSize={ROW_HEIGHT} 
                 fill={COLOR_VALIDATED} 
                 radius={[4,4,4,4]} 
-                isAnimationActive={shouldAnimate} 
+                isAnimationActive={true} 
                 animationDuration={500} 
                 animationEasing="ease-out"
                 cursor="pointer"
@@ -99,7 +99,7 @@ const MemoizedValidationChart = React.memo(({ chartData, onCellClick }) => {
                 barSize={ROW_HEIGHT} 
                 fill={COLOR_HHT} 
                 radius={[4,4,4,4]} 
-                isAnimationActive={shouldAnimate} 
+                isAnimationActive={true} 
                 animationDuration={500} 
                 animationEasing="ease-out"
                 cursor="pointer"
@@ -128,7 +128,7 @@ const MemoizedPendingChart = React.memo(({ chartData, searchFilter, onClearSearc
     );
   }, [chartData, sortDescending]);
   const chartHeight = Math.max(220, filteredData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
 
   if (filteredData.length === 0) {
     if (searchFilter && searchFilter.trim().length > 0) {
@@ -168,7 +168,7 @@ const MemoizedPendingChart = React.memo(({ chartData, searchFilter, onClearSearc
                 barSize={ROW_HEIGHT} 
                 fill={COLOR_PENDING} 
                 radius={[4,4,4,4]} 
-                isAnimationActive={shouldAnimate} 
+                isAnimationActive={true} 
                 animationDuration={500} 
                 animationEasing="ease-out"
                 cursor="pointer"
@@ -190,7 +190,7 @@ const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearc
   const GROUP_GAP = 16;
   const filteredData = chartData.filter(d => Number(d.HU_WRONG_QTY || 0) > 0);
   const chartHeight = Math.max(220, filteredData.length * (ROW_HEIGHT + GROUP_GAP) + 40);
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
 
   if (filteredData.length === 0) {
     if (searchFilter && searchFilter.trim().length > 0) {
@@ -230,7 +230,7 @@ const MemoizedWrongHUChart = React.memo(({ chartData, searchFilter, onClearSearc
                 barSize={ROW_HEIGHT} 
                 fill={COLOR_WRONG} 
                 radius={[4,4,4,4]} 
-                isAnimationActive={shouldAnimate} 
+                isAnimationActive={true} 
                 animationDuration={500} 
                 animationEasing="ease-out"
                 cursor="pointer"
@@ -587,10 +587,8 @@ export default function StoreValidationSection() {
           const validatedColor = '#16a34a';
           const hhtColor = hhtValidated < validated ? '#dc2626' : COLOR_HHT;
 
-          const isRowHighlighted = highlightedStore && String(highlightedStore).toUpperCase() === String(row.STORE || '').toUpperCase();
-
           return (
-            <tr key={row.STORE || idx} className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}>
+            <tr key={row.STORE || idx} className="cc-data-grid-tr">
               <td className="cc-data-grid-td cc-data-grid-td-bold">
                 <div 
                   className="cc-row-tooltip-wrapper sv-clickable-store"

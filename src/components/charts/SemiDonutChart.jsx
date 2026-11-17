@@ -30,7 +30,7 @@ export default function SemiDonutChart({
     { name: 'Remaining', value: remaining },
   ];
 
-  const [containerRef, hasBeenVisible, shouldAnimate] = useIsInViewport({ threshold: 0.1 });
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
   return (
     <div ref={containerRef} style={{ position: 'relative', height: `${height}px`, width: '100%', maxWidth: `${maxWidth}px`, margin: '0 auto' }}>
@@ -50,7 +50,6 @@ export default function SemiDonutChart({
                 dataKey="value"
                 stroke="none"
                 cornerRadius={8}
-                isAnimationActive={shouldAnimate}
               >
                 <Cell fill={primaryColor} />
                 <Cell fill={emptyColor} />

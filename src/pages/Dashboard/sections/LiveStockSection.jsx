@@ -69,7 +69,7 @@ const sortOptions = [
 
 // ---- Memoized Charts ----
 const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlightedStore }) => {
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
   const height = Math.max(barChartData.length * 28, 240);
   return (
     <div ref={ref} style={{ height: '100%', overflowY: 'auto', paddingRight: '10px', minHeight: '240px' }}>
@@ -95,7 +95,7 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlight
             />
 
             {/* Stacked bars: RFID on left, Difference on right */}
-            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={shouldAnimate} animationDuration={800}>
+            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800}>
               {barChartData.map((entry, index) => (
                 <Cell 
                   key={`cell-rfid-${index}`} 
@@ -103,7 +103,7 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlight
                 />
               ))}
             </Bar>
-            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={shouldAnimate} animationDuration={800} />
+            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -112,7 +112,7 @@ const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlight
 });
 
 const MemoizedPieChart = React.memo(({ accuracyPieData }) => {
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
   return (
     <div ref={ref} style={{ width: '100%', height: '100%', minHeight: '200px' }}>
       {hasBeenVisible && (
@@ -128,7 +128,7 @@ const MemoizedPieChart = React.memo(({ accuracyPieData }) => {
               outerRadius="100%"
               paddingAngle={3}
               stroke="none"
-              isAnimationActive={shouldAnimate}
+              isAnimationActive={true}
               animationDuration={800}
               cornerRadius={5}
             >

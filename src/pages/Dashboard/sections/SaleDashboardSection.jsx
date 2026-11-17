@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSaleDashboard } from '../../../hooks/useDashboardData';
 import { saveDashboardReturnPoint } from '../../../utils/dashboardNavigationMemory';
 import KpiCard2 from '../../../components/charts/KpiCard2';
+import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import GroupedBarChart from '../../../components/charts/GroupedBarChart';
 import { motion } from 'framer-motion';
 import DashboardDataGrid from '../../../components/charts/DashboardDataGrid';
@@ -67,7 +68,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function SaleDashboardSection() {
-  const { data, totals, isLoading, error, highlightedStore } = useSaleDashboard();
+  const { data, totals, isLoading, error } = useSaleDashboard();
   const navigate = useNavigate();
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState('DPOS_DESC');
@@ -229,7 +230,7 @@ export default function SaleDashboardSection() {
         >
           <KpiCard2
             title="Total DPOS Sale"
-            value={totals?.TOTAL_DPOS_SALE || '0'}
+            value={<LiveTickerValue value={totals?.TOTAL_DPOS_SALE || 0} />}
             badgeVariant="default"
             icon={<Icons.Cart />}
           />
@@ -241,7 +242,7 @@ export default function SaleDashboardSection() {
         >
           <KpiCard2
             title="Total RFID Checkout"
-            value={totals?.TOTAL_RFID_CHECKOUT || '0'}
+            value={<LiveTickerValue value={totals?.TOTAL_RFID_CHECKOUT || 0} />}
             badgeVariant="info"
             icon={<Icons.Tag />}
           />
@@ -249,7 +250,7 @@ export default function SaleDashboardSection() {
         <div style={{ flex: 1, display: 'flex' }}>
           <KpiCard2
             title="Taffeta Sales"
-            value={totals?.TOTAL_TAFFETA_SALE || '0'}
+            value={<LiveTickerValue value={totals?.TOTAL_TAFFETA_SALE || 0} />}
             badgeVariant="success"
             icon={<Icons.Star />}
           />
@@ -261,7 +262,7 @@ export default function SaleDashboardSection() {
         >
           <KpiCard2
             title="Manual Sales"
-            value={totals?.TOTAL_MANUAL_SALE || '0'}
+            value={<LiveTickerValue value={totals?.TOTAL_MANUAL_SALE || 0} />}
             badgeVariant="warning"
             icon={<Icons.Manual />}
           />
@@ -269,7 +270,7 @@ export default function SaleDashboardSection() {
         <div style={{ flex: 1, display: 'flex' }}>
           <KpiCard2
             title="RFID Sales Share"
-            value={totals?.RFID_SALES_SHARE || '0%'}
+            value={<LiveTickerValue value={totals?.RFID_SALES_SHARE || '0%'} />}
             badgeVariant="default"
             icon={<Icons.Tag />}
           />
@@ -380,16 +381,14 @@ export default function SaleDashboardSection() {
             </td>
           </motion.tr>
         }
-        renderRow={(row) => {
-          const isRowHighlighted = highlightedStore && String(highlightedStore).toUpperCase() === String(row.STORE || '').toUpperCase();
-          return (
+        renderRow={(row) => (
           <motion.tr
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
             key={row.STORE}
-            className={`cc-data-grid-tr ${isRowHighlighted ? 'row-updated-pulse' : ''}`}
+            className="cc-data-grid-tr"
           >
             <td className="cc-data-grid-td cc-data-grid-td-bold">
               <div 
@@ -447,8 +446,7 @@ export default function SaleDashboardSection() {
               </span>
             </td>
           </motion.tr>
-          );
-        }}
+        )}
       />
       </div>
 

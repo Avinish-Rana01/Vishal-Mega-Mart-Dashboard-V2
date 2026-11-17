@@ -65,7 +65,7 @@ function DurationTooltip({ active, payload }) {
 
 // ---- Memoized Chart Component ----
 const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick, highlightedRow }) => {
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
   return (
     <div ref={ref} style={{ width: '100%', minHeight: chartHeight }}>
       {hasBeenVisible && (
@@ -91,7 +91,7 @@ const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick, highligh
               content={<DurationTooltip />}
               cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }}
             />
-            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#3b82f6" isAnimationActive={shouldAnimate} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
+            <Bar dataKey="durationMins" radius={[0, 4, 4, 0]} maxBarSize={20} fill="#3b82f6" isAnimationActive={true} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
               {chartData.map((entry, index) => {
                 const isHighlighted = highlightedRow && (
                   String(highlightedRow).toUpperCase() === String(entry.STORE_CODE || '').toUpperCase() ||
@@ -119,7 +119,7 @@ const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick, highligh
 
 // ---- Memoized Distribution Chart Component ----
 const MemoizedDistributionChart = React.memo(({ distributionData }) => {
-  const [ref, hasBeenVisible, shouldAnimate] = useIsInViewport();
+  const [ref, hasBeenVisible] = useIsInViewport();
   return (
     <div ref={ref} style={{ height: '280px', width: '100%', paddingTop: '20px' }}>
       {hasBeenVisible && (
@@ -146,7 +146,7 @@ const MemoizedDistributionChart = React.memo(({ distributionData }) => {
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 600 }} dy={10} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} allowDecimals={false} />
             <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
-            <Bar dataKey="count" radius={[8, 8, 0, 0]} isAnimationActive={shouldAnimate} animationDuration={1000} animationEasing="ease-out" filter="url(#shadow)">
+            <Bar dataKey="count" radius={[8, 8, 0, 0]} isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" filter="url(#shadow)">
               {distributionData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}

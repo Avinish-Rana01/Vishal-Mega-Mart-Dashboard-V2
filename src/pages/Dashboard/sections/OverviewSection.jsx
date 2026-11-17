@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Download,
   ArrowUp,
@@ -11,17 +11,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
-import { useDashboardSharedData } from '../../../context/dashboardDataContextValue';
-import {
-  useLiveStock,
-  useSaleDashboard,
-  useStoreDashboard,
-  useVoidDashboard,
-  useReturnDashboard,
-  useCycleCount,
-  useDcValidation,
-  useWarehouseEncoding,
-} from '../../../hooks/useDashboardData';
+import { getDashboardOverview } from '../../../services/stockService';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
@@ -35,17 +25,9 @@ import './OverviewSection.css';
 
 export default function OverviewSection({ onJumpToSection }) {
   const { hasSection } = useAuth();
-  const shared = useDashboardSharedData();
-
-  const liveStock = useLiveStock();
-  const sale = useSaleDashboard();
-  const storeValidation = useStoreDashboard();
-  const voidData = useVoidDashboard();
-  const returnData = useReturnDashboard();
-  const cycleCount = useCycleCount();
-  const dcValidation = useDcValidation();
-  const dcEncoding = useWarehouseEncoding();
-
+  const [rawData, setRawData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'score', dir: 'asc' });
 
   const permissions = useMemo(() => ({
@@ -59,54 +41,40 @@ export default function OverviewSection({ onJumpToSection }) {
     dc_encoding: hasSection('dc_encoding'),
   }), [hasSection]);
 
-  const { kpis, storeRows } = useMemo(() => buildOverviewData({
-    hooks: {
-      live_stock: liveStock,
-      sale,
-      store_validation: storeValidation,
-      void: voidData,
-      return: returnData,
-      cycle_count: cycleCount,
-      dc_validation: dcValidation,
-      dc_encoding: dcEncoding,
-    },
-    dcEncodingErrors: shared?.dcEncodingErrors,
-    permissions,
-  }), [
-    liveStock,
-    sale,
-    storeValidation,
-    voidData,
-    returnData,
-    cycleCount,
-    dcValidation,
-    dcEncoding,
-    shared?.dcEncodingErrors,
-    permissions,
-  ]);
+  useEffect(() => {
+    const controller = new AbortController();
+    let mounted = true;
 
-  const enabledStates = [
-    permissions.live_stock && liveStock.isLoading,
-    permissions.sale && sale.isLoading,
-    permissions.store_validation && storeValidation.isLoading,
-    permissions.void && voidData.isLoading,
-    permissions.return && returnData.isLoading,
-    permissions.cycle_count && cycleCount.isLoading,
-    permissions.dc_validation && dcValidation.isLoading,
-    permissions.dc_encoding && dcEncoding.isLoading,
-  ];
-  const activeFlags = enabledStates.filter((_, idx) => [
-    permissions.live_stock,
-    permissions.sale,
-    permissions.store_validation,
-    permissions.void,
-    permissions.return,
-    permissions.cycle_count,
-    permissions.dc_validation,
-    permissions.dc_encoding,
-  ][idx]);
+    const loadOverview = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const result = await getDashboardOverview('', controller.signal);
+        if (!mounted || controller.signal.aborted) return;
+        setRawData(result || null);
+      } catch (err) {
+        if (!mounted || err.name === 'AbortError' || err.name === 'CanceledError' || err.code === 'ERR_CANCELED') {
+          return;
+        }
+        setError(err.message || 'Unable to load executive overview');
+      } finally {
+        if (mounted && !controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
 
-  const isInitialLoading = activeFlags.length > 0 && activeFlags.every(Boolean) && storeRows.length === 0;
+    loadOverview();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, []);
+
+  const { kpis, storeRows } = useMemo(
+    () => buildOverviewData(rawData, permissions),
+    [rawData, permissions]
+  );
 
   const sortedRows = useMemo(() => {
     const { key, dir } = sortConfig;
@@ -148,18 +116,30 @@ export default function OverviewSection({ onJumpToSection }) {
     onJumpToSection(sectionKey, storeCode);
   };
 
+  if (isLoading && !rawData) {
+    return <DashboardShimmer variant="live-stock" />;
+  }
+
+  if (error && !rawData) {
+    return (
+      <div className="cc-data-grid-card vmm-ov-scorecard" style={{ padding: '16px', color: '#EF5350', fontSize: '13px' }}>
+        Unable to load executive overview: {error}
+      </div>
+    );
+  }
+
   const kpiCards = [
     permissions.live_stock && {
       key: 'stores',
       sectionKey: 'live_stock',
       title: 'Stores Status',
-      value: liveStock.isLoading ? '—' : (
+      value: (
         <span className="vmm-ov-rag-inline">
-          <span className="vmm-ov-rag-r">{kpis.stores.red}R</span>
+          <span className="vmm-ov-rag-r"><LiveTickerValue value={kpis.stores.red} suffix="R" /></span>
           <span className="vmm-ov-rag-sep">/</span>
-          <span className="vmm-ov-rag-a">{kpis.stores.amber}A</span>
+          <span className="vmm-ov-rag-a"><LiveTickerValue value={kpis.stores.amber} suffix="A" /></span>
           <span className="vmm-ov-rag-sep">/</span>
-          <span className="vmm-ov-rag-g">{kpis.stores.green}G</span>
+          <span className="vmm-ov-rag-g"><LiveTickerValue value={kpis.stores.green} suffix="G" /></span>
         </span>
       ),
       icon: <Store />,
@@ -169,9 +149,7 @@ export default function OverviewSection({ onJumpToSection }) {
       key: 'coverage',
       sectionKey: 'live_stock',
       title: 'Stock Coverage',
-      value: liveStock.isLoading ? '—' : (
-        <LiveTickerValue value={kpis.stockCoverage.pct.toFixed(1)} suffix="%" />
-      ),
+      value: <LiveTickerValue value={kpis.stockCoverage.pct.toFixed(1)} suffix="%" />,
       icon: <Target />,
       tooltip: `RFID ${formatIn(kpis.stockCoverage.rfid)} of SAP ${formatIn(kpis.stockCoverage.sap)}`,
     },
@@ -179,9 +157,7 @@ export default function OverviewSection({ onJumpToSection }) {
       key: 'checkout',
       sectionKey: 'sale',
       title: 'RFID Checkout',
-      value: sale.isLoading ? '—' : (
-        <LiveTickerValue value={kpis.rfidCheckout.pct.toFixed(1)} suffix="%" />
-      ),
+      value: <LiveTickerValue value={kpis.rfidCheckout.pct.toFixed(1)} suffix="%" />,
       icon: <ShoppingCart />,
       tooltip: `${formatIn(kpis.rfidCheckout.rfidSale)} of ${formatIn(kpis.rfidCheckout.dposSale)} items sold • ${kpis.rfidCheckout.taggedCapturePct.toFixed(1)}% of tagged items`,
     },
@@ -189,9 +165,7 @@ export default function OverviewSection({ onJumpToSection }) {
       key: 'validation',
       sectionKey: 'store_validation',
       title: 'Validation Pending',
-      value: storeValidation.isLoading ? '—' : (
-        <LiveTickerValue value={kpis.validationPending.pending} />
-      ),
+      value: <LiveTickerValue value={kpis.validationPending.pending} />,
       icon: <ClipboardList />,
       tooltip: `Of ${formatIn(kpis.validationPending.whValidated)} WH validated • ${formatIn(kpis.validationPending.wrong)} wrong HUs`,
     },
@@ -199,9 +173,13 @@ export default function OverviewSection({ onJumpToSection }) {
       key: 'voidReturn',
       sectionKey: permissions.void ? 'void' : 'return',
       title: 'Void / Return Pending',
-      value: (voidData.isLoading && returnData.isLoading)
-        ? '—'
-        : `${formatIn(kpis.voidReturnPending.voidPending)} / ${formatIn(kpis.voidReturnPending.returnPending)}`,
+      value: (
+        <>
+          <LiveTickerValue value={kpis.voidReturnPending.voidPending} />
+          <span className="vmm-ov-slash"> / </span>
+          <LiveTickerValue value={kpis.voidReturnPending.returnPending} />
+        </>
+      ),
       icon: <RotateCcw />,
       tooltip: `Not encoded back (of ${formatIn(kpis.voidReturnPending.voidTotal)} void, ${formatIn(kpis.voidReturnPending.returnTotal)} return)`,
     },
@@ -209,17 +187,11 @@ export default function OverviewSection({ onJumpToSection }) {
       key: 'dcEncoding',
       sectionKey: permissions.dc_encoding ? 'dc_encoding' : 'dc_validation',
       title: 'DC Encoding Today',
-      value: dcEncoding.isLoading ? '—' : (
-        <LiveTickerValue value={kpis.dcEncoding.encodedToday} />
-      ),
+      value: <LiveTickerValue value={kpis.dcEncoding.encodedToday} />,
       icon: <Layers />,
       tooltip: `${Number(kpis.dcEncoding.errorPct).toFixed(1)}% errors • ${formatIn(kpis.dcEncoding.unprocessedHu)} HUs unprocessed at DC`,
     },
   ].filter(Boolean);
-
-  if (isInitialLoading) {
-    return <DashboardShimmer variant="live-stock" />;
-  }
 
   const renderSortIcon = (key) => {
     if (sortConfig.key !== key) return null;
@@ -228,7 +200,6 @@ export default function OverviewSection({ onJumpToSection }) {
       : <ArrowDown size={11} className="vmm-ov-sort-icon" />;
   };
 
-  // Concise single-line context summary inside scorecard subtitle
   const summaryParts = [];
   if (permissions.live_stock) {
     summaryParts.push(`RFID ${formatIn(kpis.stockCoverage.rfid)} / SAP ${formatIn(kpis.stockCoverage.sap)}`);
@@ -236,7 +207,7 @@ export default function OverviewSection({ onJumpToSection }) {
   if (permissions.sale) {
     summaryParts.push(`${kpis.rfidCheckout.taggedCapturePct.toFixed(1)}% tagged checkout`);
   }
-  if (permissions.dc_encoding && !kpis.dcEncoding.errorLoading) {
+  if (permissions.dc_encoding) {
     summaryParts.push(`DC ${Number(kpis.dcEncoding.errorPct).toFixed(1)}% err`);
   }
   if (permissions.dc_validation) {
@@ -359,6 +330,7 @@ export default function OverviewSection({ onJumpToSection }) {
                     (row.hasLiveStock && permissions.live_stock && 'live_stock') ||
                     (row.hasStoreValidation && permissions.store_validation && 'store_validation') ||
                     (row.hasSale && permissions.sale && 'sale') ||
+                    (row.hasDcValidation && permissions.dc_validation && 'dc_validation') ||
                     'live_stock';
 
                   const barWidth = row.coveragePct !== null
