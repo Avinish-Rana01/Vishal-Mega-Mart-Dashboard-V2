@@ -91,8 +91,10 @@ export const calculateStoreScore = (store) => {
   return Math.round(clamp((weightedPoints / totalWeight) * 100, 0, 100));
 };
 
+const plural = (n, singular, pluralWord) => (n === 1 ? singular : pluralWord);
+
 /**
- * Generates ordered, highlighted WHY badge items linking straight to the responsible module.
+ * Generates ordered, highlighted WHY items linking straight to the responsible module.
  */
 export const buildStoreWhyReasons = (store, permissions = {}) => {
   const reasons = [];
@@ -116,8 +118,9 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
         sectionKey: 'sale',
       });
     } else if (store.manualSale > 0) {
+      const n = Math.round(store.manualSale);
       reasons.push({
-        text: `${formatIn(store.manualSale)} manual scans missed RFID (${store.checkoutPct.toFixed(1)}% checkout of ${formatIn(store.dposSale)})`,
+        text: `${formatIn(n)} manual ${plural(n, 'scan', 'scans')} missed RFID (${store.checkoutPct.toFixed(1)}% checkout of ${formatIn(store.dposSale)})`,
         severity: 'amber',
         sectionKey: 'sale',
       });
@@ -131,40 +134,45 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
   }
 
   if (permissions.store_validation && store.validationPending > 0) {
+    const n = Math.round(store.validationPending);
     reasons.push({
-      text: `${formatIn(store.validationPending)} HUs pending store validation`,
+      text: `${formatIn(n)} ${plural(n, 'HU', 'HUs')} pending store validation`,
       severity: 'amber',
       sectionKey: 'store_validation',
     });
   }
 
   if (permissions.store_validation && store.huWrong > 0) {
+    const n = Math.round(store.huWrong);
     reasons.push({
-      text: `${formatIn(store.huWrong)} wrong HUs flagged at store`,
+      text: `${formatIn(n)} wrong ${plural(n, 'HU', 'HUs')} flagged at store`,
       severity: 'red',
       sectionKey: 'store_validation',
     });
   }
 
   if (permissions.void && store.voidPending > 0) {
+    const n = Math.round(store.voidPending);
     reasons.push({
-      text: `${formatIn(store.voidPending)} void items not encoded back`,
+      text: `${formatIn(n)} void ${plural(n, 'item', 'items')} not encoded back`,
       severity: 'amber',
       sectionKey: 'void',
     });
   }
 
   if (permissions.return && store.returnPending > 0) {
+    const n = Math.round(store.returnPending);
     reasons.push({
-      text: `${formatIn(store.returnPending)} return items not encoded back`,
+      text: `${formatIn(n)} return ${plural(n, 'item', 'items')} not encoded back`,
       severity: 'amber',
       sectionKey: 'return',
     });
   }
 
   if (permissions.dc_validation && store.dcUnprocessed > 0) {
+    const n = Math.round(store.dcUnprocessed);
     reasons.push({
-      text: `${formatIn(store.dcUnprocessed)} HUs not processed at DC`,
+      text: `${formatIn(n)} ${plural(n, 'HU', 'HUs')} not processed at DC`,
       severity: 'amber',
       sectionKey: 'dc_validation',
     });
@@ -184,7 +192,8 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
     });
   }
 
-  return reasons;
+  const severityRank = { red: 0, amber: 1, green: 2 };
+  return reasons.sort((a, b) => (severityRank[a.severity] ?? 3) - (severityRank[b.severity] ?? 3));
 };
 
 /**
@@ -290,7 +299,7 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
         ...storeModel,
         coverageTier,
         statusTier,
-        statusLabel: statusTier === 'red' ? 'Red' : statusTier === 'amber' ? 'Amber' : statusTier === 'green' ? 'Green' : '—',
+        statusLabel: statusTier === 'red' ? 'Critical' : statusTier === 'amber' ? 'Warning' : statusTier === 'green' ? 'Healthy' : '—',
         score,
         reasons: buildStoreWhyReasons(storeModel, permissions),
       };

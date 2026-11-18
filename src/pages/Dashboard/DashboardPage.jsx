@@ -52,36 +52,36 @@ const DASHBOARD_TABS = [
   },
   {
     id: 'stock_cycle',
-    label: 'Stock & cycle count',
+    label: 'Stock & Cycle Count',
     sections: ['live_stock', 'cycle_count'],
   },
   {
     id: 'sales_checkout',
-    label: 'Sales & checkout',
+    label: 'Sales & Checkout',
     sections: ['sale'],
   },
   {
     id: 'validation_void_return',
-    label: 'Validation, void & return',
+    label: 'Validation, Void & Return',
     sections: ['store_validation', 'void', 'return'],
   },
   {
     id: 'dc_encoding',
-    label: 'DC & encoding',
+    label: 'DC Validate & Encoding, Tag',
     sections: ['dc_validation', 'dc_encoding', 'tag_management'],
   },
   {
     id: 'vendors',
-    label: 'Vendors',
+    label: 'Vendor Discrepancy',
     sections: ['vendor_discrepancy'],
   },
-  {
-    id: 'daily_history',
-    label: 'Daily history',
-    sections: [],
-    placeholderTitle: 'Daily history',
-    placeholderMessage: 'Historical day-by-day trends and snapshots will appear here soon.',
-  },
+  // {
+  //   id: 'daily_history',
+  //   label: 'Daily History',
+  //   sections: [],
+  //   placeholderTitle: 'Daily History',
+  //   placeholderMessage: 'Historical day-by-day trends and snapshots will appear here soon.',
+  // },
 ];
 
 const SECTION_TO_TAB = DASHBOARD_TABS.reduce((acc, tab) => {

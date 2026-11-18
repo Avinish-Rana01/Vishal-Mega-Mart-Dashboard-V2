@@ -3,12 +3,16 @@ import {
   Download,
   ArrowUp,
   ArrowDown,
+  ArrowUpDown,
   Store,
   Target,
   ShoppingCart,
   ClipboardList,
   RotateCcw,
   Layers,
+  AlertTriangle,
+  Check,
+  Info,
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { getDashboardOverview } from '../../../services/stockService';
@@ -28,7 +32,7 @@ export default function OverviewSection({ onJumpToSection }) {
   const [rawData, setRawData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: 'score', dir: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, dir: null });
 
   const permissions = useMemo(() => ({
     live_stock: hasSection('live_stock'),
@@ -78,35 +82,60 @@ export default function OverviewSection({ onJumpToSection }) {
 
   const sortedRows = useMemo(() => {
     const { key, dir } = sortConfig;
+    if (!key || !dir) return storeRows;
+
     const mult = dir === 'asc' ? 1 : -1;
+    const statusOrder = { red: 0, amber: 1, green: 2 };
+
+    const getVal = (row) => {
+      switch (key) {
+        case 'status':
+          return statusOrder[row.statusTier] ?? null;
+        case 'store':
+          return row.storeName || row.storeCode || '';
+        case 'score':
+          return row.score;
+        case 'coverage':
+          return row.coveragePct;
+        case 'checkout':
+          return row.checkoutPct;
+        case 'validation':
+          return row.hasStoreValidation ? row.validationPending : null;
+        case 'voidReturn':
+          return (row.hasVoid || row.hasReturn)
+            ? (permissions.void ? row.voidPending : 0) + (permissions.return ? row.returnPending : 0)
+            : null;
+        case 'cycleCount':
+          return row.hasCycleCount ? row.cycleCountSortKey : '';
+        case 'why':
+          return row.reasons.every((r) => r.severity === 'green') ? 0 : row.reasons.length;
+        default:
+          return null;
+      }
+    };
 
     return [...storeRows].sort((a, b) => {
-      if (key === 'store') {
-        return a.storeCode.localeCompare(b.storeCode) * mult;
-      }
-      const getVal = (row) => {
-        if (key === 'score') return row.score;
-        if (key === 'coverage') return row.coveragePct;
-        if (key === 'checkout') return row.checkoutPct;
-        if (key === 'validation') return row.hasStoreValidation ? row.validationPending : null;
-        return row.score;
-      };
       const va = getVal(a);
       const vb = getVal(b);
-      if (va === null && vb === null) return a.storeCode.localeCompare(b.storeCode);
-      if (va === null) return 1;
-      if (vb === null) return -1;
+      if ((va === null || va === '') && (vb === null || vb === '')) {
+        return a.storeCode.localeCompare(b.storeCode);
+      }
+      if (va === null || va === '') return 1;
+      if (vb === null || vb === '') return -1;
+      if (typeof va === 'string' && typeof vb === 'string') {
+        const cmp = va.localeCompare(vb, undefined, { numeric: true });
+        return cmp !== 0 ? cmp * mult : a.storeCode.localeCompare(b.storeCode);
+      }
       if (va !== vb) return (va - vb) * mult;
       return a.storeCode.localeCompare(b.storeCode);
     });
-  }, [storeRows, sortConfig]);
+  }, [storeRows, sortConfig, permissions.void, permissions.return]);
 
   const handleSort = (key) => {
     setSortConfig((prev) => {
-      if (prev.key === key) {
-        return { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' };
-      }
-      return { key, dir: key === 'validation' ? 'desc' : 'asc' };
+      if (prev.key !== key) return { key, dir: 'asc' };
+      if (prev.dir === 'asc') return { key, dir: 'desc' };
+      return { key: null, dir: null };
     });
   };
 
@@ -135,15 +164,24 @@ export default function OverviewSection({ onJumpToSection }) {
       title: 'Stores Status',
       value: (
         <span className="vmm-ov-rag-inline">
-          <span className="vmm-ov-rag-r"><LiveTickerValue value={kpis.stores.red} suffix="R" /></span>
+          <span className="vmm-ov-rag-item vmm-ov-rag-r">
+            <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
+            <LiveTickerValue value={kpis.stores.red} />
+          </span>
           <span className="vmm-ov-rag-sep">/</span>
-          <span className="vmm-ov-rag-a"><LiveTickerValue value={kpis.stores.amber} suffix="A" /></span>
+          <span className="vmm-ov-rag-item vmm-ov-rag-a">
+            <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
+            <LiveTickerValue value={kpis.stores.amber} />
+          </span>
           <span className="vmm-ov-rag-sep">/</span>
-          <span className="vmm-ov-rag-g"><LiveTickerValue value={kpis.stores.green} suffix="G" /></span>
+          <span className="vmm-ov-rag-item vmm-ov-rag-g">
+            <Check size={15} strokeWidth={3.3} className="vmm-ov-rag-tick" aria-hidden="true" />
+            <LiveTickerValue value={kpis.stores.green} />
+          </span>
         </span>
       ),
       icon: <Store />,
-      tooltip: `${kpis.stores.red} Red (<50%), ${kpis.stores.amber} Amber (50-90%), ${kpis.stores.green} Green (>90%) of ${kpis.stores.total} RFID stores`,
+      tooltip: `${kpis.stores.red} Critical (<50%), ${kpis.stores.amber} Warning (50-90%), ${kpis.stores.green} Healthy (>90%) of ${kpis.stores.total} RFID stores`,
     },
     permissions.live_stock && {
       key: 'coverage',
@@ -194,11 +232,22 @@ export default function OverviewSection({ onJumpToSection }) {
   ].filter(Boolean);
 
   const renderSortIcon = (key) => {
-    if (sortConfig.key !== key) return null;
+    if (sortConfig.key !== key || !sortConfig.dir) {
+      return <ArrowUpDown size={10} className="vmm-ov-sort-idle" aria-hidden="true" />;
+    }
     return sortConfig.dir === 'asc'
-      ? <ArrowUp size={11} className="vmm-ov-sort-icon" />
-      : <ArrowDown size={11} className="vmm-ov-sort-icon" />;
+      ? <ArrowUp size={10} className="vmm-ov-sort-icon" aria-hidden="true" />
+      : <ArrowDown size={10} className="vmm-ov-sort-icon" aria-hidden="true" />;
   };
+
+  const renderSortableTh = (key, label, className = '') => (
+    <th className={className || undefined}>
+      <button type="button" className="vmm-ov-th-btn" onClick={() => handleSort(key)}>
+        <span>{label}</span>
+        {renderSortIcon(key)}
+      </button>
+    </th>
+  );
 
   const summaryParts = [];
   if (permissions.live_stock) {
@@ -216,6 +265,30 @@ export default function OverviewSection({ onJumpToSection }) {
 
   return (
     <div className="vmm-ov-wrapper">
+      {permissions.live_stock && (
+        <div className="vmm-ov-legend-bar" role="note" aria-label="Stores status color legend">
+          <span className="vmm-ov-legend-lead">
+            <Info size={13} strokeWidth={2.2} className="vmm-ov-legend-icon" aria-hidden="true" />
+            <span>Stores Status:</span>
+          </span>
+          <span className="vmm-ov-legend-item">
+            <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
+            <strong className="vmm-ov-legend-code vmm-ov-legend-code--red">Critical</strong>
+            <span>(&lt;50% coverage)</span>
+          </span>
+          <span className="vmm-ov-legend-item">
+            <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-a" aria-hidden="true" />
+            <strong className="vmm-ov-legend-code vmm-ov-legend-code--amber">Warning</strong>
+            <span>(50%–90%)</span>
+          </span>
+          <span className="vmm-ov-legend-item">
+            <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
+            <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
+            <span>(&gt;90%)</span>
+          </span>
+        </div>
+      )}
+
       {/* Top 6 KpiCard2 Cards in Single Row */}
       <section
         className="vmm-ov-kpi-row"
@@ -271,50 +344,15 @@ export default function OverviewSection({ onJumpToSection }) {
           <table className="vmm-ov-table">
             <thead>
               <tr>
-                <th>STATUS</th>
-                <th>
-                  <button type="button" className="vmm-ov-th-btn" onClick={() => handleSort('store')}>
-                    <span>STORE</span>
-                    {renderSortIcon('store')}
-                  </button>
-                </th>
-                <th>
-                  <button type="button" className="vmm-ov-th-btn" onClick={() => handleSort('score')}>
-                    <span>SCORE</span>
-                    {renderSortIcon('score')}
-                  </button>
-                </th>
-                {permissions.live_stock && (
-                  <th>
-                    <button type="button" className="vmm-ov-th-btn" onClick={() => handleSort('coverage')}>
-                      <span>COVERAGE</span>
-                      {renderSortIcon('coverage')}
-                    </button>
-                  </th>
-                )}
-                {permissions.sale && (
-                  <th className="vmm-ov-th-right">
-                    <button type="button" className="vmm-ov-th-btn vmm-ov-th-btn--right" onClick={() => handleSort('checkout')}>
-                      <span>RFID CHECKOUT</span>
-                      {renderSortIcon('checkout')}
-                    </button>
-                  </th>
-                )}
-                {permissions.store_validation && (
-                  <th className="vmm-ov-th-right">
-                    <button type="button" className="vmm-ov-th-btn vmm-ov-th-btn--right" onClick={() => handleSort('validation')}>
-                      <span>VAL. PENDING</span>
-                      {renderSortIcon('validation')}
-                    </button>
-                  </th>
-                )}
-                {(permissions.void || permissions.return) && (
-                  <th className="vmm-ov-th-right">VOID / RET. PENDING</th>
-                )}
-                {permissions.cycle_count && (
-                  <th>LAST CYCLE COUNT</th>
-                )}
-                <th>WHY</th>
+                {renderSortableTh('status', 'STATUS')}
+                {renderSortableTh('store', 'STORE')}
+                {renderSortableTh('score', 'SCORE', 'vmm-ov-th-score')}
+                {permissions.live_stock && renderSortableTh('coverage', 'COVERAGE')}
+                {permissions.sale && renderSortableTh('checkout', 'RFID CHECKOUT')}
+                {permissions.store_validation && renderSortableTh('validation', 'VAL. PENDING')}
+                {(permissions.void || permissions.return) && renderSortableTh('voidReturn', 'VOID / RET. PENDING')}
+                {permissions.cycle_count && renderSortableTh('cycleCount', 'LAST CYCLE COUNT')}
+                {renderSortableTh('why', 'WHY')}
               </tr>
             </thead>
             <tbody>
@@ -345,7 +383,23 @@ export default function OverviewSection({ onJumpToSection }) {
                     >
                       <td>
                         <span className={`vmm-ov-status-pill vmm-ov-status-pill--${row.statusTier}`}>
-                          {row.statusLabel}
+                          {(row.statusTier === 'red' || row.statusTier === 'amber') && (
+                            <AlertTriangle
+                              size={12}
+                              strokeWidth={2.4}
+                              className="vmm-ov-status-icon"
+                              aria-hidden="true"
+                            />
+                          )}
+                          {row.statusTier === 'green' && (
+                            <Check
+                              size={12}
+                              strokeWidth={2.8}
+                              className="vmm-ov-status-icon"
+                              aria-hidden="true"
+                            />
+                          )}
+                          <span>{row.statusLabel}</span>
                         </span>
                       </td>
 
@@ -354,17 +408,16 @@ export default function OverviewSection({ onJumpToSection }) {
                           type="button"
                           className="vmm-ov-cell-link vmm-ov-store-cell"
                           onClick={(e) => jump(e, defaultJump, row.storeCode)}
-                          title={`Jump to ${row.storeCode} section`}
+                          title={`Jump to ${row.storeName || row.storeCode} section`}
                         >
-                          <span className="vmm-ov-store-code">{row.storeCode}</span>
-                          {row.storeName && (
-                            <span className="vmm-ov-store-name">{row.storeName}</span>
-                          )}
+                          <span className="vmm-ov-store-name">
+                            {row.storeName || row.storeCode}
+                          </span>
                         </button>
                       </td>
 
                       <td className="vmm-ov-score-cell">
-                        {row.score !== null ? row.score : '—'}
+                        {row.score !== null ? row.score : <span className="vmm-ov-muted">—</span>}
                       </td>
 
                       {permissions.live_stock && (
@@ -393,11 +446,11 @@ export default function OverviewSection({ onJumpToSection }) {
                       )}
 
                       {permissions.sale && (
-                        <td className="vmm-ov-td-right">
+                        <td>
                           {row.hasSale && row.checkoutPct !== null ? (
                             <button
                               type="button"
-                              className="vmm-ov-cell-link vmm-ov-cell-link--right vmm-ov-num-bold"
+                              className="vmm-ov-cell-link vmm-ov-num-bold"
                               onClick={(e) => jump(e, 'sale', row.storeCode)}
                               title={`View ${row.storeCode} in Sales & Checkout`}
                             >
@@ -410,11 +463,11 @@ export default function OverviewSection({ onJumpToSection }) {
                       )}
 
                       {permissions.store_validation && (
-                        <td className="vmm-ov-td-right">
+                        <td>
                           {row.hasStoreValidation ? (
                             <button
                               type="button"
-                              className="vmm-ov-cell-link vmm-ov-cell-link--right vmm-ov-num-bold"
+                              className="vmm-ov-cell-link vmm-ov-num-bold"
                               onClick={(e) => jump(e, 'store_validation', row.storeCode)}
                               title={`Jump to ${row.storeCode} in Store Validation`}
                             >
@@ -427,7 +480,7 @@ export default function OverviewSection({ onJumpToSection }) {
                       )}
 
                       {(permissions.void || permissions.return) && (
-                        <td className="vmm-ov-td-right">
+                        <td>
                           {(row.hasVoid || row.hasReturn) ? (
                             <span className="vmm-ov-void-ret-wrap">
                               {permissions.void && (

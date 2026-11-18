@@ -32,10 +32,16 @@
 
 .vmm-ov-rag-inline {
   display: inline-flex;
-  align-items: baseline;
-  gap: 3px;
+  align-items: center;
+  gap: 5px;
   font-size: 16.5px;
   font-weight: 700;
+}
+
+.vmm-ov-rag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .vmm-ov-rag-r {
@@ -50,10 +56,69 @@
   color: #10B981;
 }
 
+.vmm-ov-rag-tick {
+  transform: translateY(1.5px);
+  margin-right: -2px;
+}
+
+.vmm-ov-legend-tick {
+  transform: translateY(0.5px);
+  margin-right: -1px;
+}
+
 .vmm-ov-rag-sep {
   color: #94a3b8;
   font-weight: 500;
   font-size: 13px;
+}
+
+/* Always-Visible Store Status Legend Strip Above KPI Cards */
+.vmm-ov-legend-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 11px;
+  color: #475569;
+}
+
+.vmm-ov-legend-lead {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.vmm-ov-legend-icon {
+  color: #3B82F6;
+  flex-shrink: 0;
+}
+
+.vmm-ov-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.vmm-ov-legend-code {
+  font-weight: 700;
+}
+
+.vmm-ov-legend-code--red {
+  color: #EF5350;
+}
+
+.vmm-ov-legend-code--amber {
+  color: #d97706;
+}
+
+.vmm-ov-legend-code--green {
+  color: #10B981;
 }
 
 /* Compact Scorecard Card & Dense Table */
@@ -96,22 +161,49 @@
 
 .vmm-ov-table-scroll {
   width: 100%;
-  overflow-x: auto;
+  /* Fixed viewport-fitted height so card size stays constant from 6 to 700+ stores */
+  height: clamp(320px, calc(100vh - 328px), 760px);
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.vmm-ov-table-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.vmm-ov-table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vmm-ov-table-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.vmm-ov-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .vmm-ov-table {
   width: 100%;
-  border-collapse: collapse;
+  /* separate + border-spacing: 0 keeps sticky thead th bottom borders crisp during vertical scroll */
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 11.5px;
   color: #1e293b;
 }
 
 .vmm-ov-table thead th {
-  padding: 6px 8px;
-  text-align: left;
-  font-size: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding: 6px 5px;
+  text-align: center;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   color: #334155;
   text-transform: uppercase;
   border-bottom: 2px solid #e2e8f0;
@@ -119,14 +211,12 @@
   white-space: nowrap;
 }
 
-.vmm-ov-table thead th.vmm-ov-th-right {
-  text-align: right;
-}
-
 .vmm-ov-th-btn {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
   border: none;
   background: transparent;
   padding: 0;
@@ -137,27 +227,24 @@
   cursor: pointer;
 }
 
-.vmm-ov-th-btn--right {
-  justify-content: flex-end;
-  width: 100%;
-}
-
 .vmm-ov-th-btn:hover {
   color: #0f172a;
 }
 
+.vmm-ov-sort-idle {
+  color: #94a3b8;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
 .vmm-ov-sort-icon {
   color: #3B82F6;
+  flex-shrink: 0;
 }
 
 .vmm-ov-tr {
-  border-bottom: 1px solid #f1f5f9;
   transition: background-color 0.12s ease;
   cursor: pointer;
-}
-
-.vmm-ov-tr:last-child {
-  border-bottom: none;
 }
 
 .vmm-ov-tr:hover {
@@ -165,45 +252,62 @@
 }
 
 .vmm-ov-table tbody td {
-  padding: 6px 8px;
+  padding: 6px 5px;
   vertical-align: middle;
-}
-
-.vmm-ov-td-right {
-  text-align: right;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
   font-variant-numeric: tabular-nums;
 }
 
-/* Status Pills */
+.vmm-ov-tr:last-child td {
+  border-bottom: none;
+}
+
+.vmm-ov-table thead th:first-child,
+.vmm-ov-tr td:first-child {
+  padding-left: 4px;
+}
+
+.vmm-ov-table thead th:last-child,
+.vmm-ov-tr td:last-child {
+  width: 1%;
+  padding-right: 2px;
+}
+
+.vmm-ov-tr td:first-child,
+.vmm-ov-tr td:nth-child(2) {
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Status Text (plain word with warning icon, no pill background) */
 .vmm-ov-status-pill {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 46px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 10.5px;
+  justify-content: flex-start;
+  gap: 4px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.25;
 }
 
+.vmm-ov-status-icon {
+  flex-shrink: 0;
+}
+
 .vmm-ov-status-pill--red {
-  background: #fdecec;
   color: #EF5350;
 }
 
 .vmm-ov-status-pill--amber {
-  background: #fef3c7;
-  color: #b45309;
+  color: #d97706;
 }
 
 .vmm-ov-status-pill--green {
-  background: #d1fae5;
   color: #10B981;
 }
 
 .vmm-ov-status-pill--neutral {
-  background: #f1f5f9;
   color: #64748b;
 }
 
@@ -212,13 +316,14 @@
   border: none;
   background: transparent;
   padding: 1px 4px;
-  margin: -1px -4px;
+  margin: 0;
   border-radius: 5px;
   font: inherit;
   color: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   transition: background-color 0.12s ease, color 0.12s ease;
 }
@@ -228,35 +333,32 @@
   color: #3B82F6;
 }
 
-.vmm-ov-cell-link--right {
-  justify-content: flex-end;
-}
-
 .vmm-ov-store-cell {
   white-space: nowrap;
-}
-
-.vmm-ov-store-code {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.vmm-ov-cell-link:hover .vmm-ov-store-code {
-  color: #3B82F6;
+  justify-content: flex-start;
 }
 
 .vmm-ov-store-name {
-  font-size: 11px;
-  font-weight: 500;
-  color: #64748b;
-  max-width: 145px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 190px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.vmm-ov-cell-link:hover .vmm-ov-store-name {
+  color: #3B82F6;
+}
+
+.vmm-ov-th-score {
+  color: #3B82F6 !important;
+}
+
 .vmm-ov-score-cell {
-  font-weight: 600;
-  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  color: #3B82F6;
   font-variant-numeric: tabular-nums;
 }
 
@@ -292,12 +394,12 @@
 .vmm-ov-coverage-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   white-space: nowrap;
 }
 
 .vmm-ov-progress-track {
-  width: 50px;
+  width: 40px;
   height: 6px;
   border-radius: 999px;
   background: #e2e8f0;
@@ -324,55 +426,61 @@
   background: #10B981;
 }
 
-/* Compact Horizontal-Wrap WHY Pills */
+/* Soft Left-Accented Reason Callout Pills */
 .vmm-ov-why-list {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  min-width: 240px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 245px;
+  max-width: 270px;
 }
 
 .vmm-ov-why-pill {
-  display: inline-flex;
-  align-items: center;
+  display: block;
+  padding: 3.5px 10px;
+  border-radius: 12px;
+  border: none;
+  border-left: 3px solid transparent;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
   text-align: left;
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 600;
-  line-height: 1.25;
-  border: 1px solid transparent;
+  white-space: normal;
   cursor: pointer;
-  white-space: nowrap;
-  transition: filter 0.12s ease;
+  transition: filter 0.12s ease, transform 0.1s ease;
 }
 
 .vmm-ov-why-pill:hover {
-  filter: brightness(0.95);
+  filter: brightness(0.96);
+  transform: translateY(-0.5px);
 }
 
 .vmm-ov-why-pill--red {
   background: #fef2f2;
-  border-color: #fecaca;
-  color: #EF5350;
+  border-left-color: #EF5350;
+  color: #b91c1c;
 }
 
 .vmm-ov-why-pill--amber {
-  background: #fffbeb;
-  border-color: #fde68a;
-  color: #b45309;
+  background: #f3f4f6;
+  border-left-color: #f59e0b;
+  color: #1e293b;
 }
 
 .vmm-ov-why-pill--green {
   background: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #10B981;
+  border-left-color: #10B981;
+  color: #065f46;
 }
 
 @media (max-width: 1180px) {
   .vmm-ov-kpi-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .vmm-ov-table-scroll {
+    height: 420px;
   }
 }
 
