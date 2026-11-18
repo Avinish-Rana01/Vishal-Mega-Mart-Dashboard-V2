@@ -42,6 +42,110 @@ const OVERVIEW_SECTIONS = [
   'dc_encoding',
 ];
 
+// Crisp 15x15 monochrome favicons per tab (inherits tab color: grey idle, blue active)
+const TAB_FAVICONS = {
+  overview: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="2" />
+      <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth="2" />
+      <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth="2" />
+      <rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  ),
+  stock_cycle: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 2.5L20.5 7.2v9.6L12 21.5l-8.5-4.7V7.2L12 2.5z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3.5 7.2L12 12l8.5-4.8M12 12v9.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M7.8 4.8l8.4 4.7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  ),
+  sales_checkout: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M6.5 6.5h14l-1.5 7.8a1.8 1.8 0 0 1-1.8 1.5H9.3a1.8 1.8 0 0 1-1.8-1.5L6.5 6.5z"
+        fill="currentColor"
+        fillOpacity="0.14"
+      />
+      <path
+        d="M3 3.5h2.4l2.1 10.8a1.8 1.8 0 0 0 1.8 1.5h7.9a1.8 1.8 0 0 0 1.8-1.5L20.5 6.5H6.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="9.8" cy="20" r="1.6" fill="currentColor" />
+      <circle cx="17.2" cy="20" r="1.6" fill="currentColor" />
+    </svg>
+  ),
+  validation_void_return: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 2.5l7.5 3.2v5.8c0 5-3.2 8.9-7.5 10.2-4.3-1.3-7.5-5.2-7.5-10.2V5.7L12 2.5z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.8 12.2l2.2 2.2 4.4-4.4"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  dc_encoding: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M11.6 3.5H4.8A1.8 1.8 0 0 0 3 5.3v6.8c0 .5.2 1 .5 1.3l7.9 7.9a1.8 1.8 0 0 0 2.6 0l6.6-6.6a1.8 1.8 0 0 0 0-2.6l-7.7-8.1a1.8 1.8 0 0 0-1.3-.5z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="7.8" cy="8.2" r="1.4" fill="currentColor" />
+    </svg>
+  ),
+  vendors: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M3 6.5A1.5 1.5 0 0 1 4.5 5H14v11.5H3V6.5z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 9h4.2l2.8 3.2v4.3H14V9z"
+        fill="currentColor"
+        fillOpacity="0.06"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="7.5" cy="18.2" r="2.1" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17.5" cy="18.2" r="2.1" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  ),
+};
+
 const DASHBOARD_TABS = [
   {
     id: 'overview',
@@ -291,7 +395,10 @@ export default function DashboardPage() {
                 className={`vmm-dash-tab-btn${isActive ? ' is-active' : ''}`}
                 onClick={() => handleTabSelect(tab.id)}
               >
-                {tab.label}
+                {TAB_FAVICONS[tab.id] && (
+                  <span className="vmm-dash-tab-icon">{TAB_FAVICONS[tab.id]}</span>
+                )}
+                <span>{tab.label}</span>
               </button>
             );
           })}

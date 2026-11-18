@@ -2,6 +2,19 @@ import * as XLSX from 'xlsx';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+export const formatShortDayLabel = (dateStr) => {
+  if (!dateStr) return '';
+  const raw = String(dateStr).trim().split('T')[0].split(' ')[0];
+  const parts = raw.split('-');
+  if (parts.length !== 3) return raw;
+  const monthIdx = parseInt(parts[1], 10) - 1;
+  const dayNum = parseInt(parts[2], 10);
+  if (monthIdx >= 0 && monthIdx < 12 && !Number.isNaN(dayNum)) {
+    return `${dayNum} ${MONTHS[monthIdx]}`;
+  }
+  return raw;
+};
+
 export const parseNumOrNull = (val) => {
   if (val === null || val === undefined || val === '') return null;
   if (typeof val === 'number') return Number.isFinite(val) ? val : null;
@@ -197,6 +210,85 @@ export const buildStoreWhyReasons = (store, permissions = {}) => {
 };
 
 /**
+ * Builds structured "What needs attention" cards combining priority store issues
+ * and highest vendor discrepancy with compact metrics and clear labels.
+ */
+export const buildAttentionItems = (
+  storeRows = [],
+  topVendorDiscrepancy = null,
+  permissions = {}
+) => {
+  const candidates = [];
+
+  storeRows.forEach((store) => {
+    const firstNonGreen = store.reasons.find((r) => r.severity !== 'green');
+    if (store.statusTier !== 'red' && !firstNonGreen) return;
+    if (store.statusTier === 'green') return;
+
+    const primaryReason = firstNonGreen || store.reasons[0];
+    const sectionKey = primaryReason?.sectionKey || 'live_stock';
+
+    let tagLabel = store.statusLabel || 'Alert';
+    let detail = primaryReason?.text || '';
+    let metric = store.coveragePct !== null ? `${Math.round(store.coveragePct)}%` : 'Alert';
+
+    if (sectionKey === 'live_stock' && store.coveragePct !== null) {
+      tagLabel = store.coveragePct < 50 ? 'Critical' : 'Warning';
+      detail = `Stock coverage · RFID ${formatIn(store.rfidStock)} of ${formatIn(store.sapStock)} SAP`;
+      metric = `${Math.round(store.coveragePct)}%`;
+    } else if (sectionKey === 'void' && store.voidPending > 0) {
+      tagLabel = 'Void';
+      detail = `${formatIn(store.voidPending)} void ${plural(store.voidPending, 'item', 'items')} not encoded back`;
+      metric = `${formatIn(store.voidPending)}`;
+    } else if (sectionKey === 'return' && store.returnPending > 0) {
+      tagLabel = 'Return';
+      detail = `${formatIn(store.returnPending)} return ${plural(store.returnPending, 'item', 'items')} not encoded back`;
+      metric = `${formatIn(store.returnPending)}`;
+    } else if (sectionKey === 'store_validation') {
+      tagLabel = store.huWrong > 0 ? 'Wrong HU' : 'Validation';
+      detail = primaryReason?.text || '';
+      metric = `${formatIn(store.huWrong > 0 ? store.huWrong : store.validationPending)} HU`;
+    }
+
+    candidates.push({
+      key: `store-${store.storeCode}`,
+      storeCode: store.storeCode,
+      title: store.storeName || store.storeCode,
+      tagLabel,
+      detail,
+      metric,
+      severity: store.statusTier === 'red' ? 'red' : 'amber',
+      sectionKey,
+      sortWeight:
+        (store.statusTier === 'red' ? 500 : 100) +
+        (100 - (store.score ?? 50)),
+    });
+  });
+
+  candidates.sort((a, b) => b.sortWeight - a.sortWeight);
+  const items = candidates.slice(0, 4);
+
+  if (permissions.vendor_discrepancy && topVendorDiscrepancy && (topVendorDiscrepancy.vendorName || topVendorDiscrepancy.vendorCode)) {
+    const vName = String(topVendorDiscrepancy.vendorName || topVendorDiscrepancy.vendorCode).trim();
+    const diffPct = Number(topVendorDiscrepancy.diffPer || 0).toFixed(1);
+    const diffQty = Math.round(parseNum(topVendorDiscrepancy.diffQty));
+    const actualQty = formatIn(topVendorDiscrepancy.actualQty);
+    const totalQty = formatIn(topVendorDiscrepancy.totalQty);
+    items.push({
+      key: `vendor-${topVendorDiscrepancy.vendorCode || vName}`,
+      title: vName,
+      tagLabel: 'Top Vendor',
+      detail: `Highest discrepancy · ${diffQty} vs ${actualQty} expected (${totalQty} total)`,
+      metric: `${diffPct}%`,
+      severity: 'info',
+      sectionKey: 'vendor_discrepancy',
+    });
+  }
+
+  return items;
+};
+
+/**
  * Maps the single `/api/stock/overview` response into permission-aware KPI card models
  * and unified Store Scorecard rows.
  */
@@ -328,6 +420,54 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
   const dcEncodedToday = parseNum(summary.dcEncodedToday);
   const dcErrorPct = parseNum(summary.dcEncodingErrorPct);
 
+  const rawTrends = Array.isArray(apiResponse?.dailyTrends) ? apiResponse.dailyTrends : [];
+  const dailyTrends = (permissions.sale || permissions.return)
+    ? rawTrends.map((t) => {
+        const dposSale = permissions.sale ? parseNum(t.dposSale) : 0;
+        const rfidCheckout = permissions.sale ? parseNum(t.rfidCheckout) : 0;
+        const returnQty = permissions.return ? parseNum(t.returnQty) : 0;
+        const returnEncodeQty = permissions.return ? parseNum(t.returnEncodeQty) : 0;
+        return {
+          date: t.date || '',
+          dateLabel: formatShortDayLabel(t.date),
+          dposSale,
+          rfidCheckout,
+          nonRfidSale: Math.max(0, dposSale - rfidCheckout),
+          rfidCheckoutPct: permissions.sale ? parseNumOrNull(t.rfidCheckoutPct) : null,
+          returnQty,
+          returnEncodeQty,
+          returnReencodePct: permissions.return ? parseNumOrNull(t.returnReencodePct) : null,
+        };
+      })
+    : [];
+
+  let trendTotalPos = 0;
+  let trendTotalRfid = 0;
+  let trendTotalReturn = 0;
+  let trendTotalReturnEnc = 0;
+  dailyTrends.forEach((d) => {
+    if (d.dposSale > 0) {
+      trendTotalPos += d.dposSale;
+      trendTotalRfid += d.rfidCheckout;
+    }
+    if (d.returnQty > 0) {
+      trendTotalReturn += d.returnQty;
+      trendTotalReturnEnc += d.returnEncodeQty;
+    }
+  });
+  const avgCheckoutPct = trendTotalPos > 0
+    ? Math.round((trendTotalRfid / trendTotalPos) * 1000) / 10
+    : null;
+  const avgReturnReencodePct = trendTotalReturn > 0
+    ? Math.round((trendTotalReturnEnc / trendTotalReturn) * 1000) / 10
+    : null;
+
+  const attentionItems = buildAttentionItems(
+    storeRows,
+    apiResponse?.topVendorDiscrepancy || null,
+    permissions
+  );
+
   return {
     kpis: {
       stores: {
@@ -365,6 +505,10 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
       },
     },
     storeRows,
+    dailyTrends,
+    avgCheckoutPct,
+    avgReturnReencodePct,
+    attentionItems,
   };
 };
 

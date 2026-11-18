@@ -22,6 +22,7 @@ class DashboardSocketService {
     this.tagManagementPatchListeners = new Set();
     this.vendorDiscrepancyPatchListeners = new Set();
     this.dcValidationPatchListeners = new Set();
+    this.overviewPatchListeners = new Set();
     this.counterStatusListeners = new Set();
     this.activeStoreSubscriptions = new Set();
 
@@ -145,6 +146,11 @@ class DashboardSocketService {
       // 8. Cash Counter Status
       this.connection.on('ReceiveCounterStatusPatch', (patch) => {
         this.dispatch(this.counterStatusListeners, patch, 'CounterStatus');
+      });
+
+      // 9. Executive Overview
+      this.connection.on('ReceiveOverviewPatch', (patch) => {
+        this.dispatch(this.overviewPatchListeners, patch, 'Overview');
       });
 
       this.connection.onreconnecting(() => {
@@ -285,6 +291,14 @@ class DashboardSocketService {
     this.dcValidationPatchListeners.add(callback);
     return () => {
       this.dcValidationPatchListeners.delete(callback);
+    };
+  }
+
+  // Overview listeners
+  onOverviewPatch(callback) {
+    this.overviewPatchListeners.add(callback);
+    return () => {
+      this.overviewPatchListeners.delete(callback);
     };
   }
 

@@ -96,10 +96,13 @@
   position: relative;
   z-index: 2;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: none;
   border-radius: 10px 10px 0 0;
-  padding: 7px 15px 8px 15px;
+  padding: 7px 13px 8px 12px;
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -107,6 +110,13 @@
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.2s ease;
+}
+
+.vmm-dash-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .vmm-dash-tab-btn::before {
@@ -223,8 +233,9 @@
   }
 
   .vmm-dash-tab-btn {
-    padding: 6px 12px 7px 12px;
+    padding: 6px 10px 7px 10px;
     font-size: 12.5px;
+    gap: 5px;
   }
 }
 

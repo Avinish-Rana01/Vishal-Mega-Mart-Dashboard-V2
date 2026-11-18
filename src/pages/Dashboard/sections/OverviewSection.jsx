@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Download,
   ArrowUp,
@@ -13,12 +13,26 @@ import {
   AlertTriangle,
   Check,
   Info,
+  ChevronRight,
+  X,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts';
 import { useAuth } from '../../../context/AuthContext';
-import { getDashboardOverview } from '../../../services/stockService';
+import { useDashboardOverview } from '../../../hooks/useDashboardData';
 import KpiCard2 from '../../../components/charts/KpiCard2';
 import LiveTickerValue from '../../../components/common/LiveTickerValue';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
+import { DateBadge } from '../../../components/common/SectionHeader';
 import {
   buildOverviewData,
   exportScorecardToExcel,
@@ -27,12 +41,64 @@ import {
 import './CycleCountShared.css';
 import './OverviewSection.css';
 
+function OverviewTrendTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const row = payload[0]?.payload;
+  if (!row) return null;
+
+  return (
+    <div className="vmm-ov-trend-tooltip">
+      <div className="vmm-ov-tt-date">{row.dateLabel || row.date}</div>
+      {row.rfidCheckoutPct !== null && (
+        <div className="vmm-ov-tt-row">
+          <span className="vmm-ov-tt-dot vmm-ov-tt-dot--orange" />
+          <span className="vmm-ov-tt-label">RFID checkout:</span>
+          <strong className="vmm-ov-tt-val">{row.rfidCheckoutPct.toFixed(1)}%</strong>
+          <span className="vmm-ov-tt-sub">({formatIn(row.rfidCheckout)} / {formatIn(row.dposSale)})</span>
+        </div>
+      )}
+      {row.returnReencodePct !== null && (
+        <div className="vmm-ov-tt-row">
+          <span className="vmm-ov-tt-dot vmm-ov-tt-dot--line-blue" />
+          <span className="vmm-ov-tt-label">Return re-encode:</span>
+          <strong className="vmm-ov-tt-val">{row.returnReencodePct.toFixed(1)}%</strong>
+          <span className="vmm-ov-tt-sub">({formatIn(row.returnEncodeQty)} / {formatIn(row.returnQty)})</span>
+        </div>
+      )}
+      {row.dposSale > 0 && (
+        <div className="vmm-ov-tt-total">
+          <span>POS Volume (RFID / Gap):</span>
+          <strong>{formatIn(row.rfidCheckout)} / {formatIn(row.nonRfidSale)}</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OverviewSection({ onJumpToSection }) {
   const { hasSection } = useAuth();
-  const [rawData, setRawData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { rawData, isLoading, error, highlightedStore, connectionStatus } = useDashboardOverview();
   const [sortConfig, setSortConfig] = useState({ key: null, dir: null });
+  const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const scoreInfoRef = useRef(null);
+
+  useEffect(() => {
+    if (!showScoreInfo) return undefined;
+    const handleOutside = (e) => {
+      if (scoreInfoRef.current && !scoreInfoRef.current.contains(e.target)) {
+        setShowScoreInfo(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setShowScoreInfo(false);
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showScoreInfo]);
 
   const permissions = useMemo(() => ({
     live_stock: hasSection('live_stock'),
@@ -43,39 +109,10 @@ export default function OverviewSection({ onJumpToSection }) {
     return: hasSection('return'),
     dc_validation: hasSection('dc_validation'),
     dc_encoding: hasSection('dc_encoding'),
+    vendor_discrepancy: hasSection('vendor_discrepancy'),
   }), [hasSection]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    let mounted = true;
-
-    const loadOverview = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const result = await getDashboardOverview('', controller.signal);
-        if (!mounted || controller.signal.aborted) return;
-        setRawData(result || null);
-      } catch (err) {
-        if (!mounted || err.name === 'AbortError' || err.name === 'CanceledError' || err.code === 'ERR_CANCELED') {
-          return;
-        }
-        setError(err.message || 'Unable to load executive overview');
-      } finally {
-        if (mounted && !controller.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadOverview();
-    return () => {
-      mounted = false;
-      controller.abort();
-    };
-  }, []);
-
-  const { kpis, storeRows } = useMemo(
+  const { kpis, storeRows, dailyTrends, avgCheckoutPct, avgReturnReencodePct, attentionItems } = useMemo(
     () => buildOverviewData(rawData, permissions),
     [rawData, permissions]
   );
@@ -249,45 +286,44 @@ export default function OverviewSection({ onJumpToSection }) {
     </th>
   );
 
-  const summaryParts = [];
-  if (permissions.live_stock) {
-    summaryParts.push(`RFID ${formatIn(kpis.stockCoverage.rfid)} / SAP ${formatIn(kpis.stockCoverage.sap)}`);
-  }
-  if (permissions.sale) {
-    summaryParts.push(`${kpis.rfidCheckout.taggedCapturePct.toFixed(1)}% tagged checkout`);
-  }
-  if (permissions.dc_encoding) {
-    summaryParts.push(`DC ${Number(kpis.dcEncoding.errorPct).toFixed(1)}% err`);
-  }
-  if (permissions.dc_validation) {
-    summaryParts.push(`${formatIn(kpis.dcEncoding.unprocessedHu)} DC unprocessed HUs`);
-  }
-
   return (
     <div className="vmm-ov-wrapper">
-      {permissions.live_stock && (
-        <div className="vmm-ov-legend-bar" role="note" aria-label="Stores status color legend">
-          <span className="vmm-ov-legend-lead">
-            <Info size={13} strokeWidth={2.2} className="vmm-ov-legend-icon" aria-hidden="true" />
-            <span>Stores Status:</span>
-          </span>
-          <span className="vmm-ov-legend-item">
-            <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
-            <strong className="vmm-ov-legend-code vmm-ov-legend-code--red">Critical</strong>
-            <span>(&lt;50% coverage)</span>
-          </span>
-          <span className="vmm-ov-legend-item">
-            <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-a" aria-hidden="true" />
-            <strong className="vmm-ov-legend-code vmm-ov-legend-code--amber">Warning</strong>
-            <span>(50%–90%)</span>
-          </span>
-          <span className="vmm-ov-legend-item">
-            <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
-            <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
-            <span>(&gt;90%)</span>
-          </span>
+      <div className="vmm-ov-legend-bar" role="note" aria-label="Stores status color legend">
+        {permissions.live_stock && (
+          <div className="vmm-ov-legend-items">
+            <span className="vmm-ov-legend-lead">
+              <Info size={13} strokeWidth={2.2} className="vmm-ov-legend-icon" aria-hidden="true" />
+              <span>Stores Status:</span>
+            </span>
+            <span className="vmm-ov-legend-item">
+              <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
+              <strong className="vmm-ov-legend-code vmm-ov-legend-code--red">Critical</strong>
+              <span>(&lt;50% coverage)</span>
+            </span>
+            <span className="vmm-ov-legend-item">
+              <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-a" aria-hidden="true" />
+              <strong className="vmm-ov-legend-code vmm-ov-legend-code--amber">Warning</strong>
+              <span>(50%–90%)</span>
+            </span>
+            <span className="vmm-ov-legend-item">
+              <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
+              <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
+              <span>(&gt;90%)</span>
+            </span>
+          </div>
+        )}
+
+        <div className="vmm-ov-legend-right">
+          <div
+            className={`live-sync-pill vmm-ov-live-pill ${connectionStatus || 'connecting'}`}
+            title={`Real-time sync: ${connectionStatus}`}
+          >
+            <span className="live-sync-dot" />
+            {connectionStatus === 'connected' ? 'Live' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+          </div>
+          <DateBadge />
         </div>
-      )}
+      </div>
 
       {/* Top 6 KpiCard2 Cards in Single Row */}
       <section
@@ -321,11 +357,75 @@ export default function OverviewSection({ onJumpToSection }) {
             <h2 className="cc-data-grid-title vmm-ov-scorecard-title">
               STORE SCORECARD ({sortedRows.length} STORES)
             </h2>
-            {summaryParts.length > 0 && (
-              <span className="vmm-ov-header-meta">
-                {summaryParts.join('  •  ')}
-              </span>
-            )}
+
+            <div className="vmm-ov-score-info-wrap" ref={scoreInfoRef}>
+              <button
+                type="button"
+                className={`vmm-ov-score-info-btn${showScoreInfo ? ' is-open' : ''}`}
+                onClick={() => setShowScoreInfo((prev) => !prev)}
+                aria-expanded={showScoreInfo}
+                aria-label="How store score is calculated"
+              >
+                <Info size={14} strokeWidth={2.3} aria-hidden="true" />
+              </button>
+
+              {showScoreInfo && (
+                <div className="vmm-ov-score-popover" role="dialog" aria-label="Store score calculation formula">
+                  <div className="vmm-ov-sp-head">
+                    <span className="vmm-ov-sp-title">Store Score Formula (0–100)</span>
+                    <button
+                      type="button"
+                      className="vmm-ov-sp-close"
+                      onClick={() => setShowScoreInfo(false)}
+                      aria-label="Close formula info"
+                    >
+                      <X size={13} strokeWidth={2.4} />
+                    </button>
+                  </div>
+
+                  <div className="vmm-ov-sp-eq">
+                    Score = (Earned Points ÷ Active Weight) × 100
+                  </div>
+
+                  <div className="vmm-ov-sp-rows">
+                    <div className="vmm-ov-sp-row">
+                      <div className="vmm-ov-sp-row-top">
+                        <strong>1. Live Stock Coverage</strong>
+                        <span className="vmm-ov-sp-pts">45 pts</span>
+                      </div>
+                      <div className="vmm-ov-sp-desc">(RFID Stock ÷ SAP Stock) × 45</div>
+                    </div>
+
+                    <div className="vmm-ov-sp-row">
+                      <div className="vmm-ov-sp-row-top">
+                        <strong>2. Sales &amp; RFID Checkout</strong>
+                        <span className="vmm-ov-sp-pts">25 pts</span>
+                      </div>
+                      <div className="vmm-ov-sp-desc">(Total RFID Checkout ÷ Total POS Sale) × 25</div>
+                    </div>
+
+                    <div className="vmm-ov-sp-row">
+                      <div className="vmm-ov-sp-row-top">
+                        <strong>3. Backlog Health</strong>
+                        <span className="vmm-ov-sp-pts">30 pts</span>
+                      </div>
+                      <div className="vmm-ov-sp-desc">
+                        30 minus capped deductions:
+                        <ul className="vmm-ov-sp-list">
+                          <li>Store Val.: 0.4 pt/pending HU (max 10) + 2 pts/wrong HU (max 5)</li>
+                          <li>Void &amp; Return: 0.25 pt/pending item (max 10)</li>
+                          <li>DC Val.: 2 pts/unprocessed HU (max 5)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="vmm-ov-sp-note">
+                    Normalized by active weight — if POS Sale is 0 (—), score scales out of 75 to 100.
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <button
@@ -375,10 +475,13 @@ export default function OverviewSection({ onJumpToSection }) {
                     ? `${Math.max(4, Math.min(100, row.coveragePct))}%`
                     : '0%';
 
+                  const isUpdatedRow =
+                    highlightedStore && highlightedStore === String(row.storeCode || '').toUpperCase();
+
                   return (
                     <tr
                       key={row.storeCode}
-                      className="vmm-ov-tr"
+                      className={`vmm-ov-tr${isUpdatedRow ? ' vmm-ov-tr--updated' : ''}`}
                       onClick={(e) => jump(e, defaultJump, row.storeCode)}
                     >
                       <td>
@@ -553,6 +656,229 @@ export default function OverviewSection({ onJumpToSection }) {
           </table>
         </div>
       </section>
+
+      {/* Dual Trend Chart + What Needs Attention Insights Row */}
+      {(permissions.sale || permissions.return || attentionItems.length > 0) && (
+        <section
+          className={`vmm-ov-insights-row${!(permissions.sale || permissions.return) ? ' vmm-ov-insights-row--single' : ''}`}
+          aria-label="Trends and operational alerts"
+        >
+          {(permissions.sale || permissions.return) && (
+            <div className="cc-data-grid-card vmm-ov-trend-card">
+              <div className="vmm-ov-card-head">
+                <div>
+                  <h2 className="vmm-ov-card-title">RFID checkout &amp; return re-encode, day by day</h2>
+                  <p className="vmm-ov-card-subtitle">
+                    {storeRows.length === 1 ? storeRows[0].storeName : 'All stores'} · last {dailyTrends.length || 12} days
+                  </p>
+                </div>
+                {(avgCheckoutPct !== null || avgReturnReencodePct !== null) && (
+                  <span className="vmm-ov-avg-badge" title="12-day weighted averages">
+                    {avgCheckoutPct !== null ? `Checkout ${avgCheckoutPct.toFixed(1)}%` : ''}
+                    {avgCheckoutPct !== null && avgReturnReencodePct !== null ? ' · ' : ''}
+                    {avgReturnReencodePct !== null ? `Return ${avgReturnReencodePct.toFixed(1)}%` : ''}
+                  </span>
+                )}
+              </div>
+
+              {dailyTrends.length === 0 ? (
+                <div className="vmm-ov-card-empty">
+                  Daily RFID trend history will appear once sales/return records are available.
+                </div>
+              ) : (
+                <>
+                  <div className="vmm-ov-trend-chart-wrap">
+                    <ResponsiveContainer width="100%" height={195}>
+                      <ComposedChart data={dailyTrends} margin={{ top: 10, right: 4, left: -14, bottom: 2 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis
+                          dataKey="dateLabel"
+                          tick={{ fontSize: 10.5, fill: '#64748b' }}
+                          axisLine={{ stroke: '#cbd5e1' }}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          yAxisId="pct"
+                          domain={[0, 100]}
+                          ticks={[0, 20, 40, 60, 80, 100]}
+                          tickFormatter={(v) => `${v}%`}
+                          tick={{ fontSize: 10.5, fill: '#64748b' }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        {permissions.sale && (
+                          <YAxis
+                            yAxisId="vol"
+                            orientation="right"
+                            width={38}
+                            domain={[0, (max) => Math.max(100, Math.ceil((max * 1.25) / 1000) * 1000)]}
+                            tickFormatter={(v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : v)}
+                            tick={{ fontSize: 10, fill: '#94a3b8' }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                        )}
+                        <Tooltip content={<OverviewTrendTooltip />} />
+                        {permissions.sale && (
+                          <Bar
+                            yAxisId="vol"
+                            dataKey="rfidCheckout"
+                            stackId="sales"
+                            name="RFID checked out"
+                            fill="#93c5fd"
+                            fillOpacity={0.45}
+                            barSize={18}
+                            radius={[0, 0, 2, 2]}
+                          />
+                        )}
+                        {permissions.sale && (
+                          <Bar
+                            yAxisId="vol"
+                            dataKey="nonRfidSale"
+                            stackId="sales"
+                            name="Non-RFID / gap"
+                            fill="#e2e8f0"
+                            fillOpacity={0.6}
+                            barSize={18}
+                            radius={[3, 3, 0, 0]}
+                          />
+                        )}
+                        {permissions.sale && avgCheckoutPct !== null && (
+                          <ReferenceLine
+                            yAxisId="pct"
+                            y={avgCheckoutPct}
+                            stroke="#ea580c"
+                            strokeDasharray="4 4"
+                            strokeOpacity={0.4}
+                          />
+                        )}
+                        {permissions.return && (
+                          <Line
+                            yAxisId="pct"
+                            type="monotone"
+                            dataKey="returnReencodePct"
+                            name="Return re-encode %"
+                            stroke="#3B82F6"
+                            strokeWidth={2.4}
+                            dot={{ r: 3.5, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 1.5 }}
+                            activeDot={{ r: 5 }}
+                            connectNulls={false}
+                          />
+                        )}
+                        {permissions.sale && (
+                          <Line
+                            yAxisId="pct"
+                            type="monotone"
+                            dataKey="rfidCheckoutPct"
+                            name="RFID checkout %"
+                            stroke="#ea580c"
+                            strokeWidth={2.4}
+                            dot={{ r: 3.5, fill: '#ea580c', stroke: '#ffffff', strokeWidth: 1.5 }}
+                            activeDot={{ r: 5 }}
+                            connectNulls={false}
+                          />
+                        )}
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="vmm-ov-trend-legend">
+                    {permissions.sale && (
+                      <span className="vmm-ov-legend-pill">
+                        <span className="vmm-ov-swatch vmm-ov-swatch--orange" />
+                        <span>RFID checkout %</span>
+                      </span>
+                    )}
+                    {permissions.return && (
+                      <span className="vmm-ov-legend-pill">
+                        <span className="vmm-ov-swatch vmm-ov-swatch--line-blue" />
+                        <span>Return re-encode %</span>
+                      </span>
+                    )}
+                    {permissions.sale && (
+                      <>
+                        <span className="vmm-ov-legend-pill">
+                          <span className="vmm-ov-swatch vmm-ov-swatch--blue" />
+                          <span>RFID volume</span>
+                        </span>
+                        <span className="vmm-ov-legend-pill">
+                          <span className="vmm-ov-swatch vmm-ov-swatch--slate" />
+                          <span>Non-RFID gap</span>
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          <div className="cc-data-grid-card vmm-ov-attention-card">
+            <div className="vmm-ov-card-head">
+              <div>
+                <h2 className="vmm-ov-card-title">What needs attention</h2>
+                <p className="vmm-ov-card-subtitle">
+                  Priority store alerts &amp; highest vendor discrepancy
+                </p>
+              </div>
+              {attentionItems.length > 0 && (
+                <span
+                  className={`vmm-ov-att-summary-pill${
+                    kpis.stores.red > 0 ? ' vmm-ov-att-summary-pill--red' : ''
+                  }`}
+                >
+                  {kpis.stores.red > 0 ? `${kpis.stores.red} Critical` : `${attentionItems.length} Alerts`}
+                </span>
+              )}
+            </div>
+
+            {attentionItems.length === 0 ? (
+              <div className="vmm-ov-card-empty vmm-ov-card-empty--ok">
+                <Check size={16} strokeWidth={2.8} />
+                <span>All monitored stores are within target thresholds.</span>
+              </div>
+            ) : (
+              <ul className="vmm-ov-att-list">
+                {attentionItems.map((item) => (
+                  <li key={item.key}>
+                    <button
+                      type="button"
+                      className={`vmm-ov-att-item vmm-ov-att-item--${item.severity}`}
+                      onClick={(e) => jump(e, item.sectionKey, item.storeCode)}
+                      title={`Jump to ${item.title}`}
+                    >
+                      <span className={`vmm-ov-att-icon-wrap vmm-ov-att-icon-wrap--${item.severity}`}>
+                        {item.severity === 'info' ? (
+                          <Info size={13} strokeWidth={2.4} aria-hidden="true" />
+                        ) : (
+                          <AlertTriangle size={13} strokeWidth={2.4} aria-hidden="true" />
+                        )}
+                      </span>
+
+                      <span className="vmm-ov-att-body">
+                        <span className="vmm-ov-att-top">
+                          <strong className="vmm-ov-att-strong">{item.title}</strong>
+                          <span className={`vmm-ov-att-tag vmm-ov-att-tag--${item.severity}`}>
+                            {item.tagLabel}
+                          </span>
+                        </span>
+                        <span className="vmm-ov-att-sub">{item.detail}</span>
+                      </span>
+
+                      <span className="vmm-ov-att-end">
+                        <span className={`vmm-ov-att-metric vmm-ov-att-metric--${item.severity}`}>
+                          {item.metric}
+                        </span>
+                        <ChevronRight size={13} className="vmm-ov-att-chevron" aria-hidden="true" />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
