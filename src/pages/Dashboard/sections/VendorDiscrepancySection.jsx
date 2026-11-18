@@ -48,6 +48,13 @@ const SORT_TO_API = {
   DIFF_PER_DESC: { sortColumn: 'DISCREPANCY(%)', sortDirection: 'desc' },
 };
 
+const SORT_TO_SCOPE_INFO = {
+  DIFF_PER_DESC: 'KPI values and Global Receiving Accuracy are based on top 10 vendors with highest discrepancy %',
+  DIFF_QTY_DESC: 'KPI values and Global Receiving Accuracy are based on top 10 vendors with highest variance',
+  EXPECTED_DESC: 'KPI values and Global Receiving Accuracy are based on top 10 vendors with highest expected quantity',
+  EXPECTED_ASC: 'KPI values and Global Receiving Accuracy are based on top 10 vendors with lowest expected quantity',
+};
+
 export default function VendorDiscrepancySection() {
   const navigate = useNavigate();
   const [chartView, setChartView] = useState('variance');
@@ -57,6 +64,7 @@ export default function VendorDiscrepancySection() {
   const activeSort = chartView === 'volume' ? volumeSort : varianceSort;
   const setActiveSort = chartView === 'volume' ? setVolumeSort : setVarianceSort;
   const apiSort = SORT_TO_API[activeSort] || SORT_TO_API.DIFF_PER_DESC;
+  const activeSortInfo = SORT_TO_SCOPE_INFO[activeSort] || SORT_TO_SCOPE_INFO.DIFF_PER_DESC;
   const { data, totals, isLoading, error, connectionStatus } = useVendorDiscrepancy(apiSort.sortColumn, apiSort.sortDirection);
 
   // Derived Metrics for Charts & Lists
@@ -159,12 +167,22 @@ export default function VendorDiscrepancySection() {
     });
   };
 
+  const sectionSubtitle = (
+    <span className="vd-subtitle-row">
+      <span>Discrepancies between expected and scanned vendor deliveries</span>
+      <span className="vd-sort-scope-pill">
+        <Icons.Info size={12} strokeWidth={2.2} className="vd-sort-scope-icon" aria-hidden="true" />
+        <span>{activeSortInfo}</span>
+      </span>
+    </span>
+  );
+
   if (isLoading) {
     return (
       <section className="ds-section">
         <SectionHeader 
         title="VENDOR DISCREPANCY" 
-        subtitle="Discrepancies between expected and scanned vendor deliveries"
+        subtitle={sectionSubtitle}
         icon={<Icons.Truck size={44} color="#3b82f6" strokeWidth={2.2} />}
         rightContent={<DateBadge />} 
       />
@@ -212,7 +230,7 @@ export default function VendorDiscrepancySection() {
     <section className="ds-section">
       <SectionHeader 
         title="VENDOR DISCREPANCY" 
-        subtitle="Discrepancies between expected and scanned vendor deliveries"
+        subtitle={sectionSubtitle}
         icon={<Icons.Truck size={44} color="#3b82f6" strokeWidth={2.2} />}
         rightContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
