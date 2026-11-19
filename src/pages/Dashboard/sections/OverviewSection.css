@@ -72,25 +72,80 @@
   font-size: 13px;
 }
 
-/* Always-Visible Store Status Legend Strip + Live Sync Indicator Above KPI Cards */
+/* Always-Visible Overview Title + Store Status Legend Strip + Live Sync Indicator Above KPI Cards */
 .vmm-ov-legend-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: 8px 14px;
   padding: 5px 10px;
   border-radius: 8px;
-  background: #f8fafc;
+  /* background: #f8fafc; */
   font-size: 11px;
   color: #475569;
+}
+
+.vmm-ov-legend-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.vmm-ov-page-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-left: 3.5px solid #3B82F6;
+  padding-left: 9px;
+  line-height: 1.15;
+}
+
+.vmm-ov-page-title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
 }
 
 .vmm-ov-legend-items {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: 6px 12px;
+}
+
+.vmm-ov-legend-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.vmm-ov-legend-toggle:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+.vmm-ov-legend-toggle.is-active {
+  color: #3B82F6;
+}
+
+.vmm-ov-legend-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
 }
 
 .vmm-ov-legend-right {
@@ -120,7 +175,7 @@
 }
 
 .vmm-ov-legend-icon {
-  color: #3B82F6;
+  color: currentColor;
   flex-shrink: 0;
 }
 
@@ -682,11 +737,16 @@
 
 .vmm-ov-table-scroll {
   width: 100%;
-  /* Fixed viewport-fitted height so card size stays constant from 6 to 700+ stores */
-  height: clamp(320px, calc(100vh - 332px), 640px);
+  /* Fits 6 store rows + sticky header; scrolls vertically only when more than 6 stores exist */
+  max-height: 294px;
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
+}
+
+.vmm-ov-table-scroll--fit {
+  max-height: none;
+  overflow-y: hidden;
 }
 
 .vmm-ov-table-scroll::-webkit-scrollbar {
@@ -777,7 +837,7 @@
 }
 
 .vmm-ov-table tbody td {
-  padding: 6px 5px;
+  padding: 9px 6px;
   vertical-align: middle;
   text-align: center;
   border-bottom: 1px solid #f1f5f9;
@@ -790,13 +850,12 @@
 
 .vmm-ov-table thead th:first-child,
 .vmm-ov-tr td:first-child {
-  padding-left: 4px;
+  padding-left: 8px;
 }
 
 .vmm-ov-table thead th:last-child,
 .vmm-ov-tr td:last-child {
-  width: 1%;
-  padding-right: 2px;
+  padding-right: 10px;
 }
 
 .vmm-ov-tr td:first-child,
@@ -861,13 +920,37 @@
 .vmm-ov-store-cell {
   white-space: nowrap;
   justify-content: flex-start;
+  gap: 7px;
+}
+
+.vmm-ov-store-code-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid rgba(186, 230, 253, 0.85);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.vmm-ov-cell-link:hover .vmm-ov-store-code-badge {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
 }
 
 .vmm-ov-store-name {
   font-size: 11.5px;
   font-weight: 600;
   color: #0f172a;
-  max-width: 190px;
+  max-width: 170px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -910,9 +993,16 @@
 
 .vmm-ov-cycle-cell {
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 500;
   color: #334155;
   font-variant-numeric: tabular-nums;
+  gap: 6px;
+}
+
+.vmm-ov-cycle-cal-icon {
+  color: #00a8e7;
+  flex-shrink: 0;
 }
 
 /* Coverage Progress Bar */
@@ -999,6 +1089,227 @@
   color: #065f46;
 }
 
+/* Hoverable value visual hints & portal reason tooltip */
+.vmm-ov-hover-target {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.vmm-ov-score-hover {
+  padding: 1px 4px;
+  border-radius: 4px;
+  transition: opacity 0.14s ease;
+}
+
+.vmm-ov-score-hover:hover {
+  opacity: 0.8;
+}
+
+/* Zero / healthy counts styled inside the same pill box with borders + green check mark */
+.vmm-ov-num-zero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.16s ease;
+}
+
+.vmm-ov-zero-icon {
+  flex-shrink: 0;
+  color: #10B981;
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+.vmm-ov-cell-link.vmm-ov-num-zero:hover {
+  background: #10B981;
+  color: #ffffff;
+  border-color: #10B981;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.24);
+}
+
+.vmm-ov-cell-link.vmm-ov-num-zero:hover .vmm-ov-zero-icon {
+  color: #ffffff;
+}
+
+/* Interactive metric pill with ExternalLink icon (matching Loss Prevention Reports table badges) */
+.vmm-ov-has-reason {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.16s ease;
+}
+
+.vmm-ov-ext-icon {
+  flex-shrink: 0;
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+/* Amber Warning pill */
+.vmm-ov-has-reason--amber {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.vmm-ov-has-reason--amber .vmm-ov-ext-icon {
+  color: #f59e0b;
+}
+
+/* Red Critical pill */
+.vmm-ov-has-reason--red {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.vmm-ov-has-reason--red .vmm-ov-ext-icon {
+  color: #EF5350;
+}
+
+/* Green Healthy pill */
+.vmm-ov-has-reason--green {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(167, 243, 208, 0.85);
+}
+
+.vmm-ov-has-reason--green .vmm-ov-ext-icon {
+  color: #10B981;
+}
+
+/* Hover states: solid semantic fill + crisp white text & icon */
+.vmm-ov-cell-link.vmm-ov-has-reason:hover,
+.vmm-ov-cell-link:has(.vmm-ov-has-reason):hover {
+  background-color: transparent;
+}
+
+.vmm-ov-cell-link:hover .vmm-ov-has-reason--amber,
+.vmm-ov-cell-link.vmm-ov-has-reason--amber:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.24);
+}
+
+.vmm-ov-cell-link:hover .vmm-ov-has-reason--red,
+.vmm-ov-cell-link.vmm-ov-has-reason--red:hover {
+  background: #EF5350;
+  color: #ffffff;
+  border-color: #EF5350;
+  box-shadow: 0 2px 6px rgba(239, 83, 80, 0.24);
+}
+
+.vmm-ov-cell-link:hover .vmm-ov-has-reason--green,
+.vmm-ov-cell-link.vmm-ov-has-reason--green:hover {
+  background: #10B981;
+  color: #ffffff;
+  border-color: #10B981;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.24);
+}
+
+.vmm-ov-cell-link:hover .vmm-ov-has-reason .vmm-ov-ext-icon,
+.vmm-ov-cell-link.vmm-ov-has-reason:hover .vmm-ov-ext-icon {
+  color: #ffffff;
+}
+
+.vmm-ov-hover-tip {
+  position: fixed;
+  z-index: 3000;
+  transform: translate(-50%, -100%);
+  width: max-content;
+  max-width: 310px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 9px 10px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.06);
+  pointer-events: none;
+  animation: vmmOvTipFade 0.12s ease-out;
+}
+
+.vmm-ov-hover-tip--below {
+  transform: translate(-50%, 0);
+}
+
+@keyframes vmmOvTipFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.vmm-ov-hover-tip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.vmm-ov-hover-tip-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.01em;
+}
+
+.vmm-ov-hover-tip-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #334155;
+  background: #f1f5f9;
+  padding: 1.5px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.vmm-ov-hover-tip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vmm-ov-hover-tip-pill {
+  cursor: default;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.vmm-ov-hover-tip-hint {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 10px;
+  font-weight: 500;
+  color: #64748b;
+}
+
 @media (max-width: 1180px) {
   .vmm-ov-kpi-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1006,10 +1317,6 @@
 
   .vmm-ov-insights-row {
     grid-template-columns: 1fr;
-  }
-
-  .vmm-ov-table-scroll {
-    height: 420px;
   }
 }
 

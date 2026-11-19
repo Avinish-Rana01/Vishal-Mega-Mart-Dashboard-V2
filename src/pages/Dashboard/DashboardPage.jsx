@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import WorkInProgress from '../../components/common/WorkInProgress';
 import { useAuth } from '../../context/AuthContext';
@@ -14,6 +15,8 @@ import DcValidationSection from './sections/DcValidationSection';
 import DcEncodingSection from './sections/DcEncodingSection';
 import TagManagementSection from './sections/TagManagementSection';
 import VendorDiscrepancySection from './sections/VendorDiscrepancySection';
+
+const LossPreventionModule = React.lazy(() => import('../../modules/loss-prevention/LossPreventionModule'));
 
 import './Dashboard-core.css'; // Core layout styles (decoupled)
 import './Dashboard.css'; // V2 specific layout overrides
@@ -144,6 +147,20 @@ const TAB_FAVICONS = {
       <circle cx="17.5" cy="18.2" r="2.1" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
     </svg>
   ),
+  loss_prevention: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 2.5l7.5 3.2v5.8c0 5-3.2 8.9-7.5 10.2-4.3-1.3-7.5-5.2-7.5-10.2V5.7L12 2.5z"
+        fill="currentColor"
+        fillOpacity="0.14"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M12 8v4.2" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+      <circle cx="12" cy="15.8" r="1.2" fill="currentColor" />
+    </svg>
+  ),
 };
 
 const DASHBOARD_TABS = [
@@ -179,13 +196,12 @@ const DASHBOARD_TABS = [
     label: 'Vendor Discrepancy',
     sections: ['vendor_discrepancy'],
   },
-  // {
-  //   id: 'daily_history',
-  //   label: 'Daily History',
-  //   sections: [],
-  //   placeholderTitle: 'Daily History',
-  //   placeholderMessage: 'Historical day-by-day trends and snapshots will appear here soon.',
-  // },
+  {
+    id: 'loss_prevention',
+    label: 'Loss Prevention',
+    sections: [],
+    isLossPrevention: true,
+  },
 ];
 
 const SECTION_TO_TAB = DASHBOARD_TABS.reduce((acc, tab) => {
@@ -195,8 +211,29 @@ const SECTION_TO_TAB = DASHBOARD_TABS.reduce((acc, tab) => {
   return acc;
 }, {});
 
+// Preserve last tab indicator position & target tab across /dashboard <-> /loss-prevention/* route transitions
+let lastTabIndicatorRect = null;
+let pendingDashboardTab = null;
+
 export default function DashboardPage() {
   const { hasSection } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isLossPreventionRoute = location.pathname.startsWith('/loss-prevention');
+  const lastLpRouteRef = useRef('/loss-prevention/dashboard');
+  const initialPendingTabRef = useRef(isLossPreventionRoute ? null : pendingDashboardTab);
+
+  useEffect(() => {
+    if (!isLossPreventionRoute && pendingDashboardTab) {
+      pendingDashboardTab = null;
+    }
+  }, [isLossPreventionRoute]);
+
+  useEffect(() => {
+    if (isLossPreventionRoute) {
+      lastLpRouteRef.current = location.pathname;
+    }
+  }, [isLossPreventionRoute, location.pathname]);
 
   const visibleTabs = useMemo(
     () => DASHBOARD_TABS.filter((tab) => {
@@ -216,24 +253,46 @@ export default function DashboardPage() {
   const tabListRef = useRef(null);
   const tabRefs = useRef({});
   const indicatorReadyRef = useRef(false);
-  const [indicator, setIndicator] = useState({ left: 0, width: 0, animate: false });
+  const [indicator, setIndicator] = useState(() =>
+    lastTabIndicatorRect
+      ? { left: lastTabIndicatorRect.left, width: lastTabIndicatorRect.width, animate: false }
+      : { left: 0, width: 0, animate: false }
+  );
 
-  // Resolve active tab: report return point > permitted session tab > first live tab
+  // Resolve active tab: /loss-prevention/* route > pending cross-route tab > report return point > permitted session tab > first live tab
   const activeTab = useMemo(() => {
+    if (isLossPreventionRoute && visibleTabs.some((t) => t.id === 'loss_prevention')) {
+      return 'loss_prevention';
+    }
+    const pendingTab = initialPendingTabRef.current;
+    if (pendingTab && pendingTab !== 'loss_prevention' && visibleTabs.some((t) => t.id === pendingTab)) {
+      return pendingTab;
+    }
     const returnPoint = getDashboardReturnPoint();
     const returnTabId = returnPoint?.sectionId ? SECTION_TO_TAB[returnPoint.sectionId] : null;
     if (returnTabId && visibleTabs.some((t) => t.id === returnTabId)) {
       return returnTabId;
     }
-    if (visibleTabs.some((t) => t.id === storedTab)) {
+    if (visibleTabs.some((t) => t.id === storedTab) && storedTab !== 'loss_prevention') {
       return storedTab;
     }
     return defaultTabId;
-  }, [visibleTabs, storedTab, defaultTabId]);
+  }, [isLossPreventionRoute, visibleTabs, storedTab, defaultTabId]);
 
   const handleTabSelect = (tabId) => {
     clearDashboardReturnPoint();
-    setStoredTab(tabId);
+    initialPendingTabRef.current = null;
+    if (tabId === 'loss_prevention') {
+      if (!isLossPreventionRoute) {
+        navigate(lastLpRouteRef.current || '/loss-prevention/dashboard');
+      }
+    } else {
+      setStoredTab(tabId);
+      if (isLossPreventionRoute) {
+        pendingDashboardTab = tabId;
+        navigate('/dashboard');
+      }
+    }
     const container = getDashboardScrollContainer();
     if (container) container.scrollTop = 0;
   };
@@ -242,7 +301,12 @@ export default function DashboardPage() {
     const targetTab = SECTION_TO_TAB[sectionKey];
     if (!targetTab || !visibleTabs.some((t) => t.id === targetTab)) return;
     clearDashboardReturnPoint();
+    initialPendingTabRef.current = null;
     setStoredTab(targetTab);
+    if (isLossPreventionRoute) {
+      pendingDashboardTab = targetTab;
+      navigate('/dashboard');
+    }
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const el = document.getElementById(`section-${sectionKey}`);
@@ -251,39 +315,55 @@ export default function DashboardPage() {
         }
       });
     });
-  }, [visibleTabs, setStoredTab]);
+  }, [visibleTabs, setStoredTab, isLossPreventionRoute, navigate]);
 
   // Slide the underline indicator smoothly beneath the active tab button
   useLayoutEffect(() => {
+    let rafId = null;
+
     const updateIndicator = (shouldAnimate) => {
       const btn = tabRefs.current[activeTab];
       if (!btn) return;
+      const nextRect = { left: btn.offsetLeft, width: btn.offsetWidth };
+      lastTabIndicatorRect = nextRect;
       setIndicator({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
+        left: nextRect.left,
+        width: nextRect.width,
         animate: shouldAnimate,
       });
     };
 
-    const animate = indicatorReadyRef.current;
-    updateIndicator(animate);
+    const wasReady = indicatorReadyRef.current;
     indicatorReadyRef.current = true;
 
+    if (!wasReady && lastTabIndicatorRect) {
+      // Smoothly animate from the previous route's tab position on first mount after crossing routes
+      rafId = requestAnimationFrame(() => updateIndicator(true));
+    } else {
+      updateIndicator(wasReady);
+    }
+
     const btn = tabRefs.current[activeTab];
-    if (animate && btn?.scrollIntoView) {
+    if ((wasReady || lastTabIndicatorRect) && btn?.scrollIntoView) {
       btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
 
     const listEl = tabListRef.current;
-    if (!listEl || typeof ResizeObserver === 'undefined') return undefined;
-    const ro = new ResizeObserver(() => updateIndicator(false));
-    ro.observe(listEl);
-    return () => ro.disconnect();
+    let ro = null;
+    if (listEl && typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => updateIndicator(false));
+      ro.observe(listEl);
+    }
+
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (ro) ro.disconnect();
+    };
   }, [activeTab, visibleTabs]);
 
   // Keep session tab aligned when returning from a detail report or when role permissions change
   useEffect(() => {
-    if (activeTab && storedTab !== activeTab) {
+    if (activeTab && activeTab !== 'loss_prevention' && storedTab !== activeTab) {
       setStoredTab(activeTab);
     }
   }, [activeTab, storedTab, setStoredTab]);
@@ -433,6 +513,20 @@ export default function DashboardPage() {
                 <div id="section-overview" className="vmm-dashboard-stack">
                   <OverviewSection onJumpToSection={handleJumpToSection} />
                 </div>
+              ) : tab.isLossPrevention ? (
+                isActive ? (
+                  <div id="section-loss-prevention" className="vmm-dashboard-stack">
+                    <Suspense
+                      fallback={
+                        <div style={{ padding: '48px 16px', textAlign: 'center', color: '#64748b', fontSize: '14px', fontWeight: 500 }}>
+                          Loading Loss Prevention &amp; Goods Security...
+                        </div>
+                      }
+                    >
+                      <LossPreventionModule />
+                    </Suspense>
+                  </div>
+                ) : null
               ) : tab.sections.length === 0 ? (
                 <div className="vmm-dash-empty-tab">
                   <WorkInProgress title={tab.placeholderTitle} message={tab.placeholderMessage} />

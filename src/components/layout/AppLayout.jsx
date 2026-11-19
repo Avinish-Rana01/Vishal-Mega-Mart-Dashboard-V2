@@ -47,7 +47,7 @@ const ROUTE_BREADCRUMBS = {
 };
 
 function getBreadcrumb(pathname) {
-  if (pathname === '/dashboard' || pathname === '/') {
+  if (pathname === '/dashboard' || pathname === '/' || pathname.startsWith('/loss-prevention')) {
     return null;
   }
   if (ROUTE_BREADCRUMBS[pathname]) {
@@ -131,10 +131,11 @@ export default function AppLayout({ children, headerProps = {}, mainClassName = 
   }
 
   // Dynamically resolve breadcrumb and back button state from URL path
+  const isDashboardShell = location.pathname === '/dashboard' || location.pathname.startsWith('/loss-prevention');
   const resolvedBreadcrumb = headerProps.breadcrumb !== undefined ? headerProps.breadcrumb : getBreadcrumb(location.pathname);
   const resolvedShowBackButton = headerProps.showBackButton !== undefined 
     ? headerProps.showBackButton 
-    : (location.pathname !== '/dashboard');
+    : !isDashboardShell;
 
   return (
     <AppLayoutContext.Provider value={true}>

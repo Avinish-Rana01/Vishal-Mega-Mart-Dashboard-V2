@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
 import ChangePasswordModal from '../modals/ChangePasswordModal';
 import { DiwaliHeaderDecorations } from '../festive/DiwaliTheme';
+import vmmLogoIcon from '../../assets/vmm-icon.svg';
 import './Header.css';
 
 export default function Header({ 
@@ -144,14 +145,21 @@ export default function Header({
           </button>
         )}
         <div className="vmm-brand-text">
-          <h1 className="vmm-brand-title" style={{
-            background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            display: 'inline-block'
-          }}>
-            {APP_INFO.TITLE}
-          </h1>
+          <div className="vmm-brand-title-row">
+            <img
+              src={vmmLogoIcon}
+              alt="Vishal Mega Mart logo"
+              className="vmm-brand-logo-icon"
+            />
+            <h1 className="vmm-brand-title" style={{
+              background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block'
+            }}>
+              {APP_INFO.TITLE}
+            </h1>
+          </div>
           {breadcrumb && (
             <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
               {typeof breadcrumb === 'string' ? (
@@ -170,6 +178,7 @@ export default function Header({
       </div>
 
       <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
+        <div id="vmm-header-module-slot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} />
         <div className="vmm-header-user" ref={dropdownRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1001 }}>
           {showBackButton && (
             <button

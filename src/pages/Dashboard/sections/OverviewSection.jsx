@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Download,
   ArrowUp,
@@ -14,6 +15,8 @@ import {
   Check,
   Info,
   ChevronRight,
+  ExternalLink,
+  Calendar,
   X,
 } from 'lucide-react';
 import {
@@ -29,8 +32,8 @@ import {
 } from 'recharts';
 import { useAuth } from '../../../context/AuthContext';
 import { useDashboardOverview } from '../../../hooks/useDashboardData';
-import KpiCard2 from '../../../components/charts/KpiCard2';
-import LiveTickerValue from '../../../components/common/LiveTickerValue';
+import StatCard from '../../../modules/loss-prevention/components/common/StatCard';
+import TickerNumber from '../../../modules/loss-prevention/components/common/TickerNumber';
 import DashboardShimmer from '../../../components/common/DashboardShimmer';
 import { DateBadge } from '../../../components/common/SectionHeader';
 import {
@@ -38,6 +41,7 @@ import {
   exportScorecardToExcel,
   formatIn,
 } from './overviewHelpers';
+import '../../../modules/loss-prevention/lossPrevention.css';
 import './CycleCountShared.css';
 import './OverviewSection.css';
 
@@ -75,12 +79,70 @@ function OverviewTrendTooltip({ active, payload }) {
   );
 }
 
+function ScorecardReasonTooltip({ tip }) {
+  if (!tip || typeof document === 'undefined') return null;
+
+  const viewportW = window.innerWidth || 1280;
+  const maxWidth = 310;
+  const half = maxWidth / 2;
+  const clampedLeft = Math.max(half + 12, Math.min(viewportW - half - 12, tip.x));
+  const placeBelow = tip.y < 170;
+
+  return createPortal(
+    <div
+      className={`vmm-ov-hover-tip${placeBelow ? ' vmm-ov-hover-tip--below' : ''}`}
+      style={{
+        left: `${clampedLeft}px`,
+        top: `${placeBelow ? tip.bottom + 8 : tip.y - 8}px`,
+      }}
+      role="tooltip"
+    >
+      <div className="vmm-ov-hover-tip-head">
+        <span className="vmm-ov-hover-tip-title">{tip.title}</span>
+        {tip.badge && <span className="vmm-ov-hover-tip-badge">{tip.badge}</span>}
+      </div>
+      <div className="vmm-ov-hover-tip-list">
+        {tip.items.map((item, idx) => (
+          <div
+            key={idx}
+            className={`vmm-ov-why-pill vmm-ov-why-pill--${item.severity || 'amber'} vmm-ov-hover-tip-pill`}
+          >
+            {item.text}
+          </div>
+        ))}
+      </div>
+      {tip.hint && <div className="vmm-ov-hover-tip-hint">{tip.hint}</div>}
+    </div>,
+    document.body,
+  );
+}
+
 export default function OverviewSection({ onJumpToSection }) {
   const { hasSection } = useAuth();
   const { rawData, isLoading, error, highlightedStore, connectionStatus } = useDashboardOverview();
   const [sortConfig, setSortConfig] = useState({ key: null, dir: null });
   const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const [showStatusLegend, setShowStatusLegend] = useState(true);
+  const [hoverTip, setHoverTip] = useState(null);
   const scoreInfoRef = useRef(null);
+
+  const showCellReason = useCallback((e, title, items, { badge = null, hint = null } = {}) => {
+    if (!items || items.length === 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setHoverTip({
+      x: rect.left + rect.width / 2,
+      y: rect.top,
+      bottom: rect.bottom,
+      title,
+      badge,
+      items,
+      hint,
+    });
+  }, []);
+
+  const hideCellReason = useCallback(() => {
+    setHoverTip(null);
+  }, []);
 
   useEffect(() => {
     if (!showScoreInfo) return undefined;
@@ -142,10 +204,10 @@ export default function OverviewSection({ onJumpToSection }) {
           return (row.hasVoid || row.hasReturn)
             ? (permissions.void ? row.voidPending : 0) + (permissions.return ? row.returnPending : 0)
             : null;
+        case 'dcUnprocessed':
+          return row.hasDcValidation ? row.dcUnprocessed : null;
         case 'cycleCount':
           return row.hasCycleCount ? row.cycleCountSortKey : '';
-        case 'why':
-          return row.reasons.every((r) => r.severity === 'green') ? 0 : row.reasons.length;
         default:
           return null;
       }
@@ -199,71 +261,77 @@ export default function OverviewSection({ onJumpToSection }) {
       key: 'stores',
       sectionKey: 'live_stock',
       title: 'Stores Status',
+      variant: 'gray',
       value: (
         <span className="vmm-ov-rag-inline">
           <span className="vmm-ov-rag-item vmm-ov-rag-r">
             <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
-            <LiveTickerValue value={kpis.stores.red} />
+            <TickerNumber value={kpis.stores.red} />
           </span>
           <span className="vmm-ov-rag-sep">/</span>
           <span className="vmm-ov-rag-item vmm-ov-rag-a">
             <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
-            <LiveTickerValue value={kpis.stores.amber} />
+            <TickerNumber value={kpis.stores.amber} />
           </span>
           <span className="vmm-ov-rag-sep">/</span>
           <span className="vmm-ov-rag-item vmm-ov-rag-g">
             <Check size={15} strokeWidth={3.3} className="vmm-ov-rag-tick" aria-hidden="true" />
-            <LiveTickerValue value={kpis.stores.green} />
+            <TickerNumber value={kpis.stores.green} />
           </span>
         </span>
       ),
-      icon: <Store />,
+      icon: Store,
       tooltip: `${kpis.stores.red} Critical (<50%), ${kpis.stores.amber} Warning (50-90%), ${kpis.stores.green} Healthy (>90%) of ${kpis.stores.total} RFID stores`,
     },
     permissions.live_stock && {
       key: 'coverage',
       sectionKey: 'live_stock',
       title: 'Stock Coverage',
-      value: <LiveTickerValue value={kpis.stockCoverage.pct.toFixed(1)} suffix="%" />,
-      icon: <Target />,
+      variant: 'green',
+      value: `${kpis.stockCoverage.pct.toFixed(1)}%`,
+      icon: Target,
       tooltip: `RFID ${formatIn(kpis.stockCoverage.rfid)} of SAP ${formatIn(kpis.stockCoverage.sap)}`,
     },
     permissions.sale && {
       key: 'checkout',
       sectionKey: 'sale',
       title: 'RFID Checkout',
-      value: <LiveTickerValue value={kpis.rfidCheckout.pct.toFixed(1)} suffix="%" />,
-      icon: <ShoppingCart />,
+      variant: 'blue',
+      value: `${kpis.rfidCheckout.pct.toFixed(1)}%`,
+      icon: ShoppingCart,
       tooltip: `${formatIn(kpis.rfidCheckout.rfidSale)} of ${formatIn(kpis.rfidCheckout.dposSale)} items sold • ${kpis.rfidCheckout.taggedCapturePct.toFixed(1)}% of tagged items`,
     },
     permissions.store_validation && {
       key: 'validation',
       sectionKey: 'store_validation',
       title: 'Validation Pending',
-      value: <LiveTickerValue value={kpis.validationPending.pending} />,
-      icon: <ClipboardList />,
+      variant: 'amber',
+      value: formatIn(kpis.validationPending.pending),
+      icon: ClipboardList,
       tooltip: `Of ${formatIn(kpis.validationPending.whValidated)} WH validated • ${formatIn(kpis.validationPending.wrong)} wrong HUs`,
     },
     (permissions.void || permissions.return) && {
       key: 'voidReturn',
       sectionKey: permissions.void ? 'void' : 'return',
       title: 'Void / Return Pending',
+      variant: 'rose',
       value: (
-        <>
-          <LiveTickerValue value={kpis.voidReturnPending.voidPending} />
-          <span className="vmm-ov-slash"> / </span>
-          <LiveTickerValue value={kpis.voidReturnPending.returnPending} />
-        </>
+        <span className="inline-flex items-baseline">
+          <TickerNumber value={formatIn(kpis.voidReturnPending.voidPending)} />
+          <span className="vmm-ov-slash" style={{ margin: '0 4px' }}>/</span>
+          <TickerNumber value={formatIn(kpis.voidReturnPending.returnPending)} />
+        </span>
       ),
-      icon: <RotateCcw />,
+      icon: RotateCcw,
       tooltip: `Not encoded back (of ${formatIn(kpis.voidReturnPending.voidTotal)} void, ${formatIn(kpis.voidReturnPending.returnTotal)} return)`,
     },
     (permissions.dc_encoding || permissions.dc_validation) && {
       key: 'dcEncoding',
       sectionKey: permissions.dc_encoding ? 'dc_encoding' : 'dc_validation',
       title: 'DC Encoding Today',
-      value: <LiveTickerValue value={kpis.dcEncoding.encodedToday} />,
-      icon: <Layers />,
+      variant: 'purple',
+      value: formatIn(kpis.dcEncoding.encodedToday),
+      icon: Layers,
       tooltip: `${Number(kpis.dcEncoding.errorPct).toFixed(1)}% errors • ${formatIn(kpis.dcEncoding.unprocessedHu)} HUs unprocessed at DC`,
     },
   ].filter(Boolean);
@@ -288,30 +356,47 @@ export default function OverviewSection({ onJumpToSection }) {
 
   return (
     <div className="vmm-ov-wrapper">
-      <div className="vmm-ov-legend-bar" role="note" aria-label="Stores status color legend">
-        {permissions.live_stock && (
-          <div className="vmm-ov-legend-items">
-            <span className="vmm-ov-legend-lead">
-              <Info size={13} strokeWidth={2.2} className="vmm-ov-legend-icon" aria-hidden="true" />
-              <span>Stores Status:</span>
-            </span>
-            <span className="vmm-ov-legend-item">
-              <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
-              <strong className="vmm-ov-legend-code vmm-ov-legend-code--red">Critical</strong>
-              <span>(&lt;50% coverage)</span>
-            </span>
-            <span className="vmm-ov-legend-item">
-              <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-a" aria-hidden="true" />
-              <strong className="vmm-ov-legend-code vmm-ov-legend-code--amber">Warning</strong>
-              <span>(50%–90%)</span>
-            </span>
-            <span className="vmm-ov-legend-item">
-              <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
-              <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
-              <span>(&gt;90%)</span>
-            </span>
+      <div className="vmm-ov-legend-bar" role="note" aria-label="Overview and stores status color legend">
+        <div className="vmm-ov-legend-left">
+          <div className="vmm-ov-page-title-wrap">
+            <h1 className="vmm-ov-page-title">Overview</h1>
+            {permissions.live_stock && (
+              <button
+                type="button"
+                className={`vmm-ov-legend-toggle${showStatusLegend ? ' is-active' : ''}`}
+                onClick={() => setShowStatusLegend((prev) => !prev)}
+                aria-expanded={showStatusLegend}
+                aria-label={showStatusLegend ? 'Hide stores status legend' : 'Show stores status legend'}
+                title={showStatusLegend ? 'Hide stores status legend' : 'Show stores status legend'}
+              >
+                <Info size={14} strokeWidth={2.25} className="vmm-ov-legend-icon" aria-hidden="true" />
+              </button>
+            )}
           </div>
-        )}
+
+          {permissions.live_stock && showStatusLegend && (
+            <div className="vmm-ov-legend-items">
+              <span className="vmm-ov-legend-lead">
+                <span>Stores Status:</span>
+              </span>
+              <span className="vmm-ov-legend-item">
+                <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
+                <strong className="vmm-ov-legend-code vmm-ov-legend-code--red">Critical</strong>
+                <span>(&lt;50% coverage)</span>
+              </span>
+              <span className="vmm-ov-legend-item">
+                <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-a" aria-hidden="true" />
+                <strong className="vmm-ov-legend-code vmm-ov-legend-code--amber">Warning</strong>
+                <span>(50%–90%)</span>
+              </span>
+              <span className="vmm-ov-legend-item">
+                <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
+                <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
+                <span>(&gt;90%)</span>
+              </span>
+            </div>
+          )}
+        </div>
 
         <div className="vmm-ov-legend-right">
           <div
@@ -325,9 +410,9 @@ export default function OverviewSection({ onJumpToSection }) {
         </div>
       </div>
 
-      {/* Top 6 KpiCard2 Cards in Single Row */}
+      {/* Top 6 Loss Prevention StatCards in Single Row */}
       <section
-        className="vmm-ov-kpi-row"
+        className="vmm-ov-kpi-row lp-module-root"
         style={{ '--ov-kpi-cols': Math.max(kpiCards.length, 1) }}
         aria-label="Executive KPI summary"
       >
@@ -341,10 +426,13 @@ export default function OverviewSection({ onJumpToSection }) {
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && jump(e, card.sectionKey)}
             title={card.tooltip}
           >
-            <KpiCard2
+            <StatCard
               title={card.title}
               value={card.value}
               icon={card.icon}
+              iconSize={card.iconSize ?? 36}
+              variant={card.variant}
+              compact
             />
           </div>
         ))}
@@ -440,7 +528,10 @@ export default function OverviewSection({ onJumpToSection }) {
           </button>
         </div>
 
-        <div className="vmm-ov-table-scroll">
+        <div
+          className={`vmm-ov-table-scroll${sortedRows.length <= 6 ? ' vmm-ov-table-scroll--fit' : ''}`}
+          onScroll={hideCellReason}
+        >
           <table className="vmm-ov-table">
             <thead>
               <tr>
@@ -451,8 +542,8 @@ export default function OverviewSection({ onJumpToSection }) {
                 {permissions.sale && renderSortableTh('checkout', 'RFID CHECKOUT')}
                 {permissions.store_validation && renderSortableTh('validation', 'VAL. PENDING')}
                 {(permissions.void || permissions.return) && renderSortableTh('voidReturn', 'VOID / RET. PENDING')}
+                {permissions.dc_validation && renderSortableTh('dcUnprocessed', 'DC UNPROCESSED')}
                 {permissions.cycle_count && renderSortableTh('cycleCount', 'LAST CYCLE COUNT')}
-                {renderSortableTh('why', 'WHY')}
               </tr>
             </thead>
             <tbody>
@@ -478,14 +569,83 @@ export default function OverviewSection({ onJumpToSection }) {
                   const isUpdatedRow =
                     highlightedStore && highlightedStore === String(row.storeCode || '').toUpperCase();
 
+                  const issueCount = row.reasons.filter((r) => r.severity !== 'green').length;
+                  const reasonsBySection = (sectionKey) =>
+                    row.reasons.filter((r) => r.sectionKey === sectionKey);
+
+                  const coverageReasons = reasonsBySection('live_stock');
+                  const coverageTipItems = coverageReasons.length > 0
+                    ? coverageReasons
+                    : [{
+                        text: `Stock coverage ${row.coveragePct !== null ? row.coveragePct.toFixed(1) : 0}% (RFID ${formatIn(row.rfidStock)} of SAP ${formatIn(row.sapStock)})`,
+                        severity: 'green',
+                      }];
+
+                  const saleReasons = reasonsBySection('sale');
+                  const saleTipItems = saleReasons.length > 0
+                    ? saleReasons
+                    : [{
+                        text: `RFID checkout ${row.checkoutPct !== null ? row.checkoutPct.toFixed(1) : 0}% (${formatIn(row.rfidCheckout)} of ${formatIn(row.dposSale)} sold)`,
+                        severity: 'green',
+                      }];
+
+                  const valReasons = reasonsBySection('store_validation');
+                  const valTipItems = valReasons.length > 0
+                    ? valReasons
+                    : [{
+                        text: `0 HUs pending store validation (of ${formatIn(row.whValidated)} WH validated)`,
+                        severity: 'green',
+                      }];
+
+                  const voidReasons = reasonsBySection('void');
+                  const voidTipItems = voidReasons.length > 0
+                    ? voidReasons
+                    : [{
+                        text: `0 void items pending re-encoding (of ${formatIn(row.voidTotal)} void)`,
+                        severity: 'green',
+                      }];
+
+                  const returnReasons = reasonsBySection('return');
+                  const returnTipItems = returnReasons.length > 0
+                    ? returnReasons
+                    : [{
+                        text: `0 return items pending re-encoding (of ${formatIn(row.returnTotal)} return)`,
+                        severity: 'green',
+                      }];
+
+                  const dcReasons = reasonsBySection('dc_validation');
+                  const dcTipItems = dcReasons.length > 0
+                    ? dcReasons
+                    : [{
+                        text: `0 HUs unprocessed at DC (${formatIn(row.dcProcessed)} HUs processed)`,
+                        severity: 'green',
+                      }];
+
+                  const cycleTipItems = [{
+                    text: `Last cycle count completed: ${row.lastCycleCount}`,
+                    severity: 'green',
+                  }];
+
                   return (
                     <tr
                       key={row.storeCode}
                       className={`vmm-ov-tr${isUpdatedRow ? ' vmm-ov-tr--updated' : ''}`}
-                      onClick={(e) => jump(e, defaultJump, row.storeCode)}
+                      onClick={(e) => {
+                        hideCellReason();
+                        jump(e, defaultJump, row.storeCode);
+                      }}
                     >
                       <td>
-                        <span className={`vmm-ov-status-pill vmm-ov-status-pill--${row.statusTier}`}>
+                        <span
+                          className={`vmm-ov-status-pill vmm-ov-status-pill--${row.statusTier} vmm-ov-hover-target`}
+                          onMouseEnter={(e) =>
+                            showCellReason(e, `${row.storeCode} · All Causes`, row.reasons, {
+                              badge: issueCount > 0 ? `${issueCount} ${issueCount === 1 ? 'issue' : 'issues'}` : 'Healthy',
+                              hint: 'Hover any value for its specific cause',
+                            })
+                          }
+                          onMouseLeave={hideCellReason}
+                        >
                           {(row.statusTier === 'red' || row.statusTier === 'amber') && (
                             <AlertTriangle
                               size={12}
@@ -510,17 +670,40 @@ export default function OverviewSection({ onJumpToSection }) {
                         <button
                           type="button"
                           className="vmm-ov-cell-link vmm-ov-store-cell"
-                          onClick={(e) => jump(e, defaultJump, row.storeCode)}
+                          onClick={(e) => {
+                            hideCellReason();
+                            jump(e, defaultJump, row.storeCode);
+                          }}
                           title={`Jump to ${row.storeName || row.storeCode} section`}
                         >
-                          <span className="vmm-ov-store-name">
-                            {row.storeName || row.storeCode}
-                          </span>
+                          <span className="vmm-ov-store-code-badge">{row.storeCode}</span>
+                          {(() => {
+                            const cleanName = (row.storeName || '')
+                              .replace(new RegExp(`^${row.storeCode}\\s*[-–:]\\s*`, 'i'), '')
+                              .trim();
+                            return cleanName && cleanName.toUpperCase() !== row.storeCode.toUpperCase() ? (
+                              <span className="vmm-ov-store-name">{cleanName}</span>
+                            ) : null;
+                          })()}
                         </button>
                       </td>
 
                       <td className="vmm-ov-score-cell">
-                        {row.score !== null ? row.score : <span className="vmm-ov-muted">—</span>}
+                        {row.score !== null ? (
+                          <span
+                            className="vmm-ov-score-hover vmm-ov-hover-target"
+                            onMouseEnter={(e) =>
+                              showCellReason(e, `${row.storeCode} · Score ${row.score}/100`, row.reasons, {
+                                badge: issueCount > 0 ? `${issueCount} ${issueCount === 1 ? 'cause' : 'causes'}` : 'Healthy',
+                              })
+                            }
+                            onMouseLeave={hideCellReason}
+                          >
+                            {row.score}
+                          </span>
+                        ) : (
+                          <span className="vmm-ov-muted">—</span>
+                        )}
                       </td>
 
                       {permissions.live_stock && (
@@ -529,8 +712,16 @@ export default function OverviewSection({ onJumpToSection }) {
                             <button
                               type="button"
                               className="vmm-ov-cell-link vmm-ov-coverage-wrap"
-                              onClick={(e) => jump(e, 'live_stock', row.storeCode)}
-                              title={`View ${row.storeCode} in Live Stock`}
+                              onClick={(e) => {
+                                hideCellReason();
+                                jump(e, 'live_stock', row.storeCode);
+                              }}
+                              onMouseEnter={(e) =>
+                                showCellReason(e, `${row.storeCode} · Stock Coverage`, coverageTipItems, {
+                                  hint: 'Click to open Live Stock',
+                                })
+                              }
+                              onMouseLeave={hideCellReason}
                             >
                               <span className="vmm-ov-progress-track">
                                 <span
@@ -538,8 +729,17 @@ export default function OverviewSection({ onJumpToSection }) {
                                   style={{ width: barWidth }}
                                 />
                               </span>
-                              <span className="vmm-ov-num-bold">
-                                {row.coveragePct.toFixed(1)}%
+                              <span
+                                className={`vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--${
+                                  coverageReasons.length > 0
+                                    ? row.coverageTier === 'red'
+                                      ? 'red'
+                                      : 'amber'
+                                    : 'green'
+                                }`}
+                              >
+                                <span>{row.coveragePct.toFixed(1)}%</span>
+                                <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
                               </span>
                             </button>
                           ) : (
@@ -553,11 +753,26 @@ export default function OverviewSection({ onJumpToSection }) {
                           {row.hasSale && row.checkoutPct !== null ? (
                             <button
                               type="button"
-                              className="vmm-ov-cell-link vmm-ov-num-bold"
-                              onClick={(e) => jump(e, 'sale', row.storeCode)}
-                              title={`View ${row.storeCode} in Sales & Checkout`}
+                              className={`vmm-ov-cell-link vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--${
+                                saleReasons.length > 0
+                                  ? row.checkoutPct < 50
+                                    ? 'red'
+                                    : 'amber'
+                                  : 'green'
+                              }`}
+                              onClick={(e) => {
+                                hideCellReason();
+                                jump(e, 'sale', row.storeCode);
+                              }}
+                              onMouseEnter={(e) =>
+                                showCellReason(e, `${row.storeCode} · RFID Checkout`, saleTipItems, {
+                                  hint: 'Click to open Sales & Checkout',
+                                })
+                              }
+                              onMouseLeave={hideCellReason}
                             >
-                              {row.checkoutPct.toFixed(1)}%
+                              <span>{row.checkoutPct.toFixed(1)}%</span>
+                              <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
                             </button>
                           ) : (
                             <span className="vmm-ov-muted">—</span>
@@ -570,11 +785,30 @@ export default function OverviewSection({ onJumpToSection }) {
                           {row.hasStoreValidation ? (
                             <button
                               type="button"
-                              className="vmm-ov-cell-link vmm-ov-num-bold"
-                              onClick={(e) => jump(e, 'store_validation', row.storeCode)}
-                              title={`Jump to ${row.storeCode} in Store Validation`}
+                              className={`vmm-ov-cell-link ${
+                                row.huWrong > 0
+                                  ? 'vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--red'
+                                  : valReasons.length > 0
+                                    ? 'vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--amber'
+                                    : 'vmm-ov-num-zero'
+                              }`}
+                              onClick={(e) => {
+                                hideCellReason();
+                                jump(e, 'store_validation', row.storeCode);
+                              }}
+                              onMouseEnter={(e) =>
+                                showCellReason(e, `${row.storeCode} · Store Validation`, valTipItems, {
+                                  hint: 'Click to open Store Validation',
+                                })
+                              }
+                              onMouseLeave={hideCellReason}
                             >
-                              {formatIn(row.validationPending)}
+                              <span>{formatIn(row.validationPending)}</span>
+                              {row.huWrong > 0 || valReasons.length > 0 ? (
+                                <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
+                              ) : (
+                                <Check size={11} strokeWidth={2.75} className="vmm-ov-zero-icon" aria-hidden="true" />
+                              )}
                             </button>
                           ) : (
                             <span className="vmm-ov-muted">—</span>
@@ -589,11 +823,28 @@ export default function OverviewSection({ onJumpToSection }) {
                               {permissions.void && (
                                 <button
                                   type="button"
-                                  className="vmm-ov-cell-link vmm-ov-num-bold"
-                                  onClick={(e) => jump(e, 'void', row.storeCode)}
-                                  title={`View ${row.storeCode} in Void Dashboard`}
+                                  className={`vmm-ov-cell-link ${
+                                    voidReasons.length > 0
+                                      ? 'vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--amber'
+                                      : 'vmm-ov-num-zero'
+                                  }`}
+                                  onClick={(e) => {
+                                    hideCellReason();
+                                    jump(e, 'void', row.storeCode);
+                                  }}
+                                  onMouseEnter={(e) =>
+                                    showCellReason(e, `${row.storeCode} · Void Pending`, voidTipItems, {
+                                      hint: 'Click to open Void Dashboard',
+                                    })
+                                  }
+                                  onMouseLeave={hideCellReason}
                                 >
-                                  {formatIn(row.voidPending)}
+                                  <span>{formatIn(row.voidPending)}</span>
+                                  {voidReasons.length > 0 ? (
+                                    <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
+                                  ) : (
+                                    <Check size={11} strokeWidth={2.75} className="vmm-ov-zero-icon" aria-hidden="true" />
+                                  )}
                                 </button>
                               )}
                               {permissions.void && permissions.return && (
@@ -602,14 +853,65 @@ export default function OverviewSection({ onJumpToSection }) {
                               {permissions.return && (
                                 <button
                                   type="button"
-                                  className="vmm-ov-cell-link vmm-ov-num-bold"
-                                  onClick={(e) => jump(e, 'return', row.storeCode)}
-                                  title={`View ${row.storeCode} in Return Dashboard`}
+                                  className={`vmm-ov-cell-link ${
+                                    returnReasons.length > 0
+                                      ? 'vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--amber'
+                                      : 'vmm-ov-num-zero'
+                                  }`}
+                                  onClick={(e) => {
+                                    hideCellReason();
+                                    jump(e, 'return', row.storeCode);
+                                  }}
+                                  onMouseEnter={(e) =>
+                                    showCellReason(e, `${row.storeCode} · Return Pending`, returnTipItems, {
+                                      hint: 'Click to open Return Dashboard',
+                                    })
+                                  }
+                                  onMouseLeave={hideCellReason}
                                 >
-                                  {formatIn(row.returnPending)}
+                                  <span>{formatIn(row.returnPending)}</span>
+                                  {returnReasons.length > 0 ? (
+                                    <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
+                                  ) : (
+                                    <Check size={11} strokeWidth={2.75} className="vmm-ov-zero-icon" aria-hidden="true" />
+                                  )}
                                 </button>
                               )}
                             </span>
+                          ) : (
+                            <span className="vmm-ov-muted">—</span>
+                          )}
+                        </td>
+                      )}
+
+                      {permissions.dc_validation && (
+                        <td>
+                          {row.hasDcValidation ? (
+                            <button
+                              type="button"
+                              className={`vmm-ov-cell-link ${
+                                dcReasons.length > 0
+                                  ? 'vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--amber'
+                                  : 'vmm-ov-num-zero'
+                              }`}
+                              onClick={(e) => {
+                                hideCellReason();
+                                jump(e, 'dc_validation', row.storeCode);
+                              }}
+                              onMouseEnter={(e) =>
+                                showCellReason(e, `${row.storeCode} · DC Unprocessed HUs`, dcTipItems, {
+                                  hint: 'Click to open DC Validation',
+                                })
+                              }
+                              onMouseLeave={hideCellReason}
+                            >
+                              <span>{formatIn(row.dcUnprocessed)}</span>
+                              {dcReasons.length > 0 ? (
+                                <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
+                              ) : (
+                                <Check size={11} strokeWidth={2.75} className="vmm-ov-zero-icon" aria-hidden="true" />
+                              )}
+                            </button>
                           ) : (
                             <span className="vmm-ov-muted">—</span>
                           )}
@@ -622,32 +924,27 @@ export default function OverviewSection({ onJumpToSection }) {
                             <button
                               type="button"
                               className="vmm-ov-cell-link vmm-ov-cycle-cell"
-                              onClick={(e) => jump(e, 'cycle_count', row.storeCode)}
-                              title={`View ${row.storeCode} in Cycle Count`}
+                              onClick={(e) => {
+                                hideCellReason();
+                                jump(e, 'cycle_count', row.storeCode);
+                              }}
+                              onMouseEnter={(e) =>
+                                showCellReason(e, `${row.storeCode} · Cycle Count`, cycleTipItems, {
+                                  hint: 'Click to open Cycle Count',
+                                })
+                              }
+                              onMouseLeave={hideCellReason}
                             >
-                              {row.lastCycleCount}
+                              {row.lastCycleCount && row.lastCycleCount !== '—' && (
+                                <Calendar size={13} className="vmm-ov-cycle-cal-icon" aria-hidden="true" />
+                              )}
+                              <span>{row.lastCycleCount}</span>
                             </button>
                           ) : (
                             <span className="vmm-ov-muted">—</span>
                           )}
                         </td>
                       )}
-
-                      <td>
-                        <div className="vmm-ov-why-list">
-                          {row.reasons.map((reason, idx) => (
-                            <button
-                              key={`${row.storeCode}-why-${idx}`}
-                              type="button"
-                              className={`vmm-ov-why-pill vmm-ov-why-pill--${reason.severity}`}
-                              onClick={(e) => jump(e, reason.sectionKey, row.storeCode)}
-                              title={`Jump to ${row.storeCode} section`}
-                            >
-                              {reason.text}
-                            </button>
-                          ))}
-                        </div>
-                      </td>
                     </tr>
                   );
                 })
@@ -655,6 +952,7 @@ export default function OverviewSection({ onJumpToSection }) {
             </tbody>
           </table>
         </div>
+        <ScorecardReasonTooltip tip={hoverTip} />
       </section>
 
       {/* Dual Trend Chart + What Needs Attention Insights Row */}

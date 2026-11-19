@@ -1,0 +1,414 @@
+/*
+ * Scoped Loss Prevention & Goods Security Stylesheet
+ *
+ * Imports Tailwind CSS v4 theme + utilities WITHOUT global Preflight so VMM's
+ * existing Vanilla CSS Dashboard, Sidebar, Reports, and DataTables are untouched.
+ * Module-specific resets, datepicker overrides, and animations are scoped under `.lp-module-root`.
+ */
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@layer base {
+  .lp-module-root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1e293b;
+  }
+
+  .lp-module-root *,
+  .lp-module-root *::before,
+  .lp-module-root *::after {
+    border-style: solid;
+    border-width: 0;
+    border-color: #e2e8f0;
+  }
+
+  .lp-module-root button,
+  .lp-module-root input,
+  .lp-module-root select,
+  .lp-module-root textarea {
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+  }
+
+  .lp-module-root button,
+  .lp-module-root [role="button"],
+  .lp-module-root [role="option"],
+  .lp-module-root [role="tab"],
+  .lp-module-root a,
+  .lp-module-root select {
+    cursor: pointer;
+  }
+
+  .lp-module-root a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .lp-module-root ul,
+  .lp-module-root ol {
+    list-style: none;
+  }
+
+  .lp-module-root table {
+    border-collapse: collapse;
+    border-color: inherit;
+  }
+
+  .lp-module-root img,
+  .lp-module-root svg {
+    vertical-align: middle;
+  }
+
+  .lp-module-root a:focus,
+  .lp-module-root a:focus-visible,
+  .lp-module-root button:focus,
+  .lp-module-root button:focus-visible,
+  .lp-module-root [role="button"]:focus,
+  .lp-module-root [role="button"]:focus-visible {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Keyframes & Animation Helpers */
+@keyframes lp-float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes lp-float-reverse {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(6px); }
+}
+
+@keyframes lp-shimmer-sweep {
+  0% { transform: translateX(-120%) skewX(-15deg); }
+  100% { transform: translateX(220%) skewX(-15deg); }
+}
+
+@keyframes lp-card-theft-pulse {
+  0%, 100% {
+    background-color: #ffffff;
+    border-color: #fca5a5;
+    box-shadow: 0 2px 8px -1px rgba(244, 63, 94, 0.1), 0 0 0 1.5px rgba(244, 63, 94, 0.2);
+  }
+  50% {
+    background-color: #fff1f2;
+    border-color: #fb7185;
+    box-shadow: 0 4px 14px -2px rgba(244, 63, 94, 0.18), 0 0 0 2.5px rgba(244, 63, 94, 0.35);
+  }
+}
+
+@keyframes lp-badge-theft-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.3);
+  }
+  50% {
+    transform: scale(1.16);
+    box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.25);
+  }
+}
+
+.lp-module-root .animate-float-slow {
+  animation: lp-float-slow 4s ease-in-out infinite;
+}
+
+.lp-module-root .animate-float-reverse {
+  animation: lp-float-reverse 4.5s ease-in-out infinite;
+}
+
+.lp-module-root .animate-shimmer {
+  animation: lp-shimmer-sweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.lp-module-root .animate-theft-blink,
+.lp-bell-root .animate-theft-blink {
+  animation: lp-card-theft-pulse 1.3s ease-in-out infinite !important;
+}
+
+.lp-module-root .animate-badge-blink,
+.lp-bell-root .animate-badge-blink {
+  animation: lp-badge-theft-pulse 1s ease-in-out infinite !important;
+}
+
+/* Scoped react-datepicker theme (does not affect VMM's other datepickers) */
+.lp-module-root .react-datepicker {
+  font-family: inherit !important;
+  border: none !important;
+  background-color: transparent !important;
+  display: inline-block !important;
+  position: relative !important;
+}
+
+.lp-module-root .react-datepicker__sr-only,
+.lp-module-root .react-datepicker__aria-live {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.lp-module-root .react-datepicker__navigation {
+  align-items: center !important;
+  background: transparent !important;
+  display: flex !important;
+  justify-content: center !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  position: absolute !important;
+  top: 8px !important;
+  padding: 0 !important;
+  border: none !important;
+  z-index: 10 !important;
+  height: 28px !important;
+  width: 28px !important;
+  text-indent: -9999px !important;
+  overflow: hidden !important;
+  border-radius: 6px !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.lp-module-root .react-datepicker__navigation:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.lp-module-root .react-datepicker__navigation--previous {
+  left: 6px !important;
+}
+
+.lp-module-root .react-datepicker__navigation--next {
+  right: 6px !important;
+}
+
+.lp-module-root .react-datepicker__navigation-icon::before {
+  border-color: #475569 !important;
+  border-style: solid !important;
+  border-width: 2px 2px 0 0 !important;
+  content: "" !important;
+  display: block !important;
+  height: 7px !important;
+  position: absolute !important;
+  top: 9px !important;
+  width: 7px !important;
+}
+
+.lp-module-root .react-datepicker__navigation-icon--previous::before {
+  left: 11px !important;
+  transform: rotate(225deg) !important;
+}
+
+.lp-module-root .react-datepicker__navigation-icon--next::before {
+  right: 11px !important;
+  transform: rotate(45deg) !important;
+}
+
+.lp-module-root .react-datepicker__month-container {
+  display: block !important;
+  float: none !important;
+}
+
+.lp-module-root .react-datepicker__header {
+  position: relative !important;
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 0.75rem 0.75rem 0 0 !important;
+  padding: 8px 10px 8px 10px !important;
+  text-align: center !important;
+}
+
+.lp-module-root .react-datepicker__current-month {
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  padding: 2px 0 6px 0 !important;
+  text-align: center !important;
+}
+
+.lp-module-root .react-datepicker__day-names {
+  display: grid !important;
+  grid-template-columns: repeat(7, 2.1rem) !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 2px !important;
+  margin-top: 4px !important;
+}
+
+.lp-module-root .react-datepicker__day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #64748b !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  width: 2.1rem !important;
+  height: 2.1rem !important;
+  line-height: 2.1rem !important;
+  margin: 0 !important;
+}
+
+.lp-module-root .react-datepicker__month {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding: 6px 0 !important;
+  margin: 0 !important;
+}
+
+.lp-module-root .react-datepicker__week {
+  display: grid !important;
+  grid-template-columns: repeat(7, 2.1rem) !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 2px !important;
+  white-space: nowrap !important;
+}
+
+.lp-module-root .react-datepicker__day {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #334155 !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  width: 2.1rem !important;
+  height: 2.1rem !important;
+  line-height: 2.1rem !important;
+  margin: 0 !important;
+  border-radius: 0.375rem !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.lp-module-root .react-datepicker__day:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.lp-module-root .react-datepicker__day--selected,
+.lp-module-root .react-datepicker__day--range-start,
+.lp-module-root .react-datepicker__day--range-end {
+  background-color: #00a8e7 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-radius: 0.375rem !important;
+  box-shadow: 0 2px 6px rgba(0, 168, 231, 0.4) !important;
+}
+
+.lp-module-root .react-datepicker__day--in-range:not(.react-datepicker__day--range-start):not(.react-datepicker__day--range-end) {
+  background-color: #e0f2fe !important;
+  color: #0369a1 !important;
+  font-weight: 700 !important;
+  border-radius: 0 !important;
+}
+
+.lp-module-root .react-datepicker__day--today {
+  font-weight: 800 !important;
+  border: 1.5px solid #00a8e7 !important;
+}
+
+.lp-module-root .react-datepicker__day--keyboard-selected {
+  background-color: rgba(0, 168, 231, 0.2) !important;
+  color: #00a8e7 !important;
+}
+
+.lp-module-root .react-datepicker__day--outside-month {
+  color: #94a3b8 !important;
+  opacity: 0.45 !important;
+}
+
+.lp-module-root .react-datepicker__day--disabled {
+  color: #cbd5e1 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* Scoped Custom Scrollbars */
+.lp-module-root .custom-scrollbar::-webkit-scrollbar,
+.lp-bell-root .custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.lp-module-root .custom-scrollbar::-webkit-scrollbar-track,
+.lp-bell-root .custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lp-module-root .custom-scrollbar::-webkit-scrollbar-thumb,
+.lp-bell-root .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.lp-module-root .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.lp-bell-root .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Scoped Print Styles for Loss Prevention Reports */
+@media print {
+  body:has(#printable-report-area) nav,
+  body:has(#printable-report-area) aside,
+  body:has(#printable-report-area) header,
+  body:has(#printable-report-area) footer,
+  body:has(#printable-report-area) .no-print,
+  body:has(#printable-report-area) .print\:hidden,
+  body:has(#printable-report-area) [role="dialog"] {
+    display: none !important;
+  }
+
+  #printable-report-area {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+
+  #printable-report-area table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 8.5pt !important;
+    page-break-inside: auto !important;
+  }
+
+  #printable-report-area thead {
+    display: table-header-group !important;
+  }
+
+  #printable-report-area tfoot {
+    display: table-footer-group !important;
+  }
+
+  #printable-report-area th,
+  #printable-report-area td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 5px 6px !important;
+    color: #0f172a !important;
+  }
+
+  #printable-report-area th {
+    background-color: #f1f5f9 !important;
+    font-weight: 700 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printable-report-area tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

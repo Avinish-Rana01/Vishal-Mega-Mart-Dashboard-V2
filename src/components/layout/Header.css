@@ -29,7 +29,23 @@
   justify-content: center;
   min-width: 0;
   gap: 2px;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.vmm-brand-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.vmm-brand-logo-icon {
+  height: clamp(22px, 4.5vw, 26px);
+  width: auto;
+  margin: -3px 0 -2px 0;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
 }
 
 .vmm-brand-title {
