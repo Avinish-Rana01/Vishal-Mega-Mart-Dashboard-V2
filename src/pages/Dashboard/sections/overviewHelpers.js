@@ -336,6 +336,7 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
       const hasDcValidation = Boolean(permissions.dc_validation && r.hasDcValidation);
       const dcProcessed = hasDcValidation ? parseNum(r.dcProcessedHu) : 0;
       const dcUnprocessed = hasDcValidation ? parseNum(r.dcUnprocessedHu) : 0;
+      const dcProcessedArticleQty = hasDcValidation ? parseNum(r.dcProcessedArticleQty) : 0;
 
       const hasCycleCount = Boolean(permissions.cycle_count && r.hasCycleCount);
       const cycleFormatted = hasCycleCount
@@ -369,12 +370,14 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
         hasDcValidation,
         dcProcessed,
         dcUnprocessed,
+        dcProcessedArticleQty,
         hasCycleCount,
         lastCycleCount: cycleFormatted.label,
         cycleCountSortKey: cycleFormatted.sortKey,
         cycleCountInProgress: cycleFormatted.inProgress,
       };
 
+      const isWarehouseOnlyMode = !permissions.live_stock && !permissions.sale && permissions.dc_validation;
       const coverageTier = getCoverageTier(coveragePct);
       if (hasLiveStock && coveragePct !== null) {
         if (coverageTier === 'red') redStores += 1;
@@ -382,10 +385,13 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
         else greenStores += 1;
       }
 
-      const score = calculateStoreScore(storeModel);
-      const statusTier = coverageTier !== 'neutral'
-        ? coverageTier
-        : (score !== null ? getCoverageTier(score) : 'neutral');
+      const score = isWarehouseOnlyMode ? null : calculateStoreScore(storeModel);
+      const dcStatusTier = dcUnprocessed >= 5 ? 'red' : dcUnprocessed > 0 ? 'amber' : 'green';
+      const statusTier = isWarehouseOnlyMode
+        ? (hasDcValidation ? dcStatusTier : 'neutral')
+        : coverageTier !== 'neutral'
+          ? coverageTier
+          : (score !== null ? getCoverageTier(score) : 'neutral');
 
       return {
         ...storeModel,
@@ -416,9 +422,12 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
   const totalReturnPending = parseNum(summary.returnPendingQty);
   const totalReturnQty = parseNum(summary.returnQty);
 
+  const totalDcProcessed = parseNum(summary.dcProcessedHu);
   const totalDcUnprocessed = parseNum(summary.dcUnprocessedHu);
   const dcEncodedToday = parseNum(summary.dcEncodedToday);
+  const dcEncodingErrors = parseNum(summary.dcEncodingErrors);
   const dcErrorPct = parseNum(summary.dcEncodingErrorPct);
+  const totalDcProcessedArticles = storeRows.reduce((sum, r) => sum + (r.dcProcessedArticleQty || 0), 0);
 
   const rawTrends = Array.isArray(apiResponse?.dailyTrends) ? apiResponse.dailyTrends : [];
   const dailyTrends = (permissions.sale || permissions.return)
@@ -500,8 +509,11 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
       },
       dcEncoding: {
         encodedToday: dcEncodedToday,
+        errors: dcEncodingErrors,
         errorPct: dcErrorPct,
+        processedHu: totalDcProcessed,
         unprocessedHu: totalDcUnprocessed,
+        processedArticles: totalDcProcessedArticles,
       },
     },
     storeRows,
@@ -513,31 +525,61 @@ export const buildOverviewData = (apiResponse, permissions = {}) => {
 };
 
 /**
- * Exports the unified Store Scorecard table directly to Excel (.xlsx).
+ * Exports the role-scoped Scorecard table directly to Excel (.xlsx).
  */
-export const exportScorecardToExcel = (storeRows = []) => {
-  const sheetRows = storeRows.map((r) => ({
-    Status: r.statusLabel,
-    'Store Code': r.storeCode,
-    'Store Name': r.storeName || r.storeCode,
-    Score: r.score !== null ? r.score : '',
-    'Stock Coverage (%)': r.coveragePct !== null ? Number(r.coveragePct.toFixed(1)) : '',
-    'RFID Stock': r.hasLiveStock ? r.rfidStock : '',
-    'SAP Stock': r.hasLiveStock ? r.sapStock : '',
-    'RFID Checkout (%)': r.checkoutPct !== null ? Number(r.checkoutPct.toFixed(1)) : '',
-    'Validation Pending': r.hasStoreValidation ? r.validationPending : '',
-    'WH Validated HUs': r.hasStoreValidation ? r.whValidated : '',
-    'Wrong HUs': r.hasStoreValidation ? r.huWrong : '',
-    'Void Pending': r.hasVoid ? r.voidPending : '',
-    'Return Pending': r.hasReturn ? r.returnPending : '',
-    'Last Cycle Count': r.lastCycleCount,
-    'DC Unprocessed HUs': r.hasDcValidation ? r.dcUnprocessed : '',
-    Reasons: r.reasons.map((item) => item.text).join(' | '),
-  }));
+export const exportScorecardToExcel = (storeRows = [], permissions = {}) => {
+  const isWarehouseOnly = !permissions.live_stock && !permissions.sale && (permissions.dc_validation || permissions.dc_encoding);
+
+  const sheetRows = storeRows.map((r) => {
+    const row = {
+      Status: r.statusLabel,
+      'Store Code': r.storeCode,
+      'Store Name': r.storeName || r.storeCode,
+    };
+
+    if (!isWarehouseOnly) {
+      row.Score = r.score !== null ? r.score : '';
+    }
+    if (permissions.live_stock) {
+      row['Stock Coverage (%)'] = r.coveragePct !== null ? Number(r.coveragePct.toFixed(1)) : '';
+      row['RFID Stock'] = r.hasLiveStock ? r.rfidStock : '';
+      row['SAP Stock'] = r.hasLiveStock ? r.sapStock : '';
+    }
+    if (permissions.sale) {
+      row['RFID Checkout (%)'] = r.checkoutPct !== null ? Number(r.checkoutPct.toFixed(1)) : '';
+    }
+    if (permissions.store_validation) {
+      row['Validation Pending'] = r.hasStoreValidation ? r.validationPending : '';
+      row['WH Validated HUs'] = r.hasStoreValidation ? r.whValidated : '';
+      row['Wrong HUs'] = r.hasStoreValidation ? r.huWrong : '';
+    }
+    if (permissions.void) {
+      row['Void Pending'] = r.hasVoid ? r.voidPending : '';
+    }
+    if (permissions.return) {
+      row['Return Pending'] = r.hasReturn ? r.returnPending : '';
+    }
+    if (permissions.dc_validation) {
+      if (isWarehouseOnly) {
+        row['DC Processed HUs'] = r.hasDcValidation ? r.dcProcessed : '';
+      }
+      row['DC Unprocessed HUs'] = r.hasDcValidation ? r.dcUnprocessed : '';
+      if (isWarehouseOnly) {
+        row['Processed Articles'] = r.hasDcValidation ? r.dcProcessedArticleQty : '';
+      }
+    }
+    if (permissions.cycle_count) {
+      row['Last Cycle Count'] = r.lastCycleCount;
+    }
+    row.Reasons = r.reasons.map((item) => item.text).join(' | ');
+    return row;
+  });
 
   const worksheet = XLSX.utils.json_to_sheet(sheetRows);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Store Scorecard');
+  const sheetName = isWarehouseOnly ? 'DC Dispatch Scorecard' : 'Store Scorecard';
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
   const todayStr = new Date().toLocaleDateString('en-CA');
-  XLSX.writeFile(workbook, `Store_Overview_Scorecard_${todayStr}.xlsx`);
+  const filePrefix = isWarehouseOnly ? 'DC_Overview_Scorecard' : 'Store_Overview_Scorecard';
+  XLSX.writeFile(workbook, `${filePrefix}_${todayStr}.xlsx`);
 };

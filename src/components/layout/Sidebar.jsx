@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Tag, Settings, Truck, ClipboardList, Smartphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { clearDashboardReturnPoint, getDashboardScrollContainer } from '../../utils/dashboardNavigationMemory';
@@ -9,7 +9,7 @@ import './Sidebar.css';
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { hasSection, hasDashboardAccess, getDefaultRoute } = useAuth();
+  const { hasSection, hasDashboardAccess } = useAuth();
   const [hoveredMenuId, setHoveredMenuId] = useState(null);
 
   // Close tooltip whenever the sidebar closes on mobile
@@ -182,16 +182,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   return (
     <aside className={`vmm-sidebar ${isOpen ? 'open' : ''}`}>
       <DiwaliSidebarDecorations />
-      <div className="vmm-sidebar-logo">
-        <Link 
-          to={getDefaultRoute()} 
-          onClick={hasDashboardAccess ? handleDashboardClick : undefined} 
-          aria-label="Vishal Mega Mart Home"
-        >
-          <img src="/assets/images/vishal_mega_mart_icon.png" alt="VMM Icon" />
-        </Link>
-      </div>
-
       <nav className="vmm-sidebar-nav">
         {menuConfig.map((menu) => {
           const Icon = menu.icon;

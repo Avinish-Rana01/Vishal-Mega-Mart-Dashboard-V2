@@ -118,7 +118,7 @@ function ScorecardReasonTooltip({ tip }) {
 }
 
 export default function OverviewSection({ onJumpToSection }) {
-  const { hasSection } = useAuth();
+  const { hasSection, userRole } = useAuth();
   const { rawData, isLoading, error, highlightedStore, connectionStatus } = useDashboardOverview();
   const [sortConfig, setSortConfig] = useState({ key: null, dir: null });
   const [showScoreInfo, setShowScoreInfo] = useState(false);
@@ -204,8 +204,12 @@ export default function OverviewSection({ onJumpToSection }) {
           return (row.hasVoid || row.hasReturn)
             ? (permissions.void ? row.voidPending : 0) + (permissions.return ? row.returnPending : 0)
             : null;
+        case 'dcProcessed':
+          return row.hasDcValidation ? row.dcProcessed : null;
         case 'dcUnprocessed':
           return row.hasDcValidation ? row.dcUnprocessed : null;
+        case 'dcArticles':
+          return row.hasDcValidation ? row.dcProcessedArticleQty : null;
         case 'cycleCount':
           return row.hasCycleCount ? row.cycleCountSortKey : '';
         default:
@@ -256,85 +260,154 @@ export default function OverviewSection({ onJumpToSection }) {
     );
   }
 
-  const kpiCards = [
-    permissions.live_stock && {
-      key: 'stores',
-      sectionKey: 'live_stock',
-      title: 'Stores Status',
-      variant: 'gray',
-      value: (
-        <span className="vmm-ov-rag-inline">
-          <span className="vmm-ov-rag-item vmm-ov-rag-r">
-            <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
-            <TickerNumber value={kpis.stores.red} />
-          </span>
-          <span className="vmm-ov-rag-sep">/</span>
-          <span className="vmm-ov-rag-item vmm-ov-rag-a">
-            <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
-            <TickerNumber value={kpis.stores.amber} />
-          </span>
-          <span className="vmm-ov-rag-sep">/</span>
-          <span className="vmm-ov-rag-item vmm-ov-rag-g">
-            <Check size={15} strokeWidth={3.3} className="vmm-ov-rag-tick" aria-hidden="true" />
-            <TickerNumber value={kpis.stores.green} />
-          </span>
-        </span>
-      ),
-      icon: Store,
-      tooltip: `${kpis.stores.red} Critical (<50%), ${kpis.stores.amber} Warning (50-90%), ${kpis.stores.green} Healthy (>90%) of ${kpis.stores.total} RFID stores`,
-    },
-    permissions.live_stock && {
-      key: 'coverage',
-      sectionKey: 'live_stock',
-      title: 'Stock Coverage',
-      variant: 'green',
-      value: `${kpis.stockCoverage.pct.toFixed(1)}%`,
-      icon: Target,
-      tooltip: `RFID ${formatIn(kpis.stockCoverage.rfid)} of SAP ${formatIn(kpis.stockCoverage.sap)}`,
-    },
-    permissions.sale && {
-      key: 'checkout',
-      sectionKey: 'sale',
-      title: 'RFID Checkout',
-      variant: 'blue',
-      value: `${kpis.rfidCheckout.pct.toFixed(1)}%`,
-      icon: ShoppingCart,
-      tooltip: `${formatIn(kpis.rfidCheckout.rfidSale)} of ${formatIn(kpis.rfidCheckout.dposSale)} items sold • ${kpis.rfidCheckout.taggedCapturePct.toFixed(1)}% of tagged items`,
-    },
-    permissions.store_validation && {
-      key: 'validation',
-      sectionKey: 'store_validation',
-      title: 'Validation Pending',
-      variant: 'amber',
-      value: formatIn(kpis.validationPending.pending),
-      icon: ClipboardList,
-      tooltip: `Of ${formatIn(kpis.validationPending.whValidated)} WH validated • ${formatIn(kpis.validationPending.wrong)} wrong HUs`,
-    },
-    (permissions.void || permissions.return) && {
-      key: 'voidReturn',
-      sectionKey: permissions.void ? 'void' : 'return',
-      title: 'Void / Return Pending',
-      variant: 'rose',
-      value: (
-        <span className="inline-flex items-baseline">
-          <TickerNumber value={formatIn(kpis.voidReturnPending.voidPending)} />
-          <span className="vmm-ov-slash" style={{ margin: '0 4px' }}>/</span>
-          <TickerNumber value={formatIn(kpis.voidReturnPending.returnPending)} />
-        </span>
-      ),
-      icon: RotateCcw,
-      tooltip: `Not encoded back (of ${formatIn(kpis.voidReturnPending.voidTotal)} void, ${formatIn(kpis.voidReturnPending.returnTotal)} return)`,
-    },
-    (permissions.dc_encoding || permissions.dc_validation) && {
-      key: 'dcEncoding',
-      sectionKey: permissions.dc_encoding ? 'dc_encoding' : 'dc_validation',
-      title: 'DC Encoding Today',
-      variant: 'purple',
-      value: formatIn(kpis.dcEncoding.encodedToday),
-      icon: Layers,
-      tooltip: `${Number(kpis.dcEncoding.errorPct).toFixed(1)}% errors • ${formatIn(kpis.dcEncoding.unprocessedHu)} HUs unprocessed at DC`,
-    },
-  ].filter(Boolean);
+  const roleScope = rawData?.roleScope || '';
+  const isWarehouseOnly = !permissions.live_stock && !permissions.sale && (permissions.dc_validation || permissions.dc_encoding);
+  const isWarehouseUserOnly = roleScope === 'warehouse_user' || (isWarehouseOnly && !permissions.vendor_discrepancy && !permissions.tag_management);
+  const isSingleStoreView =
+    !isWarehouseOnly &&
+    (roleScope === 'single_store' || (storeRows.length === 1 && userRole !== 'Super Admin'));
+  const singleStoreRow = isSingleStoreView ? storeRows[0] || null : null;
+
+  const kpiCards = isWarehouseOnly
+    ? [
+        permissions.dc_encoding && {
+          key: 'dcEncoding',
+          sectionKey: 'dc_encoding',
+          title: isWarehouseUserOnly ? 'My Encoding Today' : 'DC Encoding Today',
+          variant: 'purple',
+          value: formatIn(kpis.dcEncoding.encodedToday),
+          icon: Layers,
+          tooltip: isWarehouseUserOnly
+            ? `Your encoded tags today • ${formatIn(kpis.dcEncoding.errors)} errors (${Number(kpis.dcEncoding.errorPct).toFixed(1)}%)`
+            : `All warehouse operators today • ${formatIn(kpis.dcEncoding.errors)} errors (${Number(kpis.dcEncoding.errorPct).toFixed(1)}%)`,
+        },
+        permissions.dc_encoding && {
+          key: 'dcErrorRate',
+          sectionKey: 'dc_encoding',
+          title: 'Encoding Error Rate',
+          variant: kpis.dcEncoding.errorPct > 2 ? 'rose' : kpis.dcEncoding.errorPct > 0 ? 'amber' : 'green',
+          value: `${Number(kpis.dcEncoding.errorPct).toFixed(1)}%`,
+          icon: AlertTriangle,
+          tooltip: `${formatIn(kpis.dcEncoding.errors)} encoding errors out of ${formatIn(kpis.dcEncoding.encodedToday)} tags encoded`,
+        },
+        permissions.dc_validation && {
+          key: 'dcProcessed',
+          sectionKey: 'dc_validation',
+          title: 'DC Processed HUs',
+          variant: 'green',
+          value: formatIn(kpis.dcEncoding.processedHu),
+          icon: Check,
+          tooltip: `${formatIn(kpis.dcEncoding.processedHu)} HUs processed (${formatIn(kpis.dcEncoding.processedArticles)} articles) across ${storeRows.length} stores`,
+        },
+        permissions.dc_validation && {
+          key: 'dcUnprocessed',
+          sectionKey: 'dc_validation',
+          title: 'DC Unprocessed HUs',
+          variant: kpis.dcEncoding.unprocessedHu > 0 ? 'amber' : 'green',
+          value: formatIn(kpis.dcEncoding.unprocessedHu),
+          icon: ClipboardList,
+          tooltip: kpis.dcEncoding.unprocessedHu > 0
+            ? `${formatIn(kpis.dcEncoding.unprocessedHu)} HUs pending dispatch processing at DC`
+            : 'All DC dispatch HUs processed',
+        },
+      ].filter(Boolean)
+    : [
+        permissions.live_stock && {
+          key: 'stores',
+          sectionKey: 'live_stock',
+          title: isSingleStoreView ? 'Store Health' : 'Stores Status',
+          variant: isSingleStoreView
+            ? (singleStoreRow?.statusTier === 'red' ? 'rose' : singleStoreRow?.statusTier === 'amber' ? 'amber' : singleStoreRow?.statusTier === 'green' ? 'green' : 'gray')
+            : 'gray',
+          value: isSingleStoreView && singleStoreRow ? (
+            <span className="vmm-ov-rag-inline">
+              <span className={`vmm-ov-rag-item vmm-ov-rag-${singleStoreRow.statusTier === 'red' ? 'r' : singleStoreRow.statusTier === 'amber' ? 'a' : 'g'}`}>
+                {singleStoreRow.statusTier === 'green' ? (
+                  <Check size={15} strokeWidth={3.2} className="vmm-ov-rag-tick" aria-hidden="true" />
+                ) : (
+                  <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
+                )}
+                <span>{singleStoreRow.statusLabel}</span>
+              </span>
+              {singleStoreRow.score !== null && (
+                <span className="vmm-ov-single-score-tag">{singleStoreRow.score}/100</span>
+              )}
+            </span>
+          ) : (
+            <span className="vmm-ov-rag-inline">
+              <span className="vmm-ov-rag-item vmm-ov-rag-r">
+                <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
+                <TickerNumber value={kpis.stores.red} />
+              </span>
+              <span className="vmm-ov-rag-sep">/</span>
+              <span className="vmm-ov-rag-item vmm-ov-rag-a">
+                <AlertTriangle size={14} strokeWidth={2.5} aria-hidden="true" />
+                <TickerNumber value={kpis.stores.amber} />
+              </span>
+              <span className="vmm-ov-rag-sep">/</span>
+              <span className="vmm-ov-rag-item vmm-ov-rag-g">
+                <Check size={15} strokeWidth={3.3} className="vmm-ov-rag-tick" aria-hidden="true" />
+                <TickerNumber value={kpis.stores.green} />
+              </span>
+            </span>
+          ),
+          icon: Store,
+          tooltip: isSingleStoreView && singleStoreRow
+            ? `${singleStoreRow.storeCode} · ${singleStoreRow.statusLabel}${singleStoreRow.score !== null ? ` (Score ${singleStoreRow.score}/100)` : ''}`
+            : `${kpis.stores.red} Critical (<50%), ${kpis.stores.amber} Warning (50-90%), ${kpis.stores.green} Healthy (>90%) of ${kpis.stores.total} RFID stores`,
+        },
+        permissions.live_stock && {
+          key: 'coverage',
+          sectionKey: 'live_stock',
+          title: 'Stock Coverage',
+          variant: 'green',
+          value: `${kpis.stockCoverage.pct.toFixed(1)}%`,
+          icon: Target,
+          tooltip: `RFID ${formatIn(kpis.stockCoverage.rfid)} of SAP ${formatIn(kpis.stockCoverage.sap)}`,
+        },
+        permissions.sale && {
+          key: 'checkout',
+          sectionKey: 'sale',
+          title: 'RFID Checkout',
+          variant: 'blue',
+          value: `${kpis.rfidCheckout.pct.toFixed(1)}%`,
+          icon: ShoppingCart,
+          tooltip: `${formatIn(kpis.rfidCheckout.rfidSale)} of ${formatIn(kpis.rfidCheckout.dposSale)} items sold • ${kpis.rfidCheckout.taggedCapturePct.toFixed(1)}% of tagged items`,
+        },
+        permissions.store_validation && {
+          key: 'validation',
+          sectionKey: 'store_validation',
+          title: 'Validation Pending',
+          variant: 'amber',
+          value: formatIn(kpis.validationPending.pending),
+          icon: ClipboardList,
+          tooltip: `Of ${formatIn(kpis.validationPending.whValidated)} WH validated • ${formatIn(kpis.validationPending.wrong)} wrong HUs`,
+        },
+        (permissions.void || permissions.return) && {
+          key: 'voidReturn',
+          sectionKey: permissions.void ? 'void' : 'return',
+          title: 'Void / Return Pending',
+          variant: 'rose',
+          value: (
+            <span className="inline-flex items-baseline">
+              <TickerNumber value={formatIn(kpis.voidReturnPending.voidPending)} />
+              <span className="vmm-ov-slash" style={{ margin: '0 4px' }}>/</span>
+              <TickerNumber value={formatIn(kpis.voidReturnPending.returnPending)} />
+            </span>
+          ),
+          icon: RotateCcw,
+          tooltip: `Not encoded back (of ${formatIn(kpis.voidReturnPending.voidTotal)} void, ${formatIn(kpis.voidReturnPending.returnTotal)} return)`,
+        },
+        (permissions.dc_encoding || permissions.dc_validation) && {
+          key: 'dcEncoding',
+          sectionKey: permissions.dc_encoding ? 'dc_encoding' : 'dc_validation',
+          title: 'DC Encoding Today',
+          variant: 'purple',
+          value: formatIn(kpis.dcEncoding.encodedToday),
+          icon: Layers,
+          tooltip: `${Number(kpis.dcEncoding.errorPct).toFixed(1)}% errors • ${formatIn(kpis.dcEncoding.unprocessedHu)} HUs unprocessed at DC`,
+        },
+      ].filter(Boolean);
 
   const renderSortIcon = (key) => {
     if (sortConfig.key !== key || !sortConfig.dir) {
@@ -360,14 +433,14 @@ export default function OverviewSection({ onJumpToSection }) {
         <div className="vmm-ov-legend-left">
           <div className="vmm-ov-page-title-wrap">
             <h1 className="vmm-ov-page-title">Overview</h1>
-            {permissions.live_stock && (
+            {(permissions.live_stock || isWarehouseOnly) && (
               <button
                 type="button"
                 className={`vmm-ov-legend-toggle${showStatusLegend ? ' is-active' : ''}`}
                 onClick={() => setShowStatusLegend((prev) => !prev)}
                 aria-expanded={showStatusLegend}
-                aria-label={showStatusLegend ? 'Hide stores status legend' : 'Show stores status legend'}
-                title={showStatusLegend ? 'Hide stores status legend' : 'Show stores status legend'}
+                aria-label={showStatusLegend ? 'Hide status legend' : 'Show status legend'}
+                title={showStatusLegend ? 'Hide status legend' : 'Show status legend'}
               >
                 <Info size={14} strokeWidth={2.25} className="vmm-ov-legend-icon" aria-hidden="true" />
               </button>
@@ -377,7 +450,7 @@ export default function OverviewSection({ onJumpToSection }) {
           {permissions.live_stock && showStatusLegend && (
             <div className="vmm-ov-legend-items">
               <span className="vmm-ov-legend-lead">
-                <span>Stores Status:</span>
+                <span>{isSingleStoreView ? 'Store Status:' : 'Stores Status:'}</span>
               </span>
               <span className="vmm-ov-legend-item">
                 <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
@@ -393,6 +466,29 @@ export default function OverviewSection({ onJumpToSection }) {
                 <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
                 <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
                 <span>(&gt;90%)</span>
+              </span>
+            </div>
+          )}
+
+          {isWarehouseOnly && showStatusLegend && (
+            <div className="vmm-ov-legend-items">
+              <span className="vmm-ov-legend-lead">
+                <span>DC Dispatch Status:</span>
+              </span>
+              <span className="vmm-ov-legend-item">
+                <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-r" aria-hidden="true" />
+                <strong className="vmm-ov-legend-code vmm-ov-legend-code--red">Critical</strong>
+                <span>(5+ unprocessed HUs)</span>
+              </span>
+              <span className="vmm-ov-legend-item">
+                <AlertTriangle size={12} strokeWidth={2.4} className="vmm-ov-rag-a" aria-hidden="true" />
+                <strong className="vmm-ov-legend-code vmm-ov-legend-code--amber">Warning</strong>
+                <span>(1–4 unprocessed HUs)</span>
+              </span>
+              <span className="vmm-ov-legend-item">
+                <Check size={13} strokeWidth={3.2} className="vmm-ov-rag-g vmm-ov-legend-tick" aria-hidden="true" />
+                <strong className="vmm-ov-legend-code vmm-ov-legend-code--green">Healthy</strong>
+                <span>(0 unprocessed)</span>
               </span>
             </div>
           )}
@@ -443,85 +539,100 @@ export default function OverviewSection({ onJumpToSection }) {
         <div className="cc-data-grid-header vmm-ov-scorecard-header">
           <div className="vmm-ov-header-text">
             <h2 className="cc-data-grid-title vmm-ov-scorecard-title">
-              STORE SCORECARD ({sortedRows.length} STORES)
+              {isWarehouseOnly ? 'DC OUTWARD DISPATCH SCORECARD' : 'STORE SCORECARD'} ({sortedRows.length}{' '}
+              {sortedRows.length === 1 ? 'STORE' : 'STORES'})
             </h2>
 
-            <div className="vmm-ov-score-info-wrap" ref={scoreInfoRef}>
-              <button
-                type="button"
-                className={`vmm-ov-score-info-btn${showScoreInfo ? ' is-open' : ''}`}
-                onClick={() => setShowScoreInfo((prev) => !prev)}
-                aria-expanded={showScoreInfo}
-                aria-label="How store score is calculated"
-              >
-                <Info size={14} strokeWidth={2.3} aria-hidden="true" />
-              </button>
+            {!isWarehouseOnly && (
+              <div className="vmm-ov-score-info-wrap" ref={scoreInfoRef}>
+                <button
+                  type="button"
+                  className={`vmm-ov-score-info-btn${showScoreInfo ? ' is-open' : ''}`}
+                  onClick={() => setShowScoreInfo((prev) => !prev)}
+                  aria-expanded={showScoreInfo}
+                  aria-label="How store score is calculated"
+                >
+                  <Info size={14} strokeWidth={2.3} aria-hidden="true" />
+                </button>
 
-              {showScoreInfo && (
-                <div className="vmm-ov-score-popover" role="dialog" aria-label="Store score calculation formula">
-                  <div className="vmm-ov-sp-head">
-                    <span className="vmm-ov-sp-title">Store Score Formula (0–100)</span>
-                    <button
-                      type="button"
-                      className="vmm-ov-sp-close"
-                      onClick={() => setShowScoreInfo(false)}
-                      aria-label="Close formula info"
-                    >
-                      <X size={13} strokeWidth={2.4} />
-                    </button>
-                  </div>
-
-                  <div className="vmm-ov-sp-eq">
-                    Score = (Earned Points ÷ Active Weight) × 100
-                  </div>
-
-                  <div className="vmm-ov-sp-rows">
-                    <div className="vmm-ov-sp-row">
-                      <div className="vmm-ov-sp-row-top">
-                        <strong>1. Live Stock Coverage</strong>
-                        <span className="vmm-ov-sp-pts">45 pts</span>
-                      </div>
-                      <div className="vmm-ov-sp-desc">(RFID Stock ÷ SAP Stock) × 45</div>
+                {showScoreInfo && (
+                  <div className="vmm-ov-score-popover" role="dialog" aria-label="Store score calculation formula">
+                    <div className="vmm-ov-sp-head">
+                      <span className="vmm-ov-sp-title">Store Score Formula (0–100)</span>
+                      <button
+                        type="button"
+                        className="vmm-ov-sp-close"
+                        onClick={() => setShowScoreInfo(false)}
+                        aria-label="Close formula info"
+                      >
+                        <X size={13} strokeWidth={2.4} />
+                      </button>
                     </div>
 
-                    <div className="vmm-ov-sp-row">
-                      <div className="vmm-ov-sp-row-top">
-                        <strong>2. Sales &amp; RFID Checkout</strong>
-                        <span className="vmm-ov-sp-pts">25 pts</span>
-                      </div>
-                      <div className="vmm-ov-sp-desc">(Total RFID Checkout ÷ Total POS Sale) × 25</div>
+                    <div className="vmm-ov-sp-eq">
+                      Score = (Earned Points ÷ Active Weight) × 100
                     </div>
 
-                    <div className="vmm-ov-sp-row">
-                      <div className="vmm-ov-sp-row-top">
-                        <strong>3. Backlog Health</strong>
-                        <span className="vmm-ov-sp-pts">30 pts</span>
-                      </div>
-                      <div className="vmm-ov-sp-desc">
-                        30 minus capped deductions:
-                        <ul className="vmm-ov-sp-list">
-                          <li>Store Val.: 0.4 pt/pending HU (max 10) + 2 pts/wrong HU (max 5)</li>
-                          <li>Void &amp; Return: 0.25 pt/pending item (max 10)</li>
-                          <li>DC Val.: 2 pts/unprocessed HU (max 5)</li>
-                        </ul>
-                      </div>
+                    <div className="vmm-ov-sp-rows">
+                      {permissions.live_stock && (
+                        <div className="vmm-ov-sp-row">
+                          <div className="vmm-ov-sp-row-top">
+                            <strong>1. Live Stock Coverage</strong>
+                            <span className="vmm-ov-sp-pts">45 pts</span>
+                          </div>
+                          <div className="vmm-ov-sp-desc">(RFID Stock ÷ SAP Stock) × 45</div>
+                        </div>
+                      )}
+
+                      {permissions.sale && (
+                        <div className="vmm-ov-sp-row">
+                          <div className="vmm-ov-sp-row-top">
+                            <strong>2. Sales &amp; RFID Checkout</strong>
+                            <span className="vmm-ov-sp-pts">25 pts</span>
+                          </div>
+                          <div className="vmm-ov-sp-desc">(Total RFID Checkout ÷ Total POS Sale) × 25</div>
+                        </div>
+                      )}
+
+                      {(permissions.store_validation || permissions.void || permissions.return || permissions.dc_validation) && (
+                        <div className="vmm-ov-sp-row">
+                          <div className="vmm-ov-sp-row-top">
+                            <strong>3. Backlog Health</strong>
+                            <span className="vmm-ov-sp-pts">30 pts</span>
+                          </div>
+                          <div className="vmm-ov-sp-desc">
+                            30 minus capped deductions:
+                            <ul className="vmm-ov-sp-list">
+                              {permissions.store_validation && (
+                                <li>Store Val.: 0.4 pt/pending HU (max 10) + 2 pts/wrong HU (max 5)</li>
+                              )}
+                              {(permissions.void || permissions.return) && (
+                                <li>Void &amp; Return: 0.25 pt/pending item (max 10)</li>
+                              )}
+                              {permissions.dc_validation && (
+                                <li>DC Val.: 2 pts/unprocessed HU (max 5)</li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="vmm-ov-sp-note">
+                      Normalized by active weight — if POS Sale is 0 (—), score scales out of 75 to 100.
                     </div>
                   </div>
-
-                  <div className="vmm-ov-sp-note">
-                    Normalized by active weight — if POS Sale is 0 (—), score scales out of 75 to 100.
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
 
           <button
             type="button"
             className="cc-action-btn cc-export-btn vmm-ov-excel-btn"
-            onClick={() => exportScorecardToExcel(sortedRows)}
+            onClick={() => exportScorecardToExcel(sortedRows, permissions)}
             disabled={sortedRows.length === 0}
-            title="Export Store Scorecard to Excel"
+            title={isWarehouseOnly ? 'Export DC Dispatch Scorecard to Excel' : 'Export Store Scorecard to Excel'}
           >
             <Download size={13} />
             <span>Excel</span>
@@ -537,12 +648,14 @@ export default function OverviewSection({ onJumpToSection }) {
               <tr>
                 {renderSortableTh('status', 'STATUS')}
                 {renderSortableTh('store', 'STORE')}
-                {renderSortableTh('score', 'SCORE', 'vmm-ov-th-score')}
+                {!isWarehouseOnly && renderSortableTh('score', 'SCORE', 'vmm-ov-th-score')}
                 {permissions.live_stock && renderSortableTh('coverage', 'COVERAGE')}
                 {permissions.sale && renderSortableTh('checkout', 'RFID CHECKOUT')}
                 {permissions.store_validation && renderSortableTh('validation', 'VAL. PENDING')}
                 {(permissions.void || permissions.return) && renderSortableTh('voidReturn', 'VOID / RET. PENDING')}
+                {isWarehouseOnly && permissions.dc_validation && renderSortableTh('dcProcessed', 'DC PROCESSED HUs')}
                 {permissions.dc_validation && renderSortableTh('dcUnprocessed', 'DC UNPROCESSED')}
+                {isWarehouseOnly && permissions.dc_validation && renderSortableTh('dcArticles', 'PROCESSED ARTICLES')}
                 {permissions.cycle_count && renderSortableTh('cycleCount', 'LAST CYCLE COUNT')}
               </tr>
             </thead>
@@ -688,23 +801,26 @@ export default function OverviewSection({ onJumpToSection }) {
                         </button>
                       </td>
 
-                      <td className="vmm-ov-score-cell">
-                        {row.score !== null ? (
-                          <span
-                            className="vmm-ov-score-hover vmm-ov-hover-target"
-                            onMouseEnter={(e) =>
-                              showCellReason(e, `${row.storeCode} · Score ${row.score}/100`, row.reasons, {
-                                badge: issueCount > 0 ? `${issueCount} ${issueCount === 1 ? 'cause' : 'causes'}` : 'Healthy',
-                              })
-                            }
-                            onMouseLeave={hideCellReason}
-                          >
-                            {row.score}
-                          </span>
-                        ) : (
-                          <span className="vmm-ov-muted">—</span>
-                        )}
-                      </td>
+                      {!isWarehouseOnly && (
+                        <td className="vmm-ov-score-cell">
+                          {row.score !== null ? (
+                            <span
+                              className="vmm-ov-score-hover vmm-ov-hover-target"
+                              onMouseEnter={(e) =>
+                                showCellReason(e, `${row.storeCode} · Score ${row.score}/100`, row.reasons, {
+                                  badge: issueCount > 0 ? `${issueCount} ${issueCount === 1 ? 'cause' : 'causes'}` : 'Healthy',
+                                })
+                              }
+                              onMouseLeave={hideCellReason}
+                            >
+                              <span>{row.score}</span>
+                              <span className="vmm-ov-score-denom">/100</span>
+                            </span>
+                          ) : (
+                            <span className="vmm-ov-muted">—</span>
+                          )}
+                        </td>
+                      )}
 
                       {permissions.live_stock && (
                         <td>
@@ -884,6 +1000,35 @@ export default function OverviewSection({ onJumpToSection }) {
                         </td>
                       )}
 
+                      {isWarehouseOnly && permissions.dc_validation && (
+                        <td>
+                          {row.hasDcValidation ? (
+                            <button
+                              type="button"
+                              className="vmm-ov-cell-link vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--green"
+                              onClick={(e) => {
+                                hideCellReason();
+                                jump(e, 'dc_validation', row.storeCode);
+                              }}
+                              onMouseEnter={(e) =>
+                                showCellReason(
+                                  e,
+                                  `${row.storeCode} · DC Processed HUs`,
+                                  [{ text: `${formatIn(row.dcProcessed)} HUs processed (${formatIn(row.dcProcessedArticleQty)} articles)`, severity: 'green' }],
+                                  { hint: 'Click to open DC Validation' }
+                                )
+                              }
+                              onMouseLeave={hideCellReason}
+                            >
+                              <span>{formatIn(row.dcProcessed)}</span>
+                              <ExternalLink size={11} className="vmm-ov-ext-icon" aria-hidden="true" />
+                            </button>
+                          ) : (
+                            <span className="vmm-ov-muted">—</span>
+                          )}
+                        </td>
+                      )}
+
                       {permissions.dc_validation && (
                         <td>
                           {row.hasDcValidation ? (
@@ -891,7 +1036,7 @@ export default function OverviewSection({ onJumpToSection }) {
                               type="button"
                               className={`vmm-ov-cell-link ${
                                 dcReasons.length > 0
-                                  ? 'vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--amber'
+                                  ? `vmm-ov-num-bold vmm-ov-has-reason vmm-ov-has-reason--${row.dcUnprocessed >= 5 ? 'red' : 'amber'}`
                                   : 'vmm-ov-num-zero'
                               }`}
                               onClick={(e) => {
@@ -912,6 +1057,16 @@ export default function OverviewSection({ onJumpToSection }) {
                                 <Check size={11} strokeWidth={2.75} className="vmm-ov-zero-icon" aria-hidden="true" />
                               )}
                             </button>
+                          ) : (
+                            <span className="vmm-ov-muted">—</span>
+                          )}
+                        </td>
+                      )}
+
+                      {isWarehouseOnly && permissions.dc_validation && (
+                        <td>
+                          {row.hasDcValidation ? (
+                            <span className="vmm-ov-num-bold">{formatIn(row.dcProcessedArticleQty)}</span>
                           ) : (
                             <span className="vmm-ov-muted">—</span>
                           )}
@@ -967,7 +1122,12 @@ export default function OverviewSection({ onJumpToSection }) {
                 <div>
                   <h2 className="vmm-ov-card-title">RFID checkout &amp; return re-encode, day by day</h2>
                   <p className="vmm-ov-card-subtitle">
-                    {storeRows.length === 1 ? storeRows[0].storeName : 'All stores'} · last {dailyTrends.length || 12} days
+                    {storeRows.length === 1
+                      ? storeRows[0].storeName
+                      : roleScope === 'multi_store'
+                        ? `${storeRows.length} assigned stores`
+                        : 'All stores'}{' '}
+                    · last {dailyTrends.length || 12} days
                   </p>
                 </div>
                 {(avgCheckoutPct !== null || avgReturnReencodePct !== null) && (

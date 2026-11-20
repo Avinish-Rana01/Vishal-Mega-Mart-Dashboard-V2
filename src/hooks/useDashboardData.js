@@ -1544,11 +1544,18 @@ export const useDashboardOverview = () => {
           }
         }
 
+        const isWarehouseUser = prev.roleScope === 'warehouse_user';
+        const allowVendorPatch = isSuper || prev.roleScope === 'warehouse_admin';
+
         let nextSummary = prev.summary || {};
         if (isSuper && patch.summaryDelta) {
           nextSummary = patch.summaryDelta;
         } else if (patch.isRemoved || patch.store || patch.summaryDelta) {
-          nextSummary = recomputeOverviewSummaryFromStores(nextStores, nextSummary, patch.summaryDelta);
+          nextSummary = recomputeOverviewSummaryFromStores(
+            nextStores,
+            nextSummary,
+            isWarehouseUser ? null : patch.summaryDelta
+          );
         }
 
         return {
@@ -1557,7 +1564,7 @@ export const useDashboardOverview = () => {
           summary: nextSummary,
           dailyTrends: Array.isArray(patch.dailyTrendsDelta) ? patch.dailyTrendsDelta : prev.dailyTrends,
           topVendorDiscrepancy:
-            patch.topVendorDiscrepancyDelta !== undefined && patch.topVendorDiscrepancyDelta !== null
+            allowVendorPatch && patch.topVendorDiscrepancyDelta !== undefined && patch.topVendorDiscrepancyDelta !== null
               ? patch.topVendorDiscrepancyDelta
               : prev.topVendorDiscrepancy,
         };

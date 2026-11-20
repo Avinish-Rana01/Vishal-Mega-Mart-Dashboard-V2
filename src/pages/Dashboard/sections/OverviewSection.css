@@ -72,6 +72,16 @@
   font-size: 13px;
 }
 
+.vmm-ov-single-score-tag {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #1e293b;
+  margin-left: 3px;
+}
+
 /* Always-Visible Overview Title + Store Status Legend Strip + Live Sync Indicator Above KPI Cards */
 .vmm-ov-legend-bar {
   display: flex;
@@ -964,8 +974,8 @@
 }
 
 .vmm-ov-score-cell {
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 11.5px;
+  font-weight: 700;
   color: #3B82F6;
   font-variant-numeric: tabular-nums;
 }
@@ -1097,13 +1107,38 @@
 }
 
 .vmm-ov-score-hover {
-  padding: 1px 4px;
-  border-radius: 4px;
-  transition: opacity 0.14s ease;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  min-width: 36px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #3B82F6;
+  border: 1px solid #bfdbfe;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.16s ease;
+}
+
+.vmm-ov-score-denom {
+  font-size: 9.5px;
+  font-weight: 600;
+  opacity: 0.72;
+  margin-left: 1px;
 }
 
 .vmm-ov-score-hover:hover {
-  opacity: 0.8;
+  background: #3B82F6;
+  color: #ffffff;
+  border-color: #3B82F6;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.24);
+}
+
+.vmm-ov-score-hover:hover .vmm-ov-score-denom {
+  opacity: 0.85;
 }
 
 /* Zero / healthy counts styled inside the same pill box with borders + green check mark */

@@ -237,6 +237,9 @@ export default function DashboardPage() {
 
   const visibleTabs = useMemo(
     () => DASHBOARD_TABS.filter((tab) => {
+      if (tab.isOverview) {
+        return hasSection('overview') && tab.requiredAny.some((sec) => hasSection(sec));
+      }
       if (tab.requiredAny) return tab.requiredAny.some((sec) => hasSection(sec));
       if (tab.sections.length === 0) return true;
       return tab.sections.some((sec) => hasSection(sec));
