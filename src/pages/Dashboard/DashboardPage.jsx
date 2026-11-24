@@ -188,8 +188,8 @@ const DASHBOARD_TABS = [
   },
   {
     id: 'dc_encoding',
-    label: 'DC Validate & Encoding, Tag',
-    sections: ['dc_validation', 'dc_encoding', 'tag_management'],
+    label: 'Tag, DC Encoding & Validate',
+    sections: ['tag_management', 'dc_encoding', 'dc_validation'],
   },
   {
     id: 'vendors',

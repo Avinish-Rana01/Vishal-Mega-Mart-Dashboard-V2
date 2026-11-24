@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getActiveUserId } from './stockService';
+import { getActiveUserId, getReportStores } from './stockService';
 
 /**
  * Loss Prevention & Goods Security API Service
@@ -875,8 +875,8 @@ const pendingStoreRequests = new Map();
 
 function getStoreCacheKey() {
   const userId = getActiveUserId();
-  const loginTime = sessionStorage.getItem('vmm_login_time');
-  return userId && loginTime ? `${LP_STORAGE_KEYS.CACHED_STORES}:${userId}:${loginTime}` : null;
+  const loginTime = sessionStorage.getItem('vmm_login_time') || 'active';
+  return userId ? `${LP_STORAGE_KEYS.CACHED_STORES}:${userId}:${loginTime}` : null;
 }
 
 export function getCachedStores() {
@@ -889,30 +889,69 @@ export function getCachedStores() {
   }
 }
 
-export async function fetchStores() {
+export async function fetchStores(forceRefresh = false) {
   const key = getStoreCacheKey();
-  if (!key) return [];
-  if (pendingStoreRequests.has(key)) return pendingStoreRequests.get(key);
+  const userId = getActiveUserId();
+  if (!key || !userId) return [];
 
-  const request = axios.get(`${lossPreventionUrl}/stores`).then(({ data }) => {
-    const raw = data?.Code === 0 ? [] : (data?.Stores ?? data);
-    const stores = Array.isArray(raw) ? raw.map(normalizeStore).filter(Boolean) : [];
-    if (key !== getStoreCacheKey()) return [];
+  if (forceRefresh) {
+    pendingStoreRequests.delete(key);
     try {
-      sessionStorage.setItem(key, JSON.stringify(stores));
-    } catch {
-      // Storage can be unavailable or full.
-    }
-    return stores;
-  }).catch((error) => {
-    if (key !== getStoreCacheKey()) return [];
-    if (error.response?.status === 401 || error.response?.status === 403) {
       sessionStorage.removeItem(key);
-      return [];
+    } catch {
+      // ignore storage errors
     }
-    console.warn('Could not fetch Loss Prevention stores:', error.message);
-    return getCachedStores() || [];
-  }).finally(() => pendingStoreRequests.delete(key));
+  } else if (pendingStoreRequests.has(key)) {
+    return pendingStoreRequests.get(key);
+  }
+
+  const request = axios
+    .get(`${lossPreventionUrl}/stores`, { params: { userId } })
+    .then(({ data }) => {
+      const raw = data?.Code === 0 ? [] : (data?.Stores ?? data);
+      const stores = Array.isArray(raw) ? raw.map(normalizeStore).filter(Boolean) : [];
+      if (key !== getStoreCacheKey()) return [];
+      try {
+        sessionStorage.setItem(key, JSON.stringify(stores));
+      } catch {
+        // Storage can be unavailable or full.
+      }
+      return stores;
+    })
+    .catch(async (error) => {
+      if (key !== getStoreCacheKey()) return [];
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        sessionStorage.removeItem(key);
+        return [];
+      }
+      // Fallback to VMM's original role-based store dropdown endpoint (/api/report/stores)
+      try {
+        const reportStores = await getReportStores();
+        if (Array.isArray(reportStores) && key === getStoreCacheKey()) {
+          const stores = reportStores
+            .map((item) => {
+              const code = String(item?.Value ?? item?.value ?? item?.STORE_CODE ?? item?.storeCode ?? item?.Text ?? item?.text ?? '').trim();
+              if (!code) return null;
+              const matched = DEFAULT_STORES.find((d) => d.storeCode.toLowerCase() === code.toLowerCase());
+              return matched
+                ? { ...matched }
+                : normalizeStore({ StoreCode: code, StoreName: item?.Text ?? item?.text ?? code });
+            })
+            .filter(Boolean);
+          try {
+            sessionStorage.setItem(key, JSON.stringify(stores));
+          } catch {
+            // ignore storage errors
+          }
+          return stores;
+        }
+      } catch {
+        // ignore fallback error
+      }
+      console.warn('Could not fetch Loss Prevention stores:', error.message);
+      return getCachedStores() || [];
+    })
+    .finally(() => pendingStoreRequests.delete(key));
 
   pendingStoreRequests.set(key, request);
   return request;

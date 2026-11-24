@@ -1355,8 +1355,7 @@
 
 .vmm-ov-table tbody td.vmm-ov-why-cell {
   text-align: left;
-  min-width: 220px;
-  max-width: 300px;
+  white-space: nowrap;
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 10px;
@@ -1368,7 +1367,7 @@
   justify-content: space-between;
   gap: 6px;
   width: 100%;
-  max-width: 100%;
+  min-width: max-content;
   padding: 2px 7px;
   border-radius: 7px;
   font-size: 11px;
@@ -1459,10 +1458,7 @@
 }
 
 .vmm-ov-why-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
 }
 
 .vmm-ov-why-end {

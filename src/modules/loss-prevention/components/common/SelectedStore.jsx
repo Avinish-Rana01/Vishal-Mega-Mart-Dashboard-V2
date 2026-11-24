@@ -258,7 +258,7 @@ export default function SelectedStore({
     e.stopPropagation();
     setLoading(true);
     try {
-      const list = await fetchStores();
+      const list = await fetchStores(true);
       if (Array.isArray(list)) {
         setStores(list);
         if (list.length === 0) {
@@ -274,6 +274,18 @@ export default function SelectedStore({
           saveSelectedStore(noStoreObj);
           if (onStoreChangeRef.current) {
             onStoreChangeRef.current(noStoreObj);
+          }
+        } else {
+          const validSaved = list.find(
+            (s) => s.storeCode?.toLowerCase() === activeStore?.storeCode?.toLowerCase()
+          );
+          if (!validSaved) {
+            const nextStore = list[0];
+            setActiveStore(nextStore);
+            saveSelectedStore(nextStore);
+            if (onStoreChangeRef.current) {
+              onStoreChangeRef.current(nextStore);
+            }
           }
         }
       }
