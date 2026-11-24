@@ -53,7 +53,7 @@ const ReportsView = () => {
   const [selectedStore, setSelectedStore] = useState(() => {
     const saved = getSavedStore();
     if (saved?.noStore) return 'none';
-    return saved?.storeCode || 'all';
+    return saved?.storeCode || '';
   });
   const [dateRange, setDateRange] = useState(() => {
     const today = new Date();
@@ -203,12 +203,13 @@ const ReportsView = () => {
 
       try {
         const storeObj = typeof store === 'object' ? store : getSavedStore();
-        const storeCodeVal = typeof store === 'string' ? store : (storeObj?.noStore ? 'none' : (storeObj?.storeCode || 'all'));
-        const storeIdVal = (!storeObj?.noStore && storeObj?.storeId) ? Number(storeObj.storeId) : undefined;
+        const storeCodeVal = typeof store === 'string' ? store : storeObj?.storeCode;
+        const storeIdVal = storeCodeVal && storeCodeVal === storeObj?.storeCode && Number(storeObj.storeId) > 0
+          ? Number(storeObj.storeId) : undefined;
 
         const res = await fetchIncidentReportSummary({
           Preset: preset,
-          StoreCode: storeCodeVal !== 'all' && storeCodeVal !== 'none' ? storeCodeVal : undefined,
+          StoreCode: storeCodeVal !== 'none' ? storeCodeVal : undefined,
           StoreId: storeIdVal,
           FromDate: fromDate || undefined,
           ToDate: toDate || undefined,
@@ -243,7 +244,7 @@ const ReportsView = () => {
     const handleGlobalStoreChange = (e) => {
       const newStore = e.detail;
       if (newStore) {
-        setSelectedStore(newStore.noStore ? 'none' : (newStore.storeCode || 'all'));
+        setSelectedStore(newStore.noStore ? 'none' : (newStore.storeCode || ''));
         loadMainReport({ store: newStore });
       }
     };
@@ -285,7 +286,7 @@ const ReportsView = () => {
       try {
         const res = await fetchIncidentReportDetails({
           Date: targetDate,
-          StoreCode: targetStore !== 'all' ? targetStore : undefined,
+          StoreCode: targetStore,
           PageNumber: 1,
           PageSize: 10000,
           EventType: eventType !== 'All' ? eventType : undefined,
@@ -395,7 +396,7 @@ const ReportsView = () => {
 
   const handleStoreChange = (storeObj) => {
     const storeCode = typeof storeObj === 'object' ? storeObj.storeCode : storeObj;
-    setSelectedStore(storeCode || 'all');
+    setSelectedStore(storeCode || '');
     setMainCurrentPage(1);
     loadMainReport({ store: storeCode, page: 1 });
   };
@@ -892,7 +893,7 @@ const ReportsView = () => {
 
         const fullRes = await fetchIncidentReportSummary({
           Preset: preset,
-          StoreCode: store !== 'all' ? store : undefined,
+          StoreCode: store,
           FromDate: fromDate || undefined,
           ToDate: toDate || undefined,
           EventType: eventType !== 'All' ? eventType : undefined,
@@ -997,7 +998,7 @@ const ReportsView = () => {
 
         const fullRes = await fetchIncidentReportSummary({
           Preset: preset,
-          StoreCode: store !== 'all' ? store : undefined,
+          StoreCode: store,
           FromDate: fromDate || undefined,
           ToDate: toDate || undefined,
           EventType: eventType !== 'All' ? eventType : undefined,
@@ -1072,7 +1073,7 @@ const ReportsView = () => {
       if ((modalReportData.totalRecords || 0) > modalReportData.records.length) {
         const fullRes = await fetchIncidentReportDetails({
           Date: selectedRowContext?.date,
-          StoreCode: selectedRowContext?.storeCode !== 'all' ? selectedRowContext?.storeCode : undefined,
+          StoreCode: selectedRowContext?.storeCode,
           EventType: selectedRowContext?.eventType !== 'All' ? selectedRowContext?.eventType : undefined,
           PageNumber: 1,
           PageSize: 10000,
@@ -1177,7 +1178,7 @@ const ReportsView = () => {
       if ((modalReportData.totalRecords || 0) > modalReportData.records.length) {
         const fullRes = await fetchIncidentReportDetails({
           Date: selectedRowContext?.date,
-          StoreCode: selectedRowContext?.storeCode !== 'all' ? selectedRowContext?.storeCode : undefined,
+          StoreCode: selectedRowContext?.storeCode,
           EventType: selectedRowContext?.eventType !== 'All' ? selectedRowContext?.eventType : undefined,
           PageNumber: 1,
           PageSize: 10000,

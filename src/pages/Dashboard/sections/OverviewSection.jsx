@@ -19,7 +19,7 @@ import {
   Calendar,
   X,
 } from 'lucide-react';
-import {
+/* import {
   ResponsiveContainer,
   ComposedChart,
   Bar,
@@ -29,7 +29,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-} from 'recharts';
+} from 'recharts'; */
 import { useAuth } from '../../../context/AuthContext';
 import { useDashboardOverview } from '../../../hooks/useDashboardData';
 import StatCard from '../../../modules/loss-prevention/components/common/StatCard';
@@ -45,7 +45,7 @@ import '../../../modules/loss-prevention/lossPrevention.css';
 import './CycleCountShared.css';
 import './OverviewSection.css';
 
-function OverviewTrendTooltip({ active, payload }) {
+/* function OverviewTrendTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
   const row = payload[0]?.payload;
   if (!row) return null;
@@ -77,7 +77,7 @@ function OverviewTrendTooltip({ active, payload }) {
       )}
     </div>
   );
-}
+} */
 
 function ScorecardReasonTooltip({ tip }) {
   if (!tip || typeof document === 'undefined') return null;
@@ -124,7 +124,17 @@ export default function OverviewSection({ onJumpToSection }) {
   const [showScoreInfo, setShowScoreInfo] = useState(false);
   const [showStatusLegend, setShowStatusLegend] = useState(true);
   const [hoverTip, setHoverTip] = useState(null);
+  const [whyModalRow, setWhyModalRow] = useState(null);
   const scoreInfoRef = useRef(null);
+
+  useEffect(() => {
+    if (!whyModalRow) return undefined;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setWhyModalRow(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [whyModalRow]);
 
   const showCellReason = useCallback((e, title, items, { badge = null, hint = null } = {}) => {
     if (!items || items.length === 0) return;
@@ -174,7 +184,7 @@ export default function OverviewSection({ onJumpToSection }) {
     vendor_discrepancy: hasSection('vendor_discrepancy'),
   }), [hasSection]);
 
-  const { kpis, storeRows, dailyTrends, avgCheckoutPct, avgReturnReencodePct, attentionItems } = useMemo(
+  const { kpis, storeRows /*, dailyTrends, avgCheckoutPct, avgReturnReencodePct, attentionItems */ } = useMemo(
     () => buildOverviewData(rawData, permissions),
     [rawData, permissions]
   );
@@ -657,12 +667,13 @@ export default function OverviewSection({ onJumpToSection }) {
                 {permissions.dc_validation && renderSortableTh('dcUnprocessed', 'DC UNPROCESSED')}
                 {isWarehouseOnly && permissions.dc_validation && renderSortableTh('dcArticles', 'PROCESSED ARTICLES')}
                 {permissions.cycle_count && renderSortableTh('cycleCount', 'LAST CYCLE COUNT')}
+                <th className="vmm-ov-th-why">WHY</th>
               </tr>
             </thead>
             <tbody>
               {sortedRows.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="cc-data-grid-empty-cell">
+                  <td colSpan={10} className="cc-data-grid-empty-cell">
                     No store records available yet.
                   </td>
                 </tr>
@@ -683,6 +694,11 @@ export default function OverviewSection({ onJumpToSection }) {
                     highlightedStore && highlightedStore === String(row.storeCode || '').toUpperCase();
 
                   const issueCount = row.reasons.filter((r) => r.severity !== 'green').length;
+                  const primaryReason = row.reasons[0] || null;
+                  const extraIssueCount = Math.max(
+                    0,
+                    issueCount - (primaryReason && primaryReason.severity !== 'green' ? 1 : 0)
+                  );
                   const reasonsBySection = (sectionKey) =>
                     row.reasons.filter((r) => r.sectionKey === sectionKey);
 
@@ -1100,6 +1116,42 @@ export default function OverviewSection({ onJumpToSection }) {
                           )}
                         </td>
                       )}
+
+                      <td className="vmm-ov-why-cell">
+                        {primaryReason ? (
+                          <button
+                            type="button"
+                            className={`vmm-ov-cell-link vmm-ov-why-pill vmm-ov-why-pill--${primaryReason.severity}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              hideCellReason();
+                              setWhyModalRow(row);
+                            }}
+                          >
+                            <span className="vmm-ov-why-left">
+                              <span
+                                className={`vmm-ov-why-icon vmm-ov-why-icon--${primaryReason.severity}`}
+                                aria-hidden="true"
+                              >
+                                {primaryReason.severity === 'green' ? (
+                                  <Check size={11} strokeWidth={2.8} />
+                                ) : (
+                                  <AlertTriangle size={11} strokeWidth={2.4} />
+                                )}
+                              </span>
+                              <span className="vmm-ov-why-text">{primaryReason.text}</span>
+                            </span>
+                            <span className="vmm-ov-why-end">
+                              {extraIssueCount > 0 && (
+                                <span className="vmm-ov-why-more">+{extraIssueCount}</span>
+                              )}
+                              <ChevronRight size={13} className="vmm-ov-why-chevron" aria-hidden="true" />
+                            </span>
+                          </button>
+                        ) : (
+                          <span className="vmm-ov-muted">—</span>
+                        )}
+                      </td>
                     </tr>
                   );
                 })
@@ -1111,9 +1163,9 @@ export default function OverviewSection({ onJumpToSection }) {
       </section>
 
       {/* Dual Trend Chart + What Needs Attention Insights Row */}
-      {(permissions.sale || permissions.return || attentionItems.length > 0) && (
+      {/* {(permissions.sale || permissions.return) && (
         <section
-          className={`vmm-ov-insights-row${!(permissions.sale || permissions.return) ? ' vmm-ov-insights-row--single' : ''}`}
+          className="vmm-ov-insights-row vmm-ov-insights-row--single"
           aria-label="Trends and operational alerts"
         >
           {(permissions.sale || permissions.return) && (
@@ -1336,6 +1388,75 @@ export default function OverviewSection({ onJumpToSection }) {
             )}
           </div>
         </section>
+      )} */}
+
+      {whyModalRow && createPortal(
+        <div
+          className="vmm-ov-why-modal-backdrop"
+          onClick={() => setWhyModalRow(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${whyModalRow.storeCode} operational reasons`}
+        >
+          <div className="vmm-ov-why-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="vmm-ov-why-modal-head">
+              <div className="vmm-ov-why-modal-title-wrap">
+                <span className="vmm-ov-store-code-badge">{whyModalRow.storeCode}</span>
+                <span className="vmm-ov-why-modal-store-name">
+                  {whyModalRow.storeName || whyModalRow.storeCode}
+                </span>
+                <span
+                  className={`vmm-ov-why-modal-status vmm-ov-why-modal-status--${whyModalRow.statusTier}`}
+                >
+                  {whyModalRow.statusLabel}
+                </span>
+                {whyModalRow.score !== null && (
+                  <span className="vmm-ov-single-score-tag">{whyModalRow.score}/100</span>
+                )}
+              </div>
+              <button
+                type="button"
+                className="vmm-ov-why-modal-close"
+                onClick={() => setWhyModalRow(null)}
+                aria-label="Close reasons modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="vmm-ov-why-modal-list">
+              {whyModalRow.reasons.map((r, idx) => (
+                <button
+                  key={`${r.sectionKey || 'reason'}-${idx}`}
+                  type="button"
+                  className={`vmm-ov-why-modal-item vmm-ov-why-modal-item--${r.severity}`}
+                  onClick={(e) => {
+                    setWhyModalRow(null);
+                    jump(e, r.sectionKey || 'live_stock', whyModalRow.storeCode);
+                  }}
+                >
+                  <span
+                    className={`vmm-ov-why-icon vmm-ov-why-icon--${r.severity}`}
+                    aria-hidden="true"
+                  >
+                    {r.severity === 'green' ? (
+                      <Check size={12} strokeWidth={2.8} />
+                    ) : (
+                      <AlertTriangle size={12} strokeWidth={2.4} />
+                    )}
+                  </span>
+                  <span className="vmm-ov-why-modal-item-text">{r.text}</span>
+                  <ChevronRight size={14} className="vmm-ov-why-chevron" aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+
+            <div className="vmm-ov-why-modal-foot">
+              Click any reason to jump directly to its dashboard module.
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

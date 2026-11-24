@@ -1,3 +1,6 @@
+import axios from 'axios';
+import { getActiveUserId } from './stockService';
+
 /**
  * Loss Prevention & Goods Security API Service
  *
@@ -28,29 +31,8 @@ export function notifyPopoverOpened(source) {
 
 export const DASHBOARD_SYNC_EVENT = LP_EVENTS.DASHBOARD_SYNC;
 
-/**
- * Resolves a Loss Prevention API endpoint URL without colliding with VMM's `/api/*` proxy.
- *
- * - In dev (default): `/lp-api/<endpoint>` -> Vite proxies to `http://172.20.204.238:8080/api/<endpoint>`
- * - With `VITE_LP_API_BASE_URL`: uses the configured base URL (e.g. `http://172.20.204.238:8080` or `/lp-api`)
- */
-function buildLpUrl(endpoint) {
-  const cleanEndpoint = String(endpoint || '').replace(/^\/+/, '');
-  const configured = (import.meta.env?.VITE_LP_API_BASE_URL || '').trim().replace(/\/+$/, '');
-
-  if (configured) {
-    if (configured.endsWith('/api') || configured.endsWith('/lp-api')) {
-      return `${configured}/${cleanEndpoint}`;
-    }
-    return `${configured}/api/${cleanEndpoint}`;
-  }
-
-  if (import.meta.env.DEV) {
-    return `/lp-api/${cleanEndpoint}`;
-  }
-
-  return `http://172.20.204.238:8080/api/${cleanEndpoint}`;
-}
+const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const lossPreventionUrl = `${apiBase}/api/LossPrevention`;
 
 /**
  * Formats numeric or string rupee values consistently using Indian locale formatting.
@@ -173,7 +155,7 @@ export function onDashboardSync(callback) {
 }
 
 /**
- * Normalizes raw `/api/todayDashboard` payload into structured metrics and incidents.
+ * Normalizes raw `/api/LossPrevention/todayDashboard` payload into structured metrics and incidents.
  * @param {Object} data
  * @param {Object} requestBody
  * @returns {Object|null}
@@ -279,7 +261,7 @@ export function normalizeSingleIncident(inc, index = 0) {
 
 /**
  * Fetches today's Loss Prevention dashboard cards and gate alarm incidents.
- * POST /api/todayDashboard
+ * POST /api/LossPrevention/todayDashboard
  */
 export async function fetchDashboardRecord(payload = {}, signal) {
   try {
@@ -307,18 +289,7 @@ export async function fetchDashboardRecord(payload = {}, signal) {
       body.StoreCode = payload.StoreCode || payload.storeCode;
     }
 
-    const response = await fetch(buildLpUrl('todayDashboard'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal,
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const { data } = await axios.post(`${lossPreventionUrl}/todayDashboard`, body, { signal });
     const normalized = normalizeDashboardData(data, body);
     if (normalized) {
       broadcastDashboardSync(normalized);
@@ -333,12 +304,13 @@ export async function fetchDashboardRecord(payload = {}, signal) {
 export const fetchTodayRecord = fetchDashboardRecord;
 
 // ============================================================================
-// Shared Live Check Polling Stream (GET /api/liveCheck)
+// Shared Live Check Polling Stream (GET /api/LossPrevention/liveCheck)
 // ============================================================================
 
 const liveSubscribers = new Set();
 let livePollInterval = null;
-let lastMaxTagId = 0;
+let lastMaxTagId = null;
+let liveScope = null;
 let isCheckingLive = false;
 let currentLiveStatus = 'connecting';
 
@@ -358,20 +330,25 @@ async function pollLiveCheck() {
   if (liveSubscribers.size === 0 || isCheckingLive) return;
   isCheckingLive = true;
 
-  const checkUrl =
-    (import.meta.env?.VITE_LP_LIVE_CHECK_URL || '').trim() || buildLpUrl('liveCheck');
-
   try {
-    const response = await fetch(`${checkUrl}?lastMaxTagId=${lastMaxTagId}`);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const result = await response.json();
+    const store = getSavedStore();
+    const scope = JSON.stringify([getActiveUserId(), store?.storeId, store?.storeCode]);
+    if (liveScope !== scope) {
+      liveScope = scope;
+      lastMaxTagId = null;
+    }
+    const params = { lastMaxTagId: lastMaxTagId ?? 0 };
+    if (store?.storeId) params.storeId = store.storeId;
+    if (store?.storeCode) params.storeCode = store.storeCode;
+    const { data: result } = await axios.get(`${lossPreventionUrl}/liveCheck`, { params });
+    if (liveScope !== scope || liveSubscribers.size === 0) return;
 
     if (currentLiveStatus !== 'connected') {
       currentLiveStatus = 'connected';
       broadcastToSubscribers('status', 'connected');
     }
 
-    if (lastMaxTagId === 0) {
+    if (lastMaxTagId === null) {
       lastMaxTagId = result.maxTagId;
       broadcastToSubscribers('message', { event: 'connected', maxTagId: result.maxTagId });
     } else if (result.hasNew || result.maxTagId > lastMaxTagId) {
@@ -396,7 +373,7 @@ async function pollLiveCheck() {
 }
 
 /**
- * Subscribes to real-time live updates from GET /api/liveCheck.
+ * Subscribes to real-time live updates from GET /api/LossPrevention/liveCheck.
  * Shares a single 2.5s poll loop across all mounted Loss Prevention components
  * and automatically stops polling when all subscribers unmount.
  *
@@ -428,6 +405,7 @@ export function subscribeToLiveStream(onMessage, onError, onStatusChange) {
     if (liveSubscribers.size === 0 && livePollInterval) {
       clearInterval(livePollInterval);
       livePollInterval = null;
+      liveScope = null;
       currentLiveStatus = 'connecting';
     }
   };
@@ -435,7 +413,7 @@ export function subscribeToLiveStream(onMessage, onError, onStatusChange) {
 
 /**
  * Fetches Loss Prevention analytics charts and top stolen articles.
- * POST /api/analyticsDashboard
+ * POST /api/LossPrevention/analyticsDashboard
  */
 export async function fetchAnalyticsDashboard(payload = {}, signal) {
   try {
@@ -473,18 +451,7 @@ export async function fetchAnalyticsDashboard(payload = {}, signal) {
       body.StoreCode = payload.StoreCode || payload.storeCode;
     }
 
-    const response = await fetch(buildLpUrl('analyticsDashboard'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal,
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const { data } = await axios.post(`${lossPreventionUrl}/analyticsDashboard`, body, { signal });
     const summary = data.Summary || data;
     const rawLoss =
       summary.PotentialLossDisplay &&
@@ -552,7 +519,7 @@ export async function fetchAnalyticsDashboard(payload = {}, signal) {
 
 /**
  * Fetches incident report summary with pagination and KPI totals.
- * POST /api/incidentReportSummary (falls back to /api/incidentReport if 404)
+ * POST /api/LossPrevention/incidentReportSummary
  */
 export async function fetchIncidentReportSummary(payload = {}, signal) {
   try {
@@ -581,55 +548,21 @@ export async function fetchIncidentReportSummary(payload = {}, signal) {
       body.EndDate = toDate;
     }
 
-    const storeVal = payload.StoreCode || payload.StoreId;
-    if (storeVal && storeVal !== 'all') {
-      body.StoreCode = String(storeVal);
-    }
+    if (payload.StoreCode) body.StoreCode = String(payload.StoreCode);
     if (payload.StoreId) {
       body.StoreId = Number(payload.StoreId);
     }
 
-    let summaryRes = await fetch(buildLpUrl('incidentReportSummary'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal,
-    }).catch(() => null);
-
-    if (!summaryRes || (!summaryRes.ok && summaryRes.status === 404)) {
-      summaryRes = await fetch(buildLpUrl('incidentReport'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal,
-      });
-    }
-
-    if (!summaryRes.ok) {
-      throw new Error(`API error: ${summaryRes.status} ${summaryRes.statusText}`);
-    }
-
-    const data = await summaryRes.json();
+    const { data } = await axios.post(`${lossPreventionUrl}/incidentReportSummary`, body, { signal });
     let kpiData = null;
     if (!data?.Summary) {
       try {
-        const kpiRes = await fetch(buildLpUrl('incidentReportDetails'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            Preset: body.Preset,
-            FromDate: body.FromDate,
-            ToDate: body.ToDate,
-            StoreCode: body.StoreCode,
-            EventType: rawEventType !== 'All' ? rawEventType : undefined,
-            PageNumber: 1,
-            PageSize: 1,
-          }),
-          signal,
-        });
-        if (kpiRes && kpiRes.ok) {
-          kpiData = await kpiRes.json();
-        }
+        const result = await axios.post(`${lossPreventionUrl}/incidentReportDetails`, {
+          ...body,
+          PageNumber: 1,
+          PageSize: 1,
+        }, { signal });
+        kpiData = result.data;
       } catch (e) {
         console.warn('Failed to fetch fallback Loss Prevention KPI data:', e);
       }
@@ -783,7 +716,7 @@ export async function fetchIncidentReport(payload = {}, signal) {
 
 /**
  * Fetches detailed EPC-level incident report rows.
- * POST /api/incidentReportDetails
+ * POST /api/LossPrevention/incidentReportDetails
  */
 export async function fetchIncidentReportDetails(payload = {}, signal) {
   try {
@@ -805,24 +738,12 @@ export async function fetchIncidentReportDetails(payload = {}, signal) {
       if (toDate) body.ToDate = toDate;
     }
 
-    const storeVal = payload.StoreCode || payload.StoreId;
-    if (storeVal && storeVal !== 'all') body.StoreCode = String(storeVal);
+    if (payload.StoreCode) body.StoreCode = String(payload.StoreCode);
     if (payload.StoreId) body.StoreId = Number(payload.StoreId);
     if (rawEventType && rawEventType !== 'All') body.EventType = rawEventType;
     if (payload.Search) body.Search = payload.Search;
 
-    const response = await fetch(buildLpUrl('incidentReportDetails'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal,
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const { data } = await axios.post(`${lossPreventionUrl}/incidentReportDetails`, body, { signal });
     const summary = data.Summary || {};
     const totalAll = Number(data.TotalAll ?? data.TotalTags ?? summary.TotalTags ?? data.TotalRecords ?? 0);
     const totalTheft = Number(data.TotalTheft ?? data.TotalLoss ?? data.TheftAlerts ?? data.Loss ?? summary.TheftAlerts ?? summary.Loss ?? 0);
@@ -949,74 +870,52 @@ export const DEFAULT_STORES = [
   { id: 12, storeId: 12, storeCode: 'HH45', storeName: 'HH45 - GURGAON SEC-92', displayText: 'HH45 - GURGAON SEC-92', cleanName: 'GURGAON SEC-92', location: 'Gurgaon' },
 ];
 
-let cachedStoresList = null;
-let fetchStoresPromise = null;
+// Revalidate assignments on mount and share simultaneous requests from different views.
+const pendingStoreRequests = new Map();
 
-/**
- * Fetches store list from GET /api/stores.
- * @param {boolean} forceRefresh
- * @returns {Promise<Array<Object>>}
- */
-export async function fetchStores(forceRefresh = false) {
-  if (cachedStoresList && !forceRefresh) {
-    return cachedStoresList;
-  }
-  if (fetchStoresPromise && !forceRefresh) {
-    return fetchStoresPromise;
-  }
+function getStoreCacheKey() {
+  const userId = getActiveUserId();
+  const loginTime = sessionStorage.getItem('vmm_login_time');
+  return userId && loginTime ? `${LP_STORAGE_KEYS.CACHED_STORES}:${userId}:${loginTime}` : null;
+}
 
-  fetchStoresPromise = (async () => {
+export function getCachedStores() {
+  try {
+    const key = getStoreCacheKey();
+    const rows = key && JSON.parse(sessionStorage.getItem(key));
+    return Array.isArray(rows) ? rows : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchStores() {
+  const key = getStoreCacheKey();
+  if (!key) return [];
+  if (pendingStoreRequests.has(key)) return pendingStoreRequests.get(key);
+
+  const request = axios.get(`${lossPreventionUrl}/stores`).then(({ data }) => {
+    const raw = data?.Code === 0 ? [] : (data?.Stores ?? data);
+    const stores = Array.isArray(raw) ? raw.map(normalizeStore).filter(Boolean) : [];
+    if (key !== getStoreCacheKey()) return [];
     try {
-      const response = await fetch(buildLpUrl('stores'), {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data?.Code === 0) {
-        cachedStoresList = [];
-        try {
-          sessionStorage.setItem(LP_STORAGE_KEYS.CACHED_STORES, JSON.stringify([]));
-        } catch {
-          // ignore storage errors
-        }
-        return [];
-      }
-
-      const rawStores = Array.isArray(data?.Stores)
-        ? data.Stores
-        : (Array.isArray(data) ? data : []);
-
-      cachedStoresList = rawStores.map(normalizeStore).filter(Boolean);
-      try {
-        sessionStorage.setItem(LP_STORAGE_KEYS.CACHED_STORES, JSON.stringify(cachedStoresList));
-      } catch {
-        // ignore storage errors
-      }
-      return cachedStoresList;
-    } catch (error) {
-      console.warn('Could not fetch Loss Prevention stores from /api/stores, falling back to cache:', error.message);
-      try {
-        const saved = sessionStorage.getItem(LP_STORAGE_KEYS.CACHED_STORES);
-        if (saved !== null) {
-          cachedStoresList = JSON.parse(saved);
-          return cachedStoresList;
-        }
-      } catch {
-        // ignore storage errors
-      }
-      return [];
-    } finally {
-      fetchStoresPromise = null;
+      sessionStorage.setItem(key, JSON.stringify(stores));
+    } catch {
+      // Storage can be unavailable or full.
     }
-  })();
+    return stores;
+  }).catch((error) => {
+    if (key !== getStoreCacheKey()) return [];
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      sessionStorage.removeItem(key);
+      return [];
+    }
+    console.warn('Could not fetch Loss Prevention stores:', error.message);
+    return getCachedStores() || [];
+  }).finally(() => pendingStoreRequests.delete(key));
 
-  return fetchStoresPromise;
+  pendingStoreRequests.set(key, request);
+  return request;
 }
 
 /**
@@ -1042,8 +941,11 @@ export function getSavedStore() {
       sessionStorage.getItem(LP_STORAGE_KEYS.SELECTED_STORE);
     if (raw) {
       const parsed = JSON.parse(raw);
-      const currentUsername = getCurrentUsername();
-      if (parsed.authUsername && currentUsername && parsed.authUsername !== currentUsername) {
+      const userId = getActiveUserId();
+      const belongsToUser = parsed.authUserId != null
+        ? String(parsed.authUserId) === String(userId)
+        : parsed.authUsername && parsed.authUsername === getCurrentUsername();
+      if (!userId || !belongsToUser) {
         localStorage.removeItem(LP_STORAGE_KEYS.SELECTED_STORE);
         sessionStorage.removeItem(LP_STORAGE_KEYS.SELECTED_STORE);
         return null;
@@ -1062,6 +964,7 @@ export function saveSelectedStore(store) {
     const currentUsername = getCurrentUsername();
     const storeToSave = {
       ...store,
+      authUserId: getActiveUserId(),
       ...(currentUsername ? { authUsername: currentUsername } : {}),
     };
     localStorage.setItem(LP_STORAGE_KEYS.SELECTED_STORE, JSON.stringify(storeToSave));
@@ -1078,9 +981,8 @@ export function clearSavedStore() {
   try {
     localStorage.removeItem(LP_STORAGE_KEYS.SELECTED_STORE);
     sessionStorage.removeItem(LP_STORAGE_KEYS.SELECTED_STORE);
-    sessionStorage.removeItem(LP_STORAGE_KEYS.CACHED_STORES);
-    cachedStoresList = null;
-    fetchStoresPromise = null;
+    const cacheKey = getStoreCacheKey();
+    if (cacheKey) sessionStorage.removeItem(cacheKey);
 
     const resetStore = {
       noStore: true,

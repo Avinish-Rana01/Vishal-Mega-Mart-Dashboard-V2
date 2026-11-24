@@ -6,7 +6,6 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const backendTarget = env.VITE_API_BASE_URL || 'http://localhost:5000'
-  const lpBackendTarget = env.VITE_LP_BACKEND_URL || 'http://172.20.204.238:8080'
 
   return {
     plugins: [react(), tailwindcss()],
@@ -18,12 +17,6 @@ export default defineConfig(({ mode }) => {
           target: backendTarget,
           changeOrigin: true,
           secure: false,
-        },
-        '/lp-api': {
-          target: lpBackendTarget,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/lp-api/, '/api'),
         },
         '/api': {
           target: backendTarget,

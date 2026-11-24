@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useId } from 'react';
 import { Store, Search, ChevronDown, Check, X, MapPin, RefreshCw } from 'lucide-react';
 import {
   fetchStores,
+  getCachedStores,
   DEFAULT_STORES,
   normalizeStore,
   getSavedStore,
@@ -20,13 +21,8 @@ export default function SelectedStore({
   allowAll = false,
 }) {
   const [stores, setStores] = useState(() => {
-    try {
-      const cached = sessionStorage.getItem('lp_cached_stores');
-      if (cached !== null) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch (_) { }
+    const cached = getCachedStores();
+    if (cached) return cached;
     // Only in test environment if no cached stores exist
     if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test') {
       return DEFAULT_STORES;
@@ -59,18 +55,7 @@ export default function SelectedStore({
       return saved;
     }
     // 3. Fallback to cached stores list (first/top store in dropdown)
-    try {
-      const cached = sessionStorage.getItem('lp_cached_stores');
-      if (cached !== null) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed[0];
-        }
-        if (Array.isArray(parsed) && parsed.length === 0) {
-          return { noStore: true, storeName: 'No stores assigned', cleanName: 'No stores assigned' };
-        }
-      }
-    } catch (_) { }
+    if (stores.length > 0) return stores[0];
 
     // 4. In test mode fallback to DEFAULT_STORES[0]
     if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test') {
@@ -145,6 +130,10 @@ export default function SelectedStore({
           }
 
           if (storeToSelect) {
+            if (!propStoreCode && !propStoreName &&
+                (saved?.storeCode !== storeToSelect.storeCode || saved?.storeId !== storeToSelect.storeId)) {
+              saveSelectedStore(storeToSelect);
+            }
             setActiveStore((current) => {
               // If explicit props were provided, keep props
               if (propStoreCode || propStoreName) {
@@ -269,7 +258,7 @@ export default function SelectedStore({
     e.stopPropagation();
     setLoading(true);
     try {
-      const list = await fetchStores(true);
+      const list = await fetchStores();
       if (Array.isArray(list)) {
         setStores(list);
         if (list.length === 0) {
