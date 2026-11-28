@@ -70,11 +70,11 @@ const sortOptions = [
 // ---- Memoized Charts ----
 const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlightedStore }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
-  const minWidth = Math.max(barChartData.length * 76, 360);
+  const needsScroll = barChartData.length > 10;
   return (
-    <div ref={ref} style={{ height: '100%', overflowX: 'auto', minHeight: '240px' }}>
+    <div ref={ref} style={{ height: '100%', overflowX: needsScroll ? 'auto' : 'hidden', minHeight: '240px' }}>
       {hasBeenVisible && (
-        <div style={{ minWidth: `${minWidth}px`, width: '100%', height: '240px' }}>
+        <div style={{ ...(needsScroll ? { minWidth: `${barChartData.length * 64}px` } : {}), width: '100%', height: '240px' }}>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart
               data={barChartData}
@@ -429,7 +429,7 @@ export default function LiveStockSection() {
       </div>
 
       {/* ROW 2 & 3 Flex Container */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', width: '100%' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', width: '100%' }}>
           {/* ROW 2: Store Performance Bar Chart (60% width, positioned right) */}
           <div className="ls-card" style={{ flex: '1.5 1 500px', order: 2, minWidth: 0, margin: 0 }}>
           <ChartToolbar
@@ -560,7 +560,7 @@ export default function LiveStockSection() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart (40% width, positioned left) */}
-        <div className="ls-card" style={{ flex: '1 1 400px', padding: '10px', order: 1, minWidth: 0, margin: 0 }}>
+        <div className="ls-card" style={{ flex: '1 1 330px', padding: '10px', order: 1, minWidth: 0, margin: 0 }}>
           <div className="ls-toolbar-header">
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
               COVERAGE DISTRIBUTION SUMMARY

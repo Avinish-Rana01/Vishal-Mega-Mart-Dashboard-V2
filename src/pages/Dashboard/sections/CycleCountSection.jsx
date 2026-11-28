@@ -121,7 +121,7 @@ const MemoizedChart = React.memo(({ chartData, chartHeight, onBarClick, highligh
 const MemoizedDistributionChart = React.memo(({ distributionData }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
   return (
-    <div ref={ref} style={{ height: '280px', width: '100%', paddingTop: '20px' }}>
+    <div ref={ref} style={{ height: '230px', width: '100%', paddingTop: '8px' }}>
       {hasBeenVisible && (
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={distributionData} margin={{ top: 30, right: 30, left: 20, bottom: 5 }} barSize={45}>
@@ -164,51 +164,130 @@ function CycleInfoTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
   const d = payload[0].payload;
 
-  const netDiff = d.NET_DIFFERENCE || 0;
-  const netColor = netDiff > 0 ? '#10b981' : netDiff < 0 ? '#ef4444' : '#64748b';
+  const sys = Number(d.SYSTEM_STOCK || 0);
+  const scn = Number(d.SCANNED_QTY || 0);
+  const netDiff = Number(d.NET_DIFFERENCE || 0);
+  const accuracy = sys > 0 ? Math.min(100, (scn / sys) * 100) : (scn === 0 ? 100 : 0);
+  const netColor = netDiff > 0 ? '#10B981' : netDiff < 0 ? '#EF5350' : '#64748b';
+  const accColor = accuracy >= 95 ? '#10B981' : accuracy >= 80 ? '#3B82F6' : '#EF5350';
 
   return (
-    <div className="cc-card" style={{ padding: '8px 12px', minWidth: '180px', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
-      <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '6px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div className="cc-info-tooltip">
+      <div className="cc-info-tooltip-head">
         <span>{d.STORE_NAME || d.STORE_CODE}</span>
-        {d.STORE_CODE && d.STORE_CODE !== d.STORE_NAME && (
-          <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{d.STORE_CODE}</span>
+        {d.STORE_CODE && (
+          <span className="cc-info-tooltip-code">{d.STORE_CODE}</span>
         )}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '4px 12px', fontSize: '11px', color: '#475569' }}>
-        <span style={{ color: '#64748b' }}>Articles</span>       <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.NO_OF_ARTICLES || 0}</span>
-        <span style={{ color: '#64748b' }}>Difference</span>     <span style={{ fontWeight: 700, color: netColor }}>{netDiff > 0 ? '+' : ''}{netDiff}</span>
-        <span style={{ color: '#64748b' }}>Short Qty</span>      <span style={{ fontWeight: 700, color: '#ef4444' }}>{Math.abs(d.SHORT_QTY || 0)}</span>
-        <span style={{ color: '#64748b' }}>Excess Qty</span>     <span style={{ fontWeight: 700, color: '#10b981' }}>{d.EXCESS_QTY || 0}</span>
+
+      <div className="cc-info-tooltip-kpis">
+        <div className="cc-info-tooltip-kpi">
+          <span>System</span>
+          <strong style={{ color: '#1E40AF' }}>{sys.toLocaleString('en-IN')}</strong>
+        </div>
+        <div className="cc-info-tooltip-kpi">
+          <span>Scanned</span>
+          <strong style={{ color: '#60A5FA' }}>{scn.toLocaleString('en-IN')}</strong>
+        </div>
+        <div className="cc-info-tooltip-kpi">
+          <span>Accuracy</span>
+          <strong style={{ color: accColor }}>{accuracy.toFixed(1)}%</strong>
+        </div>
+      </div>
+
+      <div className="cc-info-tooltip-grid">
+        <span>Articles</span><strong>{(d.NO_OF_ARTICLES || 0).toLocaleString('en-IN')}</strong>
+        <span>Net Diff</span><strong style={{ color: netColor }}>{netDiff > 0 ? '+' : ''}{netDiff.toLocaleString('en-IN')}</strong>
+        <span>Short Qty</span><strong style={{ color: '#EF5350' }}>{Math.abs(d.SHORT_QTY || 0).toLocaleString('en-IN')}</strong>
+        <span>Excess Qty</span><strong style={{ color: '#10B981' }}>{(d.EXCESS_QTY || 0).toLocaleString('en-IN')}</strong>
+        <span>Duration</span><strong>{d.rawDuration || '—'}</strong>
       </div>
     </div>
   );
 }
 
 // ---- Left Chart: System vs Scanned ----
-const CycleCountStockChart = React.memo(({ chartData, chartHeight, onBarClick }) => {
+const CycleCountStockChart = React.memo(({ chartData, chartHeight, onBarClick, highlightedRow }) => {
   return (
-    <ResponsiveContainer width="100%" height={chartHeight}>
-      <BarChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
-        <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-        <YAxis
-          dataKey="STORE_CODE"
-          type="category"
-          tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
-          axisLine={false}
-          tickLine={false}
-          width={50}
-        />
-        <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.6)' }} />
-        <Bar dataKey="SYSTEM_STOCK" barSize={12} fill="#3b82f6" radius={[4, 4, 4, 4]} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
-          <LabelList dataKey="SYSTEM_STOCK" position="right" fill="#3b82f6" fontSize={11} fontWeight={600} />
-        </Bar>
-        <Bar dataKey="SCANNED_QTY" barSize={12} fill="#10b981" radius={[4, 4, 4, 4]} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
-          <LabelList dataKey="SCANNED_QTY" position="right" fill="#10b981" fontSize={11} fontWeight={600} />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div className="cc-stock-split-body" style={{ height: chartHeight }}>
+      <div className="cc-stock-bars-wrap">
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <BarChart data={chartData} layout="vertical" barGap={2} barCategoryGap="22%" margin={{ top: 4, right: 44, left: 0, bottom: 2 }}>
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#e2e8f0" />
+            <XAxis type="number" tick={{ fontSize: 10.5, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis
+              dataKey="STORE_CODE"
+              type="category"
+              tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 700 }}
+              axisLine={false}
+              tickLine={false}
+              width={52}
+            />
+            <Tooltip content={<CycleInfoTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.7)' }} />
+            <Bar dataKey="SYSTEM_STOCK" barSize={15} fill="#3B82F6" radius={[0, 3, 3, 0]} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
+              {chartData.map((entry, index) => {
+                const isHighlighted = highlightedRow && (
+                  String(highlightedRow).toUpperCase() === String(entry.STORE_CODE || '').toUpperCase() ||
+                  String(highlightedRow) === String(entry.REF_NO || '')
+                );
+                return (
+                  <Cell key={`sys-${index}`} className={isHighlighted ? 'bar-updated-pulse' : ''} />
+                );
+              })}
+              <LabelList
+                dataKey="SYSTEM_STOCK"
+                position="right"
+                fill="#3B82F6"
+                fontSize={11}
+                fontWeight={700}
+                formatter={(v) => Number(v || 0).toLocaleString('en-IN')}
+              />
+            </Bar>
+            <Bar dataKey="SCANNED_QTY" barSize={15} fill="#93C5FD" radius={[0, 3, 3, 0]} isAnimationActive={false} onClick={(data) => onBarClick && onBarClick(data.payload || data)} style={{ cursor: 'pointer' }}>
+              <LabelList
+                dataKey="SCANNED_QTY"
+                position="right"
+                fill="#60A5FA"
+                fontSize={11}
+                fontWeight={700}
+                formatter={(v) => Number(v || 0).toLocaleString('en-IN')}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Right-aligned Accuracy & Net Variance Indicator Strip per Store */}
+      <div className="cc-stock-accuracy-col">
+        {chartData.map((d, i) => {
+          const sys = Number(d.SYSTEM_STOCK || 0);
+          const scn = Number(d.SCANNED_QTY || 0);
+          const net = Number(d.NET_DIFFERENCE || 0);
+          const pct = sys > 0 ? Math.min(100, (scn / sys) * 100) : (scn === 0 ? 100 : 0);
+          const tier = pct >= 95 ? 'green' : pct >= 85 ? 'blue' : 'red';
+          const isHighlighted = highlightedRow && (
+            String(highlightedRow).toUpperCase() === String(d.STORE_CODE || '').toUpperCase() ||
+            String(highlightedRow) === String(d.REF_NO || '')
+          );
+          return (
+            <button
+              key={d.STORE_CODE || i}
+              type="button"
+              className={`cc-stock-acc-row${isHighlighted ? ' row-updated-pulse' : ''}`}
+              onClick={() => onBarClick && onBarClick(d)}
+              title={`${d.STORE_NAME || d.STORE_CODE}: ${pct.toFixed(1)}% scanned (${net > 0 ? '+' : ''}${net} net)`}
+            >
+              <span className={`cc-stock-acc-pill cc-stock-acc-pill--${tier}`}>
+                {pct.toFixed(0)}%
+              </span>
+              <span className={`cc-stock-net-tag ${net < 0 ? 'is-neg' : net > 0 ? 'is-pos' : 'is-zero'}`}>
+                {net === 0 ? 'Exact' : `${net > 0 ? '+' : ''}${net}`}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 });
 
@@ -344,11 +423,17 @@ const CycleCountVarianceChart = React.memo(({ chartData, chartHeight, onBarClick
 
 // ---- Split Layout Wrapper (Now a Tabbed Carousel) ----
 const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab, onBarClick, highlightedRow }) => {
+  const { totalSystem, totalScanned, totalNet, overallAccuracy } = useMemo(() => {
+    const sys = chartData.reduce((acc, r) => acc + Number(r.SYSTEM_STOCK || 0), 0);
+    const scn = chartData.reduce((acc, r) => acc + Number(r.SCANNED_QTY || 0), 0);
+    const net = chartData.reduce((acc, r) => acc + Number(r.NET_DIFFERENCE || 0), 0);
+    const pct = sys > 0 ? Math.min(100, (scn / sys) * 100) : 0;
+    return { totalSystem: sys, totalScanned: scn, totalNet: net, overallAccuracy: pct };
+  }, [chartData]);
+
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-
-
-      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '6px' }}>
         <AnimatePresence mode="wait">
           {activeTab === 'system' ? (
             <motion.div
@@ -359,19 +444,35 @@ const MemoizedCycleSplitCharts = React.memo(({ chartData, chartHeight, activeTab
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               style={{ minWidth: 0 }}
             >
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginBottom: '8px', paddingRight: '16px', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'inline-block' }}></span>
-                    System Stock
+              <div className="cc-info-summary-strip">
+                <div className="cc-info-totals-chips">
+                  <span className="cc-info-chip cc-info-chip--blue">
+                    <span className="cc-info-dot cc-info-dot--blue" />
+                    <span>System:</span>
+                    <strong>{totalSystem.toLocaleString('en-IN')}</strong>
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
-                    Scanned Qty
+                  <span className="cc-info-chip cc-info-chip--sky">
+                    <span className="cc-info-dot cc-info-dot--sky" />
+                    <span>Scanned:</span>
+                    <strong>{totalScanned.toLocaleString('en-IN')}</strong>
+                  </span>
+                  <span className="cc-info-chip cc-info-chip--slate">
+                    <span>Match:</span>
+                    <strong>{overallAccuracy.toFixed(1)}%</strong>
+                  </span>
+                  <span className={`cc-info-chip ${totalNet < 0 ? 'cc-info-chip--red' : 'cc-info-chip--green'}`}>
+                    <span>Net:</span>
+                    <strong>{totalNet > 0 ? '+' : ''}{totalNet.toLocaleString('en-IN')}</strong>
                   </span>
                 </div>
+                <span className="cc-info-col-hint">Accuracy / Net</span>
               </div>
-              <CycleCountStockChart chartData={chartData} chartHeight={chartHeight} onBarClick={onBarClick} />
+              <CycleCountStockChart
+                chartData={chartData}
+                chartHeight={chartHeight}
+                onBarClick={onBarClick}
+                highlightedRow={highlightedRow}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -418,7 +519,7 @@ export default function CycleCountSection() {
   const [searchFilter, setSearchFilter] = useSessionState('cc_search_filter', '');
   const [sortBy, setSortBy] = useSessionState('cc_sort_by', 'DURATION_DESC');
   const [tableSort, setTableSort] = useSessionState('cc_table_sort', 'latest');
-  const [chartView, setChartView] = useSessionState('cc_chart_view', 'store');
+  const [chartView, setChartView] = useSessionState('cc_chart_view', 'info');
   const [infoTab, setInfoTab] = useSessionState('cc_info_tab', 'system');
 
   // Single source of filtered data for both chart and table
@@ -450,21 +551,21 @@ export default function CycleCountSection() {
 
   // Distribution data: categorize durations into 3 buckets (ignores search/sort)
   const distributionData = useMemo(() => {
-    let under4 = 0;
-    let between4and8 = 0;
-    let over8 = 0;
+    let under2 = 0;
+    let between2and4 = 0;
+    let over4 = 0;
 
     (metrics.parsedData || []).forEach(row => {
       if (row.durationMins == null) return;
-      if (row.durationMins < 4 * 60) under4++;
-      else if (row.durationMins <= 8 * 60) between4and8++;
-      else over8++;
+      if (row.durationMins < 2 * 60) under2++;
+      else if (row.durationMins <= 4 * 60) between2and4++;
+      else over4++;
     });
 
     return [
-      { name: '< 4 Hours', count: under4, fill: 'url(#colorGreen)' },
-      { name: '4 - 8 Hours', count: between4and8, fill: 'url(#colorBlue)' },
-      { name: '> 8 Hours', count: over8, fill: 'url(#colorRed)' }
+      { name: '< 2 Hours', count: under2, fill: 'url(#colorGreen)' },
+      { name: '2 - 4 Hours', count: between2and4, fill: 'url(#colorBlue)' },
+      { name: '> 4 Hours', count: over4, fill: 'url(#colorRed)' }
     ];
   }, [metrics.parsedData]);
 
@@ -493,7 +594,7 @@ export default function CycleCountSection() {
 
   const chartHeight = chartView === 'store'
     ? Math.max(250, chartData.length * 30)
-    : Math.max(280, chartData.length * 44);
+    : Math.max(280, chartData.length * 48);
 
 
 
@@ -640,7 +741,10 @@ export default function CycleCountSection() {
         />
 
         {/* Chart */}
-        <div className="cc-chart-scroll">
+        <div
+          className="cc-chart-scroll"
+          style={chartView === 'distribution' ? { overflow: 'hidden' } : undefined}
+        >
           {chartView === 'store' ? (
             chartData.length === 0 ? (
               <SearchEmptyState 
