@@ -82,6 +82,10 @@ export default function App() {
             >
               <Route path="/" element={<HomeRedirect />} />
               <Route path="/dashboard" element={<DashboardRoute />} />
+              <Route path="/loss-prevention" element={<Navigate to="/loss-prevention/dashboard" replace />} />
+              <Route path="/loss-prevention/dashboard" element={<DashboardRoute />} />
+              <Route path="/loss-prevention/analytics" element={<DashboardRoute />} />
+              <Route path="/loss-prevention/reports" element={<DashboardRoute />} />
               <Route path="/dashboard-old" element={<DashboardOldPage />} />
 
               {/* Reports Module */}

@@ -70,42 +70,50 @@ const sortOptions = [
 // ---- Memoized Charts ----
 const MemoizedLiveStockChart = React.memo(({ barChartData, onBarClick, highlightedStore }) => {
   const [ref, hasBeenVisible] = useIsInViewport();
-  const height = Math.max(barChartData.length * 28, 240);
+  const needsScroll = barChartData.length > 10;
   return (
-    <div ref={ref} style={{ height: '100%', overflowY: 'auto', paddingRight: '10px', minHeight: '240px' }}>
+    <div ref={ref} style={{ height: '100%', overflowX: needsScroll ? 'auto' : 'hidden', minHeight: '240px' }}>
       {hasBeenVisible && (
-        <ResponsiveContainer width="100%" height={height}>
-          <BarChart
-            layout="vertical"
-            data={barChartData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-          >
-            <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={60}
-              tick={{ fontSize: 13, fill: '#475569', fontWeight: 600 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <RechartsTooltip
-              cursor={{ fill: '#f1f5f9' }}
-              content={<StoreBarTooltip />}
-            />
+        <div style={{ ...(needsScroll ? { minWidth: `${barChartData.length * 64}px` } : {}), width: '100%', height: '240px' }}>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart
+              data={barChartData}
+              barGap={4}
+              barCategoryGap="24%"
+              margin={{ top: 8, right: 16, left: 0, bottom: 10 }}
+            >
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: '#475569', fontWeight: 600 }}
+                dy={4}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                type="number"
+                width={48}
+                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <RechartsTooltip
+                cursor={{ fill: '#f1f5f9' }}
+                content={<StoreBarTooltip />}
+              />
 
-            {/* Stacked bars: RFID on left, Difference on right */}
-            <Bar dataKey="RFID" stackId="a" fill="url(#blue-gradient)" barSize={20} radius={[4, 0, 0, 4]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800}>
-              {barChartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-rfid-${index}`} 
-                  className={highlightedStore && highlightedStore === entry.name ? 'bar-updated-pulse' : ''}
-                />
-              ))}
-            </Bar>
-            <Bar dataKey="Difference" stackId="a" fill="#ef5350" stroke="#e2e8f0" barSize={20} radius={[0, 4, 4, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
-          </BarChart>
-        </ResponsiveContainer>
+              {/* Grouped vertical bars: RFID (blue) and Difference (red) */}
+              <Bar dataKey="RFID" fill="url(#blue-gradient)" barSize={18} radius={[4, 4, 0, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800}>
+                {barChartData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-rfid-${index}`} 
+                    className={highlightedStore && highlightedStore === entry.name ? 'bar-updated-pulse' : ''}
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Difference" fill="#EF5350" barSize={18} radius={[4, 4, 0, 0]} cursor="pointer" onClick={onBarClick} isAnimationActive={true} animationDuration={800} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   );
@@ -421,7 +429,7 @@ export default function LiveStockSection() {
       </div>
 
       {/* ROW 2 & 3 Flex Container */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', width: '100%' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', width: '100%' }}>
           {/* ROW 2: Store Performance Bar Chart (60% width, positioned right) */}
           <div className="ls-card" style={{ flex: '1.5 1 500px', order: 2, minWidth: 0, margin: 0 }}>
           <ChartToolbar
@@ -552,7 +560,7 @@ export default function LiveStockSection() {
         </div>
 
         {/* ROW 3: Coverage Distribution Donut Chart (40% width, positioned left) */}
-        <div className="ls-card" style={{ flex: '1 1 400px', padding: '10px', order: 1, minWidth: 0, margin: 0 }}>
+        <div className="ls-card" style={{ flex: '1 1 330px', padding: '10px', order: 1, minWidth: 0, margin: 0 }}>
           <div className="ls-toolbar-header">
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e3a8a', textTransform: 'uppercase', marginRight: '10px' }}>
               COVERAGE DISTRIBUTION SUMMARY

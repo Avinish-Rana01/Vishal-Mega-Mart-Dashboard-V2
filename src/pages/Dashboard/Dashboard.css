@@ -1,10 +1,11 @@
 .vmm-dashboard-body-v2 {
-  /* padding: 24px; */
   background-color: #eceef0;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  padding: 13px 10px;
-  
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .vmm-dashboard-stack {
@@ -21,6 +22,7 @@
   padding: 11px;
   border-radius: 14px;
   background-color: #ffffff;
+  scroll-margin-top: 12px;
 }
 .ls-grid2 {
   display: grid;
@@ -36,10 +38,6 @@
 }
 
 @media (max-width: 767px) {
-  .vmm-dashboard-body-v2 {
-    padding: 8px 6px;
-  }
-
   .vmm-dashboard-stack {
     padding: 8px;
     border-radius: 12px;
@@ -58,5 +56,186 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Dashboard Chrome-Style Curved Tab Bar + Independent Scroll Area Below
+   ========================================================================== */
+.vmm-dash-tabs-bar {
+  flex-shrink: 0;
+  z-index: 40;
+  padding: 2px 9px 0 9px;
+  background: #ffffff;
+}
+
+.vmm-dash-scroll-area {
+  flex: 1;
+  min-height: 0;
+  margin-top: 10px;
+  overflow-y: auto;
+  padding: 2px 10px 12px 10px;
+}
+
+.vmm-dash-tabs-list {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.vmm-dash-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.vmm-dash-tab-btn {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 10px 10px 0 0;
+  padding: 7px 13px 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.vmm-dash-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vmm-dash-tab-btn::before {
+  content: '';
+  position: absolute;
+  inset: 2px 2px 5px 2px;
+  z-index: -1;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+.vmm-dash-tab-btn::after {
+  content: '';
+  position: absolute;
+  right: -2.5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 14px;
+  background: #cbd5e1;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.vmm-dash-tab-btn:last-of-type::after,
+.vmm-dash-tab-btn.is-active::after,
+.vmm-dash-tab-btn:hover::after,
+.vmm-dash-tab-btn:has(+ .vmm-dash-tab-btn.is-active)::after,
+.vmm-dash-tab-btn:has(+ .vmm-dash-tab-btn:hover)::after {
+  opacity: 0;
+}
+
+.vmm-dash-tab-btn:not(.is-active):hover {
+  color: #0284c7;
+}
+
+.vmm-dash-tab-btn:not(.is-active):hover::before {
+  opacity: 1;
+}
+
+.vmm-dash-tab-btn.is-active {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Sliding Chrome folder shape with outward concave bottom curves */
+.vmm-dash-tab-indicator {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #eceef0;
+  border-radius: 10px 10px 0 0;
+  pointer-events: none;
+  will-change: transform, width;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.15s ease;
+}
+
+.vmm-dash-tab-indicator::before,
+.vmm-dash-tab-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+
+.vmm-dash-tab-indicator::before {
+  left: -10px;
+  background: radial-gradient(circle at 0 0, transparent 10px, #eceef0 10.5px);
+}
+
+.vmm-dash-tab-indicator::after {
+  right: -10px;
+  background: radial-gradient(circle at 100% 0, transparent 10px, #eceef0 10.5px);
+}
+
+.vmm-dash-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vmm-dash-tab-panel--hidden {
+  display: none;
+}
+
+.vmm-dash-empty-tab {
+  min-height: 360px;
+  display: flex;
+}
+
+@media (max-width: 767px) {
+  .vmm-dash-tabs-bar {
+    padding: 2px 2px 0 2px;
+  }
+
+  .vmm-dash-scroll-area {
+    margin-top: 7px;
+    padding: 1px 6px 8px 6px;
+  }
+
+  .vmm-dash-tabs-list {
+    gap: 2px;
+    padding: 0 8px;
+  }
+
+  .vmm-dash-tab-btn {
+    padding: 6px 10px 7px 10px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
 }
 

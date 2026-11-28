@@ -21,7 +21,7 @@ export const useAuth = () => {
 };
 
 export const DASHBOARD_SECTIONS = [
-  'live_stock', 'cycle_count', 'store_validation', 'sale',
+  'overview', 'live_stock', 'cycle_count', 'store_validation', 'sale',
   'void', 'return', 'dc_validation', 'dc_encoding',
   'tag_management', 'vendor_discrepancy'
 ];
@@ -234,21 +234,39 @@ export const AuthProvider = ({ children }) => {
 
     // Super Admin has access to all other standard sections
     if (role === 'Super Admin') return true;
+
+    // Explicit Overview section permission (strictly excluded from Dispatch Admin, Tag Admin, Developer)
+    if (sectionKey === 'overview') {
+      if (role === 'Dispatch Admin' || role === 'Tag Admin' || role === 'Developer') return false;
+      if (Array.isArray(allowedSections) && allowedSections.length > 0) {
+        if (allowedSections.includes('overview')) return true;
+        // Graceful fallback for active sessions created prior to explicit 'overview' key rollout
+        return DASHBOARD_SECTIONS.some((k) => k !== 'overview' && allowedSections.includes(k));
+      }
+      return [
+        'Store Admin', 'Store User', 'Store', 'LP', 'ZFM', 'Area Manager',
+        'Warehouse Admin', 'WH Admin', 'Warehouse User', 'Warehouse', 'WH', 'WH User'
+      ].includes(role);
+    }
+
     if (Array.isArray(allowedSections) && allowedSections.length > 0) {
       return allowedSections.includes(sectionKey);
     }
     // Fallback based on userRole if allowedSections array is not yet present
     if (role === 'Store Admin') {
-      return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status', 'get_sap_stock_take', 'user_registration', 'floor_registration'].includes(sectionKey);
+      return ['overview', 'live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status', 'get_sap_stock_take', 'user_registration', 'floor_registration'].includes(sectionKey);
     }
     if (role === 'Store User' || role === 'Store') {
-      return ['live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status'].includes(sectionKey);
+      return ['overview', 'live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status'].includes(sectionKey);
+    }
+    if (role === 'LP' || role === 'ZFM' || role === 'Area Manager') {
+      return ['overview', 'live_stock', 'cycle_count', 'store_validation', 'sale', 'void', 'return', 'store_counter_status', 'get_sap_stock_take'].includes(sectionKey);
     }
     if (role === 'Warehouse Admin' || role === 'WH Admin') {
-      return ['dc_validation', 'dc_encoding', 'tag_management', 'vendor_discrepancy', 'user_registration'].includes(sectionKey);
+      return ['overview', 'dc_validation', 'dc_encoding', 'tag_management', 'vendor_discrepancy', 'user_registration'].includes(sectionKey);
     }
     if (role === 'Warehouse User' || role === 'Warehouse' || role === 'WH' || role === 'WH User') {
-      return ['dc_validation', 'dc_encoding'].includes(sectionKey);
+      return ['overview', 'dc_validation', 'dc_encoding'].includes(sectionKey);
     }
     if (role === 'Dispatch Admin') {
       return ['dispatch_tracking', 'picklist_creation'].includes(sectionKey);

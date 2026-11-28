@@ -1,3 +1,6 @@
+/* Establish cascade layer order so Tailwind utilities override base resets without affecting unlayered VMM styles */
+@layer theme, base, components, utilities;
+
 /* Global Base & Typography */
 :root {
   --primary-blue: #3b82f6;
@@ -17,10 +20,12 @@
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html, body, #root {

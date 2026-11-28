@@ -213,7 +213,7 @@
   justify-content: center;
   min-width: 0;
   gap: 2px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .vmm-brand-title {

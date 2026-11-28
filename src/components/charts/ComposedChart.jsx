@@ -12,6 +12,7 @@ import {
   Cell,
   LabelList
 } from 'recharts';
+import { useIsInViewport } from '../../hooks/useIsInViewport';
 
 /**
  * ComposedChart - A reusable chart combining bars and lines on dual axes.
@@ -41,6 +42,7 @@ export default function ComposedChart({
   xAxisAngle = 0,
   margin
 }) {
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
   const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 767);
 
   React.useEffect(() => {
@@ -106,8 +108,9 @@ export default function ComposedChart({
   };
 
   return (
-    <div style={{ width: '100%', height }}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div ref={containerRef} style={{ width: '100%', height }}>
+      {hasBeenVisible && (
+        <ResponsiveContainer width="100%" height="100%">
         <RechartsComposedChart
           data={data}
           margin={
@@ -233,6 +236,7 @@ export default function ComposedChart({
           
         </RechartsComposedChart>
       </ResponsiveContainer>
+      )}
     </div>
   );
 }

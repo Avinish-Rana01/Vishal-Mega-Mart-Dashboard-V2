@@ -36,9 +36,9 @@ body.vmm-edit-mode-active .vmm-sidebar {
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  top: 50%;
+  top: -6px;
   left: 100%;
-  transform: translateY(-50%) translateX(8px);
+  transform: translateX(8px);
   background-color: #ffffff;
   color: #1e293b;
   min-width: 215px;
@@ -55,7 +55,7 @@ body.vmm-edit-mode-active .vmm-sidebar {
 .vmm-nav-tooltip.hover-visible {
   visibility: visible;
   opacity: 1;
-  transform: translateY(-50%) translateX(14px);
+  transform: translateX(14px);
   pointer-events: auto;
 }
 

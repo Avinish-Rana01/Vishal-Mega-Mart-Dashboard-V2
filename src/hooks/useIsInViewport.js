@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 /**
  * Custom Hook: useIsInViewport
  * Triggers hasBeenVisible strictly when the element enters the visible screen viewport.
+ * Once visible, stays true forever (never re-hides chart) so charts animate smoothly on reveal.
  */
 export function useIsInViewport(options = { rootMargin: '0px', threshold: 0.15 }) {
   const [hasBeenVisible, setHasBeenVisible] = useState(false);

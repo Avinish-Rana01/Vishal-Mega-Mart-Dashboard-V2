@@ -70,6 +70,18 @@ axios.interceptors.request.use((config) => {
 // Dashboard APIs
 // ==============================================================
 
+export const getDashboardOverview = async (searchQuery = '', signal) => {
+  const response = await axios.get(`${API_BASE}/api/stock/overview`, {
+    params: {
+      searchTerm: searchQuery || '',
+      userId: getActiveUserId()
+    },
+    headers: getHeaders(),
+    signal
+  });
+  return response.data;
+};
+
 export const getLiveStock = async (searchQuery = '', pageIndex = 1, pageSize = 100, signal) => {
   const term = encodeURIComponent(searchQuery || '');
   const response = await axios.get(`${API_BASE}/api/stock/live-details?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${term}&userId=${getActiveUserId()}`, {

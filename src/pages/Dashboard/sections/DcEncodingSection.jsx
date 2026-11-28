@@ -18,6 +18,16 @@ import './CycleCountShared.css'; // For cc-container, cc-kpi-row, etc.
 import * as Icons from 'lucide-react';
 
 
+// Custom RFID Icon matching LiveStockSection
+const RfidIcon = ({ size = 24, strokeWidth = 2, color = "currentColor", ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M4 9a10 10 0 0 1 16 0" />
+    <path d="M7 13a6 6 0 0 1 10 0" />
+    <path d="M10 17a2 2 0 0 1 4 0" />
+    <text x="12" y="23" fontSize="6" fontWeight="800" textAnchor="middle" fill={color} stroke="none">RFID</text>
+  </svg>
+);
+
 export default function DcEncodingSection() {
   const navigate = useNavigate();
   const { chartData: apiData, isLoading, isRefreshing, error, highlightedBlock, connectionStatus } = useWarehouseEncoding();
@@ -146,7 +156,7 @@ export default function DcEncodingSection() {
       <SectionHeader 
         title="DC Encoding" 
         subtitle="Overview of hourly tag encoding in the Distribution Center"
-        icon={<Icons.Barcode size={44} color="#3b82f6" strokeWidth={2.2} />}
+        icon={<RfidIcon size={44} color="#3B82F6" strokeWidth={2.2} />}
         rightContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className={`live-sync-pill ${connectionStatus || 'connecting'}`} title={`Real-time sync: ${connectionStatus}`}>

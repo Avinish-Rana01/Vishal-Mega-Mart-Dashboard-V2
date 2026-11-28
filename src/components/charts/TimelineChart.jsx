@@ -23,6 +23,8 @@ export default function TimelineChart({
   height = 250,
   tooltipLabel = 'Count',
 }) {
+  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
+
   if (!data || data.length === 0) {
     return (
       <div style={{
@@ -47,8 +49,6 @@ export default function TimelineChart({
     name: d[labelKey],
     [dataKey]: Number(d[dataKey]) || 0,
   }));
-
-  const [containerRef, hasBeenVisible] = useIsInViewport({ threshold: 0.1 });
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: height }}>

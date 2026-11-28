@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
+  getDashboardOverview,
   getLiveStock,
   getCycleCount,
   getVendorDiscrepancy,
@@ -1369,4 +1370,222 @@ export const useWarehouseEncoding = () => {
   }, [refresh]);
 
   return { data, chartData, isLoading, isRefreshing, error, fromDate, setFromDate, toDate, setToDate, refresh, highlightedBlock, connectionStatus };
+};
+
+// ==========================================
+// 11. Executive Overview (Enhanced with Real-Time Delta Patches & SignalR)
+// ==========================================
+const recomputeOverviewSummaryFromStores = (stores = [], prevSummary = {}, patchSummary = null) => {
+  let sap = 0;
+  let rfid = 0;
+  let dpos = 0;
+  let rfidSale = 0;
+  let taffeta = 0;
+  let manual = 0;
+  let huVal = 0;
+  let hhtVal = 0;
+  let storePend = 0;
+  let huWrong = 0;
+  let voidQty = 0;
+  let voidPend = 0;
+  let retQty = 0;
+  let retPend = 0;
+  let dcProc = 0;
+  let dcUnproc = 0;
+  let red = 0;
+  let amber = 0;
+  let green = 0;
+
+  stores.forEach((r) => {
+    const cov = r.coveragePct !== null && r.coveragePct !== undefined ? Number(r.coveragePct) : null;
+    if (r.hasLiveStock && cov !== null) {
+      if (cov < 50) red += 1;
+      else if (cov <= 90) amber += 1;
+      else green += 1;
+    }
+    sap += Number(r.sapStock || 0);
+    rfid += Number(r.rfidStock || 0);
+    dpos += Number(r.totalDposSale || 0);
+    rfidSale += Number(r.totalRfidCheckout || 0);
+    taffeta += Number(r.totalTaffetaSale || 0);
+    manual += Number(r.totalManualSale || 0);
+    huVal += Number(r.huValidatedQty || 0);
+    hhtVal += Number(r.hhtValidateQty || 0);
+    storePend += Number(r.storePendingQty || 0);
+    huWrong += Number(r.huWrongQty || 0);
+    voidQty += Number(r.voidQty || 0);
+    voidPend += Number(r.voidPendingQty || 0);
+    retQty += Number(r.returnQty || 0);
+    retPend += Number(r.returnPendingQty || 0);
+    dcProc += Number(r.dcProcessedHu || 0);
+    dcUnproc += Number(r.dcUnprocessedHu || 0);
+  });
+
+  const taggedDenom = (rfidSale + manual) > 0
+    ? (rfidSale + manual)
+    : Math.max(0, dpos - taffeta);
+
+  return {
+    ...prevSummary,
+    ...(patchSummary ? {
+      dcEncodedToday: patchSummary.dcEncodedToday ?? prevSummary.dcEncodedToday,
+      dcEncodingErrors: patchSummary.dcEncodingErrors ?? prevSummary.dcEncodingErrors,
+      dcEncodingErrorPct: patchSummary.dcEncodingErrorPct ?? prevSummary.dcEncodingErrorPct,
+      dcEncodeDate: patchSummary.dcEncodeDate ?? prevSummary.dcEncodeDate,
+    } : {}),
+    storesCount: (red + amber + green) || stores.length,
+    storesRed: red,
+    storesAmber: amber,
+    storesGreen: green,
+    sapStock: sap,
+    rfidStock: rfid,
+    coveragePct: sap > 0 ? Math.round((rfid * 10000) / sap) / 100 : 0,
+    dposSale: dpos,
+    rfidCheckout: rfidSale,
+    taffetaSale: taffeta,
+    manualSale: manual,
+    checkoutPct: dpos > 0 ? Math.round((rfidSale * 10000) / dpos) / 100 : 0,
+    taggedCapturePct: taggedDenom > 0 ? Math.min(100, Math.round((rfidSale * 10000) / taggedDenom) / 100) : 0,
+    huValidatedQty: huVal,
+    hhtValidateQty: hhtVal,
+    storePendingQty: storePend,
+    huWrongQty: huWrong,
+    voidQty,
+    voidPendingQty: voidPend,
+    returnQty: retQty,
+    returnPendingQty: retPend,
+    dcProcessedHu: dcProc,
+    dcUnprocessedHu: dcUnproc,
+  };
+};
+
+export const useDashboardOverview = () => {
+  const [rawData, setRawData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const [highlightedStore, setHighlightedStore] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
+
+  const refresh = useCallback(() => {
+    setRefreshTick((n) => n + 1);
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let mounted = true;
+
+    const loadOverview = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const result = await getDashboardOverview('', controller.signal);
+        if (!mounted || controller.signal.aborted) return;
+        setRawData(result || null);
+      } catch (err) {
+        if (!mounted || err.name === 'AbortError' || err.name === 'CanceledError' || err.code === 'ERR_CANCELED') {
+          return;
+        }
+        setError(err.message || 'Unable to load executive overview');
+      } finally {
+        if (mounted && !controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadOverview();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, [refreshTick]);
+
+  // Connect SignalR as soon as initial HTTP load completes
+  useEffect(() => {
+    if (!isLoading && connectionStatus === 'disconnected') {
+      liveStockSocket.connect();
+    }
+  }, [isLoading, connectionStatus]);
+
+  // Subscribe to SignalR live status & ReceiveOverviewPatch deltas
+  useEffect(() => {
+    let highlightTimer = null;
+
+    const unsubStatus = liveStockSocket.onStatusChange((status) => {
+      setConnectionStatus(status);
+    });
+
+    const unsubPatch = liveStockSocket.onOverviewPatch((patch) => {
+      if (!patch) return;
+      const isSuper = isCurrentUserSuperAdmin();
+
+      setRawData((prev) => {
+        if (!prev) return prev;
+
+        let nextStores = Array.isArray(prev.stores) ? prev.stores : [];
+        const patchCode = String(patch.storeCode || patch.store?.storeCode || '').trim().toUpperCase();
+
+        if (patch.isRemoved && patchCode) {
+          nextStores = nextStores.filter(
+            (r) => String(r.storeCode || '').trim().toUpperCase() !== patchCode
+          );
+        } else if (patch.store && patchCode) {
+          let found = false;
+          nextStores = nextStores.map((r) => {
+            if (String(r.storeCode || '').trim().toUpperCase() === patchCode) {
+              found = true;
+              return patch.store;
+            }
+            return r;
+          });
+          if (!found) {
+            nextStores = [patch.store, ...nextStores];
+          }
+        }
+
+        const isWarehouseUser = prev.roleScope === 'warehouse_user';
+        const allowVendorPatch = isSuper || prev.roleScope === 'warehouse_admin';
+
+        let nextSummary = prev.summary || {};
+        if (isSuper && patch.summaryDelta) {
+          nextSummary = patch.summaryDelta;
+        } else if (patch.isRemoved || patch.store || patch.summaryDelta) {
+          nextSummary = recomputeOverviewSummaryFromStores(
+            nextStores,
+            nextSummary,
+            isWarehouseUser ? null : patch.summaryDelta
+          );
+        }
+
+        return {
+          ...prev,
+          stores: nextStores,
+          summary: nextSummary,
+          dailyTrends: Array.isArray(patch.dailyTrendsDelta) ? patch.dailyTrendsDelta : prev.dailyTrends,
+          topVendorDiscrepancy:
+            allowVendorPatch && patch.topVendorDiscrepancyDelta !== undefined && patch.topVendorDiscrepancyDelta !== null
+              ? patch.topVendorDiscrepancyDelta
+              : prev.topVendorDiscrepancy,
+        };
+      });
+
+      const changedCode = patch.storeCode || patch.store?.storeCode;
+      if (changedCode && !patch.isRemoved) {
+        setHighlightedStore(String(changedCode).trim().toUpperCase());
+        if (highlightTimer) clearTimeout(highlightTimer);
+        highlightTimer = setTimeout(() => {
+          setHighlightedStore(null);
+        }, 1400);
+      }
+    });
+
+    return () => {
+      unsubStatus();
+      unsubPatch();
+      if (highlightTimer) clearTimeout(highlightTimer);
+    };
+  }, []);
+
+  return { rawData, isLoading, error, refresh, highlightedStore, connectionStatus };
 };

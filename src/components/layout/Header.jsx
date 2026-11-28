@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { User, LogOut, Menu, KeyRound, Shield, Store, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { APP_INFO } from '../../config/constants';
+import { clearDashboardReturnPoint, getDashboardScrollContainer } from '../../utils/dashboardNavigationMemory';
 import ChangePasswordModal from '../modals/ChangePasswordModal';
 import { DiwaliHeaderDecorations } from '../festive/DiwaliTheme';
+import vmmLogoIcon from '../../assets/vmm-icon.svg';
 import './Header.css';
 
 export default function Header({ 
-  breadcrumb = 'HOME - PAGES - DASHBOARD',
+  breadcrumb = null,
   showBackButton = false,
   onBackClick,
   onMenuClick 
@@ -17,7 +19,21 @@ export default function Header({
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { loggedInUser, userRole, userType, storeName, storeCode, warehouseName, warehouseCode, hasDashboardAccess, getDefaultRoute, logout } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const handleBrandClick = () => {
+    clearDashboardReturnPoint();
+    const targetRoute = hasDashboardAccess ? '/dashboard' : getDefaultRoute();
+    if (location.pathname !== targetRoute) {
+      navigate(targetRoute);
+    } else if (targetRoute === '/dashboard') {
+      const container = getDashboardScrollContainer();
+      if (container) {
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -113,7 +129,14 @@ export default function Header({
   const locationType = (storeName || storeCode) ? 'Store' : ((warehouseName || warehouseCode) ? 'Warehouse' : 'Assigned');
 
   return (
-    <header className="vmm-top-header" style={{ position: 'relative', zIndex: 1000 }}>
+    <header
+      className={`vmm-top-header${!breadcrumb ? ' vmm-top-header--no-breadcrumb' : ''}`}
+      style={{
+        position: 'relative',
+        zIndex: 1000,
+        ...(!breadcrumb ? { height: '36px', alignItems: 'flex-start', paddingTop: '6px' } : {}),
+      }}
+    >
       <DiwaliHeaderDecorations />
       <div className="vmm-brand-section">
         {onMenuClick && (
@@ -137,30 +160,46 @@ export default function Header({
           </button>
         )}
         <div className="vmm-brand-text">
-          <h1 className="vmm-brand-title" style={{
-            background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            display: 'inline-block'
-          }}>
-            {APP_INFO.TITLE}
-          </h1>
-          <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
-            {typeof breadcrumb === 'string' ? (
-              breadcrumb.split(/\s*-\s*/).map((part, idx, arr) => (
-                <React.Fragment key={idx}>
-                  <span className={idx === arr.length - 1 ? 'active' : ''}>{part}</span>
-                  {idx < arr.length - 1 && <span className="vmm-breadcrumb-sep">-</span>}
-                </React.Fragment>
-              ))
-            ) : (
-              breadcrumb
-            )}
-          </div>
+          <button
+            type="button"
+            className="vmm-brand-title-row vmm-brand-home-btn"
+            onClick={handleBrandClick}
+            title="Go to Dashboard"
+            aria-label="Vishal Mega Mart Home"
+          >
+            <img
+              src={vmmLogoIcon}
+              alt="Vishal Mega Mart logo"
+              className="vmm-brand-logo-icon"
+            />
+            <h1 className="vmm-brand-title" style={{
+              background: 'linear-gradient(90deg, #1e3a8a, #3b82f6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block'
+            }}>
+              {APP_INFO.TITLE}
+            </h1>
+          </button>
+          {breadcrumb && (
+            <div className="vmm-breadcrumbs" title={typeof breadcrumb === 'string' ? breadcrumb : undefined}>
+              {typeof breadcrumb === 'string' ? (
+                breadcrumb.split(/\s*-\s*/).map((part, idx, arr) => (
+                  <React.Fragment key={idx}>
+                    <span className={idx === arr.length - 1 ? 'active' : ''}>{part}</span>
+                    {idx < arr.length - 1 && <span className="vmm-breadcrumb-sep">-</span>}
+                  </React.Fragment>
+                ))
+              ) : (
+                breadcrumb
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="vmm-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
+        <div id="vmm-header-module-slot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} />
         <div className="vmm-header-user" ref={dropdownRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1001 }}>
           {showBackButton && (
             <button
